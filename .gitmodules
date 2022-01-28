@@ -1,0 +1,3 @@
+[submodule "submodules/fanzone-smart-contracts"]
+	path = submodules/fanzone-smart-contracts
+	url = https://github.com/fanzone-media/fanzone-smart-contracts.git
