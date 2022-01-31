@@ -1,0 +1,43 @@
+{
+  "files": {
+    "main.css": "/up/static/css/main.713700ca.chunk.css",
+    "main.js": "/up/static/js/main.4f3384e2.chunk.js",
+    "main.js.map": "/up/static/js/main.4f3384e2.chunk.js.map",
+    "runtime-main.js": "/up/static/js/runtime-main.fd9f2dd8.js",
+    "runtime-main.js.map": "/up/static/js/runtime-main.fd9f2dd8.js.map",
+    "static/js/2.fbd74834.chunk.js": "/up/static/js/2.fbd74834.chunk.js",
+    "static/js/2.fbd74834.chunk.js.map": "/up/static/js/2.fbd74834.chunk.js.map",
+    "static/js/3.3f0b2d83.chunk.js": "/up/static/js/3.3f0b2d83.chunk.js",
+    "static/js/3.3f0b2d83.chunk.js.map": "/up/static/js/3.3f0b2d83.chunk.js.map",
+    "index.html": "/up/index.html",
+    "static/css/main.713700ca.chunk.css.map": "/up/static/css/main.713700ca.chunk.css.map",
+    "static/js/2.fbd74834.chunk.js.LICENSE.txt": "/up/static/js/2.fbd74834.chunk.js.LICENSE.txt",
+    "static/media/Fanzone-Hexagon-Logo-Footer.7bb1d26d.png": "/up/static/media/Fanzone-Hexagon-Logo-Footer.7bb1d26d.png",
+    "static/media/Karla-Bold.f0553c32.ttf": "/up/static/media/Karla-Bold.f0553c32.ttf",
+    "static/media/Karla-Regular.6d937d4f.ttf": "/up/static/media/Karla-Regular.6d937d4f.ttf",
+    "static/media/arrow-left.3d231fb3.svg": "/up/static/media/arrow-left.3d231fb3.svg",
+    "static/media/arrow-right.5a0b44bf.svg": "/up/static/media/arrow-right.5a0b44bf.svg",
+    "static/media/bg-fanzone-hero.6b8e8f9d.png": "/up/static/media/bg-fanzone-hero.6b8e8f9d.png",
+    "static/media/bg-meta-card.f81bab74.png": "/up/static/media/bg-meta-card.f81bab74.png",
+    "static/media/bg-profile-card.b9ce2c1d.png": "/up/static/media/bg-profile-card.b9ce2c1d.png",
+    "static/media/drop-down.ac2bb0f9.svg": "/up/static/media/drop-down.ac2bb0f9.svg",
+    "static/media/facebook-icon.d1342051.svg": "/up/static/media/facebook-icon.d1342051.svg",
+    "static/media/App.css": "/up/static/media/fanzone-bg.02826a4f.png",
+    "static/media/globe-icon.c4561c61.svg": "/up/static/media/globe-icon.c4561c61.svg",
+    "static/media/instagram-icon.8cde74b2.svg": "/up/static/media/instagram-icon.8cde74b2.svg",
+    "static/media/link-icon.b125fd0b.svg": "/up/static/media/link-icon.b125fd0b.svg",
+    "static/media/logo.8226e33e.svg": "/up/static/media/logo.8226e33e.svg",
+    "static/media/lukso.7c108883.svg": "/up/static/media/lukso.7c108883.svg",
+    "static/media/polygon.9f8343d5.svg": "/up/static/media/polygon.9f8343d5.svg",
+    "static/media/search-icon.3643b314.svg": "/up/static/media/search-icon.3643b314.svg",
+    "static/media/share-icon.1ec6e3b2.svg": "/up/static/media/share-icon.1ec6e3b2.svg",
+    "static/media/twitter-icon.5b493137.svg": "/up/static/media/twitter-icon.5b493137.svg",
+    "static/media/universalprofile.0cc56079.png": "/up/static/media/universalprofile.0cc56079.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.fd9f2dd8.js",
+    "static/js/2.fbd74834.chunk.js",
+    "static/css/main.713700ca.chunk.css",
+    "static/js/main.4f3384e2.chunk.js"
+  ]
+}
