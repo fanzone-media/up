@@ -1,4 +1,4 @@
-Checkout the site: https://fanzone.cloud/#/
+Checkout the site: https://fanzone-media.github.io/up/#/
 
 For development:
 
