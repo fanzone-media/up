@@ -1,5 +1,5 @@
 import React from 'react';
-import { ILSP3Profile } from '../../../services/models';
+import { IProfile } from '../../../services/models';
 import polygon from '../../../assets/polygon.svg';
 import makeBlockie from 'ethereum-blockies-base64';
 import Web3Service from '../../../services/Web3Service';
@@ -16,11 +16,16 @@ import {
   StyledProfileName,
   StyledProfileRole,
 } from './styles';
+import { useParams } from 'react-router-dom';
 
 interface Iprops {
-  userProfile: ILSP3Profile;
+  userProfile: IProfile;
   type: string;
   balance?: number;
+}
+
+interface IParams {
+  network: string;
 }
 
 export const ProfileCard: React.FC<Iprops> = React.memo(function ProfileList({
@@ -28,17 +33,19 @@ export const ProfileCard: React.FC<Iprops> = React.memo(function ProfileList({
   balance,
   type,
 }: Iprops) {
+  const params = useParams<IParams>();
   return (
     <StyledProfileCard
       to={
-        '/l14/profile/' + new Web3Service().checkSumAddress(userProfile.address)
+        `/${params.network}/profile/` + new Web3Service().checkSumAddress(userProfile.address)
       }
       className="animate-cardrender"
       demo={type === 'demo' ? true : false}
     >
       <StyledBalanceWrappar demo={type === 'demo' ? true : false}>
         <StyledBalance demo={type === 'demo' ? true : false}>
-          {type === 'demo' ? userProfile.balance : balance}
+          {/* {type === 'demo' ? userProfile.balance : balance} */}
+          {type === 'demo' ? 0 : balance}
         </StyledBalance>
       </StyledBalanceWrappar>
       <StyledPolygon

@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+cache/
+dist/
+typechain/
+artifacts/
+coverage*
+.env
+setup-ecosystem-data/*
+!setup-ecosystem-data/.gitkeep
+!setup-ecosystem-data/example-setup-profiles.csv
+!setup-ecosystem-data/example-setup-cards.csv
+!setup-ecosystem-data/example-card-unpacks.csv
+!setup-ecosystem-data/example-card-transfers.csv
+scripts/
+

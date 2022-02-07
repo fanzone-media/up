@@ -23,6 +23,8 @@ export default Object.freeze({
     '0xfc5327884a7fb1912dcdd0d78d7e6753f03e61a8e0b845a4b62f5efde472d0a8',
   LSP4Images:
     '0x150834e6d4fd704dc914e5372942f0615863fd9d206030643c2a6391dc6ddbf1',
+  LSP5ReceivedAssets:
+    '0x6460ee3c0aac563ccbf76d6e1d07bada78e3a9514e6382b736ed3f478ab7b90b',
   LSP5DigitalCloth:
     '0x400823a66792632b83426dae64ca619a7b8ffcde4f406c2fb8fd5d0a62286b42',
   LSP4Creators:

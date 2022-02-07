@@ -4,9 +4,9 @@ import { useSelector } from 'react-redux';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { RootState } from '../../boot/types';
 import { selectAllUsersItems } from '../../features/profiles';
-import { ILSP3Profile } from '../../services/models';
+import { IProfile } from '../../services/models';
 import { useEffect } from 'react';
-import { fetchIssuedCards, selectAllCardItems } from '../../features/cards';
+import { selectAllCardItems } from '../../features/cards';
 import { useAppDispatch } from '../../boot/store';
 import Pagination from '../../features/pagination/Pagination';
 import {
@@ -46,22 +46,22 @@ const Profiles: React.FC = () => {
     selectAllCardItems(state),
   ).filter((items) => items['owner'] === demoCollectionAddress);
 
-  const getDemoCollection = async () => {
-    if (
-      !demoCollection.some((items) => items['owner'] === demoCollectionAddress)
-    ) {
-      dispatch(
-        fetchIssuedCards({
-          network: params.network,
-          profileAddress: demoCollectionAddress,
-        }),
-      );
-    }
-  };
+  // const getDemoCollection = async () => {
+  //   if (
+  //     !demoCollection.some((items) => items['owner'] === demoCollectionAddress)
+  //   ) {
+  //     dispatch(
+  //       fetchIssuedCards({
+  //         network: params.network,
+  //         profileAddress: demoCollectionAddress,
+  //       }),
+  //     );
+  //   }
+  // };
 
   const renderProfiles = useMemo(
     () =>
-      userProfile.map((userProfile: ILSP3Profile) => (
+      userProfile.map((userProfile: IProfile) => (
         <ProfileCard
           key={userProfile.address}
           userProfile={userProfile}
@@ -72,7 +72,7 @@ const Profiles: React.FC = () => {
   );
 
   useEffect(() => {
-    getDemoCollection();
+    // getDemoCollection();
   }, []);
 
   return (

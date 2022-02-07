@@ -4,7 +4,7 @@ import {
   fetchIssuedCards,
   fetchOwnedCards,
   selectAllCardItems,
-  selectAllOwnedItems,
+  selectCardIds,
 } from '../../features/cards';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../boot/types';
@@ -56,13 +56,8 @@ import {
 } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
-import Web3 from 'web3';
-import { fetchUserAddress } from '../../services/controllers/LNS';
-import Web3Service from '../../services/Web3Service';
-import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
-import { ILSP3Profile } from '../../services/models';
-import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
+import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
 
 interface IParams {
   add: string;
@@ -75,11 +70,19 @@ const ProfileDetails: React.FC = () => {
 
   const [profileAddress, setProfileAddress] = useState<string>('');
 
-  // const profile = useSelector((state: RootState) =>
-  //   selectUserById(state, profileAddress),
-  // );
+  const profile = useSelector((state: RootState) => selectUserById(state, params.add));
 
-  const [profile, setProfile] = useState<ILSP3Profile>();
+  const cards = useSelector((state: RootState) => selectCardIds(state));
+
+  const profileError = useSelector((state: RootState) => state.userData.users.error);
+
+  useMemo(() => {
+    if(!profile)
+      dispatch(fetchProfileByAddress(params.add));
+      console.log(profile);
+  }, [dispatch, params.add, profile]);
+
+  //const [profile, setProfile] = useState<IProfile>();
 
   const [nameError, setNameError] = useState<boolean>(false);
 
@@ -94,49 +97,63 @@ const ProfileDetails: React.FC = () => {
   const issuedCollection = useSelector((state: RootState) =>
     selectAllCardItems(state),
   ).filter(
-    (item) => item['owner'].toLowerCase() === profileAddress?.toLowerCase(),
+    (item) => item['owner'].toLowerCase() === params.add?.toLowerCase() && item['network'] === params.network,
   );
 
-  const ownedCollection = useSelector((state: RootState) =>
-    selectAllOwnedItems(state),
-  ).filter((items) =>
-    items['holders'].some(
-      (item) => item.toLowerCase() === profileAddress?.toLowerCase(),
-    ),
-  );
+  const issuedCollectionStatus = useSelector((state: RootState) => state.cards.issuedStatus);
+
+  const ownedCollection = useSelector((state: RootState) => selectAllCardItems(state))
+    .filter((item) => {
+      return profile?.ownedAssets.some((i) => {
+        return i === item.address && item.network === params.network;
+      })
+    });
 
   const ownedCollectionStatus = useSelector(
-    (state: RootState) => state.cards.ownedItems.status,
+    (state: RootState) => state.cards.ownedStatus,
   );
 
   useMemo(async () => {
-    if (issuedCollection.length === 0) {
-      dispatch(
-        fetchIssuedCards({
-          network: params.network,
-          profileAddress: profileAddress ? profileAddress : '',
-        }),
-      );
+    let addresses: string[] = [];
+    profile?.issuedAssets.forEach((item) => {
+      if(!cards.includes(item)) {
+        addresses.push(item);
+      }
+    });
+    if(addresses.length > 0) {
+      dispatch(fetchIssuedCards({network: params.network, addresses: addresses}))
     }
-  }, [dispatch, profileAddress]);
+  }, [cards, dispatch, params.network, profile?.issuedAssets]);
 
   useMemo(async () => {
-    const ownedAssetCount = await LSP4DigitalAssetApi.fetchOwnedCollectionCount(
-      new Web3Service(),
-    )(params.network, profileAddress);
-    if (
-      (ownedCollection.length === 0 ||
-        ownedCollection.length !== ownedAssetCount) &&
-      ownedAssetCount > 0
-    ) {
-      dispatch(
-        fetchOwnedCards({
-          network: params.network,
-          profileAdd: profileAddress ? profileAddress : '',
-        }),
-      );
+    let addresses: string[] = [];
+    profile?.ownedAssets.forEach((item) => {
+      if(!cards.includes(item)) {
+        addresses.push(item);
+      }
+    });
+    if(addresses.length > 0) {
+      dispatch(fetchOwnedCards({network: params.network, addresses: addresses}))
     }
-  }, [dispatch, profileAddress]);
+  }, [cards, dispatch, params.network, profile?.ownedAssets]);
+
+//  useMemo(async () => {
+  //   const ownedAssetCount = await LSP4DigitalAssetApi.fetchOwnedCollectionCount(
+  //     new Web3Service(),
+  //   )(params.network, profileAddress);
+  //   if (
+  //     (ownedCollection.length === 0 ||
+  //       ownedCollection.length !== ownedAssetCount) &&
+  //     ownedAssetCount > 0
+  //   ) {
+  //     dispatch(
+  //       fetchOwnedCards({
+  //         network: params.network,
+  //         profileAdd: profileAddress ? profileAddress : '',
+  //       }),
+  //     );
+  //   }
+  // }, [dispatch, profileAddress]);
 
   const renderIssuedAssetsPagination = useMemo(
     () => <Pagination collection={issuedCollection} type="issued" />,
@@ -167,48 +184,48 @@ const ProfileDetails: React.FC = () => {
   //   }
   // };
 
-  useMemo(async () => {
-    console.log('Fetching Profile');
-    setNameError(false);
-    const checkParams = Web3.utils.isAddress(params.add);
-    if (checkParams) {
-      try {
-        setProfileAddress(params.add);
-        //dispatch(fetchProfileByAddress(params.add));
-        await LSP3ProfileApi.fetchProfile(new Web3Service())(
-          params.add,
-          params.network,
-        ).then((result) => {
-          setProfile(result);
-        });
-      } catch (error: any) {
-        console.error(error.message);
-      }
-    } else {
-      const add = await fetchUserAddress(params.add, params.network).catch(
-        (_error) => {
-          setNameError(true);
-        },
-      );
-      console.log(add);
-      if (add) {
-        try {
-          setProfileAddress(add);
-          //dispatch(fetchProfileByAddress(add));
-          await LSP3ProfileApi.fetchProfile(new Web3Service())(
-            add,
-            params.network,
-          ).then((result) => {
-            setProfile(result);
-          });
-        } catch (error: any) {
-          console.error(error.message);
-        }
-      } else {
-        console.log('not found');
-      }
-    }
-  }, [params.add]);
+  // useMemo(async () => {
+  //   console.log('Fetching Profile');
+  //   setNameError(false);
+  //   const checkParams = Web3.utils.isAddress(params.add);
+  //   if (checkParams) {
+  //     try {
+  //       setProfileAddress(params.add);
+  //       //dispatch(fetchProfileByAddress(params.add));
+  //       await LSP3ProfileApi.fetchProfile(new Web3Service())(
+  //         params.add,
+  //         params.network,
+  //       ).then((result) => {
+  //         //setProfile(result);
+  //       });
+  //     } catch (error: any) {
+  //       console.error(error.message);
+  //     }
+  //   } else {
+  //     const add = await fetchUserAddress(params.add, params.network).catch(
+  //       (_error) => {
+  //         setNameError(true);
+  //       },
+  //     );
+  //     console.log(add);
+  //     if (add) {
+  //       try {
+  //         setProfileAddress(add);
+  //         //dispatch(fetchProfileByAddress(add));
+  //         await LSP3ProfileApi.fetchProfile(new Web3Service())(
+  //           add,
+  //           params.network,
+  //         ).then((result) => {
+  //           //setProfile(result);
+  //         });
+  //       } catch (error: any) {
+  //         console.error(error.message);
+  //       }
+  //     } else {
+  //       console.log('not found');
+  //     }
+  //   }
+  // }, [params.add]);
 
   const renderLinks = useMemo(
     () =>
@@ -263,7 +280,7 @@ const ProfileDetails: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.add]);
+  }, [params.add, profile]);
 
   return (
     <StyledProfileDetails className="relative flex flex-col w-full text-white window">
@@ -364,7 +381,17 @@ const ProfileDetails: React.FC = () => {
               ) : (
                 <></>
               )} */}
-              {issuedCollection.length > 0 ? (
+              {
+                profile && profile?.issuedAssets.length > 0 && 
+                issuedCollectionStatus === 'loading' && (
+                  <>
+                  <StyledAssetsHeading>Issued Assets</StyledAssetsHeading>
+                  <p>loading .......</p>
+                </>
+                )
+              }
+              {issuedCollection.length > 0 &&
+                issuedCollectionStatus === 'idle' ? (
                 renderIssuedAssetsPagination
               ) : (
                 <></>

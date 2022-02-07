@@ -1,5 +1,6 @@
 import { Account, TransactionReceipt } from 'web3-core';
 import { Contract, ContractInterface } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
 export interface IEthereumService {
   loadAccount: (privateKey: string) => Account;
@@ -9,6 +10,8 @@ export interface IEthereumService {
     address: string,
     network: string,
   ) => Contract;
+
+  getProvider: (network: string) => Provider;
 
   sendSignedTransaction: (
     address: string,

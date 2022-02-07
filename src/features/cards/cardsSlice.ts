@@ -4,9 +4,9 @@ import {
   createSlice,
 } from '@reduxjs/toolkit';
 import { RootState, ThunkExtra } from '../../boot/types';
-import { ILSP4Card } from '../../services/models';
+import { ICard } from '../../services/models';
 import { STATUS } from '../../utility';
-import { ICardsSliceState, ICardItemsState } from './types';
+import { ICardItemsState, ICardState } from './types';
 
 /**
  * **************
@@ -14,7 +14,7 @@ import { ICardsSliceState, ICardItemsState } from './types';
  * **************
  * We are using the createEntityAdapter since it provides us with pre-built functionality
  */
-const cardsAdapter = createEntityAdapter<ILSP4Card>({
+const cardsAdapter = createEntityAdapter<ICard>({
   selectId: (e) => e.address,
 });
 
@@ -23,16 +23,14 @@ const cardsAdapter = createEntityAdapter<ILSP4Card>({
  *     STATE
  * **************
  */
-const initialState: ICardsSliceState = {
-  issuedItems: cardsAdapter.getInitialState<ICardItemsState>({
+const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
+    ownedStatus: STATUS.IDLE,
+    ownedError: null,
+    issuedStatus: STATUS.IDLE,
+    issuedError: null,
     status: STATUS.IDLE,
     error: null,
-  }),
-  ownedItems: cardsAdapter.getInitialState<ICardItemsState>({
-    status: STATUS.IDLE,
-    error: null,
-  }),
-};
+  });
 
 /**
  * **************
@@ -40,39 +38,54 @@ const initialState: ICardsSliceState = {
  * **************
  */
 
+ export const fetchAllCards = createAsyncThunk<
+ ICard[],
+ { network: string; addresses: string[] },
+ { state: RootState; extra: ThunkExtra }
+>(
+ 'cards/fetchAllCards',
+ async ({ network, addresses }, { extra: { api } }) => {
+   const res = await api.cards.fetchAllCards(
+     network,
+     addresses,
+   );
+   return res as ICard[];
+ },
+);
+
 export const fetchIssuedCards = createAsyncThunk<
-  ILSP4Card[],
-  { network: string; profileAddress: string },
+  ICard[],
+  { network: string; addresses: string[] },
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchIssuedCards',
-  async ({ network, profileAddress }, { extra: { api } }) => {
-    const res = await api.cards.fetchProfileIssuedAssets(
+  async ({ network, addresses }, { extra: { api } }) => {
+    const res = await api.cards.fetchAllCards(
       network,
-      profileAddress,
+      addresses,
     );
-    return res as ILSP4Card[];
+    return res as ICard[];
   },
 );
 
 export const fetchCard = createAsyncThunk<
-  ILSP4Card,
+  ICard,
   { assetAdd: string; profileAdd: string },
   { state: RootState; extra: ThunkExtra }
 >('cards/fetchCard', async ({ assetAdd, profileAdd }, { extra: { api } }) => {
   const res = await api.cards.fetchCard(assetAdd, profileAdd);
-  return res as ILSP4Card;
+  return res as ICard;
 });
 
 export const fetchOwnedCards = createAsyncThunk<
-  ILSP4Card[],
-  { network: string; profileAdd: string },
+  ICard[],
+  { network: string; addresses: string[] },
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchOwnedCards',
-  async ({ network, profileAdd }, { extra: { api } }) => {
-    const res = await api.cards.fetchProfileOwnedAssets(network, profileAdd);
-    return res as ILSP4Card[];
+  async ({ network, addresses }, { extra: { api } }) => {
+    const res = await api.cards.fetchAllCards(network, addresses);
+    return res as ICard[];
   },
 );
 
@@ -102,51 +115,66 @@ const cardsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchAllCards.pending, (state, _action) => {
+        state.status = STATUS.LOADING;
+      })
+      .addCase(fetchAllCards.fulfilled, (state, action) => {
+        cardsAdapter.upsertMany(
+          state,
+          action.payload as ICard[],
+        );
+        state.status = STATUS.IDLE;
+      })
+      .addCase(fetchAllCards.rejected, (state, action) => {
+        state.error = action.error;
+        state.status = STATUS.FAILED;
+      });
+    builder
       .addCase(fetchIssuedCards.pending, (state, _action) => {
-        state.issuedItems.status = STATUS.LOADING;
+        state.issuedStatus = STATUS.LOADING;
       })
       .addCase(fetchIssuedCards.fulfilled, (state, action) => {
         cardsAdapter.upsertMany(
-          state.issuedItems,
-          action.payload as ILSP4Card[],
+          state,
+          action.payload as ICard[],
         );
-        state.issuedItems.status = STATUS.IDLE;
+        state.issuedStatus = STATUS.IDLE;
       })
       .addCase(fetchIssuedCards.rejected, (state, action) => {
-        state.issuedItems.error = action.error;
-        state.issuedItems.status = STATUS.FAILED;
+        state.issuedError = action.error;
+        state.issuedStatus = STATUS.FAILED;
       });
     builder
       .addCase(fetchCard.pending, (state, _action) => {
-        state.issuedItems.status = STATUS.LOADING;
+        state.status = STATUS.LOADING;
       })
       .addCase(fetchCard.fulfilled, (state, action) => {
         if (action.payload)
           cardsAdapter.upsertOne(
-            state.issuedItems,
-            action.payload as ILSP4Card,
+            state,
+            action.payload as ICard,
           );
-        state.issuedItems.status = STATUS.IDLE;
+        state.status = STATUS.IDLE;
       })
       .addCase(fetchCard.rejected, (state, action) => {
-        state.issuedItems.error = action.error;
-        state.issuedItems.status = STATUS.FAILED;
+        state.error = action.error;
+        state.status = STATUS.FAILED;
       });
     builder
       .addCase(fetchOwnedCards.pending, (state, _action) => {
-        state.ownedItems.status = STATUS.LOADING;
+        state.ownedStatus = STATUS.LOADING;
       })
       .addCase(fetchOwnedCards.fulfilled, (state, action) => {
         if (action.payload)
           cardsAdapter.upsertMany(
-            state.ownedItems,
-            action.payload as ILSP4Card[],
+            state,
+            action.payload as ICard[],
           );
-        state.ownedItems.status = STATUS.IDLE;
+        state.ownedStatus = STATUS.IDLE;
       })
       .addCase(fetchOwnedCards.rejected, (state, action) => {
-        state.issuedItems.error = action.error;
-        state.ownedItems.status = STATUS.FAILED;
+        state.ownedError = action.error;
+        state.ownedStatus = STATUS.FAILED;
       });
   },
 });
@@ -163,13 +191,8 @@ export const {
   selectAll: selectAllCardItems,
   selectById: selectCardById,
   selectIds: selectCardIds,
-} = cardsAdapter.getSelectors<RootState>((state) => state.cards.issuedItems);
-
-export const {
-  selectAll: selectAllOwnedItems,
-  selectById: selectOwnedCardById,
-  selectIds: selectOwnedCardIds,
-} = cardsAdapter.getSelectors<RootState>((state) => state.cards.ownedItems);
+  selectEntities: selectCardEntities
+} = cardsAdapter.getSelectors<RootState>((state) => state.cards);
 
 /**
  * ************

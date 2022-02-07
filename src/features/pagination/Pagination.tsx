@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { MetaCard } from '../cards/MetaCard';
-import { IBalanceOf, ILSP4Card } from '../../services/models';
+import { IBalanceOf, ICard } from '../../services/models';
 import { PrevIcon } from '../../assets';
 import { NextIcon } from '../../assets';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
@@ -21,7 +21,7 @@ import {
 import { Search } from '../../components/Search';
 
 interface IPagination {
-  collection: ILSP4Card[];
+  collection: ICard[];
   type: string;
   profileAddr?: string;
 }
@@ -59,7 +59,7 @@ const Pagination: React.FC<IPagination> = ({
   const { screenWidth } = useViewPort();
 
   const [filterCollection, setFilterCollection] =
-    useState<ILSP4Card[]>(collection);
+    useState<ICard[]>(collection);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -136,21 +136,21 @@ const Pagination: React.FC<IPagination> = ({
     }
   };
 
-  const getBalanceOf = () => {
-    if (balanceOf.length < 1) {
-      if (type === 'owned') {
-        collection.forEach(async (item) => {
-          const res = await LSP4DigitalAssetApi.fetchBalanceOf(
-            new Web3Service(),
-          )(params.network, item.address, profileAddr);
-          setBalanceOf((prevState) => [
-            ...prevState,
-            { address: item.address, balance: res },
-          ]);
-        });
-      }
-    }
-  };
+  // const getBalanceOf = () => {
+  //   if (balanceOf.length < 1) {
+  //     if (type === 'owned') {
+  //       collection.forEach(async (item) => {
+  //         const res = await LSP4DigitalAssetApi.fetchBalanceOf(
+  //           new Web3Service(),
+  //         )(params.network, item.address, profileAddr);
+  //         setBalanceOf((prevState) => [
+  //           ...prevState,
+  //           { address: item.address, balance: res },
+  //         ]);
+  //       });
+  //     }
+  //   }
+  // };
 
   const searchHandler = (event: React.FormEvent<HTMLInputElement>) => {
     setSearch(event.currentTarget.value.toLowerCase());
@@ -166,12 +166,12 @@ const Pagination: React.FC<IPagination> = ({
 
   useEffect(() => {
     setFilterCollection(collection);
-    getBalanceOf();
+    //getBalanceOf();
   }, [collection]);
 
   const renderCollection = useMemo(
     () =>
-      getPaginationData().map((digitalCard: ILSP4Card) => {
+      getPaginationData().map((digitalCard: ICard) => {
         if (type === 'owned' || type === 'issued') {
           const findBalanceOf = balanceOf?.find(
             (item) =>

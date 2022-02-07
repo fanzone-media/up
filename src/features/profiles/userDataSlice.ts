@@ -4,7 +4,7 @@ import {
   createSlice,
 } from '@reduxjs/toolkit';
 import { RootState, ThunkExtra } from '../../boot/types';
-import { ILSP3Profile } from '../../services/models';
+import { IProfile } from '../../services/models';
 import { STATUS } from '../../utility';
 import { IUserDataSliceState, IUsersState } from './types';
 
@@ -14,7 +14,7 @@ import { IUserDataSliceState, IUsersState } from './types';
  * **************
  * We are using the createEntityAdapter since it provides us with pre-built functionality
  */
-const usersAdapter = createEntityAdapter<ILSP3Profile>({
+const usersAdapter = createEntityAdapter<IProfile>({
   selectId: (e) => e.address,
   sortComparer: (a, b) => a.name.localeCompare(b.name),
 });
@@ -41,25 +41,24 @@ const initialState: IUserDataSliceState = {
  */
 
 export const fetchProfileByAddress = createAsyncThunk<
-  ILSP3Profile,
+  IProfile,
   string,
   { extra: ThunkExtra }
 >('userData/fetchUserById', async (userAddress, { extra: { api } }) => {
   const profile = (await api.profiles.fetchProfile(
     userAddress,
-  )) as ILSP3Profile;
-
+  )) as IProfile;
   return profile;
 });
 
 export const fetchAllProfiles = createAsyncThunk<
-  ILSP3Profile[],
+  IProfile[],
   string[],
   { extra: ThunkExtra }
 >('userData/fetchAllProfiles', async (userAddress, { extra: { api } }) => {
   const profile = (await api.profiles.fetchAllProfiles(
     userAddress,
-  )) as ILSP3Profile[];
+  )) as IProfile[];
 
   return profile;
 });
@@ -90,18 +89,18 @@ const userDataSlice = createSlice({
     // Example-End
   },
   extraReducers: (builder) => {
-    //   builder
-    //       .addCase(fetchProfileByAddress.pending, (state, _action) => {
-    //           state.users.status = STATUS.LOADING;
-    //       })
-    //       .addCase(fetchProfileByAddress.fulfilled, (state, action) => {
-    //           usersAdapter.upsertOne(state.users, action.payload as ILSP3Profile);
-    //           state.users.status = STATUS.IDLE;
-    //       })
-    //       .addCase(fetchProfileByAddress.rejected, (state, action) => {
-    //           state.users.error = action.error;
-    //           state.users.status = STATUS.FAILED;
-    //       });
+      builder
+          .addCase(fetchProfileByAddress.pending, (state, _action) => {
+              state.users.status = STATUS.LOADING;
+          })
+          .addCase(fetchProfileByAddress.fulfilled, (state, action) => {
+              usersAdapter.upsertOne(state.users, action.payload as IProfile);
+              state.users.status = STATUS.IDLE;
+          })
+          .addCase(fetchProfileByAddress.rejected, (state, action) => {
+              state.users.error = action.error;
+              state.users.status = STATUS.FAILED;
+          });
 
     builder
       .addCase(fetchAllProfiles.pending, (state, _action) => {

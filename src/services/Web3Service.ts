@@ -2,11 +2,11 @@ import KeyChain from './utilities/KeyChain';
 
 import Web3 from 'web3';
 import { ethers, Contract, ContractInterface } from 'ethers';
-import { ContractOptions } from 'web3-eth-contract';
 import { Transaction } from '@ethereumjs/tx';
 import buffer from 'buffer';
 import { IEthereumService } from './IEthereumService';
 import { Account, TransactionReceipt } from 'web3-core';
+import { Provider } from '@ethersproject/providers';
 
 export default class Web3Service implements IEthereumService {
   /**
@@ -16,7 +16,7 @@ export default class Web3Service implements IEthereumService {
   // static PROVIDER_URL  = 'http://34.120.18.166:80/'
   static LUKSO_L14_PROVIDER_URL = 'https://rpc.l14.lukso.network';
   static POLYGON_MAINNET_PROVIDER_URL = 'https://polygon-rpc.com/';
-  static POLYGON_MUMBAI_PROVIDER_URL = 'https://rpc-mumbai.maticvigil.com';
+  static POLYGON_MUMBAI_PROVIDER_URL = 'https://matic-mumbai.chainstacklabs.com';
   static ETHEREUM_MAINNET_PROVIDER_URL = '';
 
   /**
@@ -54,7 +54,7 @@ export default class Web3Service implements IEthereumService {
     Web3Service.POLYGON_MAINNET_PROVIDER_URL,
   );
   static POLYGON_MUMBAI_PROVIDER = new ethers.providers.JsonRpcProvider(
-    Web3Service.POLYGON_MAINNET_PROVIDER_URL,
+    Web3Service.POLYGON_MUMBAI_PROVIDER_URL,
   );
   static ETHEREUM_MAINNET_PROVIDER = new ethers.providers.JsonRpcProvider(
     Web3Service.ETHEREUM_MAINNET_PROVIDER_URL,
@@ -97,6 +97,19 @@ export default class Web3Service implements IEthereumService {
 
   loadAccount(privateKey: string): Account {
     return Web3Service.web3.eth.accounts.privateKeyToAccount(privateKey);
+  }
+
+  getProvider(network: string): Provider {
+    if (network === 'mumbai')
+      return Web3Service.POLYGON_MUMBAI_PROVIDER;
+    if (network === 'polygon')
+      return Web3Service.POLYGON_MAINNET_PROVIDER;
+    if (network === 'ethereum')
+      return Web3Service.ETHEREUM_MAINNET_PROVIDER;
+    if (network === 'l14') {
+      return Web3Service.LUKSO_L14_PROVIDER;
+    }
+    return Web3Service.POLYGON_MUMBAI_PROVIDER;
   }
 
   getContract(

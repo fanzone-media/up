@@ -1,73 +1,69 @@
 import ABI from '../utilities/ABIs';
 import KeyChain from '../utilities/KeyChain';
 import { IEthereumService } from '../IEthereumService';
-import { ILSP4Card } from '../models';
+import { ICard } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
-import Utils from '../utilities/util';
 import { ethers } from 'ethers';
+import { CardToken__factory, UniversalProfile__factory } from '../../submodules/fanzone-smart-contracts/typechain';
+import Utils from '../utilities/util';
 
 const fetchCard =
   (EthereumService: IEthereumService) =>
-  async (address: string, network: string): Promise<ILSP4Card> => {
-    let assetContract = EthereumService.getContract(
-      ABI.LSP4DigitalCertificateABI,
-      address,
-      network,
-    );
+  async (address: string, network: string): Promise<ICard> => {
+    
+    const provider = EthereumService.getProvider(network);
+    const contract = CardToken__factory.connect(address, provider);
 
-    const islsp8 = await assetContract.supportsInterface('0x49399145');
-    if (islsp8) {
-      assetContract = EthereumService.getContract(ABI.LnsABI, address, network);
-
-      if (!assetContract) throw new Error('Unknown Network');
-    }
     const [name, symbol, totalSupply, owner, holders, hashedUrl] =
       await Promise.all([
-        assetContract.name(),
-        assetContract.symbol(),
-        assetContract.totalSupply(),
-        assetContract.owner(),
-        assetContract.allTokenHolders(),
-        assetContract.getData(
-          islsp8 ? [KeyChain.LSP4Metadata] : KeyChain.LSP4Metadata,
-        ),
+        contract.name(),
+        contract.symbol(),
+        contract.totalSupply(),
+        contract.owner(),
+        contract.allTokenHolders(),
+        contract.getData([KeyChain.LSP4Metadata]),
       ]);
 
     if (!hashedUrl) {
       throw new Error('No card data');
     }
-    const result = await getLSP4Metadata(islsp8 ? hashedUrl[0] : hashedUrl);
+    const result = await getLSP4Metadata(hashedUrl[0]);
 
     return {
       address,
       name,
       symbol,
       totalSupply: ethers.BigNumber.from(totalSupply).toNumber(),
-      card: result.LSP4Metadata,
+      ls8MetaData: {...result, image: Utils.convertImageURL(result.image)},
       owner,
       holders: holders.map((holder: string) => `0x${holder.slice(26)}`),
-      image: Utils.convertImageURL(result.LSP4Metadata.images[0][0].url),
+      creators: [""],
+      network: network
     };
   };
 
 const fetchProfileIssuedAssets =
   (EthereumService: IEthereumService) =>
-  async (network: string, profileAddress?: string): Promise<ILSP4Card[]> => {
+  async (network: string, profileAddress?: string): Promise<ICard[]> => {
     if (!profileAddress) {
-      return [] as ILSP4Card[];
+      return [] as ICard[];
     }
 
-    const contract = EthereumService.getContract(
-      ABI.LSP3AccountABI,
-      profileAddress,
-      network,
-    );
+    const provider = EthereumService.getProvider(network);
+    const contract = UniversalProfile__factory.connect(profileAddress, provider)
+    // const contract = EthereumService.getContract(
+    //   ABI.LSP3AccountABI,
+    //   profileAddress,
+    //   network,
+    // );
 
-    let assets: ILSP4Card[] = [];
-
+    let assets: ICard[] = [];
+    console.log("yayyy 2");
+    console.log(contract);
     // Use the LSP3IssuedAssets_KEY to request the number of elements
     // response ex: 0x0000000000000000000000000000000000000000000000000000000000000002 (2 elements)
-    const numAssetsHex = await contract.getData(KeyChain.LSP3IssuedAssets);
+    const numAssetsHex = await contract.getData([KeyChain.LSP3IssuedAssets]);
+    console.log(numAssetsHex)
 
     // Convert the hex to decimal
     //
@@ -76,7 +72,7 @@ const fetchProfileIssuedAssets =
     //      0x000000000000000000000000000000000000000000000000000000000000000a => 10
     //      0x3a47ab5bd3a594c3a8995f8fa58d087600000000000000000000000000000013 => 19
     // const numAssets = EthereumSerive.web3.utils.hexToNumber(numAssetsHex);
-    const numAssets = parseInt(numAssetsHex, 16);
+    const numAssets = parseInt(numAssetsHex[0], 16);
 
     if (isNaN(numAssets) || numAssets === 0) {
       //return assets;
@@ -111,9 +107,9 @@ const fetchProfileIssuedAssets =
         const elementKey =
           elementPrefix.padEnd(66 - elementSufix.length, '0') + elementSufix;
 
-        const assetAddr = await contract.getData(elementKey);
+        const assetAddr = await contract.getData([elementKey]);
 
-        const asset = await cardFetcher(assetAddr, network);
+        const asset = await cardFetcher(assetAddr[0], network);
 
         return asset;
       }),
@@ -128,10 +124,98 @@ const fetchProfileIssuedAssets =
     return assets;
   };
 
+const fetchAllCards = 
+  (EthereumService: IEthereumService) => 
+  async (network: string, addresses: string[]): Promise<ICard[]> => {
+    let assets: ICard[] = [];
+    const cardFetcher = fetchCard(EthereumService);
+    await Promise.allSettled(
+      new Array(addresses.length).fill(0).map(async (_, index) => {
+        const asset = await cardFetcher(addresses[index], network);
+        return asset;
+      }),
+    ).then((results) =>
+      results.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          assets.push(result.value);
+        }
+      }),
+    );
+    return assets;
+  };
+
+const fetchProfileIssuedAssetsAddresses =
+  (EthereumService: IEthereumService) => 
+  async (network: string, profileAddress:string): Promise<string[]> => {
+    const provider = EthereumService.getProvider(network);
+    const contract = UniversalProfile__factory.connect(profileAddress, provider);
+
+    let assets: string[] = [];
+    // Use the LSP3IssuedAssets_KEY to request the number of elements
+    // response ex: 0x0000000000000000000000000000000000000000000000000000000000000002 (2 elements)
+    const numAssetsHex = await contract.getData([KeyChain.LSP3IssuedAssets]);
+
+    // Convert the hex to decimal
+    //
+    // Example:
+    //      0x3a47ab5bd3a594c3a8995f8fa58d087600000000000000000000000000000007 => 7
+    //      0x000000000000000000000000000000000000000000000000000000000000000a => 10
+    //      0x3a47ab5bd3a594c3a8995f8fa58d087600000000000000000000000000000013 => 19
+    // const numAssets = EthereumSerive.web3.utils.hexToNumber(numAssetsHex);
+    const numAssets = parseInt(numAssetsHex[0], 16);
+
+    if (isNaN(numAssets) || numAssets === 0) {
+      //return assets;
+      return assets;
+      //throw new Error('No Assets');
+    }
+
+    // The first 16 bytes are the first 16 bytes of the key hash     => [elementPrefix]
+    // The second 16 bytes is a uint128 of the number of the element => [elementSufix]
+    //
+    // Get the first 16 bytes + '0x' => 34
+    const elementPrefix = KeyChain.LSP3IssuedAssets.slice(0, 34);
+
+    const cardFetcher = fetchCard(EthereumService);
+
+    await Promise.allSettled(
+      new Array(numAssets).fill(0).map(async (_, index) => {
+        // Conver the number to hex and remove the perfix ('0x')
+        //
+        // Example:
+        //      19   => 0x13
+        //      0x13 => 13
+        const elementSufix = index.toString(16);
+
+        // Create the element key by appending the prefix with the sufix and filling the
+        // prefix with enough '0's to reach the 32 byte key
+        //
+        // Example:
+        //      elementPrefix = 0x3a47ab5bd3a594c3a8995f8fa58d0876
+        //      elementSufix  = 5
+        //      elementKey    = 0x3a47ab5bd3a594c3a8995f8fa58d087600000000000000000000000000000005
+        const elementKey =
+          elementPrefix.padEnd(66 - elementSufix.length, '0') + elementSufix;
+
+        const assetAddr = await contract.getData([elementKey]);
+
+        return assetAddr[0];
+      }),
+    ).then((results) =>
+      results.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          assets.push(result.value);
+        }
+      }),
+    );
+
+    return assets;
+  }
+
 const fetchProfileOwnedAssets =
   (EthereumService: IEthereumService) =>
-  async (network: string, profileAddress?: string): Promise<ILSP4Card[]> => {
-    let ownedAssets: ILSP4Card[] = [];
+  async (network: string, profileAddress?: string): Promise<ICard[]> => {
+    let ownedAssets: ICard[] = [];
     if (!profileAddress) {
       console.error('no profile');
       return ownedAssets;
@@ -231,4 +315,6 @@ export const LSP4DigitalAssetApi = {
   fetchOwnedCollectionCount,
   fetchBalanceOf,
   fetchProfileOwnedAssets,
+  fetchProfileIssuedAssetsAddresses,
+  fetchAllCards
 };

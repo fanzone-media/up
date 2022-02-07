@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ILSP4Card } from '../../../services/models';
+import { Link, useParams } from 'react-router-dom';
+import { ICard, ILSP4Card } from '../../../services/models';
 import universalprofile from '../../../assets/universalprofile.png';
 import blockscout from '../../../assets/blockscout.png';
 import {
@@ -16,9 +16,13 @@ import {
 } from './styles';
 
 interface IProps {
-  digitalCard: ILSP4Card;
+  digitalCard: ICard;
   type: string;
   balance?: number;
+}
+
+interface IParams {
+  network: string;
 }
 
 export const MetaCard: React.FC<IProps> = React.memo(function CardListItem({
@@ -26,6 +30,7 @@ export const MetaCard: React.FC<IProps> = React.memo(function CardListItem({
   type,
   balance,
 }: IProps) {
+  const params = useParams<IParams>();
   return (
     <StyledCardWrappar>
       <a
@@ -42,9 +47,9 @@ export const MetaCard: React.FC<IProps> = React.memo(function CardListItem({
       >
         <StyledBlockScoutIcon src={blockscout} alt="" />
       </a>
-      <Link to={'/l14/asset/' + digitalCard.address}>
+      <Link to={`/${params.network}/asset/` + digitalCard.address}>
         <StyledMediaWrappar>
-          <StyledMetaCardImg src={digitalCard.image} alt="" />
+          <StyledMetaCardImg src={digitalCard.ls8MetaData.image} alt="" />
         </StyledMediaWrappar>
         <StyledCardDetail>
           <StyledCardName>{digitalCard.name.split('•')[0]}</StyledCardName>

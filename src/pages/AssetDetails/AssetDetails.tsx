@@ -8,7 +8,7 @@ import { selectCardById } from '../../features/cards';
 import { useEffect } from 'react';
 import { selectUserById } from '../../features/profiles';
 import { useMemo } from 'react';
-import { IBalanceOf, ILSP3Profile, ILSP4Card } from '../../services/models';
+import { IBalanceOf, ICard, IProfile } from '../../services/models';
 import Web3Services from '../../services/Web3Service';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
@@ -54,16 +54,16 @@ const AssetDetails: React.FC = () => {
     selectCardById(state, params.add),
   );
 
-  const [asset, setAsset] = useState<ILSP4Card | null>();
+  const [asset, setAsset] = useState<ICard | null>();
 
   const ownerData = useSelector((state: RootState) =>
     selectUserById(state, asset?.owner ? asset.owner : ''),
   );
-  const [owner, setOwner] = useState<ILSP3Profile>();
+  const [owner, setOwner] = useState<IProfile>();
 
-  const [designers, setDesigners] = useState<ILSP3Profile[]>([]);
+  const [designers, setDesigners] = useState<IProfile[]>([]);
 
-  const [holders, setHolders] = useState<ILSP3Profile[]>([]);
+  const [holders, setHolders] = useState<IProfile[]>([]);
 
   const [balanceOf, setBalanceOf] = useState<IBalanceOf[]>([]);
 
@@ -110,7 +110,9 @@ const AssetDetails: React.FC = () => {
         params.add,
         params.network,
       );
+      console.log(creators);
       if (creators) {
+        console.log("creatorsss")
         creators.forEach(async (item) => {
           const balanceOf = await getBalanceOf(item.address);
           setBalanceOf((prevState) => [
@@ -176,7 +178,7 @@ const AssetDetails: React.FC = () => {
 
   const renderDesigners = useMemo(
     () =>
-      designers.map((creator: ILSP3Profile) => {
+      designers.map((creator: IProfile) => {
         const findBalanceOf = balanceOf.find(
           (item) => item.address === creator.address,
         );
@@ -194,7 +196,7 @@ const AssetDetails: React.FC = () => {
 
   const renderHolders = useMemo(
     () =>
-      holders.map((holder: ILSP3Profile) => {
+      holders.map((holder: IProfile) => {
         const findBalanceOf = balanceOf.find(
           (item) => item.address === holder.address,
         );
@@ -212,15 +214,15 @@ const AssetDetails: React.FC = () => {
 
   const metaCardInfo = [
     { text: 'Name', data: asset?.name.split('•')[0] },
-    { text: 'Card Type', data: asset?.card.cardType },
-    { text: 'Rarity', data: asset?.card.card_tierLabel },
-    { text: 'Edition', data: asset?.card.edition },
-    { text: 'Category', data: asset?.card.editionCategory },
-    { text: 'Set', data: asset?.card.editionSet },
-    { text: 'Season', data: asset?.card.season },
-    { text: 'Zone', data: asset?.card.zoneLabel },
-    { text: 'League', data: asset?.card.leagueLabel },
-    { text: 'Team', data: asset?.card.teamLabel },
+    { text: 'Card Type', data: asset?.ls8MetaData.cardType },
+    { text: 'Rarity', data: asset?.ls8MetaData.tierLabel },
+    { text: 'Edition', data: asset?.ls8MetaData.edition },
+    { text: 'Category', data: asset?.ls8MetaData.editionCategory },
+    { text: 'Set', data: asset?.ls8MetaData.editionSet },
+    { text: 'Season', data: asset?.ls8MetaData.season },
+    { text: 'Zone', data: asset?.ls8MetaData.zoneLabel },
+    { text: 'League', data: asset?.ls8MetaData.leagueLabel },
+    { text: 'Team', data: asset?.ls8MetaData.teamLabel },
   ];
 
   return (
@@ -251,7 +253,7 @@ const AssetDetails: React.FC = () => {
                 <StyledBlockScoutIcon src={BlockScoutIcon} alt="" />
               </a>
               <StyledStatsName>{metaCardInfo[0].data}</StyledStatsName>
-              <StyledMetaCardImg src={asset?.image} alt="" />
+              <StyledMetaCardImg src={asset?.ls8MetaData.image} alt="" />
             </StyledMediaWrappar>
             <StyledDetailsWrappar>
               <StyledCardInfoLabel>Card Info</StyledCardInfoLabel>
