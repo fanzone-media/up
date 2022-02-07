@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ICard, ILSP4Card } from '../../../services/models';
+import { ICard } from '../../../services/models';
 import universalprofile from '../../../assets/universalprofile.png';
 import blockscout from '../../../assets/blockscout.png';
 import {

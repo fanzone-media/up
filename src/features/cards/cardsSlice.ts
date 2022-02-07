@@ -24,13 +24,13 @@ const cardsAdapter = createEntityAdapter<ICard>({
  * **************
  */
 const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
-    ownedStatus: STATUS.IDLE,
-    ownedError: null,
-    issuedStatus: STATUS.IDLE,
-    issuedError: null,
-    status: STATUS.IDLE,
-    error: null,
-  });
+  ownedStatus: STATUS.IDLE,
+  ownedError: null,
+  issuedStatus: STATUS.IDLE,
+  issuedError: null,
+  status: STATUS.IDLE,
+  error: null,
+});
 
 /**
  * **************
@@ -38,20 +38,14 @@ const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
  * **************
  */
 
- export const fetchAllCards = createAsyncThunk<
- ICard[],
- { network: string; addresses: string[] },
- { state: RootState; extra: ThunkExtra }
->(
- 'cards/fetchAllCards',
- async ({ network, addresses }, { extra: { api } }) => {
-   const res = await api.cards.fetchAllCards(
-     network,
-     addresses,
-   );
-   return res as ICard[];
- },
-);
+export const fetchAllCards = createAsyncThunk<
+  ICard[],
+  { network: string; addresses: string[] },
+  { state: RootState; extra: ThunkExtra }
+>('cards/fetchAllCards', async ({ network, addresses }, { extra: { api } }) => {
+  const res = await api.cards.fetchAllCards(network, addresses);
+  return res as ICard[];
+});
 
 export const fetchIssuedCards = createAsyncThunk<
   ICard[],
@@ -60,20 +54,17 @@ export const fetchIssuedCards = createAsyncThunk<
 >(
   'cards/fetchIssuedCards',
   async ({ network, addresses }, { extra: { api } }) => {
-    const res = await api.cards.fetchAllCards(
-      network,
-      addresses,
-    );
+    const res = await api.cards.fetchAllCards(network, addresses);
     return res as ICard[];
   },
 );
 
 export const fetchCard = createAsyncThunk<
   ICard,
-  { assetAdd: string; profileAdd: string },
+  { address: string; network: string },
   { state: RootState; extra: ThunkExtra }
->('cards/fetchCard', async ({ assetAdd, profileAdd }, { extra: { api } }) => {
-  const res = await api.cards.fetchCard(assetAdd, profileAdd);
+>('cards/fetchCard', async ({ address, network }, { extra: { api } }) => {
+  const res = await api.cards.fetchCard(address, network);
   return res as ICard;
 });
 
@@ -119,10 +110,7 @@ const cardsSlice = createSlice({
         state.status = STATUS.LOADING;
       })
       .addCase(fetchAllCards.fulfilled, (state, action) => {
-        cardsAdapter.upsertMany(
-          state,
-          action.payload as ICard[],
-        );
+        cardsAdapter.upsertMany(state, action.payload as ICard[]);
         state.status = STATUS.IDLE;
       })
       .addCase(fetchAllCards.rejected, (state, action) => {
@@ -134,10 +122,7 @@ const cardsSlice = createSlice({
         state.issuedStatus = STATUS.LOADING;
       })
       .addCase(fetchIssuedCards.fulfilled, (state, action) => {
-        cardsAdapter.upsertMany(
-          state,
-          action.payload as ICard[],
-        );
+        cardsAdapter.upsertMany(state, action.payload as ICard[]);
         state.issuedStatus = STATUS.IDLE;
       })
       .addCase(fetchIssuedCards.rejected, (state, action) => {
@@ -150,10 +135,7 @@ const cardsSlice = createSlice({
       })
       .addCase(fetchCard.fulfilled, (state, action) => {
         if (action.payload)
-          cardsAdapter.upsertOne(
-            state,
-            action.payload as ICard,
-          );
+          cardsAdapter.upsertOne(state, action.payload as ICard);
         state.status = STATUS.IDLE;
       })
       .addCase(fetchCard.rejected, (state, action) => {
@@ -166,10 +148,7 @@ const cardsSlice = createSlice({
       })
       .addCase(fetchOwnedCards.fulfilled, (state, action) => {
         if (action.payload)
-          cardsAdapter.upsertMany(
-            state,
-            action.payload as ICard[],
-          );
+          cardsAdapter.upsertMany(state, action.payload as ICard[]);
         state.ownedStatus = STATUS.IDLE;
       })
       .addCase(fetchOwnedCards.rejected, (state, action) => {
@@ -191,7 +170,7 @@ export const {
   selectAll: selectAllCardItems,
   selectById: selectCardById,
   selectIds: selectCardIds,
-  selectEntities: selectCardEntities
+  selectEntities: selectCardEntities,
 } = cardsAdapter.getSelectors<RootState>((state) => state.cards);
 
 /**

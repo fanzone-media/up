@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { HashRouter as Router } from 'react-router-dom';
 import { md } from '../../utility';
 
 export const StyledFooter = styled.footer`

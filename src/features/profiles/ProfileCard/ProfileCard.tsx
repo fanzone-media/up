@@ -37,7 +37,8 @@ export const ProfileCard: React.FC<Iprops> = React.memo(function ProfileList({
   return (
     <StyledProfileCard
       to={
-        `/${params.network}/profile/` + new Web3Service().checkSumAddress(userProfile.address)
+        `/${params.network}/profile/` +
+        new Web3Service().checkSumAddress(userProfile.address)
       }
       className="animate-cardrender"
       demo={type === 'demo' ? true : false}

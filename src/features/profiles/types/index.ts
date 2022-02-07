@@ -1,16 +1,17 @@
 import { EntityState, SerializedError } from '@reduxjs/toolkit';
-import { IProfile, IUserAccount } from '../../../services/models';
+import { IProfile } from '../../../services/models';
 import { STATUS } from '../../../utility';
 
 interface IBaseState {
   status: STATUS;
+  holderStatus: STATUS;
+  creatorStatus: STATUS;
+  holderError: Error | SerializedError | null;
+  creatorError: Error | SerializedError | null;
   error: Error | SerializedError | null;
 }
 export type IUsersState = IBaseState;
 
 export type IUserDataSliceState = {
-  me: IUserAccount | null;
-  status: STATUS;
-  error: Error | SerializedError | null;
   users: IUsersState & EntityState<IProfile>;
 };

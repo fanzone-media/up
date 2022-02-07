@@ -4,8 +4,6 @@ import { MetaCard } from '../cards/MetaCard';
 import { IBalanceOf, ICard } from '../../services/models';
 import { PrevIcon } from '../../assets';
 import { NextIcon } from '../../assets';
-import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
-import Web3Service from '../../services/Web3Service';
 import {
   StyledAssetsHeader,
   StyledAssetsHeading,
@@ -58,11 +56,11 @@ const Pagination: React.FC<IPagination> = ({
 
   const { screenWidth } = useViewPort();
 
-  const [filterCollection, setFilterCollection] =
-    useState<ICard[]>(collection);
+  const [filterCollection, setFilterCollection] = useState<ICard[]>(collection);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [balanceOf, setBalanceOf] = useState<IBalanceOf[]>([]);
 
   const [pagesCount, setPagesCount] = useState<number>(1);
@@ -197,6 +195,7 @@ const Pagination: React.FC<IPagination> = ({
         }
         return '';
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       collection,
       params.add,

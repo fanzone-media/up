@@ -16,7 +16,8 @@ export default class Web3Service implements IEthereumService {
   // static PROVIDER_URL  = 'http://34.120.18.166:80/'
   static LUKSO_L14_PROVIDER_URL = 'https://rpc.l14.lukso.network';
   static POLYGON_MAINNET_PROVIDER_URL = 'https://polygon-rpc.com/';
-  static POLYGON_MUMBAI_PROVIDER_URL = 'https://matic-mumbai.chainstacklabs.com';
+  static POLYGON_MUMBAI_PROVIDER_URL =
+    'https://matic-mumbai.chainstacklabs.com';
   static ETHEREUM_MAINNET_PROVIDER_URL = '';
 
   /**
@@ -100,12 +101,9 @@ export default class Web3Service implements IEthereumService {
   }
 
   getProvider(network: string): Provider {
-    if (network === 'mumbai')
-      return Web3Service.POLYGON_MUMBAI_PROVIDER;
-    if (network === 'polygon')
-      return Web3Service.POLYGON_MAINNET_PROVIDER;
-    if (network === 'ethereum')
-      return Web3Service.ETHEREUM_MAINNET_PROVIDER;
+    if (network === 'mumbai') return Web3Service.POLYGON_MUMBAI_PROVIDER;
+    if (network === 'polygon') return Web3Service.POLYGON_MAINNET_PROVIDER;
+    if (network === 'ethereum') return Web3Service.ETHEREUM_MAINNET_PROVIDER;
     if (network === 'l14') {
       return Web3Service.LUKSO_L14_PROVIDER;
     }

@@ -4,14 +4,18 @@ import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { BlockScoutIcon, UniversalProfileIcon } from '../../assets';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../boot/types';
-import { selectCardById } from '../../features/cards';
+import { fetchCard, selectCardById } from '../../features/cards';
 import { useEffect } from 'react';
-import { selectUserById } from '../../features/profiles';
+import {
+  fetchAssetCreator,
+  fetchAssetHolders,
+  fetchProfileByAddress,
+  selectAllUsersItems,
+  selectUserById,
+  selectUserIds,
+} from '../../features/profiles';
 import { useMemo } from 'react';
-import { IBalanceOf, ICard, IProfile } from '../../services/models';
-import Web3Services from '../../services/Web3Service';
-import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
-import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
+import { IBalanceOf, IProfile } from '../../services/models';
 import {
   StyledAssetDetailContent,
   StyledAssetDetailsContentWrappar,
@@ -35,8 +39,12 @@ import {
   StyledUniversalProfileIcon,
   StyledBlockScoutIcon,
   StyledStatsName,
+  StyledCardError,
+  StyledLoader,
+  StyledLoadingHolder,
 } from './styles';
 import { HeaderToolbar } from '../../components/HeaderToolbar';
+import { useAppDispatch } from '../../boot/store';
 
 interface IPrams {
   add: string;
@@ -50,113 +58,96 @@ const AssetDetails: React.FC = () => {
     history.push('/');
   };
 
-  const assetData = useSelector((state: RootState) =>
+  const profiles = useSelector((state: RootState) => selectUserIds(state));
+
+  const asset = useSelector((state: RootState) =>
     selectCardById(state, params.add),
   );
 
-  const [asset, setAsset] = useState<ICard | null>();
-
-  const ownerData = useSelector((state: RootState) =>
+  const owner = useSelector((state: RootState) =>
     selectUserById(state, asset?.owner ? asset.owner : ''),
   );
-  const [owner, setOwner] = useState<IProfile>();
 
-  const [designers, setDesigners] = useState<IProfile[]>([]);
+  const holders = useSelector((state: RootState) =>
+    selectAllUsersItems(state),
+  ).filter((item) => {
+    return asset?.holders.some((i) => {
+      return i === item.address && item.network === params.network;
+    });
+  });
 
-  const [holders, setHolders] = useState<IProfile[]>([]);
+  const creators = useSelector((state: RootState) =>
+    selectAllUsersItems(state),
+  ).filter((item) => {
+    return asset?.creators.some((i) => {
+      return i === item.address && item.network === params.network;
+    });
+  });
 
+  const cardError = useSelector((state: RootState) => state.cards.error);
+
+  const cardStatus = useSelector((state: RootState) => state.cards.status);
+
+  const dispatch = useAppDispatch();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [balanceOf, setBalanceOf] = useState<IBalanceOf[]>([]);
 
-  const getOwner = async (address: string) => {
-    if (ownerData) {
-      const res = await getBalanceOf(ownerData.address);
-      setBalanceOf((prevState) => [
-        ...prevState,
-        { address: ownerData.address, balance: res },
-      ]);
-      setOwner(ownerData);
-    } else {
-      const profile = await LSP3ProfileApi.fetchProfile(new Web3Services())(
-        address,
-        params.network,
+  useMemo(() => {
+    if (!owner && asset) {
+      dispatch(
+        fetchProfileByAddress({
+          address: asset.owner,
+          network: params.network,
+        }),
       );
-      const res = await getBalanceOf(profile.address);
-      setBalanceOf((prevState) => [
-        ...prevState,
-        { address: profile.address, balance: res },
-      ]);
-      if (profile) setOwner(profile);
     }
-  };
+  }, [asset, dispatch, owner, params.network]);
 
-  const getHolders = async (address: string[]) => {
-    const res = await LSP3ProfileApi.fetchAllProfiles(new Web3Services())(
-      address,
-      params.network,
-    );
-    res.forEach(async (item) => {
-      const balanceOf = await getBalanceOf(item.address);
-      setBalanceOf((prevState) => [
-        ...prevState,
-        { address: item.address, balance: balanceOf },
-      ]);
-    });
-    setHolders(res);
-  };
+  useMemo(() => {
+    if (!asset) {
+      dispatch(fetchCard({ address: params.add, network: params.network }));
+    }
+  }, [asset, dispatch, params.add, params.network]);
 
-  const getCreators = async () => {
-    try {
-      const creators = await LSP3ProfileApi.fetchCreators(new Web3Services())(
-        params.add,
-        params.network,
-      );
-      console.log(creators);
-      if (creators) {
-        console.log("creatorsss")
-        creators.forEach(async (item) => {
-          const balanceOf = await getBalanceOf(item.address);
-          setBalanceOf((prevState) => [
-            ...prevState,
-            { address: item.address, balance: balanceOf },
-          ]);
-        });
+  useMemo(() => {
+    let addresses: string[] = [];
+    asset?.holders.forEach((item) => {
+      if (!profiles.includes(item)) {
+        addresses.push(item);
       }
-      if (creators) setDesigners(creators);
-    } catch (error: any) {
-      console.error(error.message);
-      setDesigners([]);
+    });
+    if (addresses.length > 0) {
+      dispatch(
+        fetchAssetHolders({ address: addresses, network: params.network }),
+      );
     }
-  };
+  }, [asset?.holders, dispatch, params.network, profiles]);
 
-  const getAsset = async () => {
-    if (assetData) {
-      setAsset(assetData);
-      getHolders(assetData.holders);
-      getOwner(assetData.owner);
-    } else {
-      await LSP4DigitalAssetApi.fetchCard(new Web3Services())(
-        params.add,
-        params.network,
-      ).then((value) => {
-        setAsset(value);
-        getHolders(value?.holders ? value.holders : []);
-        getOwner(value?.owner ? value.owner : '');
-      });
+  useMemo(() => {
+    let addresses: string[] = [];
+    asset?.creators.forEach((item) => {
+      if (!profiles.includes(item)) {
+        addresses.push(item);
+      }
+    });
+    if (addresses.length > 0) {
+      dispatch(
+        fetchAssetCreator({ address: addresses, network: params.network }),
+      );
     }
-  };
+  }, [asset?.creators, dispatch, params.network, profiles]);
 
-  const getBalanceOf = async (address: string) => {
-    return await LSP4DigitalAssetApi.fetchBalanceOf(new Web3Services())(
-      params.add,
-      address,
-    );
-  };
+  // const getBalanceOf = async (address: string) => {
+  //   return await LSP4DigitalAssetApi.fetchBalanceOf(new Web3Services())(
+  //     params.add,
+  //     address,
+  //   );
+  // };
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getAsset();
-    getCreators();
-  }, [params.add]);
+  }, [params.add, params.network]);
 
   const renderOwner = useMemo(() => {
     if (asset?.address === params.add) {
@@ -174,11 +165,11 @@ const AssetDetails: React.FC = () => {
         );
       }
     }
-  }, [owner, params.add, balanceOf]);
+  }, [asset?.address, asset?.owner, params.add, owner, balanceOf]);
 
   const renderDesigners = useMemo(
     () =>
-      designers.map((creator: IProfile) => {
+      creators.map((creator: IProfile) => {
         const findBalanceOf = balanceOf.find(
           (item) => item.address === creator.address,
         );
@@ -191,7 +182,7 @@ const AssetDetails: React.FC = () => {
           />
         );
       }),
-    [designers, params.add, balanceOf],
+    [creators, balanceOf],
   );
 
   const renderHolders = useMemo(
@@ -209,7 +200,7 @@ const AssetDetails: React.FC = () => {
           />
         );
       }),
-    [holders, params.add, balanceOf],
+    [holders, balanceOf],
   );
 
   const metaCardInfo = [
@@ -232,52 +223,72 @@ const AssetDetails: React.FC = () => {
         buttonLabel="Back to profile"
         headerToolbarLabel="Asset Details"
       />
-      <StyledAssetDetailContent>
-        <StyledGrid>
-          <StyledAssetDetailGrid>
-            <StyledMediaWrappar>
-              <a
-                href={'https://universalprofile.cloud/asset/' + asset?.address}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <StyledUniversalProfileIcon src={UniversalProfileIcon} alt="" />
-              </a>
-              <a
-                href={
-                  'https://blockscout.com/lukso/l14/address/' + asset?.address
-                }
-                target="_blank"
-                rel="noreferrer"
-              >
-                <StyledBlockScoutIcon src={BlockScoutIcon} alt="" />
-              </a>
-              <StyledStatsName>{metaCardInfo[0].data}</StyledStatsName>
-              <StyledMetaCardImg src={asset?.ls8MetaData.image} alt="" />
-            </StyledMediaWrappar>
-            <StyledDetailsWrappar>
-              <StyledCardInfoLabel>Card Info</StyledCardInfoLabel>
-              <StyledInfoGrid>
-                {metaCardInfo.map((items) => (
-                  <div key={items.text}>
-                    <StyledLabel>{items.text}</StyledLabel>
-                    <StyledValue>{items.data}</StyledValue>
-                  </div>
-                ))}
-              </StyledInfoGrid>
-              <StyledFullName>{asset?.name}</StyledFullName>
-            </StyledDetailsWrappar>
-          </StyledAssetDetailGrid>
-          <StyledExtraInfo>
-            <StyledIssuerLabel>Issuer</StyledIssuerLabel>
-            <StyledIssuerWrappar>{renderOwner}</StyledIssuerWrappar>
-            <StyledCreatorLabel>Creator</StyledCreatorLabel>
-            <StyledCreatorWrappar>{renderDesigners}</StyledCreatorWrappar>
-          </StyledExtraInfo>
-        </StyledGrid>
-        <StyledHolderLabel>Holder</StyledHolderLabel>
-        <StyledHolderWrappar>{renderHolders}</StyledHolderWrappar>
-      </StyledAssetDetailContent>
+      {cardStatus === 'loading' ? (
+        <StyledLoadingHolder>
+          <StyledLoader color="#ed7a2d" />
+        </StyledLoadingHolder>
+      ) : (
+        <>
+          {cardError && cardStatus === 'failed' ? (
+            <>
+              <StyledCardError>Asset not found</StyledCardError>
+            </>
+          ) : (
+            <StyledAssetDetailContent>
+              <StyledGrid>
+                <StyledAssetDetailGrid>
+                  <StyledMediaWrappar>
+                    <a
+                      href={
+                        'https://universalprofile.cloud/asset/' + asset?.address
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <StyledUniversalProfileIcon
+                        src={UniversalProfileIcon}
+                        alt=""
+                      />
+                    </a>
+                    <a
+                      href={
+                        'https://blockscout.com/lukso/l14/address/' +
+                        asset?.address
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <StyledBlockScoutIcon src={BlockScoutIcon} alt="" />
+                    </a>
+                    <StyledStatsName>{metaCardInfo[0].data}</StyledStatsName>
+                    <StyledMetaCardImg src={asset?.ls8MetaData.image} alt="" />
+                  </StyledMediaWrappar>
+                  <StyledDetailsWrappar>
+                    <StyledCardInfoLabel>Card Info</StyledCardInfoLabel>
+                    <StyledInfoGrid>
+                      {metaCardInfo.map((items) => (
+                        <div key={items.text}>
+                          <StyledLabel>{items.text}</StyledLabel>
+                          <StyledValue>{items.data}</StyledValue>
+                        </div>
+                      ))}
+                    </StyledInfoGrid>
+                    <StyledFullName>{asset?.name}</StyledFullName>
+                  </StyledDetailsWrappar>
+                </StyledAssetDetailGrid>
+                <StyledExtraInfo>
+                  <StyledIssuerLabel>Issuer</StyledIssuerLabel>
+                  <StyledIssuerWrappar>{renderOwner}</StyledIssuerWrappar>
+                  <StyledCreatorLabel>Creator</StyledCreatorLabel>
+                  <StyledCreatorWrappar>{renderDesigners}</StyledCreatorWrappar>
+                </StyledExtraInfo>
+              </StyledGrid>
+              <StyledHolderLabel>Holder</StyledHolderLabel>
+              <StyledHolderWrappar>{renderHolders}</StyledHolderWrappar>
+            </StyledAssetDetailContent>
+          )}
+        </>
+      )}
     </StyledAssetDetailsContentWrappar>
   );
 };

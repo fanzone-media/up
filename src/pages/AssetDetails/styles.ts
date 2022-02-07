@@ -1,3 +1,4 @@
+import { Puff } from 'react-loader-spinner';
 import styled from 'styled-components';
 import { BgMetaCard } from '../../assets';
 import { pulseAnimate } from '../../features/cards/MetaCard/styles';
@@ -7,6 +8,20 @@ export const StyledAssetDetailsContentWrappar = styled.div`
   display: flex;
   flex-direction: column;
   color: white;
+`;
+
+export const StyledCardError = styled.h1`
+  font-size: 30px;
+  margin: 60px auto 0 auto;
+`;
+
+export const StyledLoadingHolder = styled.div`
+  margin: auto;
+`;
+
+export const StyledLoader = styled(Puff)`
+  margin: 0 auto 0 auto;
+  height: 400px;
 `;
 
 export const StyledAssetDetailContent = styled.div`

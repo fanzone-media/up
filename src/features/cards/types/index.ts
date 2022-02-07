@@ -18,4 +18,3 @@ export type ICardsSliceState = {
 };
 
 export type ICardState = ICardItemsState & EntityState<ICard>;
-

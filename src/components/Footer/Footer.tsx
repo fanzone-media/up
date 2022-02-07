@@ -1,13 +1,11 @@
 import React from 'react';
 import { HashRouter as Router } from 'react-router-dom';
-import { FanzoneHexagon, Lukso } from '../../assets';
+import { FanzoneHexagon } from '../../assets';
 import { StyledLabel } from '../../pages/AssetDetails/styles';
 import {
   StyledFooterContent,
   StyledFooter,
   StyledFanzoneHexagon,
-  StyledLink,
-  StyledLukso,
   StyledNetworkLink,
   StyledNetworksWrapper,
   StyledDivider,

@@ -7,7 +7,6 @@ import { selectAllUsersItems } from '../../features/profiles';
 import { IProfile } from '../../services/models';
 import { useEffect } from 'react';
 import { selectAllCardItems } from '../../features/cards';
-import { useAppDispatch } from '../../boot/store';
 import Pagination from '../../features/pagination/Pagination';
 import {
   StyledContentwrappar,
@@ -25,16 +24,9 @@ import {
   StyledError,
 } from './styles';
 import { Search } from '../../components/Search';
-import { useParams } from 'react-router-dom';
-
-interface IParams {
-  network: string;
-}
 
 const Profiles: React.FC = () => {
   const demoCollectionAddress = '0x5C604ce30001Bf97D72471adA70dFDf3dC21C0e4';
-  const params = useParams<IParams>();
-  const dispatch = useAppDispatch();
 
   const userProfile = useSelector((state: RootState) =>
     selectAllUsersItems(state),
