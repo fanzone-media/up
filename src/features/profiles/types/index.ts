@@ -13,5 +13,8 @@ interface IBaseState {
 export type IUsersState = IBaseState;
 
 export type IUserDataSliceState = {
-  users: IUsersState & EntityState<IProfile>;
+  l14: IUsersState & EntityState<IProfile>;
+  polygon: IUsersState & EntityState<IProfile>;
+  mumbai: IUsersState & EntityState<IProfile>;
+  ethereum: IUsersState & EntityState<IProfile>;
 };

@@ -57,7 +57,7 @@ import {
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
-import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
+import { fetchProfileByAddress, selectEthereumUserById, selectL14UserById, selectMumbaiUserById, selectPolygonUserById } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 
 interface IParams {
@@ -69,18 +69,49 @@ const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
 
-  const profile = useSelector((state: RootState) =>
-    selectUserById(state, params.add),
-  );
+  const profile = useSelector((state: RootState) => {
+    switch (params.network) {
+      case 'l14':
+        return selectL14UserById(state, params.add);
+      case 'polygon':
+        return selectPolygonUserById(state, params.add);
+      case 'mumbai':
+        return selectMumbaiUserById(state, params.add);
+      case 'ethereum':
+        return selectEthereumUserById(state, params.add);
+    }
+  });
 
   const cards = useSelector((state: RootState) => selectCardIds(state));
 
   const profileError = useSelector(
-    (state: RootState) => state.userData.users.error,
+    (state: RootState) => {
+      switch (params.network) {
+        case 'l14':
+          return state.userData.l14.error;
+        case 'polygon':
+          return state.userData.polygon.error;
+        case 'mumbai':
+          return state.userData.mumbai.error;
+        case 'ethereum':
+          return state.userData.ethereum.error;
+      }
+    }
   );
 
   const profileStatus = useSelector(
-    (state: RootState) => state.userData.users.status,
+    (state: RootState) => {
+      switch (params.network) {
+        case 'l14':
+          return state.userData.l14.status;
+        case 'polygon':
+          return state.userData.polygon.status;
+        case 'mumbai':
+          return state.userData.mumbai.status;
+        case 'ethereum':
+          return state.userData.ethereum.status;
+      }
+    }
   );
 
   const [isShare, setIsShare] = useState<boolean>(false);

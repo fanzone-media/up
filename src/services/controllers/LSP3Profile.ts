@@ -5,12 +5,68 @@ import Utils from '../utilities/util';
 import { getLSP3ProfileData } from '../ipfsClient';
 import {
   CardToken__factory,
+  ERC725Y,
   ERC725Y__factory,
   UniversalProfile__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import { ethers } from 'ethers';
-import { fetchLSP5Data } from '../../submodules/fanzone-smart-contracts/utils/LSPSchema';
+//import { fetchLSP5Data } from '../../submodules/fanzone-smart-contracts/utils/LSPSchema';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
+import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
+import { ERC725JSONSchema } from '@erc725/erc725.js';
+
+const LSP5ReceivedAssetsSchemaList: Array<ERC725JSONSchema> = [
+  {
+    name: "LSP5ReceivedAssets[]",
+    key: "0x6460ee3c0aac563ccbf76d6e1d07bada78e3a9514e6382b736ed3f478ab7b90b",
+    keyType: "Array",
+    valueContent: "Number",
+    valueType: "uint256",
+  },
+];
+
+enum ERC165InterfaceIds {
+  LSP7 = "0xe33f65c3",
+  LSP8 = "0x49399145",
+}
+
+const fetchLSP5Data = async (
+  schema: ERC725JSONSchema,
+  contract: ERC725Y,
+) => {
+
+    let lsp8Assets: string[] = [];
+    const schemaValue = await contract.getData([KeyChain.LSP5ReceivedAssets]);
+    
+    if (schemaValue[0] !== "0x") {
+      const arrayLength = ethers.BigNumber.from(schemaValue[0]).toNumber();
+
+      const indexKeys = new Array(arrayLength)
+        .fill(null)
+        .map((_value, index) => encodeArrayKey(schema.key, index));
+
+
+      const indexValues = await contract.getData(indexKeys);
+
+      const assets = await Promise.all(indexValues.map(async (item) => {
+        const key = `0x812c4334633eb81600000000${item.replace(/^0x/, "")}`
+        const lsp5AssetsMapping = await contract.getData([key]);
+        const value = lsp5AssetsMapping[0].replace(/^0x/, "");
+        const interfaceId = `0x${value.slice(16, 20)}`;
+
+        const tokenType =
+          interfaceId === ERC165InterfaceIds.LSP7 ? "LSP7" : "LSP8";
+        return {
+          item,
+          tokenType
+        }
+      }));
+       assets.forEach((item) => {
+         if(item.tokenType === "LSP8") lsp8Assets.push(item.item);
+       });
+   }
+   return lsp8Assets;
+};
 
 const fetchProfile =
   (EthereumSerive: IEthereumService) =>
@@ -26,21 +82,17 @@ const fetchProfile =
       .catch(() => {
         throw new Error('Not a universal profile');
       });
-
     let ownedAssets: string[] = [];
 
-    await fetchLSP5Data(contract)
-      .then((result: any) => {
-        ownedAssets = result[0]?.listEntries.map((item: any) => {
-          if (item.mapEntries.receivedAsset.parsedValue.tokenType === 'LSP8')
-            return item.value;
-          return [] as string[];
-        });
+    await fetchLSP5Data(LSP5ReceivedAssetsSchemaList[0], contract)
+      .then((result) => {
+        ownedAssets = result;
       })
       .catch((error) => {
         console.log(error);
       });
 
+    console.log(ownedAssets);
     const issuedAssets =
       await LSP4DigitalAssetApi.fetchProfileIssuedAssetsAddresses(
         EthereumSerive,

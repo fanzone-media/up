@@ -10,7 +10,6 @@ const Routes: React.FC = () => {
   return (
     <Router>
       <Switch>
-        <Route exact path="/" render={() => <Profiles />} />
         <Route exact path="/:network" render={() => <Profiles />} />
         <Route
           exact
