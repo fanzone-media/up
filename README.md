@@ -1,4 +1,4 @@
-Checkout the site: https://fanzone-media.github.io/up/#/
+Checkout the site: https://fanzone-media.github.io/up/#/${network}
 
 For development:
 
