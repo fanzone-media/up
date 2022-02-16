@@ -1,4 +1,13 @@
-Checkout the site: https://fanzone-media.github.io/up/#/ ${network}
+Checkout the site: https://fanzone-media.github.io/up/#/mumbai
+
+URL structure: fanzone-media.github.io/up/#/:network
+
+Available networks for `:network` param are:
+
+1. polygon
+2. mumbai
+3. l14
+4. ethereum
 
 For development:
 
