@@ -17,6 +17,7 @@ import Link from './link-icon.svg';
 import Twitter from './twitter-icon.svg';
 import Instagram from './instagram-icon.svg';
 import Globe from './globe-icon.svg';
+import polygonExplorerIcon from './poly.png';
 
 export {
   BgMetaCard,
@@ -38,4 +39,5 @@ export {
   Facebook,
   Instagram,
   Globe,
+  polygonExplorerIcon
 };

@@ -54,6 +54,7 @@ import {
 } from './styles';
 import { HeaderToolbar } from '../../components/HeaderToolbar';
 import { useAppDispatch } from '../../boot/store';
+import { getChainExplorer } from '../../utility';
 
 interface IPrams {
   add: string;
@@ -64,8 +65,9 @@ const AssetDetails: React.FC = () => {
   const params = useParams<IPrams>();
   const history = useHistory();
   const backHandler = () => {
-    history.push('/');
+    history.push(`/${params.network}`);
   };
+  const explorer = getChainExplorer(params.network);
 
   const profiles = useSelector((state: RootState) => {
     switch (params.network) {
@@ -269,6 +271,7 @@ const AssetDetails: React.FC = () => {
         onBack={backHandler}
         buttonLabel="Back to profile"
         headerToolbarLabel="Asset Details"
+        showEditProfileButton={false}
       />
       {cardStatus === 'loading' ? (
         <StyledLoadingHolder>
@@ -285,7 +288,7 @@ const AssetDetails: React.FC = () => {
               <StyledGrid>
                 <StyledAssetDetailGrid>
                   <StyledMediaWrappar>
-                    <a
+                    {params.network === 'l14' && <a
                       href={
                         'https://universalprofile.cloud/asset/' + asset?.address
                       }
@@ -296,16 +299,16 @@ const AssetDetails: React.FC = () => {
                         src={UniversalProfileIcon}
                         alt=""
                       />
-                    </a>
+                    </a>}
                     <a
-                      href={
-                        'https://blockscout.com/lukso/l14/address/' +
+                      href={explorer &&
+                        explorer.exploreUrl +
                         asset?.address
                       }
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <StyledBlockScoutIcon src={BlockScoutIcon} alt="" />
+                      <StyledBlockScoutIcon src={explorer?.icon} alt="" />
                     </a>
                     <StyledStatsName>{metaCardInfo[0].data}</StyledStatsName>
                     <StyledMetaCardImg src={asset?.ls8MetaData.image} alt="" />

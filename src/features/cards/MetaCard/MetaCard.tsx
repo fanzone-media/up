@@ -14,6 +14,7 @@ import {
   StyledOwnedMint,
   StyledUniversalProfileIcon,
 } from './styles';
+import { getChainExplorer } from '../../../utility';
 
 interface IProps {
   digitalCard: ICard;
@@ -31,21 +32,22 @@ export const MetaCard: React.FC<IProps> = React.memo(function CardListItem({
   balance,
 }: IProps) {
   const params = useParams<IParams>();
+  const explorer = getChainExplorer(params.network);
   return (
     <StyledCardWrappar>
-      <a
+      {params.network === 'l14' && <a
         href={'https://universalprofile.cloud/asset/' + digitalCard.address}
         target="_blank"
         rel="noreferrer"
       >
         <StyledUniversalProfileIcon src={universalprofile} alt="" />
-      </a>
+      </a>}
       <a
-        href={'https://blockscout.com/lukso/l14/address/' + digitalCard.address}
+        href={explorer && explorer.exploreUrl + digitalCard.address}
         target="_blank"
         rel="noreferrer"
       >
-        <StyledBlockScoutIcon src={blockscout} alt="" />
+        <StyledBlockScoutIcon src={explorer?.icon} alt="" />
       </a>
       <Link to={`/${params.network}/asset/` + digitalCard.address}>
         <StyledMediaWrappar>

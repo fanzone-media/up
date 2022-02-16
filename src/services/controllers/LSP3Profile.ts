@@ -91,8 +91,7 @@ const fetchProfile =
       .catch((error) => {
         console.log(error);
       });
-
-    console.log(ownedAssets);
+      
     const issuedAssets =
       await LSP4DigitalAssetApi.fetchProfileIssuedAssetsAddresses(
         EthereumSerive,
@@ -103,6 +102,8 @@ const fetchProfile =
       address,
       provider,
     );
+
+    const owner = await universalProfile.owner();
 
     await universalProfile
       .getData([KeyChain.LSP3PROFILE])
@@ -128,7 +129,7 @@ const fetchProfile =
         ? Utils.convertImageURL(result.LSP3Profile.backgroundImage[0].url)
         : null,
     };
-    return { ...profile, address: address, network, ownedAssets, issuedAssets };
+    return { ...profile, owner, address: address, network, ownedAssets, issuedAssets };
   };
 
 const fetchOwnedCollectionCount =

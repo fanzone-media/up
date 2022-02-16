@@ -162,12 +162,9 @@ const fetchBalanceOf =
     if (!profileAddress) {
       return 0;
     }
-    const assetContract = EthereumService.getContract(
-      ABI.LSP4DigitalCertificateABI,
-      assetAddress,
-      network,
-    );
-    const balance = await assetContract.balanceOf(profileAddress);
+    const provider = EthereumService.getProvider(network);
+    const contract = CardToken__factory.connect(assetAddress, provider);
+    const balance = await contract.balanceOf(profileAddress);
     return ethers.BigNumber.from(balance).toNumber();
   };
 

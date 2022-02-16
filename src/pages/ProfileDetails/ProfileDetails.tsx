@@ -59,6 +59,7 @@ import { md } from '../../utility';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
 import { fetchProfileByAddress, selectEthereumUserById, selectL14UserById, selectMumbaiUserById, selectPolygonUserById } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
+import { useAccount } from 'wagmi';
 
 interface IParams {
   add: string;
@@ -68,6 +69,7 @@ interface IParams {
 const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
+  const [{data, error}] = useAccount();
 
   const profile = useSelector((state: RootState) => {
     switch (params.network) {
@@ -181,6 +183,8 @@ const ProfileDetails: React.FC = () => {
     }
   }, [cards, dispatch, params.network, profile?.ownedAssets]);
 
+  const [enableEditing, setEnableEditing] = useState<boolean>(false);
+
   const renderIssuedAssetsPagination = useMemo(
     () => <Pagination collection={issuedCollection} type="issued" />,
     [issuedCollection],
@@ -195,49 +199,6 @@ const ProfileDetails: React.FC = () => {
       />
     );
   }, [ownedCollection, profile?.address]);
-
-  // useMemo(async () => {
-  //   console.log('Fetching Profile');
-  //   setNameError(false);
-  //   const checkParams = Web3.utils.isAddress(params.add);
-  //   if (checkParams) {
-  //     try {
-  //       setProfileAddress(params.add);
-  //       //dispatch(fetchProfileByAddress(params.add));
-  //       await LSP3ProfileApi.fetchProfile(new Web3Service())(
-  //         params.add,
-  //         params.network,
-  //       ).then((result) => {
-  //         //setProfile(result);
-  //       });
-  //     } catch (error: any) {
-  //       console.error(error.message);
-  //     }
-  //   } else {
-  //     const add = await fetchUserAddress(params.add, params.network).catch(
-  //       (_error) => {
-  //         setNameError(true);
-  //       },
-  //     );
-  //     console.log(add);
-  //     if (add) {
-  //       try {
-  //         setProfileAddress(add);
-  //         //dispatch(fetchProfileByAddress(add));
-  //         await LSP3ProfileApi.fetchProfile(new Web3Service())(
-  //           add,
-  //           params.network,
-  //         ).then((result) => {
-  //           //setProfile(result);
-  //         });
-  //       } catch (error: any) {
-  //         console.error(error.message);
-  //       }
-  //     } else {
-  //       console.log('not found');
-  //     }
-  //   }
-  // }, [params.add]);
 
   const renderLinks = useMemo(
     () =>
@@ -286,7 +247,7 @@ const ProfileDetails: React.FC = () => {
   };
 
   const backHandler = () => {
-    history.push('/');
+    history.push(`/${params.network}`);
   };
 
   useEffect(() => {
@@ -300,6 +261,9 @@ const ProfileDetails: React.FC = () => {
         onBack={backHandler}
         buttonLabel="Back to profile"
         headerToolbarLabel="User Profile"
+        showEditProfileButton={(profile && data) && (profile.owner.toLowerCase() === data.address.toLowerCase()) ? true : false}
+        enableEditing={enableEditing}
+        setEnableEditing={() => setEnableEditing(!enableEditing)}
       />
       {profileStatus === 'loading' ? (
         <StyledLoadingHolder>

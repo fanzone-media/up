@@ -52,3 +52,11 @@ export const StyledFanzoneAppLink = styled.a`
   border-radius: 5px;
   width: auto;
 `;
+
+export const StyledConnectMetaMask = styled.button`
+  margin: auto 0 auto auto;
+`;
+
+export const StyledMyAccountButton = styled(StyledConnectMetaMask)`
+
+`;

@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
+import { useAccount, useConnect } from 'wagmi';
 import { FanzoneHexagon, Logo } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
+import { AccountDetails } from './AccountDetails';
 import {
+  StyledConnectMetaMask,
   StyledDivider,
-  StyledFanzoneAppLink,
   StyledHeader,
   StyledHeaderContent,
   StyledHeading,
   StyledLink,
   StyledLogo,
+  StyledMyAccountButton,
 } from './styles';
 
 export const Header: React.FC = () => {
   const isTablet = useMediaQuery(md);
+  const [{data, error}, connect] = useConnect();
+  const [showAccountDetail, setShowAccountDetail] = useState<boolean>(false);
 
   return (
     <StyledHeader id="header">
@@ -26,13 +31,25 @@ export const Header: React.FC = () => {
             <StyledHeading>Profiles</StyledHeading>
           </StyledLink>
         </Router>
-        <StyledFanzoneAppLink
+        {data.connected ? 
+          <StyledMyAccountButton onClick={() => setShowAccountDetail(!showAccountDetail)}>
+            My Account
+          </StyledMyAccountButton> :
+          <StyledConnectMetaMask onClick={() => connect(data.connectors[0])}>
+            Connect Metamask 
+          </StyledConnectMetaMask>
+        }
+        {
+          showAccountDetail && data.connected && 
+            <AccountDetails />
+        }
+        {/* <StyledFanzoneAppLink
           href="https://app.fanzone.io"
           target="_blank"
           rel="noreferrer"
         >
           Back to FANZONE
-        </StyledFanzoneAppLink>
+        </StyledFanzoneAppLink> */}
       </StyledHeaderContent>
     </StyledHeader>
   );

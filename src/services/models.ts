@@ -68,6 +68,7 @@ export interface ICard {
 
 export interface IProfile {
   address: string;
+  owner: string;
   network: string;
   name: string;
   description: string;

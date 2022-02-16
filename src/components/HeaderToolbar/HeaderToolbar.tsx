@@ -4,6 +4,7 @@ import {
   StyledBackButton,
   StyledBackImg,
   StyledButtonLabel,
+  StyledEditProfileButton,
   StyledHeaderToolbar,
   StyledHeaderToolbarContent,
   StyledHeaderToolbarLabel,
@@ -13,13 +14,20 @@ interface IProps {
   onBack: () => void;
   buttonLabel: string;
   headerToolbarLabel: string;
+  showEditProfileButton: boolean;
+  setEnableEditing?: () => void;
+  enableEditing?: boolean;
 }
 
 export const HeaderToolbar: React.FC<IProps> = ({
   onBack,
   buttonLabel,
   headerToolbarLabel,
+  showEditProfileButton,
+  setEnableEditing,
+  enableEditing
 }: IProps) => {
+
   return (
     <StyledHeaderToolbar>
       <StyledHeaderToolbarContent>
@@ -27,7 +35,13 @@ export const HeaderToolbar: React.FC<IProps> = ({
           <StyledBackImg src={PrevIcon} />
           <StyledButtonLabel>{buttonLabel}</StyledButtonLabel>
         </StyledBackButton>
-        <StyledHeaderToolbarLabel>
+        {
+          showEditProfileButton &&
+            <StyledEditProfileButton onClick={setEnableEditing}>
+              {enableEditing ? "Cancel Editing" : "Edit Profile"}
+            </StyledEditProfileButton>
+        }
+        <StyledHeaderToolbarLabel isEditVisible={showEditProfileButton}>
           {headerToolbarLabel}
         </StyledHeaderToolbarLabel>
       </StyledHeaderToolbarContent>
