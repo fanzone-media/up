@@ -15,20 +15,27 @@ interface ILSP4Metadata {
   assets: [];
 }
 
-interface NumericTrait {
-  value: number;
+export interface StringTrait {
+  display_type: "string",
   trait_type: string;
-  display_type?: 'number' | 'boost_percentage' | 'boost_number';
+  value: string;
+}
+export interface NumericTrait {
+  display_type: "number" | "boost_percentage" | "boost_number"
+  trait_type: string;
+  value: number;
   max_value?: number;
 }
-
-interface DateTraits {
-  value: number;
-  display_type: 'date';
-  trait_type?: string;
+export interface DateTrait {
+  display_type: "date",
+  trait_type: string,
+  value: number
+}
+export interface GenericProperty {
+  value: string | number
 }
 
-type Trait = NumericTrait | DateTraits;
+export type OpenseaAttribute = StringTrait | NumericTrait | DateTrait | GenericProperty;
 interface ILSP8MetaData {
   batch: string;
   batchMax: string;
@@ -51,7 +58,7 @@ interface ILSP8MetaData {
   external_url: string;
   description: string;
   name: string;
-  attributes: Trait[];
+  attributes: OpenseaAttribute[];
 }
 
 export interface ICard {

@@ -17,7 +17,7 @@ export default class Web3Service implements IEthereumService {
   static LUKSO_L14_PROVIDER_URL = 'https://rpc.l14.lukso.network';
   static POLYGON_MAINNET_PROVIDER_URL = 'https://polygon-rpc.com/';
   static POLYGON_MUMBAI_PROVIDER_URL =
-    'https://matic-mumbai.chainstacklabs.com';
+    'https://rpc-mumbai.maticvigil.com';
   static ETHEREUM_MAINNET_PROVIDER_URL = '';
 
   /**

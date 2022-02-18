@@ -24,7 +24,7 @@ import {
   selectPolygonUserIds,
 } from '../../features/profiles';
 import { useMemo } from 'react';
-import { IBalanceOf, IProfile } from '../../services/models';
+import { IBalanceOf, IProfile, NumericTrait } from '../../services/models';
 import {
   StyledAssetDetailContent,
   StyledAssetDetailsContentWrappar,
@@ -251,7 +251,7 @@ const AssetDetails: React.FC = () => {
       }),
     [holders, balanceOf],
   );
-
+  
   const metaCardInfo = [
     { text: 'Name', data: asset?.name.split('•')[0] },
     { text: 'Card Type', data: asset?.ls8MetaData.cardType },
@@ -264,6 +264,25 @@ const AssetDetails: React.FC = () => {
     { text: 'League', data: asset?.ls8MetaData.leagueLabel },
     { text: 'Team', data: asset?.ls8MetaData.teamLabel },
   ];
+
+  const renderCardProperties = useMemo(() => {
+    const keys = asset && Object.keys(asset && asset.ls8MetaData);
+    if(keys && keys.includes("attributes") && asset && asset.ls8MetaData.attributes.length > 0) {
+      return asset.ls8MetaData.attributes.map((attribute: any, i) => (
+        <React.Fragment key={i}>
+          <StyledLabel>{attribute.trait_type}</StyledLabel>
+          {Object.keys(attribute).includes("max_value") ? <StyledValue>{attribute.value} of {attribute.max_value}</StyledValue> : <StyledValue>{attribute.value}</StyledValue>}
+        </React.Fragment>                          
+      ))
+    } else {
+      return metaCardInfo.map((items, i) => (
+        <React.Fragment key={i}>
+          <StyledLabel>{items.text}</StyledLabel>
+          <StyledValue>{items.data}</StyledValue>
+        </React.Fragment>
+      ))
+    }
+  }, [asset])
 
   return (
     <StyledAssetDetailsContentWrappar>
@@ -316,12 +335,8 @@ const AssetDetails: React.FC = () => {
                   <StyledDetailsWrappar>
                     <StyledCardInfoLabel>Card Info</StyledCardInfoLabel>
                     <StyledInfoGrid>
-                      {metaCardInfo.map((items) => (
-                        <div key={items.text}>
-                          <StyledLabel>{items.text}</StyledLabel>
-                          <StyledValue>{items.data}</StyledValue>
-                        </div>
-                      ))}
+
+                      {renderCardProperties}
                     </StyledInfoGrid>
                     <StyledFullName>{asset?.name}</StyledFullName>
                   </StyledDetailsWrappar>

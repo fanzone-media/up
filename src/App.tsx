@@ -73,8 +73,8 @@ const connectors = () => {
 
 
 function App() {
+  
   useEffect(() => {});
-  console.log(chains, defaultChains);
 
   return (
     <WagmiProvider autoConnect connectors={connectors}>

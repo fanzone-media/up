@@ -1,4 +1,3 @@
-import ABI from '../utilities/ABIs';
 import KeyChain from '../utilities/KeyChain';
 import { IEthereumService } from '../IEthereumService';
 import { ICard } from '../models';

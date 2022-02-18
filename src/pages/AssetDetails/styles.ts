@@ -135,7 +135,7 @@ export const StyledDetailsWrappar = styled.div`
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
-    height: 473px;
+    min-height: 473px;
   }
 `;
 
