@@ -15,8 +15,7 @@ interface IProps {
   buttonLabel: string;
   headerToolbarLabel: string;
   showEditProfileButton: boolean;
-  setEnableEditing?: () => void;
-  enableEditing?: boolean;
+  showProfileEditModal?: () => void;
 }
 
 export const HeaderToolbar: React.FC<IProps> = ({
@@ -24,8 +23,7 @@ export const HeaderToolbar: React.FC<IProps> = ({
   buttonLabel,
   headerToolbarLabel,
   showEditProfileButton,
-  setEnableEditing,
-  enableEditing
+  showProfileEditModal,
 }: IProps) => {
 
   return (
@@ -37,8 +35,8 @@ export const HeaderToolbar: React.FC<IProps> = ({
         </StyledBackButton>
         {
           showEditProfileButton &&
-            <StyledEditProfileButton onClick={setEnableEditing}>
-              {enableEditing ? "Cancel Editing" : "Edit Profile"}
+            <StyledEditProfileButton onClick={showProfileEditModal}>
+              Edit Profile
             </StyledEditProfileButton>
         }
         <StyledHeaderToolbarLabel isEditVisible={showEditProfileButton}>

@@ -23,6 +23,7 @@ import { Search } from '../../components/Search';
 import { useAppDispatch } from '../../boot/store';
 import { useParams } from 'react-router-dom';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
+import { useSigner } from 'wagmi';
 
 interface IParams {
   network: string
@@ -32,6 +33,7 @@ const Profiles: React.FC = () => {
 
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
+  const [{ data, error, loading }, getSigner] = useSigner();
 
   const demoProfiles = {
     l14:['',''],

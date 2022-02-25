@@ -1,19 +1,20 @@
 import KeyChain from '../utilities/KeyChain';
-import { IProfile } from '../models';
+import { IProfile, ISetProfileData } from '../models';
 import { IEthereumService } from '../IEthereumService';
 import Utils from '../utilities/util';
-import { getLSP3ProfileData } from '../ipfsClient';
+import { addData, addFile, getLSP3ProfileData } from '../ipfsClient';
 import {
   CardToken__factory,
   ERC725Y,
   ERC725Y__factory,
   UniversalProfile__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
-import { ethers } from 'ethers';
+import { ethers, Signer } from 'ethers';
 //import { fetchLSP5Data } from '../../submodules/fanzone-smart-contracts/utils/LSPSchema';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import { ERC725JSONSchema } from '@erc725/erc725.js';
+import Web3 from 'web3';
 
 const LSP5ReceivedAssetsSchemaList: Array<ERC725JSONSchema> = [
   {
@@ -91,6 +92,13 @@ const fetchProfile =
       .catch((error) => {
         console.log(error);
       });
+
+    const ownedAssetsWithBalance = await Promise.all(
+      ownedAssets.map(async (assetAddress) => {
+        const balance = await fetchBalanceOf(EthereumSerive)(network, assetAddress, address);
+        return {assetAddress, balance};
+      })
+    );
       
     const issuedAssets =
       await LSP4DigitalAssetApi.fetchProfileIssuedAssetsAddresses(
@@ -114,22 +122,29 @@ const fetchProfile =
         throw new Error('No metadata found');
       });
 
-    const result = await getLSP3ProfileData(hashedUrl);
+    if(hashedUrl === "0x") return {owner, address: address, network, ownedAssets: ownedAssetsWithBalance, issuedAssets, profileImage: "", backgroundImage: ""} as IProfile;
+    
+    let metaData: any;
+    await getLSP3ProfileData(hashedUrl).then((res) => {
+      metaData = res;
+    }).catch((error) => {
+      console.log(error);
+    });
 
-    if (!result || !result.LSP3Profile) {
+    if (!metaData || !metaData.LSP3Profile) {
       throw new Error('Invalid LSP3Profile Format');
     }
 
     const profile: IProfile = {
-      ...result.LSP3Profile,
-      profileImage: result.LSP3Profile.profileImage[0]
-        ? Utils.convertImageURL(result.LSP3Profile.profileImage[0].url)
+      ...metaData?.LSP3Profile,
+      profileImage: metaData.LSP3Profile.profileImage[0]
+        ? metaData.LSP3Profile.profileImage[0].url.startsWith("ipfs://") ? Utils.convertImageURL(metaData.LSP3Profile.profileImage[0].url) : metaData.LSP3Profile.profileImage[0].url
         : null,
-      backgroundImage: result.LSP3Profile.backgroundImage[0]
-        ? Utils.convertImageURL(result.LSP3Profile.backgroundImage[0].url)
+      backgroundImage: metaData.LSP3Profile.backgroundImage[0]
+        ? metaData.LSP3Profile.backgroundImage[0].url.startsWith("ipfs://") ? Utils.convertImageURL(metaData.LSP3Profile.backgroundImage[0].url) : metaData.LSP3Profile.backgroundImage[0].url
         : null,
     };
-    return { ...profile, owner, address: address, network, ownedAssets, issuedAssets };
+    return { ...profile, owner, address: address, network, ownedAssets: ownedAssetsWithBalance, issuedAssets };
   };
 
 const fetchOwnedCollectionCount =
@@ -203,9 +218,65 @@ const fetchCreatorsAddresses =
     return creators;
   };
 
+const fetchBalanceOf =
+  (EthereumService: IEthereumService) =>
+  async (
+    network: string,
+    assetAddress: string,
+    profileAddress?: string,
+  ): Promise<number> => {
+    if (!profileAddress) {
+      return 0;
+    }
+    const provider = EthereumService.getProvider(network);
+    const contract = CardToken__factory.connect(assetAddress, provider);
+    const balance = await contract.balanceOf(profileAddress);
+    return ethers.BigNumber.from(balance).toNumber();
+  };
+
+const setUniversalProfileData = (EthereumService: IEthereumService) => 
+  async (profielAddress: string, profileData: ISetProfileData, signer: Signer): Promise<boolean> => {
+    const contract = UniversalProfile__factory.connect(profielAddress, signer);
+    if(typeof profileData.profileImage[0].url !== 'string') {
+      const profileImagePath = await addFile(profileData.profileImage[0].url);
+      if(profileImagePath) {
+        profileData = {
+          ...profileData, 
+          profileImage: [{...profileData.profileImage[0], url: profileImagePath}]
+        }
+      }
+    }
+    if(typeof profileData.backgroundImage[0].url !== 'string') {
+      const bgImagePath = await addFile(profileData.backgroundImage[0].url);
+      if(bgImagePath) {
+        profileData = {
+          ...profileData, 
+          backgroundImage: [{...profileData.backgroundImage[0], url: bgImagePath}]
+        }
+      }
+    }
+    const json = JSON.stringify({
+      LSP3Profile : profileData
+    });
+
+    const jsonIpfsPath = await addData(json);
+
+    if(!jsonIpfsPath) throw new Error('Something went wrong');
+
+    const hashFunction = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('keccak256(utf8)')).substring(0, 10);
+    const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(json));
+    const url = Web3.utils.utf8ToHex(jsonIpfsPath);
+
+    const JSONURL = hashFunction + hash.substring(2) + url.substring(2);
+    await contract.setData([KeyChain.LSP3PROFILE], [JSONURL]);
+
+    return true;
+  };
+
 export const LSP3ProfileApi = {
   fetchProfile,
   fetchAllProfiles,
   fetchCreatorsAddresses,
   fetchOwnedCollectionCount,
+  setUniversalProfileData
 };

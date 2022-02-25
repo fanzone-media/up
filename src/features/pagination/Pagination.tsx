@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { MetaCard } from '../cards/MetaCard';
-import { IBalanceOf, ICard } from '../../services/models';
+import { IBalanceOf, ICard, IProfile } from '../../services/models';
 import { PrevIcon } from '../../assets';
 import { NextIcon } from '../../assets';
 import {
@@ -21,7 +21,7 @@ import { Search } from '../../components/Search';
 interface IPagination {
   collection: ICard[];
   type: string;
-  profileAddr?: string;
+  profile?: IProfile;
 }
 
 interface IParams {
@@ -48,7 +48,7 @@ const useViewPort = () => {
 const Pagination: React.FC<IPagination> = ({
   collection,
   type,
-  profileAddr,
+  profile,
 }) => {
   const params = useParams<IParams>();
 
@@ -171,9 +171,9 @@ const Pagination: React.FC<IPagination> = ({
     () =>
       getPaginationData().map((digitalCard: ICard) => {
         if (type === 'owned' || type === 'issued') {
-          const findBalanceOf = balanceOf?.find(
+          const findBalanceOf = profile?.ownedAssets.find(
             (item) =>
-              item.address.toLowerCase() === digitalCard.address.toLowerCase(),
+              item.assetAddress.toLowerCase() === digitalCard.address.toLowerCase(),
           );
           return (
             <MetaCard

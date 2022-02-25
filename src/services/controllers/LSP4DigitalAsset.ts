@@ -54,7 +54,7 @@ const fetchCard =
       name,
       symbol,
       totalSupply: ethers.BigNumber.from(totalSupply).toNumber(),
-      ls8MetaData: { ...result, image: Utils.convertImageURL(result.image) },
+      ls8MetaData: { ...result, image: result.image.startsWith('ipfs://') ? Utils.convertImageURL(result.image) : result.image },
       owner,
       holders: holders.map((holder: string) => `0x${holder.slice(26)}`),
       creators,
@@ -151,25 +151,8 @@ const fetchProfileIssuedAssetsAddresses =
     return assets;
   };
 
-const fetchBalanceOf =
-  (EthereumService: IEthereumService) =>
-  async (
-    network: string,
-    assetAddress: string,
-    profileAddress?: string,
-  ): Promise<number> => {
-    if (!profileAddress) {
-      return 0;
-    }
-    const provider = EthereumService.getProvider(network);
-    const contract = CardToken__factory.connect(assetAddress, provider);
-    const balance = await contract.balanceOf(profileAddress);
-    return ethers.BigNumber.from(balance).toNumber();
-  };
-
 export const LSP4DigitalAssetApi = {
   fetchCard,
-  fetchBalanceOf,
   fetchProfileIssuedAssetsAddresses,
   fetchAllCards,
 };

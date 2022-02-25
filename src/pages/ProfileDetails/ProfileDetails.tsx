@@ -59,7 +59,8 @@ import { md } from '../../utility';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
 import { fetchProfileByAddress, selectEthereumUserById, selectL14UserById, selectMumbaiUserById, selectPolygonUserById } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
-import { useAccount } from 'wagmi';
+import { useAccount, useSigner } from 'wagmi';
+import { ProfileEditModal } from './ProfileEditModal';
 
 interface IParams {
   add: string;
@@ -70,6 +71,9 @@ const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
   const [{data, error}] = useAccount();
+  const [{ data: signer, error: signerError, loading }, getSigner] = useSigner();
+  const [file, setFile] = useState<File>();
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const profile = useSelector((state: RootState) => {
     switch (params.network) {
@@ -140,7 +144,7 @@ const ProfileDetails: React.FC = () => {
     selectAllCardItems(state),
   ).filter((item) => {
     return profile?.ownedAssets.some((i) => {
-      return i === item.address && item.network === params.network;
+      return i.assetAddress === item.address && item.network === params.network;
     });
   });
 
@@ -172,8 +176,8 @@ const ProfileDetails: React.FC = () => {
   useMemo(async () => {
     let addresses: string[] = [];
     profile?.ownedAssets.forEach((item) => {
-      if (!cards.includes(item)) {
-        addresses.push(item);
+      if (!cards.includes(item.assetAddress)) {
+        addresses.push(item.assetAddress);
       }
     });
     if (addresses.length > 0) {
@@ -182,8 +186,6 @@ const ProfileDetails: React.FC = () => {
       );
     }
   }, [cards, dispatch, params.network, profile?.ownedAssets]);
-
-  const [enableEditing, setEnableEditing] = useState<boolean>(false);
 
   const renderIssuedAssetsPagination = useMemo(
     () => <Pagination collection={issuedCollection} type="issued" />,
@@ -195,10 +197,10 @@ const ProfileDetails: React.FC = () => {
       <Pagination
         collection={ownedCollection}
         type="owned"
-        profileAddr={profile?.address}
+        profile={profile}
       />
     );
-  }, [ownedCollection, profile?.address]);
+  }, [ownedCollection, profile]);
 
   const renderLinks = useMemo(
     () =>
@@ -256,14 +258,14 @@ const ProfileDetails: React.FC = () => {
   }, [params.add, profile]);
 
   return (
-    <StyledProfileDetails className="relative flex flex-col w-full text-white window">
+    <StyledProfileDetails>
+      {signer && profile && data && profile.owner.toLowerCase() === data.address.toLowerCase() && <ProfileEditModal isOpen={openModal} onClose={() => setOpenModal(false)} signer={signer} profile={profile}/>}
       <HeaderToolbar
         onBack={backHandler}
         buttonLabel="Back to profile"
         headerToolbarLabel="User Profile"
         showEditProfileButton={(profile && data) && (profile.owner.toLowerCase() === data.address.toLowerCase()) ? true : false}
-        enableEditing={enableEditing}
-        setEnableEditing={() => setEnableEditing(!enableEditing)}
+        showProfileEditModal={() => setOpenModal(true)}
       />
       {profileStatus === 'loading' ? (
         <StyledLoadingHolder>

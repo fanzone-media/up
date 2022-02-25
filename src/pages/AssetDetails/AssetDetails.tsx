@@ -24,7 +24,7 @@ import {
   selectPolygonUserIds,
 } from '../../features/profiles';
 import { useMemo } from 'react';
-import { IBalanceOf, IProfile, NumericTrait } from '../../services/models';
+import { IBalanceOf, IProfile } from '../../services/models';
 import {
   StyledAssetDetailContent,
   StyledAssetDetailsContentWrappar,
@@ -201,8 +201,8 @@ const AssetDetails: React.FC = () => {
   const renderOwner = useMemo(() => {
     if (asset?.address === params.add) {
       if (owner?.address === asset.owner) {
-        const findBalanceOf = balanceOf.find(
-          (item) => item.address === owner.address,
+        const findBalanceOf = owner.ownedAssets.find(
+          (item) => item.assetAddress === params.add.toLowerCase(),
         );
         return (
           <ProfileCard
@@ -214,13 +214,13 @@ const AssetDetails: React.FC = () => {
         );
       }
     }
-  }, [asset?.address, asset?.owner, params.add, owner, balanceOf]);
+  }, [asset?.address, asset?.owner, params.add, owner]);
 
   const renderDesigners = useMemo(
     () =>
       creators?.map((creator: IProfile) => {
-        const findBalanceOf = balanceOf.find(
-          (item) => item.address === creator.address,
+        const findBalanceOf = creator.ownedAssets.find(
+          (item) => item.assetAddress === params.add.toLowerCase(),
         );
         return (
           <ProfileCard
@@ -231,14 +231,14 @@ const AssetDetails: React.FC = () => {
           />
         );
       }),
-    [creators, balanceOf],
+    [creators, params.add],
   );
 
   const renderHolders = useMemo(
     () =>
       holders?.map((holder: IProfile) => {
-        const findBalanceOf = balanceOf.find(
-          (item) => item.address === holder.address,
+        const findBalanceOf = holder.ownedAssets.find(
+          (item) => item.assetAddress === params.add.toLowerCase(),
         );
         return (
           <ProfileCard
@@ -249,7 +249,7 @@ const AssetDetails: React.FC = () => {
           />
         );
       }),
-    [holders, balanceOf],
+    [holders, params.add],
   );
   
   const metaCardInfo = [

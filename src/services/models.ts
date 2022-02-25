@@ -36,7 +36,7 @@ export interface GenericProperty {
 }
 
 export type OpenseaAttribute = StringTrait | NumericTrait | DateTrait | GenericProperty;
-interface ILSP8MetaData {
+export interface ILSP8MetaData {
   batch: string;
   batchMax: string;
   cardType: string;
@@ -82,6 +82,26 @@ export interface IProfile {
   links: { title: string; url: string }[];
   profileImage: string;
   backgroundImage: string;
-  ownedAssets: string[];
+  ownedAssets: {
+    assetAddress: string;
+    balance: number;
+  }[];
   issuedAssets: string[];
 }
+
+export interface ISetProfileData {
+  backgroundImage: {
+    width: string;
+    height: string;
+    hashFunction: 'keccak256(bytes)';
+    url: File | string;
+  }[];
+  profileImage: {
+    width: string;
+    height: string;
+    hashFunction: 'keccak256(bytes)';
+    url: File | string;
+  }[];
+  name: string;
+  description: string;
+};
