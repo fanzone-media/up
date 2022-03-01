@@ -45,10 +45,11 @@ export const StyledBackImg = styled.img`
   margin: auto 0 auto 0;
 `;
 
-export const StyledHeaderToolbarLabel = styled.h1<{isEditVisible: boolean}>`
+export const StyledHeaderToolbarLabel = styled.h1<{ isEditVisible: boolean }>`
   font-size: 24px;
   margin: auto 0 auto 0;
-  margin: ${({isEditVisible}) => isEditVisible ? "auto 0 auto 0" : "auto 0 auto auto"}
+  margin: ${({ isEditVisible }) =>
+    isEditVisible ? 'auto 0 auto 0' : 'auto 0 auto auto'};
 `;
 
 export const StyledEditProfileButton = styled.button`

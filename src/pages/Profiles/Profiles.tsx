@@ -3,7 +3,13 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { RootState } from '../../boot/types';
-import { fetchAllProfiles, selectAllEthereumUsersItems, selectAllL14UsersItems, selectAllMumbaiUsersItems, selectAllPolygonUsersItems } from '../../features/profiles';
+import {
+  fetchAllProfiles,
+  selectAllEthereumUsersItems,
+  selectAllL14UsersItems,
+  selectAllMumbaiUsersItems,
+  selectAllPolygonUsersItems,
+} from '../../features/profiles';
 import { IProfile } from '../../services/models';
 import { fetchAllCards, selectAllCardItems } from '../../features/cards';
 import Pagination from '../../features/pagination/Pagination';
@@ -26,27 +32,38 @@ import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 import { useSigner } from 'wagmi';
 
 interface IParams {
-  network: string
+  network: string;
 }
 
 const Profiles: React.FC = () => {
-
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
   const [{ data, error, loading }, getSigner] = useSigner();
 
   const demoProfiles = {
-    l14:['',''],
-    mumbai: ['0x0044FA45A42b78A8cbAF6764D770864CBC94214C', '0x77de7a8c94789263Ba24D41D9D799190C73D3Acc'],
-    polygon: ['0x775e1dA80Bbe4C507D7009AB8D3a45c87b7f9D8A', '0x5e3Aa02aEE55c64a1253BFbe267CF9df94B8Cdbf'],
-    ethereum: ['', '']
+    l14: ['', ''],
+    mumbai: [
+      '0x0044FA45A42b78A8cbAF6764D770864CBC94214C',
+      '0x77de7a8c94789263Ba24D41D9D799190C73D3Acc',
+    ],
+    polygon: [
+      '0x775e1dA80Bbe4C507D7009AB8D3a45c87b7f9D8A',
+      '0x5e3Aa02aEE55c64a1253BFbe267CF9df94B8Cdbf',
+    ],
+    ethereum: ['', ''],
   };
 
   const demoAssets = {
-    l14:['',''],
-    mumbai: ['0x8839E144Bd2EddfDBC53B5b6323008bb3CE3eb7F', '0x9c7072122178107bf66571c1f3e379368e0e47a3'],
-    polygon: ['0xd83Bc6fB61fD75beDe9d3999d7345b5C1cB8b393', '0x90ada08949d5B32C9bF8d4DeCD27BE483bc5B0e2'],
-    ethereum: ['', '']
+    l14: ['', ''],
+    mumbai: [
+      '0x8839E144Bd2EddfDBC53B5b6323008bb3CE3eb7F',
+      '0x9c7072122178107bf66571c1f3e379368e0e47a3',
+    ],
+    polygon: [
+      '0xd83Bc6fB61fD75beDe9d3999d7345b5C1cB8b393',
+      '0x90ada08949d5B32C9bF8d4DeCD27BE483bc5B0e2',
+    ],
+    ethereum: ['', ''],
   };
 
   const userProfile = useSelector((state: RootState) => {
@@ -81,7 +98,9 @@ const Profiles: React.FC = () => {
     }
   });
 
-  const demoCollection = useSelector((state: RootState) => selectAllCardItems(state))?.filter((item) => {
+  const demoCollection = useSelector((state: RootState) =>
+    selectAllCardItems(state),
+  )?.filter((item) => {
     switch (params.network) {
       case 'l14':
         return demoAssets?.l14.some((i) => {
@@ -116,38 +135,78 @@ const Profiles: React.FC = () => {
   });
 
   const fetchDemoProfiles = () => {
-    if(userProfile?.length === 0) {
+    if (userProfile?.length === 0) {
       switch (params.network) {
         case 'l14':
-          dispatch(fetchAllProfiles({addresses: demoProfiles.l14, network: params.network}));
+          dispatch(
+            fetchAllProfiles({
+              addresses: demoProfiles.l14,
+              network: params.network,
+            }),
+          );
           break;
         case 'mumbai':
-          dispatch(fetchAllProfiles({addresses: demoProfiles.mumbai, network: params.network}));
+          dispatch(
+            fetchAllProfiles({
+              addresses: demoProfiles.mumbai,
+              network: params.network,
+            }),
+          );
           break;
         case 'polygon':
-          dispatch(fetchAllProfiles({addresses: demoProfiles.polygon, network: params.network}));
+          dispatch(
+            fetchAllProfiles({
+              addresses: demoProfiles.polygon,
+              network: params.network,
+            }),
+          );
           break;
         case 'ethereum':
-          dispatch(fetchAllProfiles({addresses: demoProfiles.ethereum, network: params.network}));
+          dispatch(
+            fetchAllProfiles({
+              addresses: demoProfiles.ethereum,
+              network: params.network,
+            }),
+          );
           break;
       }
     }
   };
 
   const fetchDemoCollection = () => {
-    if(demoCollection.length === 0) {
+    if (demoCollection.length === 0) {
       switch (params.network) {
         case 'l14':
-          dispatch(fetchAllCards({addresses: demoAssets.l14, network: params.network}));
+          dispatch(
+            fetchAllCards({
+              addresses: demoAssets.l14,
+              network: params.network,
+            }),
+          );
           break;
         case 'mumbai':
-          dispatch(fetchAllCards({addresses: demoAssets.mumbai, network: params.network}));
+          dispatch(
+            fetchAllCards({
+              addresses: demoAssets.mumbai,
+              network: params.network,
+            }),
+          );
           break;
         case 'polygon':
-          dispatch(fetchAllCards({addresses: demoAssets.polygon, network: params.network}));
+          dispatch(
+            fetchAllCards({
+              addresses: demoAssets.polygon,
+              network: params.network,
+            }),
+          );
           break;
         case 'ethereum':
-          dispatch(fetchAllCards({addresses: demoAssets.ethereum, network: params.network}));
+          dispatch(
+            fetchAllCards({
+              addresses: demoAssets.ethereum,
+              network: params.network,
+            }),
+          );
           break;
       }
     }
@@ -155,11 +214,11 @@ const Profiles: React.FC = () => {
 
   useMemo(() => {
     fetchDemoCollection();
-  },[params.network]);
+  }, [params.network]);
 
   useMemo(async () => {
     fetchDemoProfiles();
-  },[params.network]);
+  }, [params.network]);
 
   const renderProfiles = useMemo(
     () =>
@@ -187,20 +246,22 @@ const Profiles: React.FC = () => {
           </StyledDescription>
         </StyledGreeting>
         <StyledDivider></StyledDivider>
-          <>
-            <StyledProfilesHeader>
-              <StyledProfileHeading>Profiles</StyledProfileHeading>
-              <Search />
-            </StyledProfilesHeader>
-            {cardStatus === 'loading' ? (
-                <StyledLoadingHolder>
-                  <StyledLoader color="#ed7a2d" />
-                </StyledLoadingHolder>
-              ): <StyledProfilesWrappar>{renderProfiles}</StyledProfilesWrappar>}
-            {demoCollection && (
-              <Pagination collection={demoCollection} type="demo" />
-            )}
-          </>
+        <>
+          <StyledProfilesHeader>
+            <StyledProfileHeading>Profiles</StyledProfileHeading>
+            <Search />
+          </StyledProfilesHeader>
+          {cardStatus === 'loading' ? (
+            <StyledLoadingHolder>
+              <StyledLoader color="#ed7a2d" />
+            </StyledLoadingHolder>
+          ) : (
+            <StyledProfilesWrappar>{renderProfiles}</StyledProfilesWrappar>
+          )}
+          {demoCollection && (
+            <Pagination collection={demoCollection} type="demo" />
+          )}
+        </>
       </StyledContentwrappar>
     </StyledMainContent>
   );

@@ -108,16 +108,19 @@ export const fetchAssetCreator = createAsyncThunk<
 
 export const fetchAllProfiles = createAsyncThunk<
   IProfile[],
-  {addresses: string[], network: string},
+  { addresses: string[]; network: string },
   { extra: ThunkExtra }
->('userData/fetchAllProfiles', async ({addresses, network}, { extra: { api } }) => {
-  const profile = (await api.profiles.fetchAllProfiles(
-    addresses,
-    network
-  )) as IProfile[];
+>(
+  'userData/fetchAllProfiles',
+  async ({ addresses, network }, { extra: { api } }) => {
+    const profile = (await api.profiles.fetchAllProfiles(
+      addresses,
+      network,
+    )) as IProfile[];
 
-  return profile;
-});
+    return profile;
+  },
+);
 
 /**
  * **********************
@@ -226,7 +229,10 @@ const userDataSlice = createSlice({
             state.l14.holderStatus = STATUS.IDLE;
             break;
           case 'polygon':
-            usersAdapter.upsertMany(state.polygon, action.payload as IProfile[]);
+            usersAdapter.upsertMany(
+              state.polygon,
+              action.payload as IProfile[],
+            );
             state.l14.holderStatus = STATUS.IDLE;
             break;
           case 'mumbai':
@@ -234,7 +240,10 @@ const userDataSlice = createSlice({
             state.l14.holderStatus = STATUS.IDLE;
             break;
           case 'ethereum':
-            usersAdapter.upsertMany(state.ethereum, action.payload as IProfile[]);
+            usersAdapter.upsertMany(
+              state.ethereum,
+              action.payload as IProfile[],
+            );
             state.l14.holderStatus = STATUS.IDLE;
             break;
         }
@@ -283,7 +292,10 @@ const userDataSlice = createSlice({
             state.l14.creatorStatus = STATUS.IDLE;
             break;
           case 'polygon':
-            usersAdapter.upsertMany(state.polygon, action.payload as IProfile[]);
+            usersAdapter.upsertMany(
+              state.polygon,
+              action.payload as IProfile[],
+            );
             state.polygon.creatorStatus = STATUS.IDLE;
             break;
           case 'mumbai':
@@ -291,7 +303,10 @@ const userDataSlice = createSlice({
             state.mumbai.creatorStatus = STATUS.IDLE;
             break;
           case 'ethereum':
-            usersAdapter.upsertMany(state.ethereum, action.payload as IProfile[]);
+            usersAdapter.upsertMany(
+              state.ethereum,
+              action.payload as IProfile[],
+            );
             state.ethereum.creatorStatus = STATUS.IDLE;
             break;
         }
@@ -340,7 +355,10 @@ const userDataSlice = createSlice({
             state.l14.status = STATUS.IDLE;
             break;
           case 'polygon':
-            usersAdapter.upsertMany(state.polygon, action.payload as IProfile[]);
+            usersAdapter.upsertMany(
+              state.polygon,
+              action.payload as IProfile[],
+            );
             state.polygon.status = STATUS.IDLE;
             break;
           case 'mumbai':
@@ -348,7 +366,10 @@ const userDataSlice = createSlice({
             state.mumbai.status = STATUS.IDLE;
             break;
           case 'ethereum':
-            usersAdapter.upsertMany(state.ethereum, action.payload as IProfile[]);
+            usersAdapter.upsertMany(
+              state.ethereum,
+              action.payload as IProfile[],
+            );
             state.ethereum.status = STATUS.IDLE;
             break;
         }

@@ -18,7 +18,7 @@ import {
 
 export const Header: React.FC = () => {
   const isTablet = useMediaQuery(md);
-  const [{data, error}, connect] = useConnect();
+  const [{ data, error }, connect] = useConnect();
   const [showAccountDetail, setShowAccountDetail] = useState<boolean>(false);
 
   return (
@@ -31,18 +31,18 @@ export const Header: React.FC = () => {
             <StyledHeading>Profiles</StyledHeading>
           </StyledLink>
         </Router>
-        {data.connected ? 
-          <StyledMyAccountButton onClick={() => setShowAccountDetail(!showAccountDetail)}>
+        {data.connected ? (
+          <StyledMyAccountButton
+            onClick={() => setShowAccountDetail(!showAccountDetail)}
+          >
             My Account
-          </StyledMyAccountButton> :
+          </StyledMyAccountButton>
+        ) : (
           <StyledConnectMetaMask onClick={() => connect(data.connectors[0])}>
-            Connect Metamask 
+            Connect Metamask
           </StyledConnectMetaMask>
-        }
-        {
-          showAccountDetail && data.connected && 
-            <AccountDetails />
-        }
+        )}
+        {showAccountDetail && data.connected && <AccountDetails />}
         {/* <StyledFanzoneAppLink
           href="https://app.fanzone.io"
           target="_blank"

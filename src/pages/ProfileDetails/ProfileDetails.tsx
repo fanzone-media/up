@@ -57,10 +57,17 @@ import {
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
-import { fetchProfileByAddress, selectEthereumUserById, selectL14UserById, selectMumbaiUserById, selectPolygonUserById } from '../../features/profiles';
+import {
+  fetchProfileByAddress,
+  selectEthereumUserById,
+  selectL14UserById,
+  selectMumbaiUserById,
+  selectPolygonUserById,
+} from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 import { useAccount, useSigner } from 'wagmi';
 import { ProfileEditModal } from './ProfileEditModal';
+import { editableProfiles } from '../../services/editableProfiles';
 
 interface IParams {
   add: string;
@@ -70,9 +77,9 @@ interface IParams {
 const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
-  const [{data, error}] = useAccount();
-  const [{ data: signer, error: signerError, loading }, getSigner] = useSigner();
-  const [file, setFile] = useState<File>();
+  const [{ data, error }] = useAccount();
+  const [{ data: signer, error: signerError, loading }, getSigner] =
+    useSigner();
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const profile = useSelector((state: RootState) => {
@@ -90,35 +97,31 @@ const ProfileDetails: React.FC = () => {
 
   const cards = useSelector((state: RootState) => selectCardIds(state));
 
-  const profileError = useSelector(
-    (state: RootState) => {
-      switch (params.network) {
-        case 'l14':
-          return state.userData.l14.error;
-        case 'polygon':
-          return state.userData.polygon.error;
-        case 'mumbai':
-          return state.userData.mumbai.error;
-        case 'ethereum':
-          return state.userData.ethereum.error;
-      }
+  const profileError = useSelector((state: RootState) => {
+    switch (params.network) {
+      case 'l14':
+        return state.userData.l14.error;
+      case 'polygon':
+        return state.userData.polygon.error;
+      case 'mumbai':
+        return state.userData.mumbai.error;
+      case 'ethereum':
+        return state.userData.ethereum.error;
     }
-  );
+  });
 
-  const profileStatus = useSelector(
-    (state: RootState) => {
-      switch (params.network) {
-        case 'l14':
-          return state.userData.l14.status;
-        case 'polygon':
-          return state.userData.polygon.status;
-        case 'mumbai':
-          return state.userData.mumbai.status;
-        case 'ethereum':
-          return state.userData.ethereum.status;
-      }
+  const profileStatus = useSelector((state: RootState) => {
+    switch (params.network) {
+      case 'l14':
+        return state.userData.l14.status;
+      case 'polygon':
+        return state.userData.polygon.status;
+      case 'mumbai':
+        return state.userData.mumbai.status;
+      case 'ethereum':
+        return state.userData.ethereum.status;
     }
-  );
+  });
 
   const [isShare, setIsShare] = useState<boolean>(false);
 
@@ -127,6 +130,14 @@ const ProfileDetails: React.FC = () => {
   const isTablet = useMediaQuery(md);
 
   const history = useHistory();
+
+  const isEditableProfile = useMemo(
+    () =>
+      editableProfiles[params.network].find(
+        (item) => item.toLowerCase() === params.add.toLowerCase(),
+      ),
+    [params.add, params.network],
+  );
 
   const issuedCollection = useSelector((state: RootState) =>
     selectAllCardItems(state),
@@ -194,11 +205,7 @@ const ProfileDetails: React.FC = () => {
 
   const renderOwnedAssetsPagination = useMemo(() => {
     return (
-      <Pagination
-        collection={ownedCollection}
-        type="owned"
-        profile={profile}
-      />
+      <Pagination collection={ownedCollection} type="owned" profile={profile} />
     );
   }, [ownedCollection, profile]);
 
@@ -252,6 +259,18 @@ const ProfileDetails: React.FC = () => {
     history.push(`/${params.network}`);
   };
 
+  const getEditPermission = () => {
+    if (
+      profile &&
+      data &&
+      isEditableProfile &&
+      profile.owner.toLowerCase() === data.address.toLowerCase()
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -259,12 +278,22 @@ const ProfileDetails: React.FC = () => {
 
   return (
     <StyledProfileDetails>
-      {signer && profile && data && profile.owner.toLowerCase() === data.address.toLowerCase() && <ProfileEditModal isOpen={openModal} onClose={() => setOpenModal(false)} signer={signer} profile={profile}/>}
+      {signer &&
+        profile &&
+        data &&
+        profile.owner.toLowerCase() === data.address.toLowerCase() && (
+          <ProfileEditModal
+            isOpen={openModal}
+            onClose={() => setOpenModal(false)}
+            signer={signer}
+            profile={profile}
+          />
+        )}
       <HeaderToolbar
         onBack={backHandler}
         buttonLabel="Back to profile"
         headerToolbarLabel="User Profile"
-        showEditProfileButton={(profile && data) && (profile.owner.toLowerCase() === data.address.toLowerCase()) ? true : false}
+        showEditProfileButton={getEditPermission()}
         showProfileEditModal={() => setOpenModal(true)}
       />
       {profileStatus === 'loading' ? (

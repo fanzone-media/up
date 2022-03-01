@@ -39,5 +39,5 @@ export {
   Facebook,
   Instagram,
   Globe,
-  polygonExplorerIcon
+  polygonExplorerIcon,
 };

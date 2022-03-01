@@ -80,7 +80,7 @@ const AssetDetails: React.FC = () => {
       case 'ethereum':
         return selectEthereumUserIds(state);
     }
- });
+  });
 
   const asset = useSelector((state: RootState) =>
     selectCardById(state, params.add),
@@ -110,13 +110,13 @@ const AssetDetails: React.FC = () => {
       case 'ethereum':
         return selectAllEthereumUsersItems(state);
     }
- })?.filter((item) => {
-  return asset?.holders.some((i) => {
-    return i === item.address && item.network === params.network;
+  })?.filter((item) => {
+    return asset?.holders.some((i) => {
+      return i === item.address && item.network === params.network;
+    });
   });
-});
 
-  const creators = useSelector((state: RootState) =>{
+  const creators = useSelector((state: RootState) => {
     switch (params.network) {
       case 'l14':
         return selectAllL14UsersItems(state);
@@ -127,7 +127,7 @@ const AssetDetails: React.FC = () => {
       case 'ethereum':
         return selectAllEthereumUsersItems(state);
     }
- })?.filter((item) => {
+  })?.filter((item) => {
     return asset?.creators.some((i) => {
       return i === item.address && item.network === params.network;
     });
@@ -138,9 +138,6 @@ const AssetDetails: React.FC = () => {
   const cardStatus = useSelector((state: RootState) => state.cards.status);
 
   const dispatch = useAppDispatch();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [balanceOf, setBalanceOf] = useState<IBalanceOf[]>([]);
 
   useMemo(() => {
     if (!owner && asset) {
@@ -251,7 +248,7 @@ const AssetDetails: React.FC = () => {
       }),
     [holders, params.add],
   );
-  
+
   const metaCardInfo = [
     { text: 'Name', data: asset?.name.split('•')[0] },
     { text: 'Card Type', data: asset?.ls8MetaData.cardType },
@@ -267,22 +264,33 @@ const AssetDetails: React.FC = () => {
 
   const renderCardProperties = useMemo(() => {
     const keys = asset && Object.keys(asset && asset.ls8MetaData);
-    if(keys && keys.includes("attributes") && asset && asset.ls8MetaData.attributes.length > 0) {
+    if (
+      keys &&
+      keys.includes('attributes') &&
+      asset &&
+      asset.ls8MetaData.attributes.length > 0
+    ) {
       return asset.ls8MetaData.attributes.map((attribute: any, i) => (
         <React.Fragment key={i}>
           <StyledLabel>{attribute.trait_type}</StyledLabel>
-          {Object.keys(attribute).includes("max_value") ? <StyledValue>{attribute.value} of {attribute.max_value}</StyledValue> : <StyledValue>{attribute.value}</StyledValue>}
-        </React.Fragment>                          
-      ))
+          {Object.keys(attribute).includes('max_value') ? (
+            <StyledValue>
+              {attribute.value} of {attribute.max_value}
+            </StyledValue>
+          ) : (
+            <StyledValue>{attribute.value}</StyledValue>
+          )}
+        </React.Fragment>
+      ));
     } else {
       return metaCardInfo.map((items, i) => (
         <React.Fragment key={i}>
           <StyledLabel>{items.text}</StyledLabel>
           <StyledValue>{items.data}</StyledValue>
         </React.Fragment>
-      ))
+      ));
     }
-  }, [asset])
+  }, [asset]);
 
   return (
     <StyledAssetDetailsContentWrappar>
@@ -307,23 +315,23 @@ const AssetDetails: React.FC = () => {
               <StyledGrid>
                 <StyledAssetDetailGrid>
                   <StyledMediaWrappar>
-                    {params.network === 'l14' && <a
-                      href={
-                        'https://universalprofile.cloud/asset/' + asset?.address
-                      }
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <StyledUniversalProfileIcon
-                        src={UniversalProfileIcon}
-                        alt=""
-                      />
-                    </a>}
+                    {params.network === 'l14' && (
+                      <a
+                        href={
+                          'https://universalprofile.cloud/asset/' +
+                          asset?.address
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <StyledUniversalProfileIcon
+                          src={UniversalProfileIcon}
+                          alt=""
+                        />
+                      </a>
+                    )}
                     <a
-                      href={explorer &&
-                        explorer.exploreUrl +
-                        asset?.address
-                      }
+                      href={explorer && explorer.exploreUrl + asset?.address}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -334,10 +342,7 @@ const AssetDetails: React.FC = () => {
                   </StyledMediaWrappar>
                   <StyledDetailsWrappar>
                     <StyledCardInfoLabel>Card Info</StyledCardInfoLabel>
-                    <StyledInfoGrid>
-
-                      {renderCardProperties}
-                    </StyledInfoGrid>
+                    <StyledInfoGrid>{renderCardProperties}</StyledInfoGrid>
                     <StyledFullName>{asset?.name}</StyledFullName>
                   </StyledDetailsWrappar>
                 </StyledAssetDetailGrid>

@@ -45,11 +45,7 @@ const useViewPort = () => {
   return { screenWidth };
 };
 
-const Pagination: React.FC<IPagination> = ({
-  collection,
-  type,
-  profile,
-}) => {
+const Pagination: React.FC<IPagination> = ({ collection, type, profile }) => {
   const params = useParams<IParams>();
 
   const [search, setSearch] = useState<string>('');
@@ -173,7 +169,8 @@ const Pagination: React.FC<IPagination> = ({
         if (type === 'owned' || type === 'issued') {
           const findBalanceOf = profile?.ownedAssets.find(
             (item) =>
-              item.assetAddress.toLowerCase() === digitalCard.address.toLowerCase(),
+              item.assetAddress.toLowerCase() ===
+              digitalCard.address.toLowerCase(),
           );
           return (
             <MetaCard

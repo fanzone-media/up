@@ -1,13 +1,17 @@
 import axios from 'axios';
 import Web3Service from './Web3Service';
-import { create } from "ipfs-http-client";
+import { create } from 'ipfs-http-client';
 import { ILSP8MetaData, ISetProfileData } from './models';
 
 const url: string = 'https://ipfs.fanzone.io/ipfs/';
 const IPFS_HOST = 'ipfs.infura.io';
 const IPFS_PORT = 5001;
 const IPFS_PROTOCOL = 'https';
-const ipfsApi = create({host: IPFS_HOST, port: IPFS_PORT, protocol: IPFS_PROTOCOL});
+const ipfsApi = create({
+  host: IPFS_HOST,
+  port: IPFS_PORT,
+  protocol: IPFS_PROTOCOL,
+});
 
 const getIpfsPath = (hashedUrl: string) => {
   const hash = `0x${hashedUrl.slice(74)}`;
@@ -23,7 +27,9 @@ export const getLSP3ProfileData = async (hashedUrl: string) => {
   return result.data;
 };
 
-export const getLSP4Metadata = async (hashedUrl: string): Promise<ILSP8MetaData> => {
+export const getLSP4Metadata = async (
+  hashedUrl: string,
+): Promise<ILSP8MetaData> => {
   const ipfsPath = getIpfsPath(hashedUrl);
   const result = await axios.get(url + ipfsPath);
   return result.data as ILSP8MetaData;
@@ -46,15 +52,15 @@ export const addFile = async (file: File) => {
     const res = await ipfsApi.add(file);
     return `ipfs://${res.path}`;
   } catch (err) {
-      console.error(err);
+    console.error(err);
   }
-}
+};
 
 export const addData = async (profileData: string) => {
   try {
     const res = await ipfsApi.add(profileData);
     return `ipfs://${res.path}`;
   } catch (err) {
-      console.error(err);
+    console.error(err);
   }
-}
+};

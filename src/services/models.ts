@@ -16,26 +16,30 @@ interface ILSP4Metadata {
 }
 
 export interface StringTrait {
-  display_type: "string",
+  display_type: 'string';
   trait_type: string;
   value: string;
 }
 export interface NumericTrait {
-  display_type: "number" | "boost_percentage" | "boost_number"
+  display_type: 'number' | 'boost_percentage' | 'boost_number';
   trait_type: string;
   value: number;
   max_value?: number;
 }
 export interface DateTrait {
-  display_type: "date",
-  trait_type: string,
-  value: number
+  display_type: 'date';
+  trait_type: string;
+  value: number;
 }
 export interface GenericProperty {
-  value: string | number
+  value: string | number;
 }
 
-export type OpenseaAttribute = StringTrait | NumericTrait | DateTrait | GenericProperty;
+export type OpenseaAttribute =
+  | StringTrait
+  | NumericTrait
+  | DateTrait
+  | GenericProperty;
 export interface ILSP8MetaData {
   batch: string;
   batchMax: string;
@@ -104,4 +108,4 @@ export interface ISetProfileData {
   }[];
   name: string;
   description: string;
-};
+}

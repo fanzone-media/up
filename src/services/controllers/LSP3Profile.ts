@@ -10,7 +10,6 @@ import {
   UniversalProfile__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import { ethers, Signer } from 'ethers';
-//import { fetchLSP5Data } from '../../submodules/fanzone-smart-contracts/utils/LSPSchema';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import { ERC725JSONSchema } from '@erc725/erc725.js';
@@ -18,55 +17,52 @@ import Web3 from 'web3';
 
 const LSP5ReceivedAssetsSchemaList: Array<ERC725JSONSchema> = [
   {
-    name: "LSP5ReceivedAssets[]",
-    key: "0x6460ee3c0aac563ccbf76d6e1d07bada78e3a9514e6382b736ed3f478ab7b90b",
-    keyType: "Array",
-    valueContent: "Number",
-    valueType: "uint256",
+    name: 'LSP5ReceivedAssets[]',
+    key: '0x6460ee3c0aac563ccbf76d6e1d07bada78e3a9514e6382b736ed3f478ab7b90b',
+    keyType: 'Array',
+    valueContent: 'Number',
+    valueType: 'uint256',
   },
 ];
 
 enum ERC165InterfaceIds {
-  LSP7 = "0xe33f65c3",
-  LSP8 = "0x49399145",
+  LSP7 = '0xe33f65c3',
+  LSP8 = '0x49399145',
 }
 
-const fetchLSP5Data = async (
-  schema: ERC725JSONSchema,
-  contract: ERC725Y,
-) => {
+const fetchLSP5Data = async (schema: ERC725JSONSchema, contract: ERC725Y) => {
+  let lsp8Assets: string[] = [];
+  const schemaValue = await contract.getData([KeyChain.LSP5ReceivedAssets]);
 
-    let lsp8Assets: string[] = [];
-    const schemaValue = await contract.getData([KeyChain.LSP5ReceivedAssets]);
-    
-    if (schemaValue[0] !== "0x") {
-      const arrayLength = ethers.BigNumber.from(schemaValue[0]).toNumber();
+  if (schemaValue[0] !== '0x') {
+    const arrayLength = ethers.BigNumber.from(schemaValue[0]).toNumber();
 
-      const indexKeys = new Array(arrayLength)
-        .fill(null)
-        .map((_value, index) => encodeArrayKey(schema.key, index));
+    const indexKeys = new Array(arrayLength)
+      .fill(null)
+      .map((_value, index) => encodeArrayKey(schema.key, index));
 
+    const indexValues = await contract.getData(indexKeys);
 
-      const indexValues = await contract.getData(indexKeys);
-
-      const assets = await Promise.all(indexValues.map(async (item) => {
-        const key = `0x812c4334633eb81600000000${item.replace(/^0x/, "")}`
+    const assets = await Promise.all(
+      indexValues.map(async (item) => {
+        const key = `0x812c4334633eb81600000000${item.replace(/^0x/, '')}`;
         const lsp5AssetsMapping = await contract.getData([key]);
-        const value = lsp5AssetsMapping[0].replace(/^0x/, "");
+        const value = lsp5AssetsMapping[0].replace(/^0x/, '');
         const interfaceId = `0x${value.slice(16, 20)}`;
 
         const tokenType =
-          interfaceId === ERC165InterfaceIds.LSP7 ? "LSP7" : "LSP8";
+          interfaceId === ERC165InterfaceIds.LSP7 ? 'LSP7' : 'LSP8';
         return {
           item,
-          tokenType
-        }
-      }));
-       assets.forEach((item) => {
-         if(item.tokenType === "LSP8") lsp8Assets.push(item.item);
-       });
-   }
-   return lsp8Assets;
+          tokenType,
+        };
+      }),
+    );
+    assets.forEach((item) => {
+      if (item.tokenType === 'LSP8') lsp8Assets.push(item.item);
+    });
+  }
+  return lsp8Assets;
 };
 
 const fetchProfile =
@@ -95,11 +91,15 @@ const fetchProfile =
 
     const ownedAssetsWithBalance = await Promise.all(
       ownedAssets.map(async (assetAddress) => {
-        const balance = await fetchBalanceOf(EthereumSerive)(network, assetAddress, address);
-        return {assetAddress, balance};
-      })
+        const balance = await fetchBalanceOf(EthereumSerive)(
+          network,
+          assetAddress,
+          address,
+        );
+        return { assetAddress, balance };
+      }),
     );
-      
+
     const issuedAssets =
       await LSP4DigitalAssetApi.fetchProfileIssuedAssetsAddresses(
         EthereumSerive,
@@ -122,14 +122,25 @@ const fetchProfile =
         throw new Error('No metadata found');
       });
 
-    if(hashedUrl === "0x") return {owner, address: address, network, ownedAssets: ownedAssetsWithBalance, issuedAssets, profileImage: "", backgroundImage: ""} as IProfile;
-    
+    if (hashedUrl === '0x')
+      return {
+        owner,
+        address: address,
+        network,
+        ownedAssets: ownedAssetsWithBalance,
+        issuedAssets,
+        profileImage: '',
+        backgroundImage: '',
+      } as IProfile;
+
     let metaData: any;
-    await getLSP3ProfileData(hashedUrl).then((res) => {
-      metaData = res;
-    }).catch((error) => {
-      console.log(error);
-    });
+    await getLSP3ProfileData(hashedUrl)
+      .then((res) => {
+        metaData = res;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     if (!metaData || !metaData.LSP3Profile) {
       throw new Error('Invalid LSP3Profile Format');
@@ -138,13 +149,24 @@ const fetchProfile =
     const profile: IProfile = {
       ...metaData?.LSP3Profile,
       profileImage: metaData.LSP3Profile.profileImage[0]
-        ? metaData.LSP3Profile.profileImage[0].url.startsWith("ipfs://") ? Utils.convertImageURL(metaData.LSP3Profile.profileImage[0].url) : metaData.LSP3Profile.profileImage[0].url
+        ? metaData.LSP3Profile.profileImage[0].url.startsWith('ipfs://')
+          ? Utils.convertImageURL(metaData.LSP3Profile.profileImage[0].url)
+          : metaData.LSP3Profile.profileImage[0].url
         : null,
       backgroundImage: metaData.LSP3Profile.backgroundImage[0]
-        ? metaData.LSP3Profile.backgroundImage[0].url.startsWith("ipfs://") ? Utils.convertImageURL(metaData.LSP3Profile.backgroundImage[0].url) : metaData.LSP3Profile.backgroundImage[0].url
+        ? metaData.LSP3Profile.backgroundImage[0].url.startsWith('ipfs://')
+          ? Utils.convertImageURL(metaData.LSP3Profile.backgroundImage[0].url)
+          : metaData.LSP3Profile.backgroundImage[0].url
         : null,
     };
-    return { ...profile, owner, address: address, network, ownedAssets: ownedAssetsWithBalance, issuedAssets };
+    return {
+      ...profile,
+      owner,
+      address: address,
+      network,
+      ownedAssets: ownedAssetsWithBalance,
+      issuedAssets,
+    };
   };
 
 const fetchOwnedCollectionCount =
@@ -234,36 +256,45 @@ const fetchBalanceOf =
     return ethers.BigNumber.from(balance).toNumber();
   };
 
-const setUniversalProfileData = (EthereumService: IEthereumService) => 
-  async (profielAddress: string, profileData: ISetProfileData, signer: Signer): Promise<boolean> => {
+const setUniversalProfileData =
+  (EthereumService: IEthereumService) =>
+  async (
+    profielAddress: string,
+    profileData: ISetProfileData,
+    signer: Signer,
+  ): Promise<boolean> => {
     const contract = UniversalProfile__factory.connect(profielAddress, signer);
-    if(typeof profileData.profileImage[0].url !== 'string') {
-      const profileImagePath = await addFile(profileData.profileImage[0].url);
-      if(profileImagePath) {
-        profileData = {
-          ...profileData, 
-          profileImage: [{...profileData.profileImage[0], url: profileImagePath}]
+    if (typeof profileData.profileImage[0].url !== 'string') {
+      await addFile(profileData.profileImage[0].url).then((path) => {
+        if (path) {
+          profileData = {
+            ...profileData,
+            profileImage: [{ ...profileData.profileImage[0], url: path }],
+          };
         }
-      }
+      });
     }
-    if(typeof profileData.backgroundImage[0].url !== 'string') {
-      const bgImagePath = await addFile(profileData.backgroundImage[0].url);
-      if(bgImagePath) {
-        profileData = {
-          ...profileData, 
-          backgroundImage: [{...profileData.backgroundImage[0], url: bgImagePath}]
+    if (typeof profileData.backgroundImage[0].url !== 'string') {
+      await addFile(profileData.backgroundImage[0].url).then((path) => {
+        if (path) {
+          profileData = {
+            ...profileData,
+            backgroundImage: [{ ...profileData.backgroundImage[0], url: path }],
+          };
         }
-      }
+      });
     }
     const json = JSON.stringify({
-      LSP3Profile : profileData
+      LSP3Profile: profileData,
     });
 
     const jsonIpfsPath = await addData(json);
 
-    if(!jsonIpfsPath) throw new Error('Something went wrong');
+    if (!jsonIpfsPath) throw new Error('Something went wrong');
 
-    const hashFunction = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('keccak256(utf8)')).substring(0, 10);
+    const hashFunction = ethers.utils
+      .keccak256(ethers.utils.toUtf8Bytes('keccak256(utf8)'))
+      .substring(0, 10);
     const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(json));
     const url = Web3.utils.utf8ToHex(jsonIpfsPath);
 
@@ -278,5 +309,5 @@ export const LSP3ProfileApi = {
   fetchAllProfiles,
   fetchCreatorsAddresses,
   fetchOwnedCollectionCount,
-  setUniversalProfileData
+  setUniversalProfileData,
 };

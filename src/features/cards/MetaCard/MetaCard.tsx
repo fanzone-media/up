@@ -35,13 +35,15 @@ export const MetaCard: React.FC<IProps> = React.memo(function CardListItem({
   const explorer = getChainExplorer(params.network);
   return (
     <StyledCardWrappar>
-      {params.network === 'l14' && <a
-        href={'https://universalprofile.cloud/asset/' + digitalCard.address}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <StyledUniversalProfileIcon src={universalprofile} alt="" />
-      </a>}
+      {params.network === 'l14' && (
+        <a
+          href={'https://universalprofile.cloud/asset/' + digitalCard.address}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <StyledUniversalProfileIcon src={universalprofile} alt="" />
+        </a>
+      )}
       <a
         href={explorer && explorer.exploreUrl + digitalCard.address}
         target="_blank"

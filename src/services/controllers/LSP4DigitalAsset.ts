@@ -54,7 +54,12 @@ const fetchCard =
       name,
       symbol,
       totalSupply: ethers.BigNumber.from(totalSupply).toNumber(),
-      ls8MetaData: { ...result, image: result.image.startsWith('ipfs://') ? Utils.convertImageURL(result.image) : result.image },
+      ls8MetaData: {
+        ...result,
+        image: result.image.startsWith('ipfs://')
+          ? Utils.convertImageURL(result.image)
+          : result.image,
+      },
       owner,
       holders: holders.map((holder: string) => `0x${holder.slice(26)}`),
       creators,

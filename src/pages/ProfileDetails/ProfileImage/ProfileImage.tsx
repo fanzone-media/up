@@ -25,7 +25,6 @@ export const ProfileImage: React.FC<IProps> = ({
   blockieImgSrc,
   profileAddress,
 }: IProps) => {
-
   const params = useParams<IParams>();
   const explorer = getChainExplorer(params.network);
   return (
@@ -38,7 +37,7 @@ export const ProfileImage: React.FC<IProps> = ({
       >
         <StyledBlockScoutLogo src={explorer && explorer.icon} />
       </a>
-      { params.network === 'l14' && 
+      {params.network === 'l14' && (
         <a
           href={'https://universalprofile.cloud/' + profileAddress}
           target="_blank"
@@ -47,7 +46,7 @@ export const ProfileImage: React.FC<IProps> = ({
         >
           <StyledUniversalProfileLogo src={UniversalProfileIcon} />
         </a>
-      }
+      )}
       <StyledProfileImg src={profileImgSrc} />
     </StyledProfileImageWrappar>
   );

@@ -25,7 +25,6 @@ export const HeaderToolbar: React.FC<IProps> = ({
   showEditProfileButton,
   showProfileEditModal,
 }: IProps) => {
-
   return (
     <StyledHeaderToolbar>
       <StyledHeaderToolbarContent>
@@ -33,12 +32,11 @@ export const HeaderToolbar: React.FC<IProps> = ({
           <StyledBackImg src={PrevIcon} />
           <StyledButtonLabel>{buttonLabel}</StyledButtonLabel>
         </StyledBackButton>
-        {
-          showEditProfileButton &&
-            <StyledEditProfileButton onClick={showProfileEditModal}>
-              Edit Profile
-            </StyledEditProfileButton>
-        }
+        {showEditProfileButton && (
+          <StyledEditProfileButton onClick={showProfileEditModal}>
+            Edit Profile
+          </StyledEditProfileButton>
+        )}
         <StyledHeaderToolbarLabel isEditVisible={showEditProfileButton}>
           {headerToolbarLabel}
         </StyledHeaderToolbarLabel>

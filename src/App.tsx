@@ -13,17 +13,15 @@ const chains: Chain[] = [
     nativeCurrency: {
       name: 'Matic',
       symbol: 'MATIC',
-      decimals: 18
+      decimals: 18,
     },
-    rpcUrls: [
-      'https://polygon-rpc.com/'
-    ],
+    rpcUrls: ['https://polygon-rpc.com/'],
     blockExplorers: [
       {
         name: 'Polyscan',
-        url: 'https://polygonscan.com/'
-      }
-    ]
+        url: 'https://polygonscan.com/',
+      },
+    ],
   },
   {
     id: 80001,
@@ -31,18 +29,16 @@ const chains: Chain[] = [
     nativeCurrency: {
       name: 'Matic',
       symbol: 'MATIC',
-      decimals: 18
+      decimals: 18,
     },
-    rpcUrls: [
-      'https://matic-mumbai.chainstacklabs.com/'
-    ],
+    rpcUrls: ['https://matic-mumbai.chainstacklabs.com/'],
     blockExplorers: [
       {
         name: 'Polyscan',
-        url: 'https://mumbai.polygonscan.com/'
-      }
+        url: 'https://mumbai.polygonscan.com/',
+      },
     ],
-    testnet: true
+    testnet: true,
   },
   {
     id: 22,
@@ -50,30 +46,24 @@ const chains: Chain[] = [
     nativeCurrency: {
       name: 'Lukso',
       symbol: 'LYXe',
-      decimals: 18
+      decimals: 18,
     },
-    rpcUrls: [
-      'https://rpc.l14.lukso.network/'
-    ],
+    rpcUrls: ['https://rpc.l14.lukso.network/'],
     blockExplorers: [
       {
         name: 'Blockscout',
-        url: 'https://blockscout.com/lukso/l14/'
-      }
+        url: 'https://blockscout.com/lukso/l14/',
+      },
     ],
-    testnet: true
-  }
+    testnet: true,
+  },
 ];
 
 const connectors = () => {
-  return [
-    new InjectedConnector({chains, options: {shimDisconnect: true}}),
-  ];
+  return [new InjectedConnector({ chains, options: { shimDisconnect: true } })];
 };
 
-
 function App() {
-  
   useEffect(() => {});
 
   return (
