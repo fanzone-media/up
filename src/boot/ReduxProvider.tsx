@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { buildApi } from '../services/api';
-import Web3Service from '../services/Web3Service';
 import { buildStore } from './store';
 
 interface IProps {
@@ -16,10 +15,9 @@ export const ReduxProvider: React.FC<IProps> = ({
   buildApi,
   children,
 }: IProps) => {
-  const web3 = new Web3Service();
-  const api = buildApi(web3);
+  const api = buildApi();
 
-  const store = buildStore({ web3, api });
+  const store = buildStore({ api });
 
   // The idea is to only replace individual reducers without reloading state (and dropping current state)
   // if (process.env.NODE_ENV === 'development' && module.hot) {

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import Web3Service from './Web3Service';
 import { create } from 'ipfs-http-client';
-import { ILSP8MetaData, ISetProfileData } from './models';
+import { ILSP8MetaData } from './models';
+import { ethers } from 'ethers';
 
 const url: string = 'https://ipfs.fanzone.io/ipfs/';
 const IPFS_HOST = 'ipfs.infura.io';
@@ -15,9 +15,7 @@ const ipfsApi = create({
 
 const getIpfsPath = (hashedUrl: string) => {
   const hash = `0x${hashedUrl.slice(74)}`;
-  const ipfsPath = Web3Service.web3.utils
-    .hexToUtf8(hash)
-    .replace('ipfs://', '');
+  const ipfsPath = ethers.utils.toUtf8String(hash).replace('ipfs://', '');
   return ipfsPath;
 };
 

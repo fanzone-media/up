@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import { Modal } from '../../../components/Modal';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { IProfile, ISetProfileData } from '../../../services/models';
-import Web3Service from '../../../services/Web3Service';
 import { StyledLoader, StyledLoadingHolder } from '../../AssetDetails/styles';
 import {
   StyledEditProfileModalContent,
@@ -123,7 +122,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
 
   const setData = async () => {
     setLoading(true);
-    await LSP3ProfileApi.setUniversalProfileData(new Web3Service())(
+    await LSP3ProfileApi.setUniversalProfileData(
       params.add,
       data,
       signer,

@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import KeyChain from '../utilities/KeyChain';
-import { IEthereumService } from '../IEthereumService';
 import { ICard } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
 import { ethers } from 'ethers';
@@ -9,11 +9,11 @@ import {
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import Utils from '../utilities/util';
 import { LSP3ProfileApi } from './LSP3Profile';
+import { useRpcProvider } from '../../hooks/useRpcProvider';
 
 const fetchCard =
-  (EthereumService: IEthereumService) =>
   async (address: string, network: string): Promise<ICard> => {
-    const provider = EthereumService.getProvider(network);
+    const provider = useRpcProvider(network);
     const contract = CardToken__factory.connect(address, provider);
     await contract
       .supportsInterface('0x49399145')
@@ -39,7 +39,7 @@ const fetchCard =
     }
     const result = await getLSP4Metadata(hashedUrl[0]);
     let creators: string[] = [];
-    await LSP3ProfileApi.fetchCreatorsAddresses(EthereumService)(
+    await LSP3ProfileApi.fetchCreatorsAddresses(
       address,
       network,
     )
@@ -68,10 +68,9 @@ const fetchCard =
   };
 
 const fetchAllCards =
-  (EthereumService: IEthereumService) =>
   async (network: string, addresses: string[]): Promise<ICard[]> => {
     let assets: ICard[] = [];
-    const cardFetcher = fetchCard(EthereumService);
+    const cardFetcher = fetchCard;
     await Promise.allSettled(
       new Array(addresses.length).fill(0).map(async (_, index) => {
         const asset = await cardFetcher(addresses[index], network);
@@ -88,9 +87,8 @@ const fetchAllCards =
   };
 
 const fetchProfileIssuedAssetsAddresses =
-  (EthereumService: IEthereumService) =>
   async (network: string, profileAddress: string): Promise<string[]> => {
-    const provider = EthereumService.getProvider(network);
+    const provider = useRpcProvider(network);
     const contract = UniversalProfile__factory.connect(
       profileAddress,
       provider,

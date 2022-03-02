@@ -1,6 +1,6 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import KeyChain from '../utilities/KeyChain';
 import { IProfile, ISetProfileData } from '../models';
-import { IEthereumService } from '../IEthereumService';
 import Utils from '../utilities/util';
 import { addData, addFile, getLSP3ProfileData } from '../ipfsClient';
 import {
@@ -14,6 +14,7 @@ import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import { ERC725JSONSchema } from '@erc725/erc725.js';
 import Web3 from 'web3';
+import { useRpcProvider } from '../../hooks/useRpcProvider';
 
 const LSP5ReceivedAssetsSchemaList: Array<ERC725JSONSchema> = [
   {
@@ -66,9 +67,8 @@ const fetchLSP5Data = async (schema: ERC725JSONSchema, contract: ERC725Y) => {
 };
 
 const fetchProfile =
-  (EthereumSerive: IEthereumService) =>
   async (address: string, network: string): Promise<IProfile> => {
-    const provider = EthereumSerive.getProvider(network);
+    const provider = useRpcProvider(network);
     const contract = ERC725Y__factory.connect(address, provider);
 
     await contract
@@ -91,7 +91,7 @@ const fetchProfile =
 
     const ownedAssetsWithBalance = await Promise.all(
       ownedAssets.map(async (assetAddress) => {
-        const balance = await fetchBalanceOf(EthereumSerive)(
+        const balance = await fetchBalanceOf(
           network,
           assetAddress,
           address,
@@ -101,9 +101,7 @@ const fetchProfile =
     );
 
     const issuedAssets =
-      await LSP4DigitalAssetApi.fetchProfileIssuedAssetsAddresses(
-        EthereumSerive,
-      )(network, address);
+      await LSP4DigitalAssetApi.fetchProfileIssuedAssetsAddresses(network, address);
 
     let hashedUrl: string = '';
     const universalProfile = UniversalProfile__factory.connect(
@@ -170,9 +168,8 @@ const fetchProfile =
   };
 
 const fetchOwnedCollectionCount =
-  (EthereumService: IEthereumService) =>
   async (address: string, network: string): Promise<number> => {
-    const provider = EthereumService.getProvider(network);
+    const provider = useRpcProvider(network);
     const universalProfile = UniversalProfile__factory.connect(
       address,
       provider,
@@ -183,9 +180,8 @@ const fetchOwnedCollectionCount =
   };
 
 const fetchAllProfiles =
-  (EthereumService: IEthereumService) =>
   async (addressList: string[], network: string): Promise<IProfile[]> => {
-    const profileFetcher = fetchProfile(EthereumService);
+    const profileFetcher = fetchProfile;
 
     let profiles: IProfile[] = [];
 
@@ -205,9 +201,8 @@ const fetchAllProfiles =
   };
 
 const fetchCreatorsAddresses =
-  (EthereumService: IEthereumService) =>
   async (address: string, network: string): Promise<string[]> => {
-    const provider = EthereumService.getProvider(network);
+    const provider = useRpcProvider(network);
 
     const contract = CardToken__factory.connect(address, provider);
 
@@ -241,7 +236,6 @@ const fetchCreatorsAddresses =
   };
 
 const fetchBalanceOf =
-  (EthereumService: IEthereumService) =>
   async (
     network: string,
     assetAddress: string,
@@ -250,14 +244,13 @@ const fetchBalanceOf =
     if (!profileAddress) {
       return 0;
     }
-    const provider = EthereumService.getProvider(network);
+    const provider = useRpcProvider(network);
     const contract = CardToken__factory.connect(assetAddress, provider);
     const balance = await contract.balanceOf(profileAddress);
     return ethers.BigNumber.from(balance).toNumber();
   };
 
 const setUniversalProfileData =
-  (EthereumService: IEthereumService) =>
   async (
     profielAddress: string,
     profileData: ISetProfileData,

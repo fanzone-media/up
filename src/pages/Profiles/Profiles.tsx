@@ -38,7 +38,6 @@ interface IParams {
 const Profiles: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
-  const [{ data, error, loading }, getSigner] = useSigner();
 
   const demoProfiles = {
     l14: ['', ''],

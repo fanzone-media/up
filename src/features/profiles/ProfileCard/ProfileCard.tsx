@@ -2,7 +2,6 @@ import React from 'react';
 import { IProfile } from '../../../services/models';
 import polygon from '../../../assets/polygon.svg';
 import makeBlockie from 'ethereum-blockies-base64';
-import Web3Service from '../../../services/Web3Service';
 import {
   StyledBalance,
   StyledBalanceWrappar,
@@ -17,6 +16,7 @@ import {
   StyledProfileRole,
 } from './styles';
 import { useParams } from 'react-router-dom';
+import Web3 from 'web3';
 
 interface Iprops {
   userProfile: IProfile;
@@ -38,7 +38,7 @@ export const ProfileCard: React.FC<Iprops> = React.memo(function ProfileList({
     <StyledProfileCard
       to={
         `/${params.network}/profile/` +
-        new Web3Service().checkSumAddress(userProfile.address)
+        Web3.utils.toChecksumAddress(userProfile.address)
       }
       className="animate-cardrender"
       demo={type === 'demo' ? true : false}

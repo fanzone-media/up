@@ -4,10 +4,8 @@ import { combineReducers } from 'redux';
 import { cardsReducer } from '../features/cards';
 import { userDataReducer } from '../features/profiles';
 import { API } from '../services/api';
-import Web3Service from '../services/Web3Service';
 
 interface IStoreOptions {
-  web3: Web3Service;
   api: API;
 }
 
@@ -18,14 +16,14 @@ const rootReducer = combineReducers({
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const buildStore = (options: IStoreOptions) => {
-  const { web3, api } = options;
+  const { api } = options;
 
   const store = configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         thunk: {
-          extraArgument: { web3, api },
+          extraArgument: { api },
         },
       }),
     preloadedState: {},

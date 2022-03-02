@@ -24,7 +24,7 @@ import {
   selectPolygonUserIds,
 } from '../../features/profiles';
 import { useMemo } from 'react';
-import { IBalanceOf, IProfile } from '../../services/models';
+import { IProfile } from '../../services/models';
 import {
   StyledAssetDetailContent,
   StyledAssetDetailsContentWrappar,
@@ -183,13 +183,6 @@ const AssetDetails: React.FC = () => {
       );
     }
   }, [asset?.creators, dispatch, params.network, profiles]);
-
-  // const getBalanceOf = async (address: string) => {
-  //   return await LSP4DigitalAssetApi.fetchBalanceOf(new Web3Services())(
-  //     params.add,
-  //     address,
-  //   );
-  // };
 
   useEffect(() => {
     window.scrollTo(0, 0);
