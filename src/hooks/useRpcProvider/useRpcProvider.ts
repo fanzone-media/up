@@ -6,10 +6,10 @@ export const useRpcProvider = (network: string): Provider => {
         'https://rpc.l14.lukso.network',
     );
     const POLYGON_MAINNET_PROVIDER = new ethers.providers.JsonRpcProvider(
-        'https://polygon-rpc.com/'
+        `https://polygon-mainnet.g.alchemy.com/v2/${process.env.REACT_APP_ALCHEMY_POLYGON_KEY}`
     );
     const POLYGON_MUMBAI_PROVIDER = new ethers.providers.JsonRpcProvider(
-        'https://rpc-mumbai.maticvigil.com'
+        `https://polygon-mumbai.g.alchemy.com/v2/${process.env.REACT_APP_ALCHEMY_MUMBAI_KEY}`
     );
     const ETHEREUM_MAINNET_PROVIDER = new ethers.providers.JsonRpcProvider(
         'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
