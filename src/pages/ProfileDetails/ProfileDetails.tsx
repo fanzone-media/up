@@ -131,13 +131,13 @@ const ProfileDetails: React.FC = () => {
 
   const history = useHistory();
 
-  const isEditableProfile = useMemo(
-    () =>
-      editableProfiles[params.network].find(
-        (item) => item.toLowerCase() === params.add.toLowerCase(),
-      ),
-    [params.add, params.network],
-  );
+  // const isEditableProfile = useMemo(
+  //   () =>
+  //     editableProfiles[params.network].find(
+  //       (item) => item.toLowerCase() === params.add.toLowerCase(),
+  //     ),
+  //   [params.add, params.network],
+  // );
 
   const issuedCollection = useSelector((state: RootState) =>
     selectAllCardItems(state),
@@ -263,7 +263,6 @@ const ProfileDetails: React.FC = () => {
     if (
       profile &&
       data &&
-      isEditableProfile &&
       profile.owner.toLowerCase() === data.address.toLowerCase()
     ) {
       return true;

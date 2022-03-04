@@ -111,6 +111,15 @@ const fetchProfile =
 
     const owner = await universalProfile.owner();
 
+    // const elementPrefix = KeyChain.LSP6AddressPermissions.slice(0, 34);
+    // const keys: string[] = new Array(2).fill(0).map((_, index) => {
+    //   const elementSufix = index.toString(16);
+    //   const elementKey =
+    //     elementPrefix.padEnd(66 - elementSufix.length, '0') + elementSufix;
+    //     return elementKey;
+    // })
+    // await getKeyManagerPermissions(address, network);
+
     await universalProfile
       .getData([KeyChain.LSP3PROFILE])
       .then((result) => {
@@ -296,6 +305,33 @@ const setUniversalProfileData =
 
     return true;
   };
+
+// export const getKeyManagerPermissions = 
+//   async (address: string, network: string) => {
+//     const provider = useRpcProvider(network);
+//     const contract = UniversalProfile__factory.connect(address, provider);
+//     const addressPermissions = await contract.getData([KeyChain.LSP6AddressPermissions]);
+//     if (addressPermissions[0] !== '0x') {
+//       const arrayLength = ethers.BigNumber.from(addressPermissions[0]).toNumber();
+
+//       const indexKeys = new Array(arrayLength)
+//         .fill(null)
+//         .map((_value, index) => encodeArrayKey(KeyChain.LSP6AddressPermissions, index));
+  
+//       const indexValues = await contract.getData(indexKeys);
+//       const permissions = await Promise.all(
+//         indexValues.map(async (item) => {
+//           const key = KeyChain.LSP6AddressPermissions_Permissions + item.replace(/^0x/, '');
+//           const res = await contract.getData([key]);
+//           return res;
+//         })
+//       )
+//       console.log(permissions);
+//     }
+
+//     const addressPermissionsAllowedAddresses = await contract.getData(['0x4b80742d00000000c6dd0000' + '0x0044FA45A42b78A8cbAF6764D770864CBC94214C'.replace(/^0x/, '')]);
+//     console.log(addressPermissionsAllowedAddresses);
+//   };
 
 export const LSP3ProfileApi = {
   fetchProfile,

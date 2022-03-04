@@ -37,4 +37,8 @@ export default Object.freeze({
     '0x9afb95cacc9f95858ec44aa8c3b685511002e30ae54415823f406128b85b238e',
   LSP6UniqueDigitalCollectible:
     '0xeafec4d89fa9619884b6b891356264550000000000000000000000007a21a5c1',
+  LSP6AddressPermissions:
+    '0xdf30dba06db6a30e65354d9a64c609861f089545ca58c6b4dbe31a5f338cb0e3',
+  LSP6AddressPermissions_Permissions:
+    '0x4b80742d0000000082ac0000'
 });
