@@ -1,6 +1,7 @@
-export interface IBalanceOf {
-  readonly address: string;
-  readonly balance: number;
+export interface IOwnedAssets {
+  assetAddress: string;
+  balance: number;
+  tokenIds: number[];
 }
 interface ILSP4Metadata {
   title: string;
@@ -80,17 +81,16 @@ export interface ICard {
 export interface IProfile {
   address: string;
   owner: string;
+  isOwnerKeyManager: boolean;
   network: string;
   name: string;
   description: string;
   links: { title: string; url: string }[];
   profileImage: string;
   backgroundImage: string;
-  ownedAssets: {
-    assetAddress: string;
-    balance: number;
-  }[];
+  ownedAssets: IOwnedAssets[];
   issuedAssets: string[];
+  permissionSet: IPermissionSet[];
 }
 
 export interface ISetProfileData {
@@ -108,4 +108,20 @@ export interface ISetProfileData {
   }[];
   name: string;
   description: string;
+}
+
+export interface IPermissionSet {
+  permissions: {
+    sign: string,
+    transferValue: string,
+    deploy: string,
+    delegateCall: string,
+    staticCall: string,
+    call: string,
+    setData: string,
+    addPermissions: string,
+    changePermissions: string,
+    changeOwner: string
+  }
+  address: string
 }

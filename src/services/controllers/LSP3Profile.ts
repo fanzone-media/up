@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import KeyChain from '../utilities/KeyChain';
-import { IProfile, ISetProfileData } from '../models';
+import { IOwnedAssets, IPermissionSet, IProfile, ISetProfileData } from '../models';
 import Utils from '../utilities/util';
 import { addData, addFile, getLSP3ProfileData } from '../ipfsClient';
 import {
   CardToken__factory,
   ERC725Y,
   ERC725Y__factory,
+  LSP6KeyManager__factory,
   UniversalProfile__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
-import { ethers, Signer } from 'ethers';
+import { BigNumberish, ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import { ERC725JSONSchema } from '@erc725/erc725.js';
@@ -91,12 +92,12 @@ const fetchProfile =
 
     const ownedAssetsWithBalance = await Promise.all(
       ownedAssets.map(async (assetAddress) => {
-        const balance = await fetchBalanceOf(
+        const res = await fetchBalanceOf(
           network,
           assetAddress,
           address,
         );
-        return { assetAddress, balance };
+        return res;
       }),
     );
 
@@ -111,14 +112,9 @@ const fetchProfile =
 
     const owner = await universalProfile.owner();
 
-    // const elementPrefix = KeyChain.LSP6AddressPermissions.slice(0, 34);
-    // const keys: string[] = new Array(2).fill(0).map((_, index) => {
-    //   const elementSufix = index.toString(16);
-    //   const elementKey =
-    //     elementPrefix.padEnd(66 - elementSufix.length, '0') + elementSufix;
-    //     return elementKey;
-    // })
-    // await getKeyManagerPermissions(address, network);
+    const permissionSet = await getKeyManagerPermissions(address, network);
+
+    const isOwnerKeyManager = await checkKeyManager(owner, network);
 
     await universalProfile
       .getData([KeyChain.LSP3PROFILE])
@@ -138,6 +134,8 @@ const fetchProfile =
         issuedAssets,
         profileImage: '',
         backgroundImage: '',
+        permissionSet,
+        isOwnerKeyManager
       } as IProfile;
 
     let metaData: any;
@@ -173,6 +171,8 @@ const fetchProfile =
       network,
       ownedAssets: ownedAssetsWithBalance,
       issuedAssets,
+      permissionSet,
+      isOwnerKeyManager
     };
   };
 
@@ -249,89 +249,203 @@ const fetchBalanceOf =
     network: string,
     assetAddress: string,
     profileAddress?: string,
-  ): Promise<number> => {
+  ): Promise<IOwnedAssets> => {
     if (!profileAddress) {
-      return 0;
+      return {} as IOwnedAssets;
     }
     const provider = useRpcProvider(network);
     const contract = CardToken__factory.connect(assetAddress, provider);
     const balance = await contract.balanceOf(profileAddress);
-    return ethers.BigNumber.from(balance).toNumber();
+    const tokenIds = await (await contract.tokenIdsOf(profileAddress)).map((tokenId) => ethers.BigNumber.from(tokenId).toNumber());
+    return {assetAddress, balance: ethers.BigNumber.from(balance).toNumber(), tokenIds};
   };
 
 const setUniversalProfileData =
   async (
-    profielAddress: string,
+    profileAddress: string,
     profileData: ISetProfileData,
     signer: Signer,
   ): Promise<boolean> => {
-    const contract = UniversalProfile__factory.connect(profielAddress, signer);
-    if (typeof profileData.profileImage[0].url !== 'string') {
-      await addFile(profileData.profileImage[0].url).then((path) => {
-        if (path) {
-          profileData = {
-            ...profileData,
-            profileImage: [{ ...profileData.profileImage[0], url: path }],
-          };
-        }
-      });
-    }
-    if (typeof profileData.backgroundImage[0].url !== 'string') {
-      await addFile(profileData.backgroundImage[0].url).then((path) => {
-        if (path) {
-          profileData = {
-            ...profileData,
-            backgroundImage: [{ ...profileData.backgroundImage[0], url: path }],
-          };
-        }
-      });
-    }
-    const json = JSON.stringify({
-      LSP3Profile: profileData,
+
+    const contract = UniversalProfile__factory.connect(profileAddress, signer);
+    await uploadProfileData(profileData).then(async (JSONURL) => {
+      await contract.setData([KeyChain.LSP3PROFILE], [JSONURL]);
+    }).catch((error) => {
+      throw new Error(error.message);
     });
-
-    const jsonIpfsPath = await addData(json);
-
-    if (!jsonIpfsPath) throw new Error('Something went wrong');
-
-    const hashFunction = ethers.utils
-      .keccak256(ethers.utils.toUtf8Bytes('keccak256(utf8)'))
-      .substring(0, 10);
-    const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(json));
-    const url = Web3.utils.utf8ToHex(jsonIpfsPath);
-
-    const JSONURL = hashFunction + hash.substring(2) + url.substring(2);
-    await contract.setData([KeyChain.LSP3PROFILE], [JSONURL]);
 
     return true;
   };
 
-// export const getKeyManagerPermissions = 
-//   async (address: string, network: string) => {
-//     const provider = useRpcProvider(network);
-//     const contract = UniversalProfile__factory.connect(address, provider);
-//     const addressPermissions = await contract.getData([KeyChain.LSP6AddressPermissions]);
-//     if (addressPermissions[0] !== '0x') {
-//       const arrayLength = ethers.BigNumber.from(addressPermissions[0]).toNumber();
+const setUniversalProfileDataViaKeyManager = 
+  async (
+    keyManagerAddress: string,
+    profileAddress: string,
+    profileData: ISetProfileData,
+    signer: Signer,
+    ) => {
+    const universalProfileContract = UniversalProfile__factory.connect(profileAddress, signer);
+    const keyManagerContract = LSP6KeyManager__factory.connect(keyManagerAddress, signer);
 
-//       const indexKeys = new Array(arrayLength)
-//         .fill(null)
-//         .map((_value, index) => encodeArrayKey(KeyChain.LSP6AddressPermissions, index));
+    await uploadProfileData(profileData).then(async (JSONURL) => {
+      const enodedData = universalProfileContract.interface.encodeFunctionData("setData", [
+        [KeyChain.LSP3PROFILE],
+        [JSONURL]
+      ]);
+      await keyManagerContract.execute(enodedData);  
+    });
+  }; 
+
+export const getKeyManagerPermissions = 
+  async (address: string, network: string): Promise<IPermissionSet[]> => {
+    const provider = useRpcProvider(network);
+    const contract = UniversalProfile__factory.connect(address, provider);
+    const addressPermissions = await contract.getData([KeyChain.LSP6AddressPermissions]);
+    if (addressPermissions[0] !== '0x') {
+      const permissionNames = [
+        'sign',
+        'transferValue',
+        'deploy',
+        'delegateCall',
+        'staticCall',
+        'call',
+        'setData',
+        'addPermissions',
+        'changePermissions',
+        'changeOwner'
+      ];
+      const arrayLength = ethers.BigNumber.from(addressPermissions[0]).toNumber();
+
+      const indexKeys = new Array(arrayLength)
+        .fill(null)
+        .map((_value, index) => encodeArrayKey(KeyChain.LSP6AddressPermissions, index));
   
-//       const indexValues = await contract.getData(indexKeys);
-//       const permissions = await Promise.all(
-//         indexValues.map(async (item) => {
-//           const key = KeyChain.LSP6AddressPermissions_Permissions + item.replace(/^0x/, '');
-//           const res = await contract.getData([key]);
-//           return res;
-//         })
-//       )
-//       console.log(permissions);
-//     }
+      const indexValues = await contract.getData(indexKeys);
+      const permissionsSet = await Promise.all(
+        indexValues.map(async (address) => {
+          const key = KeyChain.LSP6AddressPermissions_Permissions + address.replace(/^0x/, '');
+          const res = await contract.getData([key]);
+          let permissionsBinary = (parseInt(res[0].slice(58), 16).toString(2)).padStart(10, '0');
+          if(permissionsBinary.length > 10) {
+            permissionsBinary = permissionsBinary.slice(permissionsBinary.length - 10);
+          }
+          const permissionsBinaryArray = permissionsBinary.split('');
+          const permissions = Object.fromEntries(permissionNames.map((item, i) => [item, permissionsBinaryArray[i]]));
+          return {address, permissions};
+        })
+      )
+      return permissionsSet as IPermissionSet[];
+    }
+    return [] as IPermissionSet[];
+  };
 
-//     const addressPermissionsAllowedAddresses = await contract.getData(['0x4b80742d00000000c6dd0000' + '0x0044FA45A42b78A8cbAF6764D770864CBC94214C'.replace(/^0x/, '')]);
-//     console.log(addressPermissionsAllowedAddresses);
-//   };
+export const checkKeyManager = 
+  async (address: string, network: string) => {
+    const provider = useRpcProvider(network);
+    const contract = LSP6KeyManager__factory.connect(address, provider);
+    let isKeyManager = false;
+    await contract.supportsInterface('0x6f4df48b').then((result) => {
+      isKeyManager = result;
+    }).catch(() => {
+      isKeyManager = false;
+    });
+
+    return isKeyManager;
+  };
+
+const uploadProfileData = async (profileData: ISetProfileData): Promise<string> => {
+  if (typeof profileData.profileImage[0].url !== 'string') {
+    await addFile(profileData.profileImage[0].url).then((path) => {
+      if (path) {
+        profileData = {
+          ...profileData,
+          profileImage: [{ ...profileData.profileImage[0], url: path }],
+        };
+      }
+    });
+  }
+  if (typeof profileData.backgroundImage[0].url !== 'string') {
+    await addFile(profileData.backgroundImage[0].url).then((path) => {
+      if (path) {
+        profileData = {
+          ...profileData,
+          backgroundImage: [{ ...profileData.backgroundImage[0], url: path }],
+        };
+      }
+    });
+  }
+  const json = JSON.stringify({
+    LSP3Profile: profileData,
+  });
+
+  const jsonIpfsPath = await addData(json);
+
+  if (!jsonIpfsPath) throw new Error('Something went wrong');
+
+  const hashFunction = ethers.utils
+    .keccak256(ethers.utils.toUtf8Bytes('keccak256(utf8)'))
+    .substring(0, 10);
+  const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(json));
+  const url = Web3.utils.utf8ToHex(jsonIpfsPath);
+
+  const JSONURL = hashFunction + hash.substring(2) + url.substring(2);
+
+  return JSONURL;
+}
+
+const transferCardViaKeyManager = 
+  async (
+    assetAddress: string, 
+    universalProfileAddress: string, 
+    keyManagerAddress: string, 
+    tokenId: number,
+    toAddress: string,
+    signer: Signer
+  ) => {
+    const assetContract = CardToken__factory.connect(assetAddress, signer);
+    const universalProfileContract = UniversalProfile__factory.connect(universalProfileAddress, signer);
+    const keyManagerContract = LSP6KeyManager__factory.connect(keyManagerAddress, signer);
+
+    const encodedTransferFunction = assetContract.interface.encodeFunctionData("transferFrom", [
+      universalProfileAddress,
+      toAddress,
+      tokenId
+    ]);
+
+    const encodedExecuteFunction = universalProfileContract.interface.encodeFunctionData("execute", [
+      "0x0",
+      assetAddress,
+      0,
+      encodedTransferFunction
+    ]);
+
+    await keyManagerContract.execute(encodedExecuteFunction);
+};
+
+const transferCardViaUniversalProfile = 
+  async (
+    assetAddress: string, 
+    universalProfileAddress: string, 
+    tokenId: number,
+    toAddress: string,
+    signer: Signer
+  ) => {
+    const assetContract = CardToken__factory.connect(assetAddress, signer);
+    const universalProfileContract = UniversalProfile__factory.connect(universalProfileAddress, signer);
+
+    const encodedTransferFunction = assetContract.interface.encodeFunctionData("transferFrom", [
+      universalProfileAddress,
+      toAddress,
+      tokenId
+    ]);
+
+    await universalProfileContract.execute(
+      "0x0",
+      assetAddress,
+      0,
+      encodedTransferFunction
+    );
+  };
 
 export const LSP3ProfileApi = {
   fetchProfile,
@@ -339,4 +453,7 @@ export const LSP3ProfileApi = {
   fetchCreatorsAddresses,
   fetchOwnedCollectionCount,
   setUniversalProfileData,
+  setUniversalProfileDataViaKeyManager,
+  transferCardViaKeyManager,
+  transferCardViaUniversalProfile
 };

@@ -221,3 +221,15 @@ export const StyledAssetsWrappar = styled.div`
 `;
 
 export const StyledLinkIcon = styled.img``;
+
+export const StyledOpenTransferModalButton = styled.button`
+  background-color: rgba(33, 33, 33, 1);
+  max-width: max-content;
+  margin: 20px auto;
+  padding: 5px 10px;
+  border-radius: 8px;
+
+  @media ${md} {
+    margin: 0 auto;
+  }
+`;

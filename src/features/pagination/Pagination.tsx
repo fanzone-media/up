@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { MetaCard } from '../cards/MetaCard';
-import { IBalanceOf, ICard, IProfile } from '../../services/models';
+import { ICard, IProfile } from '../../services/models';
 import { PrevIcon } from '../../assets';
 import { NextIcon } from '../../assets';
 import {
@@ -55,9 +55,6 @@ const Pagination: React.FC<IPagination> = ({ collection, type, profile }) => {
   const [filterCollection, setFilterCollection] = useState<ICard[]>(collection);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [balanceOf, setBalanceOf] = useState<IBalanceOf[]>([]);
 
   const [pagesCount, setPagesCount] = useState<number>(1);
 
@@ -198,7 +195,6 @@ const Pagination: React.FC<IPagination> = ({ collection, type, profile }) => {
       params.add,
       type,
       screenWidth,
-      balanceOf,
       filterCollection,
       currentPage,
     ],

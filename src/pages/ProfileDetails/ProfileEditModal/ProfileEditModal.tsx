@@ -122,18 +122,34 @@ export const ProfileEditModal: React.FC<IProps> = ({
 
   const setData = async () => {
     setLoading(true);
-    await LSP3ProfileApi.setUniversalProfileData(
-      params.add,
-      data,
-      signer,
-    )
-      .catch((error) => {
+    if(profile.isOwnerKeyManager) {
+      await LSP3ProfileApi.setUniversalProfileDataViaKeyManager(
+        profile.owner,
+        profile.address,
+        data,
+        signer
+      ).catch((error) => {
         setError(true);
         onClose();
       })
       .finally(() => {
         setLoading(false);
       });
+    }
+    else {
+      await LSP3ProfileApi.setUniversalProfileData(
+        params.add,
+        data,
+        signer,
+      )
+        .catch((error) => {
+          setError(true);
+          onClose();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   };
 
   const extendedClose = () => {
