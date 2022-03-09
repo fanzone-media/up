@@ -9,6 +9,12 @@ Available networks for `:network` param are:
 3. l14
 4. ethereum
 
+## Add permissions
+
+- connect Metamask with address: `0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b`
+- choose the network in metamask where the universal profile is deployed
+- visit: https://fanzone-media.github.io/up/#/addpermissions
+
 For development:
 
 - npm run start
