@@ -1,17 +1,11 @@
 import { ethers, Signer } from "ethers";
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
 import { Modal } from "../../../components/Modal";
 import { LSP3ProfileApi } from "../../../services/controllers/LSP3Profile";
 import { IProfile } from "../../../services/models";
 import { StyledLoader, StyledLoadingHolder } from "../../AssetDetails/styles";
 import { StyledErrorLoadingContent, StyledErrorText, StyledInput, StyledInputRow, StyledLabel, StyledLoadingMessage, StyledSaveButton } from "../ProfileEditModal/styles";
 import { StyledSelectInput, StyledTransferCardModalContent } from "./styles";
-
-interface IParams {
-    add: string;
-    network: string;
-  }
   
 interface IProps {
     isOpen: boolean;
@@ -33,7 +27,6 @@ export const TransferCardModal: React.FC<IProps> = ({
     profile,
 }: IProps) => {
 
-    const params = useParams<IParams>();
     const [error, setError] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [transferCardForm, setTransferCardForm] = useState<formInput>({

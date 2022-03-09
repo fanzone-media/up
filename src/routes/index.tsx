@@ -5,11 +5,14 @@ import ProfileDetails from '../pages/ProfileDetails/ProfileDetails';
 import Profiles from '../pages/Profiles/Profiles';
 import AssetDetails from '../pages/AssetDetails/AssetDetails';
 import { CreateName } from '../pages/CreateName';
+import ProtectedRoute from './ProtectedRoute';
+import { AddPermissions } from '../pages/AddPermissions';
 
 const Routes: React.FC = () => {
   return (
     <Router>
       <Switch>
+        <ProtectedRoute exact path="/addpermissions" component={AddPermissions} />
         <Route exact path="/:network" render={() => <Profiles />} />
         <Route
           exact

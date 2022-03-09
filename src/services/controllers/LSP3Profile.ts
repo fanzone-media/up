@@ -10,10 +10,10 @@ import {
   LSP6KeyManager__factory,
   UniversalProfile__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
-import { BigNumberish, ethers, Signer } from 'ethers';
+import { ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
-import { ERC725JSONSchema } from '@erc725/erc725.js';
+import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js';
 import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 
@@ -323,15 +323,18 @@ export const getKeyManagerPermissions =
       const indexValues = await contract.getData(indexKeys);
       const permissionsSet = await Promise.all(
         indexValues.map(async (address) => {
-          const key = KeyChain.LSP6AddressPermissions_Permissions + address.replace(/^0x/, '');
-          const res = await contract.getData([key]);
-          let permissionsBinary = (parseInt(res[0].slice(58), 16).toString(2)).padStart(10, '0');
-          if(permissionsBinary.length > 10) {
-            permissionsBinary = permissionsBinary.slice(permissionsBinary.length - 10);
+          if(address !== "0x") {
+            const key = KeyChain.LSP6AddressPermissions_Permissions + address.replace(/^0x/, '');
+            const res = await contract.getData([key]);
+            let permissionsBinary = (parseInt(res[0].slice(58), 16).toString(2)).padStart(10, '0');
+            if(permissionsBinary.length > 10) {
+              permissionsBinary = permissionsBinary.slice(permissionsBinary.length - 10);
+            }
+            const permissionsBinaryArray = permissionsBinary.split('');
+            const permissions = Object.fromEntries(permissionNames.map((item, i) => [item, permissionsBinaryArray[i]]));
+            return {address, permissions};
           }
-          const permissionsBinaryArray = permissionsBinary.split('');
-          const permissions = Object.fromEntries(permissionNames.map((item, i) => [item, permissionsBinaryArray[i]]));
-          return {address, permissions};
+          return {address: "", permissions: {}};
         })
       )
       return permissionsSet as IPermissionSet[];
