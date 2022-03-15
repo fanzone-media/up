@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/up/static/css/main.e50ebbf4.chunk.css",
-    "main.js": "/up/static/js/main.0a240d11.chunk.js",
-    "main.js.map": "/up/static/js/main.0a240d11.chunk.js.map",
+    "main.js": "/up/static/js/main.b52594a7.chunk.js",
+    "main.js.map": "/up/static/js/main.b52594a7.chunk.js.map",
     "runtime-main.js": "/up/static/js/runtime-main.21033d67.js",
     "runtime-main.js.map": "/up/static/js/runtime-main.21033d67.js.map",
-    "static/js/2.1a65249d.chunk.js": "/up/static/js/2.1a65249d.chunk.js",
-    "static/js/2.1a65249d.chunk.js.map": "/up/static/js/2.1a65249d.chunk.js.map",
+    "static/js/2.e5f51feb.chunk.js": "/up/static/js/2.e5f51feb.chunk.js",
+    "static/js/2.e5f51feb.chunk.js.map": "/up/static/js/2.e5f51feb.chunk.js.map",
     "static/js/3.47ec4010.chunk.js": "/up/static/js/3.47ec4010.chunk.js",
     "static/js/3.47ec4010.chunk.js.map": "/up/static/js/3.47ec4010.chunk.js.map",
     "index.html": "/up/index.html",
     "static/css/main.e50ebbf4.chunk.css.map": "/up/static/css/main.e50ebbf4.chunk.css.map",
-    "static/js/2.1a65249d.chunk.js.LICENSE.txt": "/up/static/js/2.1a65249d.chunk.js.LICENSE.txt",
+    "static/js/2.e5f51feb.chunk.js.LICENSE.txt": "/up/static/js/2.e5f51feb.chunk.js.LICENSE.txt",
     "static/media/Fanzone-Hexagon-Logo-Footer.7bb1d26d.png": "/up/static/media/Fanzone-Hexagon-Logo-Footer.7bb1d26d.png",
     "static/media/Karla-Bold.f0553c32.ttf": "/up/static/media/Karla-Bold.f0553c32.ttf",
     "static/media/Karla-Regular.6d937d4f.ttf": "/up/static/media/Karla-Regular.6d937d4f.ttf",
@@ -36,8 +36,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.21033d67.js",
-    "static/js/2.1a65249d.chunk.js",
+    "static/js/2.e5f51feb.chunk.js",
     "static/css/main.e50ebbf4.chunk.css",
-    "static/js/main.0a240d11.chunk.js"
+    "static/js/main.b52594a7.chunk.js"
   ]
 }
