@@ -11,10 +11,12 @@ type ProtectRouteProps = {
 const ProtectedRoute : React.FC<ProtectRouteProps> = ({ component: Component, path, ...rest }) => {
     
     const [{ data, error }] = useAccount();
+    const adminAddresses = process.env.REACT_APP_OWNER_ACCOUNTS?.split(",");
+    const isAdmin = data && adminAddresses?.includes(data.address)
 
     return (
         <Route { ...rest } render = { (props) => (
-            data?.address.toLowerCase() === process.env.REACT_APP_OWNER?.toLowerCase() ? <Component {...props}/> : <Redirect to="/mumbai"/>
+            isAdmin ? <Component {...props}/> : <Redirect to="/mumbai"/>
         )}/>        
     );
 }

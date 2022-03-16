@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
 import React, { useState } from 'react';
-import { useSigner } from 'wagmi';
+import { useNetwork, useSigner } from 'wagmi';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
-import { StyledAddPermissions, StyledInputWrappar, StyledInput, StyledLabel, StyledPermissionInputWrappar, StyledCheckboxInput, StyledSetPermisssionButton } from './styles';
+import { StyledAddPermissions, StyledInputWrappar, StyledInput, StyledLabel, StyledPermissionInputWrappar, StyledCheckboxInput, StyledSetPermisssionButton, StyledNetworkLabel } from './styles';
 
 type formInput = {
     universalProfileAddress: string;
@@ -24,6 +24,7 @@ type formInput = {
 export const AddPermissions: React.FC = () => {
 
     const [{ data, error, loading }, getSigner] = useSigner();
+    const [{ data: networkData, error: networkError, loading: networkLoading }, getNetwork] = useNetwork();
     const [permissionsForm, setpermissionsForm] = useState<formInput>({
         universalProfileAddress: '',
         addressTo: '',
@@ -31,8 +32,8 @@ export const AddPermissions: React.FC = () => {
             CHANGEOWNER: false,
             CHANGEPERMISSIONS: false,
             ADDPERMISSIONS: false,
-            SETDATA: true,
-            CALL: true,
+            SETDATA: false,
+            CALL: false,
             STATICCALL: false,
             DELEGATECALL: false,
             DEPLOY: false,
@@ -84,6 +85,9 @@ export const AddPermissions: React.FC = () => {
 
     return (
         <StyledAddPermissions>
+            <StyledNetworkLabel>
+                You are connected to {networkData.chain?.name} network
+            </StyledNetworkLabel>
             <StyledInputWrappar>
                 <StyledLabel>Universal Profile Address: </StyledLabel>
                 <StyledInput name='universalProfileAddress' onChange={changeHandler}></StyledInput>

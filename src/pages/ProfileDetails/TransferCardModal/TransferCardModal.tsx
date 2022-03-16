@@ -54,6 +54,7 @@ export const TransferCardModal: React.FC<IProps> = ({
     };
 
     const tranferCard = async () => {
+        setLoading(true);
         if(profile.isOwnerKeyManager) {
             await LSP3ProfileApi.transferCardViaKeyManager(
                 transferCardForm.cardAddress,
@@ -62,7 +63,13 @@ export const TransferCardModal: React.FC<IProps> = ({
                 transferCardForm.tokenId ? transferCardForm.tokenId : 0,
                 transferCardForm.toAddress,
                 signer
-            );
+            ).then(() => {
+              onClose();
+            }).catch(() => {
+              setError(true);
+            }).finally(() => {
+              setLoading(false);
+            });
         } else {
             await LSP3ProfileApi.transferCardViaUniversalProfile(
                 transferCardForm.cardAddress,
@@ -70,7 +77,13 @@ export const TransferCardModal: React.FC<IProps> = ({
                 transferCardForm.tokenId ? transferCardForm.tokenId : 0,
                 transferCardForm.toAddress,
                 signer
-            )
+            ).then(() => {
+              onClose();
+            }).catch(() => {
+              setError(true);
+            }).finally(() => {
+              setLoading(false);
+            });
         }
 
     };

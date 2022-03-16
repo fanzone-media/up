@@ -12,6 +12,12 @@ export const StyledAddPermissions = styled.div`
     }
 `;
 
+export const StyledNetworkLabel = styled.p`
+    color: white;
+    font-size: 25px;
+    font-weight: 700;
+`;
+
 export const StyledLabel = styled.p`
     color: white;
     width: 200px;

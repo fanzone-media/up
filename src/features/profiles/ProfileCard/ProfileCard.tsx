@@ -45,7 +45,6 @@ export const ProfileCard: React.FC<Iprops> = React.memo(function ProfileList({
     >
       <StyledBalanceWrappar demo={type === 'demo' ? true : false}>
         <StyledBalance demo={type === 'demo' ? true : false}>
-          {/* {type === 'demo' ? userProfile.balance : balance} */}
           {type === 'demo' ? userProfile.ownedAssets.length : balance}
         </StyledBalance>
       </StyledBalanceWrappar>
