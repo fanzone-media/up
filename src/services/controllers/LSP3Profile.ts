@@ -13,7 +13,7 @@ import {
 import { ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
-import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js';
+import { ERC725JSONSchema } from '@erc725/erc725.js';
 import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 
@@ -101,18 +101,17 @@ const fetchProfile =
       }),
     );
 
-    const issuedAssets =
-      await LSP4DigitalAssetApi.fetchProfileIssuedAssetsAddresses(network, address);
-
     let hashedUrl: string = '';
     const universalProfile = UniversalProfile__factory.connect(
       address,
       provider,
     );
 
-    const owner = await universalProfile.owner();
-
-    const permissionSet = await getKeyManagerPermissions(address, network);
+    const [owner, permissionSet, issuedAssets] = await Promise.all([
+      universalProfile.owner(),
+      getKeyManagerPermissions(address, network),
+      LSP4DigitalAssetApi.fetchProfileIssuedAssetsAddresses(network, address)
+    ]);
 
     const isOwnerKeyManager = await checkKeyManager(owner, network);
 
@@ -422,7 +421,12 @@ const transferCardViaKeyManager =
       encodedTransferFunction
     ]);
 
-    await keyManagerContract.execute(encodedExecuteFunction);
+    const transaction = await keyManagerContract.execute(encodedExecuteFunction);
+    await transaction.wait(1).then((result) => {
+      if(result.status === 0) {
+        throw new Error("Transaction reverted");
+      }
+    });
 };
 
 const transferCardViaUniversalProfile = 
@@ -442,12 +446,17 @@ const transferCardViaUniversalProfile =
       tokenId
     ]);
 
-    await universalProfileContract.execute(
+    const transaction = await universalProfileContract.execute(
       "0x0",
       assetAddress,
       0,
       encodedTransferFunction
     );
+    await transaction.wait(1).then((result) => {
+      if(result.status === 0) {
+        throw new Error("Transaction reverted");
+      }
+    });
   };
 
 export const LSP3ProfileApi = {

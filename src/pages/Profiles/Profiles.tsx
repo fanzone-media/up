@@ -29,7 +29,6 @@ import { Search } from '../../components/Search';
 import { useAppDispatch } from '../../boot/store';
 import { useParams } from 'react-router-dom';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
-import { useSigner } from 'wagmi';
 
 interface IParams {
   network: string;

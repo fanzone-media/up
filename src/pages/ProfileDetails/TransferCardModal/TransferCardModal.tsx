@@ -65,7 +65,8 @@ export const TransferCardModal: React.FC<IProps> = ({
                 signer
             ).then(() => {
               onClose();
-            }).catch(() => {
+              window.location.reload();
+            }).catch((error) => {
               setError(true);
             }).finally(() => {
               setLoading(false);
@@ -156,7 +157,7 @@ export const TransferCardModal: React.FC<IProps> = ({
                     <StyledLoader color="#ed7a2d" />
                   </StyledLoadingHolder>
                   <StyledLoadingMessage>
-                    confirm the metamask transaction and wait ....
+                    confirm the metamask transaction and wait for transaction success....
                   </StyledLoadingMessage>
                 </>
               ) : (

@@ -55,6 +55,7 @@ import {
 import { HeaderToolbar } from '../../components/HeaderToolbar';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer } from '../../utility';
+import ReactTooltip from 'react-tooltip';
 
 interface IPrams {
   add: string;
@@ -195,12 +196,21 @@ const AssetDetails: React.FC = () => {
           (item) => item.assetAddress === params.add.toLowerCase(),
         );
         return (
-          <ProfileCard
-            key={owner.address}
-            userProfile={owner}
-            balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-            type="owner"
-          />
+          <React.Fragment key={owner.address}>
+            <ProfileCard
+              userProfile={owner}
+              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
+              type="owner"
+              tooltipId='ownerTooltip'
+            />
+            <ReactTooltip id='ownerTooltip'
+              getContent={(dataTip) => (
+                <span>Token Ids: {dataTip}</span>
+              )}
+            >
+            </ReactTooltip>
+          </React.Fragment>
+
         );
       }
     }
@@ -213,12 +223,21 @@ const AssetDetails: React.FC = () => {
           (item) => item.assetAddress === params.add.toLowerCase(),
         );
         return (
-          <ProfileCard
-            key={creator.address}
-            userProfile={creator}
-            balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-            type="creator"
-          />
+          <React.Fragment key={creator.address}>
+            <ProfileCard
+              userProfile={creator}
+              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
+              type="creator"
+              tooltipId='designerTooltip'
+            />
+            <ReactTooltip id='designerTooltip'
+              getContent={(dataTip) => (
+                <span>Token Ids: {dataTip}</span>
+              )}
+            >
+            </ReactTooltip>
+          </React.Fragment>
+          
         );
       }),
     [creators, params.add],
@@ -231,12 +250,20 @@ const AssetDetails: React.FC = () => {
           (item) => item.assetAddress === params.add.toLowerCase(),
         );
         return (
-          <ProfileCard
-            key={holder.address}
-            userProfile={holder}
-            balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-            type="holder"
-          />
+          <React.Fragment key={holder.address}>
+            <ProfileCard
+              userProfile={holder}
+              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
+              type="holder"
+              tooltipId='holderTooltip'
+            />
+            <ReactTooltip id='holderTooltip'
+                getContent={(dataTip) => (
+                  <span>Token Ids: {dataTip}</span>
+                )}
+            >
+            </ReactTooltip>
+          </React.Fragment>
         );
       }),
     [holders, params.add],

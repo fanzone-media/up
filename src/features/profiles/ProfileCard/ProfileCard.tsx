@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { IProfile } from '../../../services/models';
 import polygon from '../../../assets/polygon.svg';
 import makeBlockie from 'ethereum-blockies-base64';
@@ -22,18 +22,27 @@ interface Iprops {
   userProfile: IProfile;
   type: string;
   balance?: number;
+  tooltipId?: string;
 }
 
 interface IParams {
   network: string;
+  add: string;
 }
 
-export const ProfileCard: React.FC<Iprops> = React.memo(function ProfileList({
+export const ProfileCard: React.FC<Iprops> = ({
   userProfile,
   balance,
   type,
-}: Iprops) {
+  tooltipId
+}: Iprops) => {
   const params = useParams<IParams>();
+  const getTooltipTokenIds = useMemo(() => 
+    type !== "demo" && userProfile.ownedAssets.find((asset) => 
+      asset.assetAddress.toLowerCase() === params.add.toLowerCase()
+    )
+  ,[params.add, type, userProfile.ownedAssets])
+
   return (
     <StyledProfileCard
       to={
@@ -42,6 +51,8 @@ export const ProfileCard: React.FC<Iprops> = React.memo(function ProfileList({
       }
       className="animate-cardrender"
       demo={type === 'demo' ? true : false}
+      data-tip={type !== "demo" && getTooltipTokenIds && getTooltipTokenIds.tokenIds}
+      data-for={tooltipId}
     >
       <StyledBalanceWrappar demo={type === 'demo' ? true : false}>
         <StyledBalance demo={type === 'demo' ? true : false}>
@@ -76,4 +87,4 @@ export const ProfileCard: React.FC<Iprops> = React.memo(function ProfileList({
       </StyledProfileDetailWrappar>
     </StyledProfileCard>
   );
-});
+};
