@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ICard } from '../../../services/models';
 import universalprofile from '../../../assets/universalprofile.png';
-import blockscout from '../../../assets/blockscout.png';
+import transferIcon from '../../../assets/transfer-icon.png';
 import {
   StyledBlockScoutIcon,
   StyledCardDetail,
@@ -12,6 +12,8 @@ import {
   StyledMediaWrappar,
   StyledMetaCardImg,
   StyledOwnedMint,
+  StyledTransferButton,
+  StyledTransferIcon,
   StyledUniversalProfileIcon,
 } from './styles';
 import { getChainExplorer } from '../../../utility';
@@ -20,17 +22,19 @@ interface IProps {
   digitalCard: ICard;
   type: string;
   balance?: number;
+  openTransferCardModal?: (address: string) => void;
 }
 
 interface IParams {
   network: string;
 }
 
-export const MetaCard: React.FC<IProps> = React.memo(function CardListItem({
+export const MetaCard: React.FC<IProps> = ({
   digitalCard,
   type,
   balance,
-}: IProps) {
+  openTransferCardModal,
+}: IProps) => {
   const params = useParams<IParams>();
   const explorer = getChainExplorer(params.network);
   return (
@@ -43,6 +47,13 @@ export const MetaCard: React.FC<IProps> = React.memo(function CardListItem({
         >
           <StyledUniversalProfileIcon src={universalprofile} alt="" />
         </a>
+      )}
+      {openTransferCardModal && (
+        <StyledTransferButton
+          onClick={() => openTransferCardModal(digitalCard.address)}
+        >
+          <StyledTransferIcon src={transferIcon} alt="" />
+        </StyledTransferButton>
       )}
       <a
         href={explorer && explorer.exploreUrl + digitalCard.address}
@@ -69,4 +80,4 @@ export const MetaCard: React.FC<IProps> = React.memo(function CardListItem({
       </Link>
     </StyledCardWrappar>
   );
-});
+};

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
-import { BlockScoutIcon, UniversalProfileIcon } from '../../assets';
+import { UniversalProfileIcon } from '../../assets';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../boot/types';
 import { fetchCard, selectCardById } from '../../features/cards';
@@ -302,6 +302,7 @@ const AssetDetails: React.FC = () => {
         </React.Fragment>
       ));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asset]);
 
   return (

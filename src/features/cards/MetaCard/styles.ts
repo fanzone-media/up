@@ -106,6 +106,29 @@ export const StyledUniversalProfileIcon = styled.img`
   }
 `;
 
+export const StyledTransferButton = styled.button`
+  position: absolute;
+  left: 0;
+  height: 34px;
+  width: 34px;
+  top: 170px;
+  margin-left: 8px;
+  animation: ${pulseAnimate} 2s ease-in-out infinite;
+  background-color: white;
+  border-radius: 100%;
+
+  @media ${sm} {
+    top: 205px;
+    margin-left: 15px;
+    height: 40px;
+    width: 40px;
+  }
+`;
+
+export const StyledTransferIcon = styled.img`
+  margin: 0 auto;
+`;
+
 export const StyledOwnedMint = styled.p`
   font-size: 14px;
   margin: auto auto 0 auto;

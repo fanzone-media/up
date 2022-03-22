@@ -105,6 +105,7 @@ const fetchProfile = async (
   );
 
   let hashedUrl: string = '';
+
   const universalProfile = UniversalProfileProxy__factory.connect(
     address,
     provider,

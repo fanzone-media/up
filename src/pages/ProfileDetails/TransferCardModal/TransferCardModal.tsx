@@ -1,5 +1,5 @@
 import { ethers, Signer } from 'ethers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from '../../../components/Modal';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { IProfile } from '../../../services/models';
@@ -20,6 +20,7 @@ interface IProps {
   onClose: () => void;
   signer: Signer;
   profile: IProfile;
+  selectecAddress?: string;
 }
 
 type formInput = {
@@ -33,12 +34,13 @@ export const TransferCardModal: React.FC<IProps> = ({
   onClose,
   signer,
   profile,
+  selectecAddress,
 }: IProps) => {
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [transferCardForm, setTransferCardForm] = useState<formInput>({
     toAddress: '',
-    cardAddress: '',
+    cardAddress: selectecAddress ? selectecAddress : '',
     tokenId: null,
   });
 
@@ -60,7 +62,6 @@ export const TransferCardModal: React.FC<IProps> = ({
         [event.currentTarget.name]: event.currentTarget.value,
       });
     }
-    console.log(transferCardForm);
   };
 
   const tranferCard = async () => {
@@ -121,6 +122,10 @@ export const TransferCardModal: React.FC<IProps> = ({
     onClose();
   };
 
+  useEffect(() => {
+    console.log(selectecAddress);
+  }, [selectecAddress]);
+
   const fields = [
     { name: 'toAddress', label: 'To', type: 'text' },
     { name: 'cardAddress', label: 'Card Name', type: 'select' },
@@ -146,6 +151,7 @@ export const TransferCardModal: React.FC<IProps> = ({
                   <option>Select token address</option>
                   {profile.ownedAssets.map((ownedAsset) => (
                     <option
+                      selected={ownedAsset.assetAddress === selectecAddress}
                       key={ownedAsset.assetAddress}
                       value={ownedAsset.assetAddress}
                     >
