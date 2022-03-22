@@ -22,6 +22,7 @@ interface IPagination {
   collection: ICard[];
   type: string;
   profile?: IProfile;
+  openTransferCardModal?: (address: string) => void;
 }
 
 interface IParams {
@@ -45,7 +46,7 @@ const useViewPort = () => {
   return { screenWidth };
 };
 
-const Pagination: React.FC<IPagination> = ({ collection, type, profile }) => {
+const Pagination: React.FC<IPagination> = ({ collection, type, profile, openTransferCardModal }) => {
   const params = useParams<IParams>();
 
   const [search, setSearch] = useState<string>('');
@@ -175,6 +176,7 @@ const Pagination: React.FC<IPagination> = ({ collection, type, profile }) => {
               digitalCard={digitalCard}
               type={type}
               balance={findBalanceOf?.balance}
+              openTransferCardModal={openTransferCardModal}
             />
           );
         }

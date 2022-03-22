@@ -83,6 +83,7 @@ const ProfileDetails: React.FC = () => {
     useSigner();
   const [openEditProfileModal, setOpenEditProfileModal] = useState<boolean>(false);
   const [openTransferCardModal, setOpenTransferCardModal] = useState<boolean>(false);
+  const [preSelectedAssetAddress, setPreSelectedAssetAddress] = useState<string>();
 
   const profile = useSelector((state: RootState) => {
     switch (params.network) {
@@ -167,6 +168,11 @@ const ProfileDetails: React.FC = () => {
     (state: RootState) => state.cards.ownedStatus,
   );
 
+  const toggleTransferModal = (address: string) => {
+    setPreSelectedAssetAddress(address);
+    setOpenTransferCardModal(true);
+  }
+
   useMemo(() => {
     if (!profile)
       dispatch(
@@ -203,13 +209,13 @@ const ProfileDetails: React.FC = () => {
   }, [cards, dispatch, params.network, profile?.ownedAssets]);
 
   const renderIssuedAssetsPagination = useMemo(
-    () => <Pagination collection={issuedCollection} type="issued" />,
+    () => <Pagination collection={issuedCollection} type="issued" openTransferCardModal={toggleTransferModal}/>,
     [issuedCollection],
   );
 
   const renderOwnedAssetsPagination = useMemo(() => {
     return (
-      <Pagination collection={ownedCollection} type="owned" profile={profile} />
+      <Pagination collection={ownedCollection} type="owned" profile={profile} openTransferCardModal={toggleTransferModal}/>
     );
   }, [ownedCollection, profile]);
 
@@ -303,6 +309,7 @@ const ProfileDetails: React.FC = () => {
               onClose={() => setOpenTransferCardModal(false)}
               signer={signer}
               profile={profile}
+              selectecAddress={preSelectedAssetAddress}
             />
           )}
       <HeaderToolbar
