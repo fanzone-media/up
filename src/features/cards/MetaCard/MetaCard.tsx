@@ -33,7 +33,7 @@ export const MetaCard: React.FC<IProps> = ({
   digitalCard,
   type,
   balance,
-  openTransferCardModal
+  openTransferCardModal,
 }: IProps) => {
   const params = useParams<IParams>();
   const explorer = getChainExplorer(params.network);
@@ -49,9 +49,11 @@ export const MetaCard: React.FC<IProps> = ({
         </a>
       )}
       {openTransferCardModal && (
-      <StyledTransferButton onClick={() => openTransferCardModal(digitalCard.address)}>
-        <StyledTransferIcon src={transferIcon} alt="" />
-      </StyledTransferButton>
+        <StyledTransferButton
+          onClick={() => openTransferCardModal(digitalCard.address)}
+        >
+          <StyledTransferIcon src={transferIcon} alt="" />
+        </StyledTransferButton>
       )}
       <a
         href={explorer && explorer.exploreUrl + digitalCard.address}

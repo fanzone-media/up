@@ -46,7 +46,12 @@ const useViewPort = () => {
   return { screenWidth };
 };
 
-const Pagination: React.FC<IPagination> = ({ collection, type, profile, openTransferCardModal }) => {
+const Pagination: React.FC<IPagination> = ({
+  collection,
+  type,
+  profile,
+  openTransferCardModal,
+}) => {
   const params = useParams<IParams>();
 
   const [search, setSearch] = useState<string>('');
@@ -192,14 +197,7 @@ const Pagination: React.FC<IPagination> = ({ collection, type, profile, openTran
         return '';
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      collection,
-      params.add,
-      type,
-      screenWidth,
-      filterCollection,
-      currentPage,
-    ],
+    [collection, params.add, type, screenWidth, filterCollection, currentPage],
   );
 
   return (

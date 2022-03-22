@@ -34,14 +34,18 @@ export const ProfileCard: React.FC<Iprops> = ({
   userProfile,
   balance,
   type,
-  tooltipId
+  tooltipId,
 }: Iprops) => {
   const params = useParams<IParams>();
-  const getTooltipTokenIds = useMemo(() => 
-    type !== "demo" && userProfile.ownedAssets.find((asset) => 
-      asset.assetAddress.toLowerCase() === params.add.toLowerCase()
-    )
-  ,[params.add, type, userProfile.ownedAssets])
+  const getTooltipTokenIds = useMemo(
+    () =>
+      type !== 'demo' &&
+      userProfile.ownedAssets.find(
+        (asset) =>
+          asset.assetAddress.toLowerCase() === params.add.toLowerCase(),
+      ),
+    [params.add, type, userProfile.ownedAssets],
+  );
 
   return (
     <StyledProfileCard
@@ -51,7 +55,9 @@ export const ProfileCard: React.FC<Iprops> = ({
       }
       className="animate-cardrender"
       demo={type === 'demo' ? true : false}
-      data-tip={type !== "demo" && getTooltipTokenIds && getTooltipTokenIds.tokenIds}
+      data-tip={
+        type !== 'demo' && getTooltipTokenIds && getTooltipTokenIds.tokenIds
+      }
       data-for={tooltipId}
     >
       <StyledBalanceWrappar demo={type === 'demo' ? true : false}>

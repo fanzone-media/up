@@ -75,6 +75,7 @@ const Profiles: React.FC = () => {
       case 'ethereum':
         return selectAllEthereumUsersItems(state);
     }
+    // eslint-disable-next-line array-callback-return
   })?.filter((item) => {
     switch (params.network) {
       case 'l14':
@@ -96,8 +97,9 @@ const Profiles: React.FC = () => {
     }
   });
 
-  const demoCollection = useSelector((state: RootState) =>
-    selectAllCardItems(state),
+  const demoCollection = useSelector(
+    (state: RootState) => selectAllCardItems(state),
+    // eslint-disable-next-line array-callback-return
   )?.filter((item) => {
     switch (params.network) {
       case 'l14':
@@ -212,10 +214,8 @@ const Profiles: React.FC = () => {
 
   useMemo(() => {
     fetchDemoCollection();
-  }, [params.network]);
-
-  useMemo(async () => {
     fetchDemoProfiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.network]);
 
   const renderProfiles = useMemo(

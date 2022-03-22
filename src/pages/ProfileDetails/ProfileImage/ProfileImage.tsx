@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { BlockScoutIcon, UniversalProfileIcon } from '../../../assets';
+import { UniversalProfileIcon } from '../../../assets';
 import { getChainExplorer } from '../../../utility';
 import {
   StyledBlockieImg,

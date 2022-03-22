@@ -112,16 +112,16 @@ export interface ISetProfileData {
 
 export interface IPermissionSet {
   permissions: {
-    sign: string,
-    transferValue: string,
-    deploy: string,
-    delegateCall: string,
-    staticCall: string,
-    call: string,
-    setData: string,
-    addPermissions: string,
-    changePermissions: string,
-    changeOwner: string
-  }
-  address: string
+    sign: string;
+    transferValue: string;
+    deploy: string;
+    delegateCall: string;
+    staticCall: string;
+    call: string;
+    setData: string;
+    addPermissions: string;
+    changePermissions: string;
+    changeOwner: string;
+  };
+  address: string;
 }

@@ -1,4 +1,4 @@
-import { BlockScoutIcon, polygonExplorerIcon } from "../assets";
+import { BlockScoutIcon, polygonExplorerIcon } from '../assets';
 
 export enum STATUS {
   IDLE = 'idle',
@@ -15,14 +15,22 @@ export const lg = '(min-width: 1024px)';
 
 export const xl = '(min-width: 1280px)';
 
-
 export const getChainExplorer = (network: string) => {
   switch (network) {
     case 'polygon':
-      return {exploreUrl: "https://polygonscan.com/address/", icon: polygonExplorerIcon};
+      return {
+        exploreUrl: 'https://polygonscan.com/address/',
+        icon: polygonExplorerIcon,
+      };
     case 'l14':
-      return {exploreUrl: "https://blockscout.com/lukso/l14/address/", icon: BlockScoutIcon};
+      return {
+        exploreUrl: 'https://blockscout.com/lukso/l14/address/',
+        icon: BlockScoutIcon,
+      };
     case 'mumbai':
-      return {exploreUrl: "https://mumbai.polygonscan.com/address/", icon: polygonExplorerIcon};
+      return {
+        exploreUrl: 'https://mumbai.polygonscan.com/address/',
+        icon: polygonExplorerIcon,
+      };
   }
 };

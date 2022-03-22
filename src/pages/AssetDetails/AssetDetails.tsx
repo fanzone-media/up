@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
-import { BlockScoutIcon, UniversalProfileIcon } from '../../assets';
+import { UniversalProfileIcon } from '../../assets';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../boot/types';
 import { fetchCard, selectCardById } from '../../features/cards';
@@ -201,16 +201,13 @@ const AssetDetails: React.FC = () => {
               userProfile={owner}
               balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
               type="owner"
-              tooltipId='ownerTooltip'
+              tooltipId="ownerTooltip"
             />
-            <ReactTooltip id='ownerTooltip'
-              getContent={(dataTip) => (
-                <span>Token Ids: {dataTip}</span>
-              )}
-            >
-            </ReactTooltip>
+            <ReactTooltip
+              id="ownerTooltip"
+              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+            ></ReactTooltip>
           </React.Fragment>
-
         );
       }
     }
@@ -228,16 +225,13 @@ const AssetDetails: React.FC = () => {
               userProfile={creator}
               balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
               type="creator"
-              tooltipId='designerTooltip'
+              tooltipId="designerTooltip"
             />
-            <ReactTooltip id='designerTooltip'
-              getContent={(dataTip) => (
-                <span>Token Ids: {dataTip}</span>
-              )}
-            >
-            </ReactTooltip>
+            <ReactTooltip
+              id="designerTooltip"
+              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+            ></ReactTooltip>
           </React.Fragment>
-          
         );
       }),
     [creators, params.add],
@@ -255,14 +249,12 @@ const AssetDetails: React.FC = () => {
               userProfile={holder}
               balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
               type="holder"
-              tooltipId='holderTooltip'
+              tooltipId="holderTooltip"
             />
-            <ReactTooltip id='holderTooltip'
-                getContent={(dataTip) => (
-                  <span>Token Ids: {dataTip}</span>
-                )}
-            >
-            </ReactTooltip>
+            <ReactTooltip
+              id="holderTooltip"
+              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+            ></ReactTooltip>
           </React.Fragment>
         );
       }),
@@ -310,6 +302,7 @@ const AssetDetails: React.FC = () => {
         </React.Fragment>
       ));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asset]);
 
   return (
