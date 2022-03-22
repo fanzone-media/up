@@ -4,8 +4,8 @@ import { ICard } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
 import { ethers } from 'ethers';
 import {
-  CardToken__factory,
-  UniversalProfile__factory,
+  CardTokenProxy__factory,
+  UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import Utils from '../utilities/util';
 import { LSP3ProfileApi } from './LSP3Profile';
@@ -13,7 +13,7 @@ import { useRpcProvider } from '../../hooks/useRpcProvider';
 
 const fetchCard = async (address: string, network: string): Promise<ICard> => {
   const provider = useRpcProvider(network);
-  const contract = CardToken__factory.connect(address, provider);
+  const contract = CardTokenProxy__factory.connect(address, provider);
   await contract
     .supportsInterface('0x49399145')
     .then((result) => {
@@ -89,7 +89,10 @@ const fetchProfileIssuedAssetsAddresses = async (
   profileAddress: string,
 ): Promise<string[]> => {
   const provider = useRpcProvider(network);
-  const contract = UniversalProfile__factory.connect(profileAddress, provider);
+  const contract = UniversalProfileProxy__factory.connect(
+    profileAddress,
+    provider,
+  );
 
   let assets: string[] = [];
   // Use the LSP3IssuedAssets_KEY to request the number of elements

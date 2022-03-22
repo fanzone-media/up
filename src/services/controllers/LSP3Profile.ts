@@ -9,11 +9,11 @@ import {
 import Utils from '../utilities/util';
 import { addData, addFile, getLSP3ProfileData } from '../ipfsClient';
 import {
-  CardToken__factory,
+  CardTokenProxy__factory,
   ERC725Y,
   ERC725Y__factory,
-  LSP6KeyManager__factory,
-  UniversalProfile__factory,
+  LSP6KeyManagerProxy__factory,
+  UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import { ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
@@ -105,7 +105,11 @@ const fetchProfile = async (
   );
 
   let hashedUrl: string = '';
-  const universalProfile = UniversalProfile__factory.connect(address, provider);
+
+  const universalProfile = UniversalProfileProxy__factory.connect(
+    address,
+    provider,
+  );
 
   const [owner, permissionSet, issuedAssets] = await Promise.all([
     universalProfile.owner(),
@@ -180,7 +184,10 @@ const fetchOwnedCollectionCount = async (
   network: string,
 ): Promise<number> => {
   const provider = useRpcProvider(network);
-  const universalProfile = UniversalProfile__factory.connect(address, provider);
+  const universalProfile = UniversalProfileProxy__factory.connect(
+    address,
+    provider,
+  );
   const res = await universalProfile.getData([KeyChain.LSP5ReceivedAssets]);
   const ownedAssetsCount = ethers.BigNumber.from(res[0]).toNumber();
   return ownedAssetsCount;
@@ -215,7 +222,7 @@ const fetchCreatorsAddresses = async (
 ): Promise<string[]> => {
   const provider = useRpcProvider(network);
 
-  const contract = CardToken__factory.connect(address, provider);
+  const contract = CardTokenProxy__factory.connect(address, provider);
 
   const numCreatorHex = await contract.getData([KeyChain.LSP4Creators]);
 
@@ -255,7 +262,7 @@ const fetchBalanceOf = async (
     return {} as IOwnedAssets;
   }
   const provider = useRpcProvider(network);
-  const contract = CardToken__factory.connect(assetAddress, provider);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
   const balance = await contract.balanceOf(profileAddress);
   const tokenIds = await (
     await contract.tokenIdsOf(profileAddress)
@@ -272,7 +279,10 @@ const setUniversalProfileData = async (
   profileData: ISetProfileData,
   signer: Signer,
 ): Promise<boolean> => {
-  const contract = UniversalProfile__factory.connect(profileAddress, signer);
+  const contract = UniversalProfileProxy__factory.connect(
+    profileAddress,
+    signer,
+  );
   await uploadProfileData(profileData)
     .then(async (JSONURL) => {
       await contract.setData([KeyChain.LSP3PROFILE], [JSONURL]);
@@ -290,11 +300,11 @@ const setUniversalProfileDataViaKeyManager = async (
   profileData: ISetProfileData,
   signer: Signer,
 ) => {
-  const universalProfileContract = UniversalProfile__factory.connect(
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
     profileAddress,
     signer,
   );
-  const keyManagerContract = LSP6KeyManager__factory.connect(
+  const keyManagerContract = LSP6KeyManagerProxy__factory.connect(
     keyManagerAddress,
     signer,
   );
@@ -313,7 +323,7 @@ export const getKeyManagerPermissions = async (
   network: string,
 ): Promise<IPermissionSet[]> => {
   const provider = useRpcProvider(network);
-  const contract = UniversalProfile__factory.connect(address, provider);
+  const contract = UniversalProfileProxy__factory.connect(address, provider);
   const addressPermissions = await contract.getData([
     KeyChain.LSP6AddressPermissions,
   ]);
@@ -370,7 +380,7 @@ export const getKeyManagerPermissions = async (
 
 export const checkKeyManager = async (address: string, network: string) => {
   const provider = useRpcProvider(network);
-  const contract = LSP6KeyManager__factory.connect(address, provider);
+  const contract = LSP6KeyManagerProxy__factory.connect(address, provider);
   let isKeyManager = false;
   await contract
     .supportsInterface('0x6f4df48b')
@@ -434,12 +444,12 @@ const transferCardViaKeyManager = async (
   toAddress: string,
   signer: Signer,
 ) => {
-  const assetContract = CardToken__factory.connect(assetAddress, signer);
-  const universalProfileContract = UniversalProfile__factory.connect(
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
     universalProfileAddress,
     signer,
   );
-  const keyManagerContract = LSP6KeyManager__factory.connect(
+  const keyManagerContract = LSP6KeyManagerProxy__factory.connect(
     keyManagerAddress,
     signer,
   );
@@ -472,8 +482,8 @@ const transferCardViaUniversalProfile = async (
   toAddress: string,
   signer: Signer,
 ) => {
-  const assetContract = CardToken__factory.connect(assetAddress, signer);
-  const universalProfileContract = UniversalProfile__factory.connect(
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
     universalProfileAddress,
     signer,
   );

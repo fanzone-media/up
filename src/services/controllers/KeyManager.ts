@@ -5,8 +5,8 @@ import {
 } from '@erc725/erc725.js/build/main/lib/utils';
 import { ethers, Signer } from 'ethers';
 import {
-  LSP6KeyManager__factory,
-  UniversalProfile__factory,
+  LSP6KeyManagerProxy__factory,
+  UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import KeyChain from '../utilities/KeyChain';
 
@@ -32,12 +32,15 @@ const addPermissions = async (
     keys: [],
     values: [],
   } as { keys: string[]; values: string[] };
-  const universalProfileContract = UniversalProfile__factory.connect(
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
     universalProfileAddress,
     signer,
   );
   const owner = await universalProfileContract.owner();
-  const KeyManagerContract = LSP6KeyManager__factory.connect(owner, signer);
+  const KeyManagerContract = LSP6KeyManagerProxy__factory.connect(
+    owner,
+    signer,
+  );
 
   const [currentIndex] = await universalProfileContract.getData([
     KeyChain.LSP6AddressPermissions,
