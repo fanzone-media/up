@@ -201,16 +201,13 @@ const AssetDetails: React.FC = () => {
               userProfile={owner}
               balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
               type="owner"
-              tooltipId='ownerTooltip'
+              tooltipId="ownerTooltip"
             />
-            <ReactTooltip id='ownerTooltip'
-              getContent={(dataTip) => (
-                <span>Token Ids: {dataTip}</span>
-              )}
-            >
-            </ReactTooltip>
+            <ReactTooltip
+              id="ownerTooltip"
+              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+            ></ReactTooltip>
           </React.Fragment>
-
         );
       }
     }
@@ -228,16 +225,13 @@ const AssetDetails: React.FC = () => {
               userProfile={creator}
               balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
               type="creator"
-              tooltipId='designerTooltip'
+              tooltipId="designerTooltip"
             />
-            <ReactTooltip id='designerTooltip'
-              getContent={(dataTip) => (
-                <span>Token Ids: {dataTip}</span>
-              )}
-            >
-            </ReactTooltip>
+            <ReactTooltip
+              id="designerTooltip"
+              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+            ></ReactTooltip>
           </React.Fragment>
-          
         );
       }),
     [creators, params.add],
@@ -255,14 +249,12 @@ const AssetDetails: React.FC = () => {
               userProfile={holder}
               balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
               type="holder"
-              tooltipId='holderTooltip'
+              tooltipId="holderTooltip"
             />
-            <ReactTooltip id='holderTooltip'
-                getContent={(dataTip) => (
-                  <span>Token Ids: {dataTip}</span>
-                )}
-            >
-            </ReactTooltip>
+            <ReactTooltip
+              id="holderTooltip"
+              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+            ></ReactTooltip>
           </React.Fragment>
         );
       }),

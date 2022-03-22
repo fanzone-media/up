@@ -190,14 +190,7 @@ const Pagination: React.FC<IPagination> = ({ collection, type, profile }) => {
         return '';
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      collection,
-      params.add,
-      type,
-      screenWidth,
-      filterCollection,
-      currentPage,
-    ],
+    [collection, params.add, type, screenWidth, filterCollection, currentPage],
   );
 
   return (

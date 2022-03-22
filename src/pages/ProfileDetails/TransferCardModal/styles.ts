@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const StyledTransferCardModalContent = styled.div`
   width: 100%;
@@ -7,6 +7,6 @@ export const StyledTransferCardModalContent = styled.div`
 `;
 
 export const StyledSelectInput = styled.select`
-    color: black;
-    width: 200px;
+  color: black;
+  width: 200px;
 `;

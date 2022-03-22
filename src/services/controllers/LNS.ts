@@ -9,9 +9,8 @@ export const fetchUserAddress = async (
   vanityName: string,
   network: string,
 ): Promise<string | null> => {
-
   const provider = useRpcProvider(network);
-  const contract = Lns__factory.connect(lnsAddress,provider)
+  const contract = Lns__factory.connect(lnsAddress, provider);
   const hexName = Web3.utils.asciiToHex(vanityName);
   const paddedName = hexName.padEnd(64 - hexName.length, '0');
   const res = await contract
@@ -49,7 +48,7 @@ export const checkNameAvailabity = async (
   network: string,
 ): Promise<string | null> => {
   const provider = useRpcProvider(network);
-  const contract = Lns__factory.connect(lnsAddress,provider)
+  const contract = Lns__factory.connect(lnsAddress, provider);
   const hexName = Web3.utils.asciiToHex(vanityName);
   const paddedName = hexName.padEnd(64 - hexName.length, '0');
   const res = await contract

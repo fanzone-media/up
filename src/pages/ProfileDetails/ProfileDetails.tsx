@@ -81,8 +81,10 @@ const ProfileDetails: React.FC = () => {
   const [{ data, error }] = useAccount();
   const [{ data: signer, error: signerError, loading }, getSigner] =
     useSigner();
-  const [openEditProfileModal, setOpenEditProfileModal] = useState<boolean>(false);
-  const [openTransferCardModal, setOpenTransferCardModal] = useState<boolean>(false);
+  const [openEditProfileModal, setOpenEditProfileModal] =
+    useState<boolean>(false);
+  const [openTransferCardModal, setOpenTransferCardModal] =
+    useState<boolean>(false);
 
   const profile = useSelector((state: RootState) => {
     switch (params.network) {
@@ -133,15 +135,31 @@ const ProfileDetails: React.FC = () => {
 
   const history = useHistory();
 
-  const keyManagerSetDataPermission = useMemo(() => 
-    profile && data && profile.permissionSet.length > 0 &&  profile.permissionSet.some((set) => 
-      set.address.toLowerCase() === data.address.toLowerCase() && set.permissions.setData === "1"
-  ), [data, profile]);
+  const keyManagerSetDataPermission = useMemo(
+    () =>
+      profile &&
+      data &&
+      profile.permissionSet.length > 0 &&
+      profile.permissionSet.some(
+        (set) =>
+          set.address.toLowerCase() === data.address.toLowerCase() &&
+          set.permissions.setData === '1',
+      ),
+    [data, profile],
+  );
 
-  const keyManagerCallPermission = useMemo(() => 
-  profile && data && profile.permissionSet.length > 0 &&  profile.permissionSet.some((set) => 
-    set.address.toLowerCase() === data.address.toLowerCase() && set.permissions.call === "1"
-), [data, profile]);
+  const keyManagerCallPermission = useMemo(
+    () =>
+      profile &&
+      data &&
+      profile.permissionSet.length > 0 &&
+      profile.permissionSet.some(
+        (set) =>
+          set.address.toLowerCase() === data.address.toLowerCase() &&
+          set.permissions.call === '1',
+      ),
+    [data, profile],
+  );
 
   const issuedCollection = useSelector((state: RootState) =>
     selectAllCardItems(state),
@@ -267,7 +285,8 @@ const ProfileDetails: React.FC = () => {
     if (
       profile &&
       data &&
-      (keyManagerSetDataPermission || profile.owner.toLowerCase() === data.address.toLowerCase())
+      (keyManagerSetDataPermission ||
+        profile.owner.toLowerCase() === data.address.toLowerCase())
     ) {
       return true;
     }
@@ -284,7 +303,8 @@ const ProfileDetails: React.FC = () => {
       {signer &&
         profile &&
         data &&
-        (keyManagerSetDataPermission || profile.owner.toLowerCase() === data.address.toLowerCase()) && (
+        (keyManagerSetDataPermission ||
+          profile.owner.toLowerCase() === data.address.toLowerCase()) && (
           <ProfileEditModal
             isOpen={openEditProfileModal}
             onClose={() => setOpenEditProfileModal(false)}
@@ -292,19 +312,19 @@ const ProfileDetails: React.FC = () => {
             profile={profile}
           />
         )}
-        {
-          signer &&
-          profile &&
-          data &&
-          profile.ownedAssets.length > 0 &&
-          (keyManagerCallPermission || profile.owner.toLowerCase() === data.address.toLowerCase()) && (
-            <TransferCardModal 
-              isOpen={openTransferCardModal}
-              onClose={() => setOpenTransferCardModal(false)}
-              signer={signer}
-              profile={profile}
-            />
-          )}
+      {signer &&
+        profile &&
+        data &&
+        profile.ownedAssets.length > 0 &&
+        (keyManagerCallPermission ||
+          profile.owner.toLowerCase() === data.address.toLowerCase()) && (
+          <TransferCardModal
+            isOpen={openTransferCardModal}
+            onClose={() => setOpenTransferCardModal(false)}
+            signer={signer}
+            profile={profile}
+          />
+        )}
       <HeaderToolbar
         onBack={backHandler}
         buttonLabel="Back to profile"
@@ -402,16 +422,19 @@ const ProfileDetails: React.FC = () => {
                   </StyledProfileInfo2Content>
                 </StyledProfileInfo2>
               </StyledProfileInfoWrappar>
-              {
-                signer &&
+              {signer &&
                 profile &&
                 data &&
                 profile.ownedAssets.length > 0 &&
-                (keyManagerCallPermission || profile.owner.toLowerCase() === data.address.toLowerCase()) && (
-                  <StyledOpenTransferModalButton onClick={() => setOpenTransferCardModal(true)}>
+                (keyManagerCallPermission ||
+                  profile.owner.toLowerCase() ===
+                    data.address.toLowerCase()) && (
+                  <StyledOpenTransferModalButton
+                    onClick={() => setOpenTransferCardModal(true)}
+                  >
                     Transfer Cards
                   </StyledOpenTransferModalButton>
-              )}
+                )}
               <StyledAssetsWrappar>
                 {/* {issuedCollection.some((item) => item['owner'] === params.add) &&
               issuedFetchError !== 'No Assets' ? (
