@@ -202,28 +202,23 @@ export const userDataReducer = userDataSlice.reducer;
  */
 
 export const {
-  selectAll: selectAllL14UsersItems,
-  selectById: selectL14UserById,
-  selectIds: selectL14UserIds,
-} = usersAdapter.getSelectors<RootState>((state) => state.userData.l14);
-
-export const {
-  selectAll: selectAllPolygonUsersItems,
-  selectById: selectPolygonUserById,
-  selectIds: selectPolygonUserIds,
-} = usersAdapter.getSelectors<RootState>((state) => state.userData.polygon);
-
-export const {
-  selectAll: selectAllMumbaiUsersItems,
-  selectById: selectMumbaiUserById,
-  selectIds: selectMumbaiUserIds,
-} = usersAdapter.getSelectors<RootState>((state) => state.userData.mumbai);
-
-export const {
-  selectAll: selectAllEthereumUsersItems,
-  selectById: selectEthereumUserById,
-  selectIds: selectEthereumUserIds,
-} = usersAdapter.getSelectors<RootState>((state) => state.userData.ethereum);
+  selectAll: selectAllUsersItems,
+  selectById: selectUserById,
+  selectIds: selectUserIds,
+} = usersAdapter.getSelectors<RootState>((state) => {
+  Object.keys(state.userData).forEach((network) => {
+    const networkName = network as NetworkName;
+    if (
+      state.userData[networkName].entities ||
+      state.userData[networkName].ids
+    ) {
+      usersAdapter.getSelectors<RootState>(
+        (state) => state.userData[networkName],
+      );
+    }
+  });
+  return state.userData.polygon;
+});
 
 /**
  * ************

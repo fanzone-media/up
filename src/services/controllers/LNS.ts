@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import Web3 from 'web3';
+import { NetworkName } from '../../boot/types';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { Lns__factory } from '../../submodules/fanzone-smart-contracts/typechain';
 
@@ -7,7 +8,7 @@ const lnsAddress = '0x8533c8c4d72d07c8593789dfff38d67192fb2088';
 
 export const fetchUserAddress = async (
   vanityName: string,
-  network: string,
+  network: NetworkName,
 ): Promise<string | null> => {
   const provider = useRpcProvider(network);
   const contract = Lns__factory.connect(lnsAddress, provider);
@@ -27,7 +28,7 @@ export const fetchUserAddress = async (
 export const setVanityName = async (
   vanityName: string,
   address: string,
-  network: string,
+  network: NetworkName,
 ) => {
   // const provider = useRpcProvider(network);
   // const contract = Lns__factory.connect(lnsAddress,provider)
@@ -45,7 +46,7 @@ export const setVanityName = async (
 
 export const checkNameAvailabity = async (
   vanityName: string,
-  network: string,
+  network: NetworkName,
 ): Promise<string | null> => {
   const provider = useRpcProvider(network);
   const contract = Lns__factory.connect(lnsAddress, provider);

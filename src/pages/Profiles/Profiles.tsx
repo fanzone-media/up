@@ -3,13 +3,7 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { NetworkName, RootState } from '../../boot/types';
-import {
-  fetchAllProfiles,
-  selectAllEthereumUsersItems,
-  selectAllL14UsersItems,
-  selectAllMumbaiUsersItems,
-  selectAllPolygonUsersItems,
-} from '../../features/profiles';
+import { fetchAllProfiles, selectAllUsersItems } from '../../features/profiles';
 import { IProfile } from '../../services/models';
 import { fetchAllCards, selectAllCardItems } from '../../features/cards';
 import Pagination from '../../features/pagination/Pagination';
@@ -64,19 +58,10 @@ const Profiles: React.FC = () => {
     ethereum: ['', ''],
   };
 
-  const userProfiles = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return selectAllL14UsersItems(state);
-      case 'polygon':
-        return selectAllPolygonUsersItems(state);
-      case 'mumbai':
-        return selectAllMumbaiUsersItems(state);
-      case 'ethereum':
-        return selectAllEthereumUsersItems(state);
-    }
+  const userProfiles = useSelector(
+    (state: RootState) => selectAllUsersItems(state),
     // eslint-disable-next-line array-callback-return
-  })?.filter((item) => {
+  )?.filter((item) => {
     if (demoProfiles)
       return demoProfiles[params.network].some((i) => {
         return i === item.address && item.network === params.network;

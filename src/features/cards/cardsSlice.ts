@@ -3,7 +3,7 @@ import {
   createEntityAdapter,
   createSlice,
 } from '@reduxjs/toolkit';
-import { RootState, ThunkExtra } from '../../boot/types';
+import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
 import { ICard } from '../../services/models';
 import { STATUS } from '../../utility';
 import { ICardItemsState, ICardState } from './types';
@@ -40,7 +40,7 @@ const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
 
 export const fetchAllCards = createAsyncThunk<
   ICard[],
-  { network: string; addresses: string[] },
+  { network: NetworkName; addresses: string[] },
   { state: RootState; extra: ThunkExtra }
 >('cards/fetchAllCards', async ({ network, addresses }, { extra: { api } }) => {
   const res = await api.cards.fetchAllCards(network, addresses);
@@ -49,7 +49,7 @@ export const fetchAllCards = createAsyncThunk<
 
 export const fetchIssuedCards = createAsyncThunk<
   ICard[],
-  { network: string; addresses: string[] },
+  { network: NetworkName; addresses: string[] },
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchIssuedCards',
@@ -61,7 +61,7 @@ export const fetchIssuedCards = createAsyncThunk<
 
 export const fetchCard = createAsyncThunk<
   ICard,
-  { address: string; network: string },
+  { network: NetworkName; address: string },
   { state: RootState; extra: ThunkExtra }
 >('cards/fetchCard', async ({ address, network }, { extra: { api } }) => {
   const res = await api.cards.fetchCard(address, network);
@@ -70,7 +70,7 @@ export const fetchCard = createAsyncThunk<
 
 export const fetchOwnedCards = createAsyncThunk<
   ICard[],
-  { network: string; addresses: string[] },
+  { network: NetworkName; addresses: string[] },
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchOwnedCards',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { UniversalProfileIcon } from '../../../assets';
+import { NetworkName } from '../../../boot/types';
 import { getChainExplorer } from '../../../utility';
 import {
   StyledBlockieImg,
@@ -17,7 +18,7 @@ interface IProps {
 }
 
 interface IParams {
-  network: string;
+  network: NetworkName;
 }
 
 export const ProfileImage: React.FC<IProps> = ({

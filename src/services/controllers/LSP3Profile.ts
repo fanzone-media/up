@@ -6,7 +6,7 @@ import {
   IProfile,
   ISetProfileData,
 } from '../models';
-import { AsyncReturnType, UnpackedType } from '../../boot/types';
+import { NetworkName, AsyncReturnType, UnpackedType } from '../../boot/types';
 import Utils from '../utilities/util';
 import { addData, addFile, getLSP3ProfileData } from '../ipfsClient';
 import {
@@ -27,7 +27,7 @@ import { useRpcProvider } from '../../hooks/useRpcProvider';
 
 const fetchProfile = async (
   address: string,
-  network: string,
+  network: NetworkName,
 ): Promise<IProfile> => {
   const provider = useRpcProvider(network);
   const contract = ERC725Y__factory.connect(address, provider);
@@ -140,7 +140,7 @@ const fetchProfile = async (
 
 const fetchOwnedCollectionCount = async (
   address: string,
-  network: string,
+  network: NetworkName,
 ): Promise<number> => {
   const provider = useRpcProvider(network);
   const universalProfile = UniversalProfileProxy__factory.connect(
@@ -154,7 +154,7 @@ const fetchOwnedCollectionCount = async (
 
 const fetchAllProfiles = async (
   addressList: string[],
-  network: string,
+  network: NetworkName,
 ): Promise<IProfile[]> => {
   const profileFetcher = fetchProfile;
 
@@ -177,7 +177,7 @@ const fetchAllProfiles = async (
 
 const fetchCreatorsAddresses = async (
   address: string,
-  network: string,
+  network: NetworkName,
 ): Promise<string[]> => {
   const provider = useRpcProvider(network);
 
@@ -213,7 +213,7 @@ const fetchCreatorsAddresses = async (
 };
 
 const fetchBalanceOf = async (
-  network: string,
+  network: NetworkName,
   assetAddress: string,
   profileAddress?: string,
 ): Promise<IOwnedAssets> => {
@@ -279,7 +279,7 @@ const setUniversalProfileDataViaKeyManager = async (
 
 export const getKeyManagerPermissions = async (
   address: string,
-  network: string,
+  network: NetworkName,
 ): Promise<IPermissionSet[]> => {
   const provider = useRpcProvider(network);
   const contract = UniversalProfileProxy__factory.connect(address, provider);
@@ -337,7 +337,10 @@ export const getKeyManagerPermissions = async (
   return [] as IPermissionSet[];
 };
 
-export const checkKeyManager = async (address: string, network: string) => {
+export const checkKeyManager = async (
+  address: string,
+  network: NetworkName,
+) => {
   const provider = useRpcProvider(network);
   const contract = LSP6KeyManagerProxy__factory.connect(address, provider);
   let isKeyManager = false;

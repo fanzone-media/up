@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import KeyChain from '../utilities/KeyChain';
+import { NetworkName } from '../../boot/types';
 import { ICard } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
 import { ethers } from 'ethers';
@@ -11,7 +12,10 @@ import Utils from '../utilities/util';
 import { LSP3ProfileApi } from './LSP3Profile';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 
-const fetchCard = async (address: string, network: string): Promise<ICard> => {
+const fetchCard = async (
+  address: string,
+  network: NetworkName,
+): Promise<ICard> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(address, provider);
   await contract
@@ -64,7 +68,7 @@ const fetchCard = async (address: string, network: string): Promise<ICard> => {
 };
 
 const fetchAllCards = async (
-  network: string,
+  network: NetworkName,
   addresses: string[],
 ): Promise<ICard[]> => {
   let assets: ICard[] = [];
@@ -85,7 +89,7 @@ const fetchAllCards = async (
 };
 
 const fetchProfileIssuedAssetsAddresses = async (
-  network: string,
+  network: NetworkName,
   profileAddress: string,
 ): Promise<string[]> => {
   const provider = useRpcProvider(network);
