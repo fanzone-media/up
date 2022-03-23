@@ -23,6 +23,7 @@ interface IProps {
   type: string;
   balance?: number;
   openTransferCardModal?: (address: string) => void;
+  transferPermission?: boolean;
 }
 
 interface IParams {
@@ -34,6 +35,7 @@ export const MetaCard: React.FC<IProps> = ({
   type,
   balance,
   openTransferCardModal,
+  transferPermission,
 }: IProps) => {
   const params = useParams<IParams>();
   const explorer = getChainExplorer(params.network);
@@ -48,7 +50,7 @@ export const MetaCard: React.FC<IProps> = ({
           <StyledUniversalProfileIcon src={universalprofile} alt="" />
         </a>
       )}
-      {openTransferCardModal && (
+      {transferPermission === true && openTransferCardModal && (
         <StyledTransferButton
           onClick={() => openTransferCardModal(digitalCard.address)}
         >

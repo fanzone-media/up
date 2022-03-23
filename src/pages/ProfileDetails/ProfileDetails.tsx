@@ -245,9 +245,10 @@ const ProfileDetails: React.FC = () => {
         type="owned"
         profile={profile}
         openTransferCardModal={toggleTransferModal}
+        transferPermission={keyManagerCallPermission}
       />
     );
-  }, [ownedCollection, profile]);
+  }, [keyManagerCallPermission, ownedCollection, profile]);
 
   const renderLinks = useMemo(
     () =>
