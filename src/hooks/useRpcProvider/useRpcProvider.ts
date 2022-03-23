@@ -1,7 +1,8 @@
 import { Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
+import { NetworkName } from '../../boot/types';
 
-export const useRpcProvider = (network: string): Provider => {
+export const useRpcProvider = (network: NetworkName): Provider => {
   const LUKSO_L14_PROVIDER = new ethers.providers.JsonRpcProvider(
     'https://rpc.l14.lukso.network',
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
-import { RootState } from '../../boot/types';
+import { NetworkName, RootState } from '../../boot/types';
 import {
   fetchAllProfiles,
   selectAllEthereumUsersItems,
@@ -31,7 +31,7 @@ import { useParams } from 'react-router-dom';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 
 interface IParams {
-  network: string;
+  network: NetworkName;
 }
 
 const Profiles: React.FC = () => {
@@ -64,7 +64,7 @@ const Profiles: React.FC = () => {
     ethereum: ['', ''],
   };
 
-  const userProfile = useSelector((state: RootState) => {
+  const userProfiles = useSelector((state: RootState) => {
     switch (params.network) {
       case 'l14':
         return selectAllL14UsersItems(state);
@@ -77,138 +77,45 @@ const Profiles: React.FC = () => {
     }
     // eslint-disable-next-line array-callback-return
   })?.filter((item) => {
-    switch (params.network) {
-      case 'l14':
-        return demoProfiles?.l14.some((i) => {
-          return i === item.address && item.network === params.network;
-        });
-      case 'polygon':
-        return demoProfiles?.polygon.some((i) => {
-          return i === item.address && item.network === params.network;
-        });
-      case 'mumbai':
-        return demoProfiles?.mumbai.some((i) => {
-          return i === item.address && item.network === params.network;
-        });
-      case 'ethereum':
-        return demoProfiles?.ethereum.some((i) => {
-          return i === item.address && item.network === params.network;
-        });
-    }
+    if (demoProfiles)
+      return demoProfiles[params.network].some((i) => {
+        return i === item.address && item.network === params.network;
+      });
   });
 
   const demoCollection = useSelector(
     (state: RootState) => selectAllCardItems(state),
     // eslint-disable-next-line array-callback-return
   )?.filter((item) => {
-    switch (params.network) {
-      case 'l14':
-        return demoAssets?.l14.some((i) => {
-          return i === item.address && item.network === params.network;
-        });
-      case 'polygon':
-        return demoAssets?.polygon.some((i) => {
-          return i === item.address && item.network === params.network;
-        });
-      case 'mumbai':
-        return demoAssets?.mumbai.some((i) => {
-          return i === item.address && item.network === params.network;
-        });
-      case 'ethereum':
-        return demoAssets?.ethereum.some((i) => {
-          return i === item.address && item.network === params.network;
-        });
-    }
+    if (demoAssets)
+      return demoAssets[params.network].some((i) => {
+        return i === item.address && item.network === params.network;
+      });
   });
 
   const cardStatus = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return state.userData.l14.status;
-      case 'polygon':
-        return state.userData.polygon.status;
-      case 'mumbai':
-        return state.userData.mumbai.status;
-      case 'ethereum':
-        return state.userData.ethereum.status;
-    }
+    return state.userData[params.network].status;
   });
 
   const fetchDemoProfiles = () => {
-    if (userProfile?.length === 0) {
-      switch (params.network) {
-        case 'l14':
-          dispatch(
-            fetchAllProfiles({
-              addresses: demoProfiles.l14,
-              network: params.network,
-            }),
-          );
-          break;
-        case 'mumbai':
-          dispatch(
-            fetchAllProfiles({
-              addresses: demoProfiles.mumbai,
-              network: params.network,
-            }),
-          );
-          break;
-        case 'polygon':
-          dispatch(
-            fetchAllProfiles({
-              addresses: demoProfiles.polygon,
-              network: params.network,
-            }),
-          );
-          break;
-        case 'ethereum':
-          dispatch(
-            fetchAllProfiles({
-              addresses: demoProfiles.ethereum,
-              network: params.network,
-            }),
-          );
-          break;
-      }
+    if (userProfiles?.length === 0) {
+      dispatch(
+        fetchAllProfiles({
+          addresses: demoProfiles[params.network],
+          network: params.network,
+        }),
+      );
     }
   };
 
   const fetchDemoCollection = () => {
     if (demoCollection.length === 0) {
-      switch (params.network) {
-        case 'l14':
-          dispatch(
-            fetchAllCards({
-              addresses: demoAssets.l14,
-              network: params.network,
-            }),
-          );
-          break;
-        case 'mumbai':
-          dispatch(
-            fetchAllCards({
-              addresses: demoAssets.mumbai,
-              network: params.network,
-            }),
-          );
-          break;
-        case 'polygon':
-          dispatch(
-            fetchAllCards({
-              addresses: demoAssets.polygon,
-              network: params.network,
-            }),
-          );
-          break;
-        case 'ethereum':
-          dispatch(
-            fetchAllCards({
-              addresses: demoAssets.ethereum,
-              network: params.network,
-            }),
-          );
-          break;
-      }
+      dispatch(
+        fetchAllCards({
+          addresses: demoAssets[params.network],
+          network: params.network,
+        }),
+      );
     }
   };
 
@@ -220,14 +127,14 @@ const Profiles: React.FC = () => {
 
   const renderProfiles = useMemo(
     () =>
-      userProfile?.map((userProfile: IProfile) => (
+      userProfiles?.map((userProfile: IProfile) => (
         <ProfileCard
           key={userProfile.address}
           userProfile={userProfile}
           type="demo"
         />
       )),
-    [userProfile],
+    [userProfiles],
   );
 
   return (
