@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
@@ -212,7 +212,7 @@ const Profiles: React.FC = () => {
     }
   };
 
-  useMemo(() => {
+  useEffect(() => {
     fetchDemoCollection();
     fetchDemoProfiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
