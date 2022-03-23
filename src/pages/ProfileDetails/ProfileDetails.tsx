@@ -192,14 +192,14 @@ const ProfileDetails: React.FC = () => {
     setOpenTransferCardModal(true);
   };
 
-  useMemo(() => {
+  useEffect(() => {
     if (!profile)
       dispatch(
         fetchProfileByAddress({ address: params.add, network: params.network }),
       );
   }, [dispatch, params.add, params.network, profile]);
 
-  useMemo(async () => {
+  useMemo(() => {
     let addresses: string[] = [];
     profile?.issuedAssets.forEach((item) => {
       if (!cards.includes(item)) {
@@ -213,7 +213,7 @@ const ProfileDetails: React.FC = () => {
     }
   }, [cards, dispatch, params.network, profile?.issuedAssets]);
 
-  useMemo(async () => {
+  useMemo(() => {
     let addresses: string[] = [];
     profile?.ownedAssets.forEach((item) => {
       if (!cards.includes(item.assetAddress)) {
