@@ -1,4 +1,5 @@
 import { BlockScoutIcon, polygonExplorerIcon } from '../assets';
+import { NetworkName } from '../boot/types';
 
 export enum STATUS {
   IDLE = 'idle',
@@ -15,7 +16,7 @@ export const lg = '(min-width: 1024px)';
 
 export const xl = '(min-width: 1280px)';
 
-export const getChainExplorer = (network: string) => {
+export const getChainExplorer = (network: NetworkName) => {
   switch (network) {
     case 'polygon':
       return {

@@ -10,3 +10,10 @@ export type RootState = {
   userData: IUserDataSliceState;
   cards: ICardState;
 };
+
+export type NetworkName = 'l14' | 'mumbai' | 'polygon' | 'ethereum';
+
+export type AsyncReturnType<T extends (...args: any) => Promise<any>> =
+  T extends (...args: any) => Promise<infer R> ? R : any;
+
+export type UnpackedType<T> = T extends (infer U)[] ? U : T;
