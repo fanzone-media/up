@@ -24,6 +24,7 @@ interface IPagination {
   type: string;
   profile?: IProfile;
   openTransferCardModal?: (address: string) => void;
+  transferPermission?: boolean;
 }
 
 interface IParams {
@@ -52,6 +53,7 @@ const Pagination: React.FC<IPagination> = ({
   type,
   profile,
   openTransferCardModal,
+  transferPermission,
 }) => {
   const params = useParams<IParams>();
 
@@ -183,6 +185,7 @@ const Pagination: React.FC<IPagination> = ({
               type={type}
               balance={findBalanceOf?.balance}
               openTransferCardModal={openTransferCardModal}
+              transferPermission={transferPermission}
             />
           );
         }
