@@ -59,7 +59,7 @@ const Profiles: React.FC = () => {
   };
 
   const userProfiles = useSelector(
-    (state: RootState) => selectAllUsersItems(state),
+    (state: RootState) => selectAllUsersItems(state.userData[params.network]),
     // eslint-disable-next-line array-callback-return
   )?.filter((item) => {
     if (demoProfiles)

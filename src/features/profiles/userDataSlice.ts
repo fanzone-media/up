@@ -205,20 +205,7 @@ export const {
   selectAll: selectAllUsersItems,
   selectById: selectUserById,
   selectIds: selectUserIds,
-} = usersAdapter.getSelectors<RootState>((state) => {
-  Object.keys(state.userData).forEach((network) => {
-    const networkName = network as NetworkName;
-    if (
-      state.userData[networkName].entities ||
-      state.userData[networkName].ids
-    ) {
-      usersAdapter.getSelectors<RootState>(
-        (state) => state.userData[networkName],
-      );
-    }
-  });
-  return state.userData.polygon;
-});
+} = usersAdapter.getSelectors();
 
 /**
  * ************

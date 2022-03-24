@@ -83,7 +83,7 @@ const ProfileDetails: React.FC = () => {
     useState<string>();
 
   const profile = useSelector((state: RootState) =>
-    selectUserById(state, params.add),
+    selectUserById(state.userData[params.network], params.add),
   );
 
   const cards = useSelector((state: RootState) => selectCardIds(state));

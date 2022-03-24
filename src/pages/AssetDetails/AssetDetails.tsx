@@ -61,18 +61,23 @@ const AssetDetails: React.FC = () => {
   };
   const explorer = getChainExplorer(params.network);
 
-  const profiles = useSelector((state: RootState) => selectUserIds(state));
+  const profiles = useSelector((state: RootState) =>
+    selectUserIds(state.userData[params.network]),
+  );
 
   const asset = useSelector((state: RootState) =>
     selectCardById(state, params.add),
   );
 
   const owner = useSelector((state: RootState) =>
-    selectUserById(state, asset?.owner ? asset.owner : ''),
+    selectUserById(
+      state.userData[params.network],
+      asset?.owner ? asset.owner : '',
+    ),
   );
 
   const holders = useSelector((state: RootState) => {
-    return selectAllUsersItems(state);
+    return selectAllUsersItems(state.userData[params.network]);
   })?.filter((item) => {
     return asset?.holders.some((i) => {
       return i === item.address && item.network === params.network;
@@ -80,7 +85,7 @@ const AssetDetails: React.FC = () => {
   });
 
   const creators = useSelector((state: RootState) =>
-    selectAllUsersItems(state),
+    selectAllUsersItems(state.userData[params.network]),
   )?.filter((item) => {
     return asset?.creators.some((i) => {
       return i === item.address && item.network === params.network;
