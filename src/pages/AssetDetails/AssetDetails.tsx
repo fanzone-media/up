@@ -3,25 +3,16 @@ import { useHistory, useParams } from 'react-router-dom';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { UniversalProfileIcon } from '../../assets';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../boot/types';
+import { NetworkName, RootState } from '../../boot/types';
 import { fetchCard, selectCardById } from '../../features/cards';
 import { useEffect } from 'react';
 import {
   fetchAssetCreator,
   fetchAssetHolders,
   fetchProfileByAddress,
-  selectAllEthereumUsersItems,
-  selectAllL14UsersItems,
-  selectAllMumbaiUsersItems,
-  selectAllPolygonUsersItems,
-  selectEthereumUserById,
-  selectEthereumUserIds,
-  selectL14UserById,
-  selectL14UserIds,
-  selectMumbaiUserById,
-  selectMumbaiUserIds,
-  selectPolygonUserById,
-  selectPolygonUserIds,
+  selectAllUsersItems,
+  selectUserById,
+  selectUserIds,
 } from '../../features/profiles';
 import { useMemo } from 'react';
 import { IProfile } from '../../services/models';
@@ -59,7 +50,7 @@ import ReactTooltip from 'react-tooltip';
 
 interface IPrams {
   add: string;
-  network: string;
+  network: NetworkName;
 }
 
 const AssetDetails: React.FC = () => {
@@ -70,65 +61,32 @@ const AssetDetails: React.FC = () => {
   };
   const explorer = getChainExplorer(params.network);
 
-  const profiles = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return selectL14UserIds(state);
-      case 'polygon':
-        return selectPolygonUserIds(state);
-      case 'mumbai':
-        return selectMumbaiUserIds(state);
-      case 'ethereum':
-        return selectEthereumUserIds(state);
-    }
-  });
+  const profiles = useSelector((state: RootState) =>
+    selectUserIds(state.userData[params.network]),
+  );
 
   const asset = useSelector((state: RootState) =>
     selectCardById(state, params.add),
   );
 
-  const owner = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return selectL14UserById(state, asset?.owner ? asset.owner : '');
-      case 'polygon':
-        return selectPolygonUserById(state, asset?.owner ? asset.owner : '');
-      case 'mumbai':
-        return selectMumbaiUserById(state, asset?.owner ? asset.owner : '');
-      case 'ethereum':
-        return selectEthereumUserById(state, asset?.owner ? asset.owner : '');
-    }
-  });
+  const owner = useSelector((state: RootState) =>
+    selectUserById(
+      state.userData[params.network],
+      asset?.owner ? asset.owner : '',
+    ),
+  );
 
   const holders = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return selectAllL14UsersItems(state);
-      case 'polygon':
-        return selectAllPolygonUsersItems(state);
-      case 'mumbai':
-        return selectAllMumbaiUsersItems(state);
-      case 'ethereum':
-        return selectAllEthereumUsersItems(state);
-    }
+    return selectAllUsersItems(state.userData[params.network]);
   })?.filter((item) => {
     return asset?.holders.some((i) => {
       return i === item.address && item.network === params.network;
     });
   });
 
-  const creators = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return selectAllL14UsersItems(state);
-      case 'polygon':
-        return selectAllPolygonUsersItems(state);
-      case 'mumbai':
-        return selectAllMumbaiUsersItems(state);
-      case 'ethereum':
-        return selectAllEthereumUsersItems(state);
-    }
-  })?.filter((item) => {
+  const creators = useSelector((state: RootState) =>
+    selectAllUsersItems(state.userData[params.network]),
+  )?.filter((item) => {
     return asset?.creators.some((i) => {
       return i === item.address && item.network === params.network;
     });

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { IProfile } from '../../../services/models';
 import polygon from '../../../assets/polygon.svg';
+import { NetworkName } from '../../../boot/types';
 import makeBlockie from 'ethereum-blockies-base64';
 import {
   StyledBalance,
@@ -26,7 +27,7 @@ interface Iprops {
 }
 
 interface IParams {
-  network: string;
+  network: NetworkName;
   add: string;
 }
 

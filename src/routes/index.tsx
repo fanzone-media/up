@@ -3,14 +3,19 @@ import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import NoMatch from '../pages/NoMatch/NoMatch';
 import { CreateName } from '../pages/CreateName';
 import { AddPermissions } from '../pages/AddPermissions';
-import { LazyProfiles } from '../pages/Profiles';
-import { LazyProfileDetails } from '../pages/ProfileDetails';
-import { LazyAssetDetails } from '../pages/AssetDetails';
+
+const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
+const LazyProfileDetails = React.lazy(
+  () => import('../pages/ProfileDetails/ProfileDetails'),
+);
+const LazyAssetDetails = React.lazy(
+  () => import('../pages/AssetDetails/AssetDetails'),
+);
 
 const Routes: React.FC = () => {
   return (
-    <Suspense fallback={<h1>Loading....</h1>}>
-      <Router>
+    <Router>
+      <Suspense fallback={<h1>Loading....</h1>}>
         <Switch>
           <Route exact path="/addpermissions">
             <AddPermissions />
@@ -31,8 +36,8 @@ const Routes: React.FC = () => {
             <NoMatch />
           </Route>
         </Switch>
-      </Router>
-    </Suspense>
+      </Suspense>
+    </Router>
   );
 };
 

@@ -17,6 +17,7 @@ import {
   StyledUniversalProfileIcon,
 } from './styles';
 import { getChainExplorer } from '../../../utility';
+import { NetworkName } from '../../../boot/types';
 
 interface IProps {
   digitalCard: ICard;
@@ -27,7 +28,7 @@ interface IProps {
 }
 
 interface IParams {
-  network: string;
+  network: NetworkName;
 }
 
 export const MetaCard: React.FC<IProps> = ({

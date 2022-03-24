@@ -1,5 +1,6 @@
 import { Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
+import { NetworkName } from '../../boot/types';
 
 export const useRpcProvider = (network: string): Provider => {
   if (network === 'mumbai') {

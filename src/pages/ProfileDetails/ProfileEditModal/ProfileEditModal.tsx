@@ -1,6 +1,7 @@
 import { Signer } from 'ethers';
 import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { NetworkName } from '../../../boot/types';
 import { Modal } from '../../../components/Modal';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { IProfile, ISetProfileData } from '../../../services/models';
@@ -19,7 +20,7 @@ import {
 
 interface IParams {
   add: string;
-  network: string;
+  network: NetworkName;
 }
 
 interface IProps {

@@ -7,7 +7,7 @@ import {
   selectCardIds,
 } from '../../features/cards';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../boot/types';
+import { NetworkName, RootState } from '../../boot/types';
 import { useAppDispatch } from '../../boot/store';
 import Pagination from '../../features/pagination/Pagination';
 import makeBlockie from 'ethereum-blockies-base64';
@@ -58,13 +58,7 @@ import {
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
-import {
-  fetchProfileByAddress,
-  selectEthereumUserById,
-  selectL14UserById,
-  selectMumbaiUserById,
-  selectPolygonUserById,
-} from '../../features/profiles';
+import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 import { useAccount, useSigner } from 'wagmi';
 import { ProfileEditModal } from './ProfileEditModal';
@@ -72,7 +66,7 @@ import { TransferCardModal } from './TransferCardModal';
 
 interface IParams {
   add: string;
-  network: string;
+  network: NetworkName;
 }
 
 const ProfileDetails: React.FC = () => {
@@ -88,46 +82,19 @@ const ProfileDetails: React.FC = () => {
   const [preSelectedAssetAddress, setPreSelectedAssetAddress] =
     useState<string>();
 
-  const profile = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return selectL14UserById(state, params.add);
-      case 'polygon':
-        return selectPolygonUserById(state, params.add);
-      case 'mumbai':
-        return selectMumbaiUserById(state, params.add);
-      case 'ethereum':
-        return selectEthereumUserById(state, params.add);
-    }
-  });
+  const profile = useSelector((state: RootState) =>
+    selectUserById(state.userData[params.network], params.add),
+  );
 
   const cards = useSelector((state: RootState) => selectCardIds(state));
 
-  const profileError = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return state.userData.l14.error;
-      case 'polygon':
-        return state.userData.polygon.error;
-      case 'mumbai':
-        return state.userData.mumbai.error;
-      case 'ethereum':
-        return state.userData.ethereum.error;
-    }
-  });
+  const profileError = useSelector(
+    (state: RootState) => state.userData[params.network].error,
+  );
 
-  const profileStatus = useSelector((state: RootState) => {
-    switch (params.network) {
-      case 'l14':
-        return state.userData.l14.status;
-      case 'polygon':
-        return state.userData.polygon.status;
-      case 'mumbai':
-        return state.userData.mumbai.status;
-      case 'ethereum':
-        return state.userData.ethereum.status;
-    }
-  });
+  const profileStatus = useSelector(
+    (state: RootState) => state.userData[params.network].status,
+  );
 
   const [isShare, setIsShare] = useState<boolean>(false);
 

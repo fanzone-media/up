@@ -1,3 +1,5 @@
+import { NetworkName } from '../boot/types';
+
 export interface IOwnedAssets {
   assetAddress: string;
   balance: number;
@@ -68,7 +70,7 @@ export interface ILSP8MetaData {
 
 export interface ICard {
   address: string;
-  network: string;
+  network: NetworkName;
   name: string;
   symbol: string;
   owner: string;
@@ -82,7 +84,7 @@ export interface IProfile {
   address: string;
   owner: string;
   isOwnerKeyManager: boolean;
-  network: string;
+  network: NetworkName;
   name: string;
   description: string;
   links: { title: string; url: string }[];

@@ -4,6 +4,7 @@ import { MetaCard } from '../cards/MetaCard';
 import { ICard, IProfile } from '../../services/models';
 import { PrevIcon } from '../../assets';
 import { NextIcon } from '../../assets';
+import { NetworkName } from '../../boot/types';
 import {
   StyledAssetsHeader,
   StyledAssetsHeading,
@@ -28,7 +29,7 @@ interface IPagination {
 
 interface IParams {
   add: string;
-  network: string;
+  network: NetworkName;
 }
 
 const useViewPort = () => {
