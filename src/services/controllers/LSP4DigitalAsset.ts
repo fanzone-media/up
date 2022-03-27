@@ -11,6 +11,7 @@ import {
 import Utils from '../utilities/util';
 import { LSP3ProfileApi } from './LSP3Profile';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
+import { tokenIdAsBytes32 } from '../../submodules/fanzone-smart-contracts/utils/cardToken';
 
 const fetchCard = async (
   address: string,
@@ -156,6 +157,19 @@ const fetchProfileIssuedAssetsAddresses = async (
   );
 
   return assets;
+};
+
+const sellCard = async (
+  assetAddress: string,
+  tokenId: number,
+  acceptedToken: string,
+  minimumAmount: number,
+  network: NetworkName,
+) => {
+  const provider = useRpcProvider(network);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
+  await contract.setMarketFor(tokenIdAsBytes, acceptedToken, minimumAmount);
 };
 
 export const LSP4DigitalAssetApi = {
