@@ -24,6 +24,7 @@ import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
+import { tokenIdAsBytes32 } from '../../submodules/fanzone-smart-contracts/utils/cardToken';
 
 const fetchProfile = async (
   address: string,
@@ -398,45 +399,6 @@ const uploadProfileData = async (
   return JSONURL;
 };
 
-const transferCardViaKeyManager = async (
-  assetAddress: string,
-  universalProfileAddress: string,
-  keyManagerAddress: string,
-  tokenId: number,
-  toAddress: string,
-  signer: Signer,
-) => {
-  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
-  const universalProfileContract = UniversalProfileProxy__factory.connect(
-    universalProfileAddress,
-    signer,
-  );
-  const keyManagerContract = LSP6KeyManagerProxy__factory.connect(
-    keyManagerAddress,
-    signer,
-  );
-
-  const encodedTransferFunction = assetContract.interface.encodeFunctionData(
-    'transferFrom',
-    [universalProfileAddress, toAddress, tokenId],
-  );
-
-  const encodedExecuteFunction =
-    universalProfileContract.interface.encodeFunctionData('execute', [
-      '0x0',
-      assetAddress,
-      0,
-      encodedTransferFunction,
-    ]);
-
-  const transaction = await keyManagerContract.execute(encodedExecuteFunction);
-  await transaction.wait(1).then((result) => {
-    if (result.status === 0) {
-      throw new Error('Transaction reverted');
-    }
-  });
-};
-
 const transferCardViaUniversalProfile = async (
   assetAddress: string,
   universalProfileAddress: string,
@@ -468,6 +430,38 @@ const transferCardViaUniversalProfile = async (
   });
 };
 
+const setCardMarketViaUniversalProfile = async (
+  assetAddress: string,
+  universalProfileAddress: string,
+  tokenId: number,
+  acceptedToken: string,
+  minimumAmount: number,
+  signer: Signer,
+) => {
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
+  const encodedSetMarketFor = assetContract.interface.encodeFunctionData(
+    'setMarketFor',
+    [tokenIdAsBytes, acceptedToken, minimumAmount],
+  );
+  const transaction = await universalProfileContract.execute(
+    '0x0',
+    assetAddress,
+    0,
+    encodedSetMarketFor,
+  );
+
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
 export const LSP3ProfileApi = {
   fetchProfile,
   fetchAllProfiles,
@@ -475,6 +469,6 @@ export const LSP3ProfileApi = {
   fetchOwnedCollectionCount,
   setUniversalProfileData,
   setUniversalProfileDataViaKeyManager,
-  transferCardViaKeyManager,
   transferCardViaUniversalProfile,
+  setCardMarketViaUniversalProfile,
 };

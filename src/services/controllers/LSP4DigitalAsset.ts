@@ -172,8 +172,36 @@ const sellCard = async (
   await contract.setMarketFor(tokenIdAsBytes, acceptedToken, minimumAmount);
 };
 
+const getTokenSale = async (
+  assetAddress: string,
+  tokenId: number,
+  network: NetworkName,
+): Promise<{ minimumAmount: number; acceptedToken: string }> => {
+  const provider = useRpcProvider(network);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
+  let market: { minimumAmount: number; acceptedToken: string } = {
+    minimumAmount: 0,
+    acceptedToken: '',
+  };
+  await contract
+    .marketFor(tokenIdAsBytes)
+    .then((result) => {
+      market = {
+        ...result,
+        minimumAmount: ethers.BigNumber.from(result.minimumAmount).toNumber(),
+      };
+    })
+    .catch((error) => {
+      console.error(error.message);
+    });
+  return market;
+};
+
 export const LSP4DigitalAssetApi = {
   fetchCard,
   fetchProfileIssuedAssetsAddresses,
   fetchAllCards,
+  getTokenSale,
+  sellCard,
 };

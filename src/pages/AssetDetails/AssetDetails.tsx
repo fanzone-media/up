@@ -47,10 +47,13 @@ import { HeaderToolbar } from '../../components/HeaderToolbar';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer } from '../../utility';
 import ReactTooltip from 'react-tooltip';
+import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
+import { useSigner } from 'wagmi';
 
 interface IPrams {
   add: string;
   network: NetworkName;
+  id: string;
 }
 
 const AssetDetails: React.FC = () => {
@@ -59,6 +62,8 @@ const AssetDetails: React.FC = () => {
   const backHandler = () => {
     history.push(`/${params.network}`);
   };
+  const [{ data: signer, error: signerError, loading }, getSigner] =
+    useSigner();
   const explorer = getChainExplorer(params.network);
 
   const profiles = useSelector((state: RootState) =>
@@ -97,6 +102,16 @@ const AssetDetails: React.FC = () => {
   const cardStatus = useSelector((state: RootState) => state.cards.status);
 
   const dispatch = useAppDispatch();
+
+  const tokenIdForSale = useMemo(
+    async () =>
+      await LSP4DigitalAssetApi.getTokenSale(
+        params.add,
+        Number(params.id),
+        params.network,
+      ),
+    [params.add, params.network, params.id],
+  );
 
   useMemo(() => {
     if (!owner && asset) {

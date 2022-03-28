@@ -29,6 +29,9 @@ const Routes: React.FC = () => {
           <Route exact path="/:network/asset/:add">
             <LazyAssetDetails />
           </Route>
+          <Route exact path="/:network/asset/:add/:id">
+            <LazyAssetDetails />
+          </Route>
           <Route exact path="/:network/create-name">
             <CreateName />
           </Route>
