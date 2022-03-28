@@ -123,9 +123,7 @@ export const TransferCardModal: React.FC<IProps> = ({
     onClose();
   };
 
-  useEffect(() => {
-    console.log(selectecAddress);
-  }, [selectecAddress]);
+  useEffect(() => {}, [selectecAddress]);
 
   const fields = [
     { name: 'toAddress', label: 'To', type: 'text' },

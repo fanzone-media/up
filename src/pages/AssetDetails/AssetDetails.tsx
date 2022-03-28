@@ -105,11 +105,12 @@ const AssetDetails: React.FC = () => {
 
   const tokenIdForSale = useMemo(
     async () =>
-      await LSP4DigitalAssetApi.getTokenSale(
+      params.id &&
+      (await LSP4DigitalAssetApi.getTokenSale(
         params.add,
         Number(params.id),
         params.network,
-      ),
+      )),
     [params.add, params.network, params.id],
   );
 
