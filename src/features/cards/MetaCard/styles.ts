@@ -15,6 +15,8 @@ export const StyledCardWrappar = styled.div`
   position: relative;
   width: 165px;
   height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
 
   @media ${sm} {
     width: 212px;
@@ -127,9 +129,4 @@ export const StyledTransferButton = styled.button`
 
 export const StyledTransferIcon = styled.img`
   margin: 0 auto;
-`;
-
-export const StyledOwnedMint = styled.p`
-  font-size: 14px;
-  margin: auto auto 0 auto;
 `;
