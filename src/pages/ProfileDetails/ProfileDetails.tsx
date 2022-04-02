@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   fetchIssuedCards,
   fetchOwnedCards,
@@ -44,7 +44,6 @@ import {
   StyledTwitterIcon,
   StyledTwitterShare,
 } from './styles';
-import { HeaderToolbar } from '../../components/HeaderToolbar';
 import { ProfileImage } from './ProfileImage';
 import {
   DropDownIcon,
@@ -109,8 +108,6 @@ const ProfileDetails: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
 
   const isTablet = useMediaQuery(md);
-
-  const history = useHistory();
 
   const keyManagerSetDataPermission = useMemo(
     () =>
@@ -281,10 +278,6 @@ const ProfileDetails: React.FC = () => {
     setIsShare((isShare) => !isShare);
   };
 
-  const backHandler = () => {
-    history.push(`/${params.network}`);
-  };
-
   const getEditPermission = () => {
     if (
       profile &&
@@ -330,13 +323,6 @@ const ProfileDetails: React.FC = () => {
             selectecAddress={preSelectedAssetAddress}
           />
         )}
-      <HeaderToolbar
-        onBack={backHandler}
-        buttonLabel="Back to profile"
-        headerToolbarLabel="User Profile"
-        showEditProfileButton={getEditPermission()}
-        showProfileEditModal={() => setOpenEditProfileModal(true)}
-      />
       {profileStatus === 'loading' ? (
         <StyledLoadingHolder>
           <StyledLoader color="#ed7a2d" />
