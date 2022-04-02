@@ -84,9 +84,7 @@ export const MetaCard: React.FC<IProps> = ({
         </StyledMediaWrappar>
         <StyledCardDetail>
           <StyledCardName>{digitalCard.name.split('•')[0]}</StyledCardName>
-          <StyledCardFullName>
-            {digitalCard.name.replaceAll('•', '/')}
-          </StyledCardFullName>
+          <StyledCardFullName>{digitalCard.name}</StyledCardFullName>
         </StyledCardDetail>
       </Link>
     </StyledCardWrappar>

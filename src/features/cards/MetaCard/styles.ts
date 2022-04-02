@@ -14,7 +14,6 @@ export const pulseAnimate = keyframes`
 export const StyledCardWrappar = styled.div`
   position: relative;
   width: 165px;
-  height: 100%;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
 
@@ -52,15 +51,11 @@ export const StyledCardDetail = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(100% - 211px);
-  background-color: #212121;
+  height: 100px;
+  background-color: rgba(37, 37, 37, 1);
   border-radius: 0 0 10px 10px;
   padding: 5px 10px 10px 10px;
   row-gap: 5px;
-
-  @media ${sm} {
-    height: calc(100% - 257px);
-  }
 `;
 
 export const StyledCardName = styled.h3`
@@ -76,6 +71,11 @@ export const StyledCardFullName = styled.p`
   font-size: 14px;
   font-weight: 400;
   line-height: 17.5px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const StyledBlockScoutIcon = styled.img`
