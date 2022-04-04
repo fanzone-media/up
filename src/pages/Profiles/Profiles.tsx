@@ -68,20 +68,6 @@ const Profiles: React.FC = () => {
       });
   });
 
-  const demoCollection = useSelector(
-    (state: RootState) => selectAllCardItems(state),
-    // eslint-disable-next-line array-callback-return
-  )?.filter((item) => {
-    if (demoAssets)
-      return demoAssets[params.network].some((i) => {
-        return i === item.address && item.network === params.network;
-      });
-  });
-
-  const cardStatus = useSelector((state: RootState) => {
-    return state.userData[params.network].status;
-  });
-
   const fetchDemoProfiles = () => {
     if (userProfiles?.length === 0) {
       dispatch(
@@ -93,19 +79,7 @@ const Profiles: React.FC = () => {
     }
   };
 
-  const fetchDemoCollection = () => {
-    if (demoCollection.length === 0) {
-      dispatch(
-        fetchAllCards({
-          addresses: demoAssets[params.network],
-          network: params.network,
-        }),
-      );
-    }
-  };
-
   useEffect(() => {
-    fetchDemoCollection();
     fetchDemoProfiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.network]);
@@ -141,16 +115,11 @@ const Profiles: React.FC = () => {
             <StyledProfileHeading>Profiles</StyledProfileHeading>
             <Search />
           </StyledProfilesHeader>
-          {cardStatus === 'loading' ? (
-            <StyledLoadingHolder>
-              <StyledLoader color="#ed7a2d" />
-            </StyledLoadingHolder>
-          ) : (
-            <StyledProfilesWrappar>{renderProfiles}</StyledProfilesWrappar>
-          )}
-          {demoCollection && (
-            <Pagination collection={demoCollection} type="demo" />
-          )}
+          <StyledProfilesWrappar>{renderProfiles}</StyledProfilesWrappar>
+          <Pagination
+            type="demo"
+            collectionAddresses={demoAssets[params.network]}
+          />
         </>
       </StyledContentwrappar>
     </StyledMainContent>

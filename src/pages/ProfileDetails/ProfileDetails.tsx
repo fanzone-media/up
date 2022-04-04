@@ -1,11 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  fetchIssuedCards,
-  fetchOwnedCards,
-  selectAllCardItems,
-  selectCardIds,
-} from '../../features/cards';
+import { selectCardIds } from '../../features/cards';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import { useAppDispatch } from '../../boot/store';
@@ -55,7 +50,7 @@ import {
   Twitter,
 } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { md, STATUS } from '../../utility';
+import { md } from '../../utility';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
 import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
@@ -95,14 +90,6 @@ const ProfileDetails: React.FC = () => {
     (state: RootState) => state.userData[params.network].status,
   );
 
-  const ownedCardStatus = useSelector(
-    (state: RootState) => state.cards.ownedStatus,
-  );
-
-  const issuedCardStatus = useSelector(
-    (state: RootState) => state.cards.issuedStatus,
-  );
-
   const [isShare, setIsShare] = useState<boolean>(false);
 
   const [copied, setCopied] = useState<boolean>(false);
@@ -135,30 +122,6 @@ const ProfileDetails: React.FC = () => {
     [data, profile],
   );
 
-  const issuedCollection = useSelector((state: RootState) =>
-    selectAllCardItems(state),
-  ).filter(
-    (item) =>
-      item['owner'].toLowerCase() === params.add?.toLowerCase() &&
-      item['network'] === params.network,
-  );
-
-  const issuedCollectionStatus = useSelector(
-    (state: RootState) => state.cards.issuedStatus,
-  );
-
-  const ownedCollection = useSelector((state: RootState) =>
-    selectAllCardItems(state),
-  ).filter((item) => {
-    return profile?.ownedAssets.some((i) => {
-      return i.assetAddress === item.address && item.network === params.network;
-    });
-  });
-
-  const ownedCollectionStatus = useSelector(
-    (state: RootState) => state.cards.ownedStatus,
-  );
-
   const toggleTransferModal = (address: string) => {
     setPreSelectedAssetAddress(address);
     setOpenTransferCardModal(true);
@@ -171,66 +134,30 @@ const ProfileDetails: React.FC = () => {
       );
   }, [dispatch, params.add, params.network, profile]);
 
-  useMemo(() => {
-    if (issuedCardStatus !== STATUS.LOADING) {
-      let addresses: string[] = [];
-      profile?.issuedAssets.forEach((item) => {
-        if (!cards.includes(item)) {
-          addresses.push(item);
-        }
-      });
-      if (addresses.length > 0) {
-        dispatch(
-          fetchIssuedCards({ network: params.network, addresses: addresses }),
-        );
-      }
-    }
-  }, [
-    cards,
-    dispatch,
-    issuedCardStatus,
-    params.network,
-    profile?.issuedAssets,
-  ]);
-
-  useMemo(() => {
-    if (ownedCardStatus !== STATUS.LOADING) {
-      let addresses: string[] = [];
-      profile?.ownedAssets.forEach((item) => {
-        if (!cards.includes(item.assetAddress)) {
-          addresses.push(item.assetAddress);
-        }
-      });
-      if (addresses.length > 0) {
-        dispatch(
-          fetchOwnedCards({ network: params.network, addresses: addresses }),
-        );
-      }
-    }
-  }, [cards, dispatch, ownedCardStatus, params.network, profile?.ownedAssets]);
-
   const renderIssuedAssetsPagination = useMemo(
     () => (
       <Pagination
-        collection={issuedCollection}
         type="issued"
         openTransferCardModal={toggleTransferModal}
+        collectionAddresses={profile ? profile.issuedAssets : []}
       />
     ),
-    [issuedCollection],
+    [profile],
   );
 
   const renderOwnedAssetsPagination = useMemo(() => {
     return (
       <Pagination
-        collection={ownedCollection}
         type="owned"
         profile={profile}
         openTransferCardModal={toggleTransferModal}
         transferPermission={keyManagerCallPermission}
+        collectionAddresses={
+          profile ? profile.ownedAssets.map((item) => item.assetAddress) : []
+        }
       />
     );
-  }, [keyManagerCallPermission, ownedCollection, profile]);
+  }, [keyManagerCallPermission, profile]);
 
   const renderLinks = useMemo(
     () =>
@@ -427,58 +354,14 @@ const ProfileDetails: React.FC = () => {
                   </StyledOpenTransferModalButton>
                 )}
               <StyledAssetsWrappar>
-                {/* {issuedCollection.some((item) => item['owner'] === params.add) &&
-              issuedFetchError !== 'No Assets' ? (
-                  <Pagination collection={issuedCollection} type="issued" />
-              ) : (
-                <></>
-              )} */}
-                {profile &&
-                  profile?.issuedAssets.length > 0 &&
-                  issuedCollectionStatus === 'loading' && (
-                    <>
-                      <StyledAssetsHeading>Issued Assets</StyledAssetsHeading>
-                      <StyledLoadingHolder>
-                        <StyledLoader color="#ed7a2d" />
-                      </StyledLoadingHolder>
-                    </>
-                  )}
-                {issuedCollection.length > 0 &&
-                issuedCollectionStatus === 'idle' ? (
+                {profile && profile.issuedAssets.length > 0 ? (
                   renderIssuedAssetsPagination
                 ) : (
                   <></>
                 )}
-                {/* {ownedCollection.length > 0 ? (
-                <Pagination collection={ownedCollection} type="owned" />
-              ) : (
-                <>
-                  <h2 className="uppercase">Owned Assets</h2>
-                  <div className="mt-8 mx-auto">
-                    <h1 className="text-lg font-light">
-                      Has No Owned Assest
-                    </h1>
-                  </div>
-                </>
-              )} */}
-                {ownedCollectionStatus === 'loading' && (
-                  <>
-                    <StyledAssetsHeading>Owned Assets</StyledAssetsHeading>
-                    <StyledLoadingHolder>
-                      <StyledLoader color="#ed7a2d" />
-                    </StyledLoadingHolder>
-                  </>
-                )}
-                {ownedCollection.length > 0 &&
-                  ownedCollectionStatus === 'idle' &&
+                {profile &&
+                  profile.ownedAssets.length > 0 &&
                   renderOwnedAssetsPagination}
-                {ownedCollectionStatus === 'idle' &&
-                  ownedCollection.length === 0 && (
-                    <>
-                      <StyledAssetsHeading>Owned Assets</StyledAssetsHeading>
-                      <p>Has No Owned Assets</p>
-                    </>
-                  )}
               </StyledAssetsWrappar>
             </>
           )}
