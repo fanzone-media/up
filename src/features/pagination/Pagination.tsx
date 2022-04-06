@@ -72,8 +72,12 @@ const Pagination: React.FC<IPagination> = ({
 
   const dispatch = useAppDispatch();
 
-  const allCollection = useSelector(selectAllCardItems).filter(
-    (item) => item.network === params.network,
+  const [currentPageAssetAddresses, setCurrentPageAssetAddresses] = useState<
+    string[]
+  >([]);
+
+  const allCollection = useSelector(selectAllCardItems).filter((item) =>
+    currentPageAssetAddresses.some((i) => i === item.address),
   );
 
   const ownedCardStatus = useSelector(
@@ -89,10 +93,6 @@ const Pagination: React.FC<IPagination> = ({
   const [search, setSearch] = useState<string>('');
 
   const { screenWidth } = useViewPort();
-
-  const [currentPageAssetAddresses, setCurrentPageAssetAddresses] = useState<
-    string[]
-  >([]);
 
   const [filterCollection, setFilterCollection] = useState<ICard[]>();
 
@@ -167,7 +167,11 @@ const Pagination: React.FC<IPagination> = ({
     const start = currentPage * limit - limit;
     const end = start + limit;
     setCurrentPageAssetAddresses(collectionAddresses.slice(start, end));
-    if (type === 'owned' && ownedCardStatus !== STATUS.LOADING) {
+    if (
+      type === 'owned' &&
+      ownedCardStatus !== STATUS.LOADING &&
+      allCollection.length !== currentPageAssetAddresses.length
+    ) {
       dispatch(
         fetchOwnedCards({
           network: params.network,
@@ -175,7 +179,11 @@ const Pagination: React.FC<IPagination> = ({
         }),
       );
     }
-    if (type === 'issued' && issuedCardStatus !== STATUS.LOADING) {
+    if (
+      type === 'issued' &&
+      issuedCardStatus !== STATUS.LOADING &&
+      allCollection.length !== currentPageAssetAddresses.length
+    ) {
       dispatch(
         fetchIssuedCards({
           network: params.network,
@@ -183,7 +191,11 @@ const Pagination: React.FC<IPagination> = ({
         }),
       );
     }
-    if (type === 'demo' && cardStatus !== STATUS.LOADING) {
+    if (
+      type === 'demo' &&
+      cardStatus !== STATUS.LOADING &&
+      allCollection.length !== currentPageAssetAddresses.length
+    ) {
       dispatch(
         fetchAllCards({
           network: params.network,
@@ -191,7 +203,19 @@ const Pagination: React.FC<IPagination> = ({
         }),
       );
     }
-  }, [collectionAddresses, currentPage, dispatch, limit, params.network, type]);
+  }, [
+    allCollection.length,
+    cardStatus,
+    collectionAddresses,
+    currentPage,
+    currentPageAssetAddresses.length,
+    dispatch,
+    issuedCardStatus,
+    limit,
+    ownedCardStatus,
+    params.network,
+    type,
+  ]);
 
   // const getBalanceOf = () => {
   //   if (balanceOf.length < 1) {
@@ -221,45 +245,37 @@ const Pagination: React.FC<IPagination> = ({
     // setFilterCollection(filter);
   };
 
-  useEffect(() => {
-    //getBalanceOf();
-  }, []);
-
   const renderCollection = useMemo(
     () =>
-      allCollection
-        .filter((item) =>
-          currentPageAssetAddresses.some((i) => i === item.address),
-        )
-        .map((digitalCard: ICard) => {
-          if (type === 'owned' || type === 'issued') {
-            const findBalanceOf = profile?.ownedAssets.find(
-              (item) =>
-                item.assetAddress.toLowerCase() ===
-                digitalCard.address.toLowerCase(),
-            );
-            return (
-              <MetaCard
-                key={digitalCard.address}
-                digitalCard={digitalCard}
-                type={type}
-                balance={findBalanceOf?.balance}
-                openTransferCardModal={openTransferCardModal}
-                transferPermission={transferPermission}
-              />
-            );
-          }
-          if (type === 'demo') {
-            return (
-              <MetaCard
-                key={digitalCard.address}
-                digitalCard={digitalCard}
-                type={type}
-              />
-            );
-          }
-          return '';
-        }),
+      allCollection.map((digitalCard: ICard) => {
+        if (type === 'owned' || type === 'issued') {
+          const findBalanceOf = profile?.ownedAssets.find(
+            (item) =>
+              item.assetAddress.toLowerCase() ===
+              digitalCard.address.toLowerCase(),
+          );
+          return (
+            <MetaCard
+              key={digitalCard.address}
+              digitalCard={digitalCard}
+              type={type}
+              balance={findBalanceOf?.balance}
+              openTransferCardModal={openTransferCardModal}
+              transferPermission={transferPermission}
+            />
+          );
+        }
+        if (type === 'demo') {
+          return (
+            <MetaCard
+              key={digitalCard.address}
+              digitalCard={digitalCard}
+              type={type}
+            />
+          );
+        }
+        return '';
+      }),
     [
       allCollection,
       currentPageAssetAddresses,
@@ -278,15 +294,14 @@ const Pagination: React.FC<IPagination> = ({
         </StyledAssetsHeading>
         <Search onChange={searchHandler} />
       </StyledAssetsHeader>
-      {ownedCardStatus === STATUS.LOADING ||
+      {/* {ownedCardStatus === STATUS.LOADING ||
       issuedCardStatus === STATUS.LOADING ||
       cardStatus === STATUS.LOADING ? (
         <StyledLoadingHolder>
           <StyledLoader color="#ed7a2d" />
         </StyledLoadingHolder>
-      ) : (
-        <StyledAssetsWrappar>{renderCollection}</StyledAssetsWrappar>
-      )}
+      ) : ( */}
+      <StyledAssetsWrappar>{renderCollection}</StyledAssetsWrappar>
       {pagesCount > 1 && search === '' && (
         <StyledPaginationControls>
           <StyledPreviousButton
