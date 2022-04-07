@@ -24,6 +24,9 @@ jobs:
       - name: Copy default app env
         run: cp .env.example .env
         
+      - name: Install submodules
+        run: git submodule update --init --recursive
+        
       - name: Copy default contracts env
         run: cp src/submodules/fanzone-smart-contracts/.env.example src/submodules/fanzone-smart-contracts/.env
 
