@@ -42,6 +42,7 @@ export const StyledProfileInfo1Content = styled.div`
   position: relative;
   display: flex;
   padding: 20px 0 20px 0;
+  width: 100%;
 
   @media ${md} {
     display: grid;
@@ -88,6 +89,7 @@ export const StyledProfileNameBioWrappar = styled.div`
   flex-direction: column;
   margin: auto 0 auto 0;
   row-gap: 5px;
+  width: 100%;
 
   @media ${md} {
     flex-direction: row;
@@ -152,8 +154,16 @@ export const StyledProfileInfo2Content = styled.div`
   padding: 20px 0 20px 0;
 `;
 
+export const StyledShareProfileHolder = styled.div`
+  position: relative;
+
+  @media ${md} {
+    margin-left: auto;
+  }
+`;
+
 export const StyledShareProfileWrappar = styled.div<{ expand: boolean }>`
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(59, 59, 59, 1);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;
   width: 162px;
@@ -162,10 +172,12 @@ export const StyledShareProfileWrappar = styled.div<{ expand: boolean }>`
   flex-direction: column;
   padding: 6px;
   overflow: hidden;
-  margin: auto 0 auto auto;
+  margin: auto 0;
+  position: ${({ expand }) => (expand ? 'absolute' : '')};
 
   @media ${md} {
     margin: 0;
+    right: 0;
   }
 `;
 

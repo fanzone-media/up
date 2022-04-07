@@ -35,6 +35,7 @@ import {
   StyledProfileNotFound,
   StyledShareIcon,
   StyledShareProfileHeader,
+  StyledShareProfileHolder,
   StyledShareProfileWrappar,
   StyledTwitterIcon,
   StyledTwitterShare,
@@ -282,14 +283,40 @@ const ProfileDetails: React.FC = () => {
                     </StyledProfileMediaWrappar>
                     <StyledProfileNameBioWrappar>
                       <StyledProfileName>@{profile?.name}</StyledProfileName>
-                      {!isTablet && (
-                        <StyledProfileBioWrappar>
-                          <StyledProfileBio>
-                            {profile?.description}
-                          </StyledProfileBio>
-                        </StyledProfileBioWrappar>
-                      )}
                       <StyledProfileLinks>{renderLinks}</StyledProfileLinks>
+                      <StyledShareProfileHolder>
+                        <StyledShareProfileWrappar expand={isShare}>
+                          <StyledShareProfileHeader
+                            expand={isShare}
+                            onClick={shareButtonHandler}
+                          >
+                            <StyledShareIcon src={ShareIcon} />
+                            Share Profile
+                            <StyledDropDownIcon src={DropDownIcon} />
+                          </StyledShareProfileHeader>
+                          <StyledTwitterShare
+                            expand={isShare}
+                            href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${profile?.name}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <StyledTwitterIcon src={Twitter} />
+                            Twitter
+                          </StyledTwitterShare>
+                          <StyledFaceBookShare
+                            href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <StyledFacebookIcon src={Facebook} />
+                            Facebook
+                          </StyledFaceBookShare>
+                          <StyledCopyLink onClick={copyLink}>
+                            <StyledCopyLinkIcon src={Link} />
+                            {copied ? 'Copied' : 'Copy Link'}
+                          </StyledCopyLink>
+                        </StyledShareProfileWrappar>
+                      </StyledShareProfileHolder>
                     </StyledProfileNameBioWrappar>
                   </StyledProfileInfo1Content>
                 </StyledProfileInfo1>
@@ -297,45 +324,6 @@ const ProfileDetails: React.FC = () => {
                   <StyledProfileInfo2Content>
                     {!isTablet && (
                       <StyledProfileAddress>{params.add}</StyledProfileAddress>
-                    )}
-                    <StyledShareProfileWrappar expand={isShare}>
-                      <StyledShareProfileHeader
-                        expand={isShare}
-                        onClick={shareButtonHandler}
-                      >
-                        <StyledShareIcon src={ShareIcon} />
-                        Share Profile
-                        <StyledDropDownIcon src={DropDownIcon} />
-                      </StyledShareProfileHeader>
-                      <StyledTwitterShare
-                        expand={isShare}
-                        href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${profile?.name}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <StyledTwitterIcon src={Twitter} />
-                        Twitter
-                      </StyledTwitterShare>
-                      <StyledFaceBookShare
-                        href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <StyledFacebookIcon src={Facebook} />
-                        Facebook
-                      </StyledFaceBookShare>
-                      <StyledCopyLink onClick={copyLink}>
-                        <StyledCopyLinkIcon src={Link} />
-                        {copied ? 'Copied' : 'Copy Link'}
-                      </StyledCopyLink>
-                    </StyledShareProfileWrappar>
-                    {isTablet && (
-                      <StyledProfileBioWrappar>
-                        <StyledProfileBioHeading>Bio</StyledProfileBioHeading>
-                        <StyledProfileBio>
-                          {profile?.description}
-                        </StyledProfileBio>
-                      </StyledProfileBioWrappar>
                     )}
                   </StyledProfileInfo2Content>
                 </StyledProfileInfo2>
