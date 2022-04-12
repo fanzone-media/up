@@ -56,7 +56,7 @@ import {
   Twitter,
 } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { md } from '../../utility';
+import { md, STATUS } from '../../utility';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
 import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
@@ -94,6 +94,14 @@ const ProfileDetails: React.FC = () => {
 
   const profileStatus = useSelector(
     (state: RootState) => state.userData[params.network].status,
+  );
+
+  const ownedCardStatus = useSelector(
+    (state: RootState) => state.cards.ownedStatus,
+  );
+
+  const issuedCardStatus = useSelector(
+    (state: RootState) => state.cards.issuedStatus,
   );
 
   const [isShare, setIsShare] = useState<boolean>(false);
@@ -167,32 +175,42 @@ const ProfileDetails: React.FC = () => {
   }, [dispatch, params.add, params.network, profile]);
 
   useMemo(() => {
-    let addresses: string[] = [];
-    profile?.issuedAssets.forEach((item) => {
-      if (!cards.includes(item)) {
-        addresses.push(item);
+    if (issuedCardStatus !== STATUS.LOADING) {
+      let addresses: string[] = [];
+      profile?.issuedAssets.forEach((item) => {
+        if (!cards.includes(item)) {
+          addresses.push(item);
+        }
+      });
+      if (addresses.length > 0) {
+        dispatch(
+          fetchIssuedCards({ network: params.network, addresses: addresses }),
+        );
       }
-    });
-    if (addresses.length > 0) {
-      dispatch(
-        fetchIssuedCards({ network: params.network, addresses: addresses }),
-      );
     }
-  }, [cards, dispatch, params.network, profile?.issuedAssets]);
+  }, [
+    cards,
+    dispatch,
+    issuedCardStatus,
+    params.network,
+    profile?.issuedAssets,
+  ]);
 
   useMemo(() => {
-    let addresses: string[] = [];
-    profile?.ownedAssets.forEach((item) => {
-      if (!cards.includes(item.assetAddress)) {
-        addresses.push(item.assetAddress);
+    if (ownedCardStatus !== STATUS.LOADING) {
+      let addresses: string[] = [];
+      profile?.ownedAssets.forEach((item) => {
+        if (!cards.includes(item.assetAddress)) {
+          addresses.push(item.assetAddress);
+        }
+      });
+      if (addresses.length > 0) {
+        dispatch(
+          fetchOwnedCards({ network: params.network, addresses: addresses }),
+        );
       }
-    });
-    if (addresses.length > 0) {
-      dispatch(
-        fetchOwnedCards({ network: params.network, addresses: addresses }),
-      );
     }
-  }, [cards, dispatch, params.network, profile?.ownedAssets]);
+  }, [cards, dispatch, ownedCardStatus, params.network, profile?.ownedAssets]);
 
   const renderIssuedAssetsPagination = useMemo(
     () => (

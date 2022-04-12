@@ -1,6 +1,7 @@
 import { ethers, Signer } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { Modal } from '../../../components/Modal';
+import { KeyManagerApi } from '../../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { IProfile } from '../../../services/models';
 import { StyledLoader, StyledLoadingHolder } from '../../AssetDetails/styles';
@@ -67,7 +68,7 @@ export const TransferCardModal: React.FC<IProps> = ({
   const tranferCard = async () => {
     setLoading(true);
     if (profile.isOwnerKeyManager) {
-      await LSP3ProfileApi.transferCardViaKeyManager(
+      await KeyManagerApi.transferCardViaKeyManager(
         transferCardForm.cardAddress,
         profile.address,
         profile.owner,
@@ -122,9 +123,7 @@ export const TransferCardModal: React.FC<IProps> = ({
     onClose();
   };
 
-  useEffect(() => {
-    console.log(selectecAddress);
-  }, [selectecAddress]);
+  useEffect(() => {}, [selectecAddress]);
 
   const fields = [
     { name: 'toAddress', label: 'To', type: 'text' },

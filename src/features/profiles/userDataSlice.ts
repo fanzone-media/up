@@ -3,7 +3,7 @@ import {
   createEntityAdapter,
   createSlice,
 } from '@reduxjs/toolkit';
-import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
+import { NetworkName, ThunkExtra } from '../../boot/types';
 import { IProfile } from '../../services/models';
 import { STATUS } from '../../utility';
 import { IUserDataSliceState, IUsersState } from './types';
