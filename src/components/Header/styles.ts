@@ -15,18 +15,52 @@ export const StyledHeader = styled.header`
 `;
 
 export const StyledHeaderContent = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
   width: 100%;
   height: 100%;
   padding: 0 8px;
 
   @media ${md} {
+    display: grid;
     max-width: 1440px;
     margin: 0 auto;
     padding: 0 40px;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 `;
+
+export const StyledHamburgerMenu = styled.div`
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background-color: black;
+  z-index: 9999;
+`;
+
+export const StyledHamburgerMenuContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: auto 0;
+  row-gap: 20px;
+`;
+
+export const StyledHamburgerMenuButton = styled.button`
+  margin-left: auto;
+`;
+
+export const StyledHmamburgerMenuIcon = styled.img``;
+
+export const StyledHamburgerMenuCloseButton = styled.button`
+  margin-left: auto;
+`;
+
+export const StyledHmamburgerMenuCloseIcon = styled.img``;
 
 export const StyledLink = styled(Link)`
   margin: auto 0;
@@ -37,22 +71,37 @@ export const StyledLogo = styled.img`
 `;
 
 export const StyledFanzoneAppLink = styled.a`
-  margin: auto 0 auto auto;
+  margin: 0 auto;
+
+  @media ${md} {
+    margin: auto 0 auto auto;
+  }
 `;
 
 export const StyledOurNftLink = styled.a`
-  margin: auto auto auto 0;
+  margin: 0 auto;
+
+  @media ${md} {
+    margin: auto auto auto 0;
+  }
 `;
 
 export const StyledButtonConainer = styled.div`
   display: flex;
-  height: 100%;
-  width: 100%;
-  column-gap: 20px;
+  flex-direction: column;
+  row-gap: 20px;
+
+  @media ${md} {
+    height: 100%;
+    width: 100%;
+    column-gap: 20px;
+    row-gap: none;
+    flex-direction: row;
+  }
 `;
 
 export const StyledSignUpLink = styled.a`
-  margin: auto 0 auto auto;
+  margin: 0 auto;
   width: 150px;
   height: 35px;
   text-align: center;
@@ -61,16 +110,24 @@ export const StyledSignUpLink = styled.a`
   background: linear-gradient(180deg, #ff9b00 0%, #ff5c00 100%);
   box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.15);
   border-radius: 3px;
+
+  @media ${md} {
+    margin: auto 0 auto auto;
+  }
 `;
 
 export const StyledConnectMetaMask = styled.button`
   height: 35px;
   width: 150px;
   border: 1px solid white;
-  margin: auto 0;
+  margin: 0 auto;
   box-sizing: border-box;
   filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.15));
   border-radius: 3px;
+
+  @media ${md} {
+    margin: auto 0;
+  }
 `;
 
 export const StyledMyAccountButton = styled(StyledConnectMetaMask)``;
