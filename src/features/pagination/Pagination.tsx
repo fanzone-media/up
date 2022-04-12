@@ -4,7 +4,7 @@ import { MetaCard } from '../cards/MetaCard';
 import { ICard, IProfile } from '../../services/models';
 import { PrevIcon } from '../../assets';
 import { NextIcon } from '../../assets';
-import { NetworkName } from '../../boot/types';
+import { NetworkName, RootState } from '../../boot/types';
 import {
   StyledAssetsHeader,
   StyledAssetsHeading,
@@ -18,13 +18,26 @@ import {
   StyledPreviousButton,
 } from './styles';
 import { Search } from '../../components/Search';
+import { useAppDispatch } from '../../boot/store';
+import {
+  fetchAllCards,
+  fetchIssuedCards,
+  fetchOwnedCards,
+  selectAllCardItems,
+} from '../cards';
+import { useSelector } from 'react-redux';
+import {
+  StyledLoader,
+  StyledLoadingHolder,
+} from '../../pages/AssetDetails/styles';
+import { STATUS } from '../../utility';
 
 interface IPagination {
-  collection: ICard[];
   type: string;
   profile?: IProfile;
   openTransferCardModal?: (address: string) => void;
   transferPermission?: boolean;
+  collectionAddresses: string[];
 }
 
 interface IParams {
@@ -49,21 +62,43 @@ const useViewPort = () => {
 };
 
 const Pagination: React.FC<IPagination> = ({
-  collection,
   type,
   profile,
   openTransferCardModal,
   transferPermission,
+  collectionAddresses,
 }) => {
   const params = useParams<IParams>();
+
+  const dispatch = useAppDispatch();
+
+  const [currentPageAssetAddresses, setCurrentPageAssetAddresses] = useState<
+    string[]
+  >([]);
+
+  const allCollection = useSelector(selectAllCardItems).filter((item) =>
+    currentPageAssetAddresses.some((i) => i === item.address),
+  );
+
+  const ownedCardStatus = useSelector(
+    (state: RootState) => state.cards.ownedStatus,
+  );
+
+  const issuedCardStatus = useSelector(
+    (state: RootState) => state.cards.issuedStatus,
+  );
+
+  const cardStatus = useSelector((state: RootState) => state.cards.status);
 
   const [search, setSearch] = useState<string>('');
 
   const { screenWidth } = useViewPort();
 
-  const [filterCollection, setFilterCollection] = useState<ICard[]>(collection);
+  const [filterCollection, setFilterCollection] = useState<ICard[]>();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const [limit, setLimit] = useState<number>(4);
 
   const [pagesCount, setPagesCount] = useState<number>(1);
 
@@ -109,32 +144,78 @@ const Pagination: React.FC<IPagination> = ({
     }
   };
 
-  const getPaginationData = () => {
-    let limit: number = 4;
+  useMemo(() => {
     if (screenWidth < 769) {
-      setPagesCount(Math.ceil(filterCollection.length / 4));
-      limit = 4;
+      setPagesCount(Math.ceil(collectionAddresses.length / 4));
+      setLimit(4);
     }
     if (screenWidth > 768) {
-      setPagesCount(Math.ceil(filterCollection.length / 6));
-      limit = 6;
+      setPagesCount(Math.ceil(collectionAddresses.length / 6));
+      setLimit(6);
     }
     if (screenWidth > 1024) {
-      setPagesCount(Math.ceil(filterCollection.length / 8));
-      limit = 8;
+      setPagesCount(Math.ceil(collectionAddresses.length / 8));
+      setLimit(8);
     }
     if (screenWidth > 1280) {
-      setPagesCount(Math.ceil(filterCollection.length / 10));
-      limit = 10;
+      setPagesCount(Math.ceil(collectionAddresses.length / 10));
+      setLimit(10);
     }
-    if (search === '') {
-      const start = currentPage * limit - limit;
-      const end = start + limit;
-      return filterCollection.slice(start, end);
-    } else {
-      return filterCollection;
+  }, [collectionAddresses.length, screenWidth]);
+
+  useMemo(() => {
+    const start = currentPage * limit - limit;
+    const end = start + limit;
+    setCurrentPageAssetAddresses(collectionAddresses.slice(start, end));
+    if (
+      type === 'owned' &&
+      ownedCardStatus !== STATUS.LOADING &&
+      allCollection.length !== currentPageAssetAddresses.length
+    ) {
+      dispatch(
+        fetchOwnedCards({
+          network: params.network,
+          addresses: collectionAddresses.slice(start, end),
+        }),
+      );
     }
-  };
+    if (
+      type === 'issued' &&
+      issuedCardStatus !== STATUS.LOADING &&
+      allCollection.length !== currentPageAssetAddresses.length
+    ) {
+      dispatch(
+        fetchIssuedCards({
+          network: params.network,
+          addresses: collectionAddresses.slice(start, end),
+        }),
+      );
+    }
+    if (
+      type === 'demo' &&
+      cardStatus !== STATUS.LOADING &&
+      allCollection.length !== currentPageAssetAddresses.length
+    ) {
+      dispatch(
+        fetchAllCards({
+          network: params.network,
+          addresses: collectionAddresses.slice(start, end),
+        }),
+      );
+    }
+  }, [
+    allCollection.length,
+    cardStatus,
+    collectionAddresses,
+    currentPage,
+    currentPageAssetAddresses.length,
+    dispatch,
+    issuedCardStatus,
+    limit,
+    ownedCardStatus,
+    params.network,
+    type,
+  ]);
 
   // const getBalanceOf = () => {
   //   if (balanceOf.length < 1) {
@@ -153,25 +234,20 @@ const Pagination: React.FC<IPagination> = ({
   // };
 
   const searchHandler = (event: React.FormEvent<HTMLInputElement>) => {
-    setSearch(event.currentTarget.value.toLowerCase());
-    if (search !== '') setCurrentPage(1);
-    const filter = collection.filter((item) => {
-      const name = item.name.split('•')[0];
-      return name
-        .toLowerCase()
-        .includes(event.currentTarget.value.toLowerCase());
-    });
-    setFilterCollection(filter);
+    // setSearch(event.currentTarget.value.toLowerCase());
+    // if (search !== '') setCurrentPage(1);
+    // const filter = collection.filter((item) => {
+    //   const name = item.name.split('•')[0];
+    //   return name
+    //     .toLowerCase()
+    //     .includes(event.currentTarget.value.toLowerCase());
+    // });
+    // setFilterCollection(filter);
   };
-
-  useEffect(() => {
-    setFilterCollection(collection);
-    //getBalanceOf();
-  }, [collection]);
 
   const renderCollection = useMemo(
     () =>
-      getPaginationData().map((digitalCard: ICard) => {
+      allCollection.map((digitalCard: ICard) => {
         if (type === 'owned' || type === 'issued') {
           const findBalanceOf = profile?.ownedAssets.find(
             (item) =>
@@ -200,8 +276,14 @@ const Pagination: React.FC<IPagination> = ({
         }
         return '';
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [collection, params.add, type, screenWidth, filterCollection, currentPage],
+    [
+      allCollection,
+      currentPageAssetAddresses,
+      type,
+      profile?.ownedAssets,
+      openTransferCardModal,
+      transferPermission,
+    ],
   );
 
   return (
@@ -212,6 +294,13 @@ const Pagination: React.FC<IPagination> = ({
         </StyledAssetsHeading>
         <Search onChange={searchHandler} />
       </StyledAssetsHeader>
+      {/* {ownedCardStatus === STATUS.LOADING ||
+      issuedCardStatus === STATUS.LOADING ||
+      cardStatus === STATUS.LOADING ? (
+        <StyledLoadingHolder>
+          <StyledLoader color="#ed7a2d" />
+        </StyledLoadingHolder>
+      ) : ( */}
       <StyledAssetsWrappar>{renderCollection}</StyledAssetsWrappar>
       {pagesCount > 1 && search === '' && (
         <StyledPaginationControls>

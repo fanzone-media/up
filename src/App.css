@@ -1,5 +1,4 @@
 .App {
-  background-color: rgb(51, 51, 51);
   min-height: 100vh;
   height: 100%;
   width: 100%;
@@ -8,6 +7,7 @@
   background-image: url(./assets/fanzone-bg.png);
   background-size: cover;
   background-position: center;
+  position: relative;
 }
 
 /* .App::before {

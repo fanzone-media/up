@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ICard } from '../../../services/models';
 import universalprofile from '../../../assets/universalprofile.png';
 import transferIcon from '../../../assets/transfer-icon.png';
+import polygon from '../../../assets/polygon.svg';
 import {
   StyledBlockScoutIcon,
   StyledCardDetail,
@@ -11,13 +12,17 @@ import {
   StyledCardWrappar,
   StyledMediaWrappar,
   StyledMetaCardImg,
-  StyledOwnedMint,
   StyledTransferButton,
   StyledTransferIcon,
   StyledUniversalProfileIcon,
 } from './styles';
 import { getChainExplorer } from '../../../utility';
 import { NetworkName } from '../../../boot/types';
+import {
+  StyledBalance,
+  StyledBalanceWrappar,
+  StyledPolygon,
+} from '../../profiles/ProfileCard/styles';
 
 interface IProps {
   digitalCard: ICard;
@@ -51,6 +56,14 @@ export const MetaCard: React.FC<IProps> = ({
           <StyledUniversalProfileIcon src={universalprofile} alt="" />
         </a>
       )}
+      {type === 'owned' && (
+        <>
+          <StyledBalanceWrappar demo={true}>
+            <StyledBalance demo={true}>{balance}</StyledBalance>
+          </StyledBalanceWrappar>
+          <StyledPolygon src={polygon} alt="" demo={true} />
+        </>
+      )}
       {transferPermission === true && openTransferCardModal && (
         <StyledTransferButton
           onClick={() => openTransferCardModal(digitalCard.address)}
@@ -71,14 +84,7 @@ export const MetaCard: React.FC<IProps> = ({
         </StyledMediaWrappar>
         <StyledCardDetail>
           <StyledCardName>{digitalCard.name.split('•')[0]}</StyledCardName>
-          <StyledCardFullName>
-            {digitalCard.name.replaceAll('•', '/')}
-          </StyledCardFullName>
-          {type === 'owned' && (
-            <StyledOwnedMint>
-              ( {balance} / {digitalCard.totalSupply} )
-            </StyledOwnedMint>
-          )}
+          <StyledCardFullName>{digitalCard.name}</StyledCardFullName>
         </StyledCardDetail>
       </Link>
     </StyledCardWrappar>

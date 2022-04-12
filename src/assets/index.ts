@@ -18,6 +18,7 @@ import Twitter from './twitter-icon.svg';
 import Instagram from './instagram-icon.svg';
 import Globe from './globe-icon.svg';
 import polygonExplorerIcon from './poly.png';
+import hamburgerIcon from './hamburger-icon.svg';
 
 export {
   BgMetaCard,
@@ -40,4 +41,5 @@ export {
   Instagram,
   Globe,
   polygonExplorerIcon,
+  hamburgerIcon,
 };

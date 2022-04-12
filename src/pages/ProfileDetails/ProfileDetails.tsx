@@ -1,11 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import {
-  fetchIssuedCards,
-  fetchOwnedCards,
-  selectAllCardItems,
-  selectCardIds,
-} from '../../features/cards';
+import { useParams } from 'react-router-dom';
+import { selectCardIds } from '../../features/cards';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import { useAppDispatch } from '../../boot/store';
@@ -40,11 +35,11 @@ import {
   StyledProfileNotFound,
   StyledShareIcon,
   StyledShareProfileHeader,
+  StyledShareProfileHolder,
   StyledShareProfileWrappar,
   StyledTwitterIcon,
   StyledTwitterShare,
 } from './styles';
-import { HeaderToolbar } from '../../components/HeaderToolbar';
 import { ProfileImage } from './ProfileImage';
 import {
   DropDownIcon,
@@ -56,7 +51,7 @@ import {
   Twitter,
 } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { md, STATUS } from '../../utility';
+import { md } from '../../utility';
 import { StyledAssetsHeading } from '../../features/pagination/styles';
 import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
@@ -96,21 +91,11 @@ const ProfileDetails: React.FC = () => {
     (state: RootState) => state.userData[params.network].status,
   );
 
-  const ownedCardStatus = useSelector(
-    (state: RootState) => state.cards.ownedStatus,
-  );
-
-  const issuedCardStatus = useSelector(
-    (state: RootState) => state.cards.issuedStatus,
-  );
-
   const [isShare, setIsShare] = useState<boolean>(false);
 
   const [copied, setCopied] = useState<boolean>(false);
 
   const isTablet = useMediaQuery(md);
-
-  const history = useHistory();
 
   const keyManagerSetDataPermission = useMemo(
     () =>
@@ -138,30 +123,6 @@ const ProfileDetails: React.FC = () => {
     [data, profile],
   );
 
-  const issuedCollection = useSelector((state: RootState) =>
-    selectAllCardItems(state),
-  ).filter(
-    (item) =>
-      item['owner'].toLowerCase() === params.add?.toLowerCase() &&
-      item['network'] === params.network,
-  );
-
-  const issuedCollectionStatus = useSelector(
-    (state: RootState) => state.cards.issuedStatus,
-  );
-
-  const ownedCollection = useSelector((state: RootState) =>
-    selectAllCardItems(state),
-  ).filter((item) => {
-    return profile?.ownedAssets.some((i) => {
-      return i.assetAddress === item.address && item.network === params.network;
-    });
-  });
-
-  const ownedCollectionStatus = useSelector(
-    (state: RootState) => state.cards.ownedStatus,
-  );
-
   const toggleTransferModal = (address: string) => {
     setPreSelectedAssetAddress(address);
     setOpenTransferCardModal(true);
@@ -174,66 +135,30 @@ const ProfileDetails: React.FC = () => {
       );
   }, [dispatch, params.add, params.network, profile]);
 
-  useMemo(() => {
-    if (issuedCardStatus !== STATUS.LOADING) {
-      let addresses: string[] = [];
-      profile?.issuedAssets.forEach((item) => {
-        if (!cards.includes(item)) {
-          addresses.push(item);
-        }
-      });
-      if (addresses.length > 0) {
-        dispatch(
-          fetchIssuedCards({ network: params.network, addresses: addresses }),
-        );
-      }
-    }
-  }, [
-    cards,
-    dispatch,
-    issuedCardStatus,
-    params.network,
-    profile?.issuedAssets,
-  ]);
-
-  useMemo(() => {
-    if (ownedCardStatus !== STATUS.LOADING) {
-      let addresses: string[] = [];
-      profile?.ownedAssets.forEach((item) => {
-        if (!cards.includes(item.assetAddress)) {
-          addresses.push(item.assetAddress);
-        }
-      });
-      if (addresses.length > 0) {
-        dispatch(
-          fetchOwnedCards({ network: params.network, addresses: addresses }),
-        );
-      }
-    }
-  }, [cards, dispatch, ownedCardStatus, params.network, profile?.ownedAssets]);
-
   const renderIssuedAssetsPagination = useMemo(
     () => (
       <Pagination
-        collection={issuedCollection}
         type="issued"
         openTransferCardModal={toggleTransferModal}
+        collectionAddresses={profile ? profile.issuedAssets : []}
       />
     ),
-    [issuedCollection],
+    [profile],
   );
 
   const renderOwnedAssetsPagination = useMemo(() => {
     return (
       <Pagination
-        collection={ownedCollection}
         type="owned"
         profile={profile}
         openTransferCardModal={toggleTransferModal}
         transferPermission={keyManagerCallPermission}
+        collectionAddresses={
+          profile ? profile.ownedAssets.map((item) => item.assetAddress) : []
+        }
       />
     );
-  }, [keyManagerCallPermission, ownedCollection, profile]);
+  }, [keyManagerCallPermission, profile]);
 
   const renderLinks = useMemo(
     () =>
@@ -281,10 +206,6 @@ const ProfileDetails: React.FC = () => {
     setIsShare((isShare) => !isShare);
   };
 
-  const backHandler = () => {
-    history.push(`/${params.network}`);
-  };
-
   const getEditPermission = () => {
     if (
       profile &&
@@ -330,13 +251,6 @@ const ProfileDetails: React.FC = () => {
             selectecAddress={preSelectedAssetAddress}
           />
         )}
-      <HeaderToolbar
-        onBack={backHandler}
-        buttonLabel="Back to profile"
-        headerToolbarLabel="User Profile"
-        showEditProfileButton={getEditPermission()}
-        showProfileEditModal={() => setOpenEditProfileModal(true)}
-      />
       {profileStatus === 'loading' ? (
         <StyledLoadingHolder>
           <StyledLoader color="#ed7a2d" />
@@ -369,14 +283,40 @@ const ProfileDetails: React.FC = () => {
                     </StyledProfileMediaWrappar>
                     <StyledProfileNameBioWrappar>
                       <StyledProfileName>@{profile?.name}</StyledProfileName>
-                      {!isTablet && (
-                        <StyledProfileBioWrappar>
-                          <StyledProfileBio>
-                            {profile?.description}
-                          </StyledProfileBio>
-                        </StyledProfileBioWrappar>
-                      )}
                       <StyledProfileLinks>{renderLinks}</StyledProfileLinks>
+                      <StyledShareProfileHolder>
+                        <StyledShareProfileWrappar expand={isShare}>
+                          <StyledShareProfileHeader
+                            expand={isShare}
+                            onClick={shareButtonHandler}
+                          >
+                            <StyledShareIcon src={ShareIcon} />
+                            Share Profile
+                            <StyledDropDownIcon src={DropDownIcon} />
+                          </StyledShareProfileHeader>
+                          <StyledTwitterShare
+                            expand={isShare}
+                            href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${profile?.name}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <StyledTwitterIcon src={Twitter} />
+                            Twitter
+                          </StyledTwitterShare>
+                          <StyledFaceBookShare
+                            href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <StyledFacebookIcon src={Facebook} />
+                            Facebook
+                          </StyledFaceBookShare>
+                          <StyledCopyLink onClick={copyLink}>
+                            <StyledCopyLinkIcon src={Link} />
+                            {copied ? 'Copied' : 'Copy Link'}
+                          </StyledCopyLink>
+                        </StyledShareProfileWrappar>
+                      </StyledShareProfileHolder>
                     </StyledProfileNameBioWrappar>
                   </StyledProfileInfo1Content>
                 </StyledProfileInfo1>
@@ -384,45 +324,6 @@ const ProfileDetails: React.FC = () => {
                   <StyledProfileInfo2Content>
                     {!isTablet && (
                       <StyledProfileAddress>{params.add}</StyledProfileAddress>
-                    )}
-                    <StyledShareProfileWrappar expand={isShare}>
-                      <StyledShareProfileHeader
-                        expand={isShare}
-                        onClick={shareButtonHandler}
-                      >
-                        <StyledShareIcon src={ShareIcon} />
-                        Share Profile
-                        <StyledDropDownIcon src={DropDownIcon} />
-                      </StyledShareProfileHeader>
-                      <StyledTwitterShare
-                        expand={isShare}
-                        href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${profile?.name}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <StyledTwitterIcon src={Twitter} />
-                        Twitter
-                      </StyledTwitterShare>
-                      <StyledFaceBookShare
-                        href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <StyledFacebookIcon src={Facebook} />
-                        Facebook
-                      </StyledFaceBookShare>
-                      <StyledCopyLink onClick={copyLink}>
-                        <StyledCopyLinkIcon src={Link} />
-                        {copied ? 'Copied' : 'Copy Link'}
-                      </StyledCopyLink>
-                    </StyledShareProfileWrappar>
-                    {isTablet && (
-                      <StyledProfileBioWrappar>
-                        <StyledProfileBioHeading>Bio</StyledProfileBioHeading>
-                        <StyledProfileBio>
-                          {profile?.description}
-                        </StyledProfileBio>
-                      </StyledProfileBioWrappar>
                     )}
                   </StyledProfileInfo2Content>
                 </StyledProfileInfo2>
@@ -441,58 +342,14 @@ const ProfileDetails: React.FC = () => {
                   </StyledOpenTransferModalButton>
                 )}
               <StyledAssetsWrappar>
-                {/* {issuedCollection.some((item) => item['owner'] === params.add) &&
-              issuedFetchError !== 'No Assets' ? (
-                  <Pagination collection={issuedCollection} type="issued" />
-              ) : (
-                <></>
-              )} */}
-                {profile &&
-                  profile?.issuedAssets.length > 0 &&
-                  issuedCollectionStatus === 'loading' && (
-                    <>
-                      <StyledAssetsHeading>Issued Assets</StyledAssetsHeading>
-                      <StyledLoadingHolder>
-                        <StyledLoader color="#ed7a2d" />
-                      </StyledLoadingHolder>
-                    </>
-                  )}
-                {issuedCollection.length > 0 &&
-                issuedCollectionStatus === 'idle' ? (
+                {profile && profile.issuedAssets.length > 0 ? (
                   renderIssuedAssetsPagination
                 ) : (
                   <></>
                 )}
-                {/* {ownedCollection.length > 0 ? (
-                <Pagination collection={ownedCollection} type="owned" />
-              ) : (
-                <>
-                  <h2 className="uppercase">Owned Assets</h2>
-                  <div className="mt-8 mx-auto">
-                    <h1 className="text-lg font-light">
-                      Has No Owned Assest
-                    </h1>
-                  </div>
-                </>
-              )} */}
-                {ownedCollectionStatus === 'loading' && (
-                  <>
-                    <StyledAssetsHeading>Owned Assets</StyledAssetsHeading>
-                    <StyledLoadingHolder>
-                      <StyledLoader color="#ed7a2d" />
-                    </StyledLoadingHolder>
-                  </>
-                )}
-                {ownedCollection.length > 0 &&
-                  ownedCollectionStatus === 'idle' &&
+                {profile &&
+                  profile.ownedAssets.length > 0 &&
                   renderOwnedAssetsPagination}
-                {ownedCollectionStatus === 'idle' &&
-                  ownedCollection.length === 0 && (
-                    <>
-                      <StyledAssetsHeading>Owned Assets</StyledAssetsHeading>
-                      <p>Has No Owned Assets</p>
-                    </>
-                  )}
               </StyledAssetsWrappar>
             </>
           )}

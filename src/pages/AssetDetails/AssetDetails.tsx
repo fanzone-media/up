@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { UniversalProfileIcon } from '../../assets';
 import { useSelector } from 'react-redux';
@@ -43,7 +43,6 @@ import {
   StyledLoader,
   StyledLoadingHolder,
 } from './styles';
-import { HeaderToolbar } from '../../components/HeaderToolbar';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer } from '../../utility';
 import ReactTooltip from 'react-tooltip';
@@ -58,10 +57,6 @@ interface IPrams {
 
 const AssetDetails: React.FC = () => {
   const params = useParams<IPrams>();
-  const history = useHistory();
-  const backHandler = () => {
-    history.push(`/${params.network}`);
-  };
   const [{ data: signer, error: signerError, loading }, getSigner] =
     useSigner();
   const explorer = getChainExplorer(params.network);
@@ -281,12 +276,6 @@ const AssetDetails: React.FC = () => {
 
   return (
     <StyledAssetDetailsContentWrappar>
-      <HeaderToolbar
-        onBack={backHandler}
-        buttonLabel="Back to profile"
-        headerToolbarLabel="Asset Details"
-        showEditProfileButton={false}
-      />
       {cardStatus === 'loading' ? (
         <StyledLoadingHolder>
           <StyledLoader color="#ed7a2d" />

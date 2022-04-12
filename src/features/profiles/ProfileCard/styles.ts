@@ -8,6 +8,7 @@ export const StyledProfileCard = styled(Link)<{ demo?: boolean }>`
   border-radius: 10px;
   position: relative;
   transition: transform 0.2s ease-in-out;
+  border: 1px solid rgba(255, 255, 255, 0.25);
 
   &:hover {
     transform: scale(1.05);
@@ -21,7 +22,7 @@ export const StyledProfileCard = styled(Link)<{ demo?: boolean }>`
 export const StyledProfileDetailWrappar = styled.div<{ demo?: boolean }>`
   display: flex;
   flex-direction: column;
-  height: ${({ demo }) => (demo ? 'calc(100% - 213px)' : 'calc(100% - 121px)')};
+  height: ${({ demo }) => (demo ? '68px' : '53px')};
   background-color: #212121;
   border-radius: 0 0 10px 10px;
   padding: 5px 10px 5px 10px;
@@ -60,6 +61,9 @@ export const StyledProfileDetail = styled.div`
 export const StyledProfileName = styled.h3<{ demo?: boolean }>`
   font-size: ${({ demo }) => (demo ? '18px' : '13px')};
   font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const StyledProfileRole = styled.p`

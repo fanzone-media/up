@@ -1,56 +1,161 @@
 import React, { useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
 import { useAccount, useConnect } from 'wagmi';
-import { FanzoneHexagon, Logo } from '../../assets';
+import { FanzoneHexagon, hamburgerIcon, Logo } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
 import { AccountDetails } from './AccountDetails';
 import {
+  StyledButtonConainer,
   StyledConnectMetaMask,
-  StyledDivider,
+  StyledFanzoneAppLink,
+  StyledHamburgerMenu,
+  StyledHamburgerMenuButton,
+  StyledHamburgerMenuCloseButton,
+  StyledHamburgerMenuContent,
   StyledHeader,
   StyledHeaderContent,
-  StyledHeading,
+  StyledHmamburgerMenuIcon,
   StyledLink,
   StyledLogo,
   StyledMyAccountButton,
+  StyledOurNftLink,
+  StyledSignUpLink,
 } from './styles';
+
+type HeaderContentType = {
+  isConnected: boolean;
+  connectMetamask: () => void;
+  showAccountDetails: () => void;
+};
 
 export const Header: React.FC = () => {
   const isTablet = useMediaQuery(md);
   const [{ data, error }, connect] = useConnect();
   const [showAccountDetail, setShowAccountDetail] = useState<boolean>(false);
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState<boolean>(false);
 
   return (
     <StyledHeader id="header">
+      {!isTablet && showHamburgerMenu && (
+        <StyledHamburgerMenu>
+          <StyledHamburgerMenuCloseButton
+            onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
+          >
+            Close Menu
+          </StyledHamburgerMenuCloseButton>
+          <StyledHamburgerMenuContent>
+            <HeaderContent
+              isConnected={data.connected}
+              connectMetamask={() => connect(data.connectors[0])}
+              showAccountDetails={() =>
+                setShowAccountDetail(!showAccountDetail)
+              }
+            />
+          </StyledHamburgerMenuContent>
+        </StyledHamburgerMenu>
+      )}
       <StyledHeaderContent>
         <Router>
           <StyledLink to="/">
             <StyledLogo src={isTablet ? Logo : FanzoneHexagon} alt="" />
-            <StyledDivider></StyledDivider>
-            <StyledHeading>Profiles</StyledHeading>
           </StyledLink>
         </Router>
-        {data.connected ? (
-          <StyledMyAccountButton
-            onClick={() => setShowAccountDetail(!showAccountDetail)}
+        {/* <StyledButtonConainer>
+          <StyledFanzoneAppLink
+            href="https://app.fanzone.io"
+            target="_blank"
+            rel="noreferrer"
           >
-            My Account
-          </StyledMyAccountButton>
-        ) : (
-          <StyledConnectMetaMask onClick={() => connect(data.connectors[0])}>
-            Connect Metamask
-          </StyledConnectMetaMask>
+            Back to FANZONE App
+          </StyledFanzoneAppLink>
+          <StyledOurNftLink
+            href="https://www.notion.so/fanzoneio/About-NFTs-Web3-by-FANZONE-io-6d1e615991c34bcabb03b7005222c918"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Our NFTs
+          </StyledOurNftLink>
+        </StyledButtonConainer>
+        <StyledButtonConainer>
+          <StyledSignUpLink
+            href="https://app.fanzone.io/login"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Signup
+          </StyledSignUpLink>
+          {data.connected ? (
+            <StyledMyAccountButton
+              onClick={() => setShowAccountDetail(!showAccountDetail)}
+            >
+              My Account
+            </StyledMyAccountButton>
+          ) : (
+            <StyledConnectMetaMask onClick={() => connect(data.connectors[0])}>
+              Connect wallet
+            </StyledConnectMetaMask>
+          )}
+        </StyledButtonConainer> */}
+        {isTablet && (
+          <HeaderContent
+            isConnected={data.connected}
+            connectMetamask={() => connect(data.connectors[0])}
+            showAccountDetails={() => setShowAccountDetail(!showAccountDetail)}
+          />
+        )}
+        {!isTablet && (
+          <StyledHamburgerMenuButton
+            onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
+          >
+            <StyledHmamburgerMenuIcon src={hamburgerIcon} />
+          </StyledHamburgerMenuButton>
         )}
         {showAccountDetail && data.connected && <AccountDetails />}
-        {/* <StyledFanzoneAppLink
-          href="https://app.fanzone.io"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Back to FANZONE
-        </StyledFanzoneAppLink> */}
       </StyledHeaderContent>
     </StyledHeader>
   );
 };
+
+const HeaderContent = ({
+  isConnected,
+  connectMetamask,
+  showAccountDetails,
+}: HeaderContentType) => (
+  <>
+    <StyledButtonConainer>
+      <StyledFanzoneAppLink
+        href="https://app.fanzone.io"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Back to FANZONE App
+      </StyledFanzoneAppLink>
+      <StyledOurNftLink
+        href="https://www.notion.so/fanzoneio/About-NFTs-Web3-by-FANZONE-io-6d1e615991c34bcabb03b7005222c918"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Our NFTs
+      </StyledOurNftLink>
+    </StyledButtonConainer>
+    <StyledButtonConainer>
+      <StyledSignUpLink
+        href="https://app.fanzone.io/login"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Signup
+      </StyledSignUpLink>
+      {isConnected ? (
+        <StyledMyAccountButton onClick={showAccountDetails}>
+          My Account
+        </StyledMyAccountButton>
+      ) : (
+        <StyledConnectMetaMask onClick={connectMetamask}>
+          Connect wallet
+        </StyledConnectMetaMask>
+      )}
+    </StyledButtonConainer>
+  </>
+);
