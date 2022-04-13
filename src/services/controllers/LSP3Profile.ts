@@ -18,7 +18,7 @@ import {
 import {
   isFetchDataForSchemaResultList,
   fetchLSP5Data,
-} from '../../submodules/fanzone-smart-contracts/utils/LSPSchema';
+} from '../../utils/LSPSchema';
 import { ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
@@ -53,7 +53,6 @@ const fetchProfile = async (
     });
 
   let ownedAssetsWithBalance;
-
   if (isFetchDataForSchemaResultList(ownedAssets)) {
     ownedAssetsWithBalance = await Promise.all(
       ownedAssets.listEntries.map(async (ownedAsset) => {
