@@ -50,7 +50,8 @@
     "deploy": "gh-pages -d build",
     "build-fanzone-contracts": "npm run build-fanzone-contracts:sync-submodule && npm run build-fanzone-contracts:compile-contracts",
     "build-fanzone-contracts:sync-submodule": "git submodule sync --recursive && git submodule update --rebase --remote",
-    "build-fanzone-contracts:compile-contracts": "cd src/submodules/fanzone-smart-contracts && npm install && npm run build && cd -"
+    "build-fanzone-contracts:compile-contracts": "cd src/submodules/fanzone-smart-contracts && npm install && npm run build && cd -",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -76,8 +77,13 @@
     "autoprefixer": "^9.8.8",
     "babel-plugin-const-enum": "^1.2.0",
     "gh-pages": "^3.2.0",
+    "husky": "^7.0.0",
+    "lint-staged": "^12.3.7",
     "postcss": "^7.0.39",
     "prettier": "^2.3.1",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": "prettier --write"
   }
 }
