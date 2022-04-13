@@ -19,6 +19,10 @@ import Instagram from './instagram-icon.svg';
 import Globe from './globe-icon.svg';
 import polygonExplorerIcon from './poly.png';
 import hamburgerIcon from './hamburger-icon.svg';
+import ReloadIcon from './reload-icon.svg';
+import OptionIcon from './option-icon.svg';
+import WethIcon from './weth-icon.png';
+import AccordionToggleIcon from './accordion-toggle-icon.svg';
 
 export {
   BgMetaCard,
@@ -42,4 +46,8 @@ export {
   Globe,
   polygonExplorerIcon,
   hamburgerIcon,
+  ReloadIcon,
+  OptionIcon,
+  WethIcon,
+  AccordionToggleIcon,
 };

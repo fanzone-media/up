@@ -33,7 +33,7 @@ export const StyledAssetDetailContent = styled.div`
     max-width: 1440px;
     margin-left: auto;
     margin-right: auto;
-    padding-top: 48px;
+    padding: 48px 40px 0 40px;
   }
 
   @media ${xl} {
@@ -41,256 +41,390 @@ export const StyledAssetDetailContent = styled.div`
   }
 `;
 
-export const StyledGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
+// export const StyledGrid = styled.div`
+//   display: grid;
+//   grid-template-columns: 1fr;
 
-  @media ${sm} {
-    margin: 0 48px 0 48px;
-  }
+//   @media ${sm} {
+//     margin: 0 48px 0 48px;
+//   }
 
-  @media ${lg} {
-    grid-template-columns: repeat(2, 392px);
-    margin: 0 auto 0 auto;
-    column-gap: 20px;
-  }
+//   @media ${lg} {
+//     grid-template-columns: repeat(2, 392px);
+//     margin: 0 auto 0 auto;
+//     column-gap: 20px;
+//   }
 
-  @media ${xl} {
-    grid-template-columns: 2fr 1fr;
-    column-gap: 10px;
-    margin: 0;
-  }
-`;
+//   @media ${xl} {
+//     grid-template-columns: 2fr 1fr;
+//     column-gap: 10px;
+//     margin: 0;
+//   }
+// `;
 
-export const StyledAssetDetailGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  column-gap: 10px;
-  row-gap: 20px;
+// export const StyledAssetDetailGrid = styled.div`
+//   display: grid;
+//   grid-template-columns: 1fr;
+//   column-gap: 10px;
+//   row-gap: 20px;
 
-  @media ${xl} {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
+//   @media ${xl} {
+//     grid-template-columns: repeat(2, 1fr);
+//   }
+// `;
 
-export const StyledMediaWrappar = styled.div`
-  position: relative;
-  background: url(${BgMetaCard});
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  display: flex;
-  height: 473px;
+// export const StyledMediaWrappar = styled.div`
+//   position: relative;
+//   background: url(${BgMetaCard});
+//   background-position: center;
+//   background-repeat: no-repeat;
+//   background-size: cover;
+//   display: flex;
+//   height: 473px;
 
-  @media ${sm} {
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
-  }
-`;
+//   @media ${sm} {
+//     border-radius: 10px;
+//     border: 1px solid rgba(255, 255, 255, 0.15);
+//     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+//   }
+// `;
 
-export const StyledMetaCardImg = styled.img`
-  width: 221px;
-  margin: auto;
-`;
+// export const StyledMetaCardImg = styled.img`
+//   width: 221px;
+//   margin: auto;
+// `;
 
-export const StyledStatsName = styled.h1`
-  position: absolute;
-  left: 5%;
-  margin-top: 10px;
-  font-size: 24px;
-  font-weight: 700;
-`;
+// export const StyledStatsName = styled.h1`
+//   position: absolute;
+//   left: 5%;
+//   margin-top: 10px;
+//   font-size: 24px;
+//   font-weight: 700;
+// `;
 
-export const StyledUniversalProfileIcon = styled.img`
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  bottom: 5%;
-  left: 10%;
-  animation: ${pulseAnimate} 2s ease-in-out infinite;
-`;
+// export const StyledUniversalProfileIcon = styled.img`
+//   position: absolute;
+//   width: 44px;
+//   height: 44px;
+//   bottom: 5%;
+//   left: 10%;
+//   animation: ${pulseAnimate} 2s ease-in-out infinite;
+// `;
 
-export const StyledBlockScoutIcon = styled.img`
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  bottom: 5%;
-  right: 10%;
-  animation: ${pulseAnimate} 2s ease-in-out infinite;
-`;
+// export const StyledBlockScoutIcon = styled.img`
+//   position: absolute;
+//   width: 44px;
+//   height: 44px;
+//   bottom: 5%;
+//   right: 10%;
+//   animation: ${pulseAnimate} 2s ease-in-out infinite;
+// `;
 
-export const StyledDetailsWrappar = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 10px 0px 0px 0px;
+// export const StyledDetailsWrappar = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   padding: 10px 0px 0px 0px;
 
-  @media ${sm} {
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.08) 100%
-      ),
-      #212121;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
-    min-height: 473px;
-  }
-`;
+//   @media ${sm} {
+//     background: linear-gradient(
+//         180deg,
+//         rgba(255, 255, 255, 0) 0%,
+//         rgba(255, 255, 255, 0.08) 100%
+//       ),
+//       #212121;
+//     border-radius: 10px;
+//     border: 1px solid rgba(255, 255, 255, 0.15);
+//     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+//     min-height: 473px;
+//   }
+// `;
 
-export const StyledCardInfoLabel = styled.h2`
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 8px 10px 8px;
-  border-width: 0 0 1px 0;
-  border-style: solid;
-  border-color: white;
-  padding-bottom: 5px;
+// export const StyledCardInfoLabel = styled.h2`
+//   font-size: 18px;
+//   font-weight: 700;
+//   margin: 0 8px 10px 8px;
+//   border-width: 0 0 1px 0;
+//   border-style: solid;
+//   border-color: white;
+//   padding-bottom: 5px;
 
-  @media ${sm} {
-    margin: 0 20px 5px 20px;
-  }
-`;
+//   @media ${sm} {
+//     margin: 0 20px 5px 20px;
+//   }
+// `;
 
-export const StyledInfoGrid = styled.div`
-  display: grid;
-  grid-template-columns: 35% 1fr;
-  padding: 0 8px 5px 8px;
-  row-gap: 10px;
+// export const StyledInfoGrid = styled.div`
+//   display: grid;
+//   grid-template-columns: 35% 1fr;
+//   padding: 0 8px 5px 8px;
+//   row-gap: 10px;
 
-  @media ${sm} {
-    padding: 0 20px 0 20px;
-  }
-`;
+//   @media ${sm} {
+//     padding: 0 20px 0 20px;
+//   }
+// `;
 
 export const StyledLabel = styled.p`
   font-size: 15px;
 `;
 
-export const StyledValue = styled.p`
-  font-size: 15px;
-  font-weight: 700;
-  text-transform: capitalize;
-`;
+// export const StyledValue = styled.p`
+//   font-size: 15px;
+//   font-weight: 700;
+//   text-transform: capitalize;
+// `;
 
-export const StyledFullName = styled.p`
-  font-size: 15px;
-  font-weight: 700;
-  margin: 0 10px 0 10px;
-  padding: 15px 0 15px 0;
-  border-width: 2px 0 2px 0;
-  border-style: solid;
-  border-color: rgba(255, 255, 255, 0.25);
-  line-height: 17px;
+// export const StyledFullName = styled.p`
+//   font-size: 15px;
+//   font-weight: 700;
+//   margin: 0 10px 0 10px;
+//   padding: 15px 0 15px 0;
+//   border-width: 2px 0 2px 0;
+//   border-style: solid;
+//   border-color: rgba(255, 255, 255, 0.25);
+//   line-height: 17px;
 
-  @media ${sm} {
-    margin: 0;
-    padding: 15px 20px 15px 20px;
-    border-width: 2px 0 0 0;
-    margin-top: auto;
-  }
-`;
+//   @media ${sm} {
+//     margin: 0;
+//     padding: 15px 20px 15px 20px;
+//     border-width: 2px 0 0 0;
+//     margin-top: auto;
+//   }
+// `;
 
-export const StyledExtraInfo = styled.div`
+// export const StyledExtraInfo = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   height: max-content;
+//   padding: 0 8px 0 8px;
+//   margin-top: 20px;
+
+//   @media ${sm} {
+//     padding: 0;
+//   }
+
+//   @media ${lg} {
+//     margin: 0;
+//     background: linear-gradient(
+//         180deg,
+//         rgba(255, 255, 255, 0) 0%,
+//         rgba(255, 255, 255, 0.08) 100%
+//       ),
+//       #212121;
+//     border-radius: 10px;
+//     border: 1px solid rgba(255, 255, 255, 0.15);
+//     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+//     padding: 15px 10px 15px 10px;
+//   }
+// `;
+
+// export const StyledIssuerLabel = styled.h3`
+//   font-size: 18px;
+//   font-weight: 700;
+//   margin-bottom: 10px;
+
+//   @media ${lg} {
+//     width: 116px;
+//     border-width: 0 0 1px 0;
+//     border-style: solid;
+//     border-color: rgba(223, 223, 223, 1);
+//   }
+// `;
+
+// export const StyledCreatorLabel = styled(StyledIssuerLabel)`
+//   margin-top: 10px;
+// `;
+
+// export const StyledHolderLabel = styled(StyledIssuerLabel)`
+//   margin-top: 10px;
+//   margin-left: 8px;
+//   border: none;
+
+//   @media ${sm} {
+//     margin-left: 48px;
+//   }
+
+//   @media ${xl} {
+//     margin: 0;
+//   }
+// `;
+
+// export const StyledIssuerWrappar = styled.div`
+//   display: grid;
+//   grid-template-columns: repeat(3, 1fr);
+//   justify-items: center;
+//   column-gap: 5px;
+//   row-gap: 10px;
+//   /*
+//     @media ${sm} {
+//         grid-template-columns: repeat(3, 1fr);
+//     } */
+
+//   @media ${md} {
+//     grid-template-columns: repeat(4, 1fr);
+//   }
+
+//   @media ${lg} {
+//     grid-template-columns: repeat(3, 1fr);
+//   }
+// `;
+
+// export const StyledCreatorWrappar = styled(StyledIssuerWrappar)``;
+
+// export const StyledHolderWrappar = styled(StyledIssuerWrappar)`
+//   display: grid;
+//   grid-template-columns: repeat(3, 1fr);
+//   margin: 0 8px 0 8px;
+//   justify-items: center;
+
+//   @media ${sm} {
+//     margin: 0 48px 0 48px;
+//   }
+
+//   @media ${md} {
+//     grid-template-columns: repeat(4, 1fr);
+//   }
+
+//   @media ${lg} {
+//     grid-template-columns: repeat(5, 1fr);
+//   }
+
+//   @media ${xl} {
+//     margin: 0;
+//     grid-template-columns: repeat(6, 1fr);
+//   }
+// `;
+
+// Re designed styled components
+
+export const StyledCardMainDetails = styled.div`
   display: flex;
   flex-direction: column;
-  height: max-content;
-  padding: 0 8px 0 8px;
-  margin-top: 20px;
+  width: 100%;
 
-  @media ${sm} {
-    padding: 0;
+  @media ${md} {
+    flex-direction: row;
+    column-gap: 20px;
+    height: 590px;
   }
+`;
 
-  @media ${lg} {
-    margin: 0;
+export const StyledMediaWrapper = styled.div`
+  display: flex;
+  background: url(${BgMetaCard});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 445px;
+
+  @media ${md} {
+    width: 50%;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    height: 100%;
+  }
+`;
+
+export const StyledMedia = styled.img`
+  width: 230px;
+  margin: auto;
+`;
+
+export const StyledCardInfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  @media ${md} {
+    width: 50%;
+    row-gap: 20px;
+  }
+`;
+
+export const StyledCardPriceWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  row-gap: 10px;
+
+  @media ${md} {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
     background: linear-gradient(
         180deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.08) 100%
+        rgba(255, 255, 255, 0.08) 98.49%
       ),
-      #212121;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
-    padding: 15px 10px 15px 10px;
+      rgba(33, 33, 33, 0.6);
   }
 `;
 
-export const StyledIssuerLabel = styled.h3`
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 10px;
-
-  @media ${lg} {
-    width: 116px;
-    border-width: 0 0 1px 0;
-    border-style: solid;
-    border-color: rgba(223, 223, 223, 1);
-  }
+export const StyledCardPriceWrapperHeader = styled.div`
+  display: flex;
 `;
 
-export const StyledCreatorLabel = styled(StyledIssuerLabel)`
-  margin-top: 10px;
-`;
+export const StyledCardPriceLabel = styled.p``;
 
-export const StyledHolderLabel = styled(StyledIssuerLabel)`
-  margin-top: 10px;
-  margin-left: 8px;
-  border: none;
-
-  @media ${sm} {
-    margin-left: 48px;
-  }
-
-  @media ${xl} {
-    margin: 0;
-  }
-`;
-
-export const StyledIssuerWrappar = styled.div`
+export const StyledQuickActions = styled.div`
   display: grid;
+  width: 110px;
+  height: 30px;
   grid-template-columns: repeat(3, 1fr);
-  justify-items: center;
-  column-gap: 5px;
+  margin-left: auto;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+`;
+
+export const StyledReloadPriceAction = styled.button`
+  display: flex;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+`;
+
+export const StyledShareCardAction = styled(StyledReloadPriceAction)``;
+
+export const StyledOptionAction = styled(StyledReloadPriceAction)`
+  border-right: none;
+`;
+
+export const StyledActionIcon = styled.img`
+  margin: auto;
+`;
+
+export const StyledCardPriceValueWrapper = styled.div`
+  display: flex;
+`;
+
+export const StyledTokenIcon = styled.img``;
+
+export const StyledCardPriceValue = styled.p`
+  margin: auto 0;
+`;
+
+export const StyledActionsButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   row-gap: 10px;
-  /* 
-    @media ${sm} {
-        grid-template-columns: repeat(3, 1fr);
-    } */
 
   @media ${md} {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @media ${lg} {
-    grid-template-columns: repeat(3, 1fr);
+    flex-direction: row;
+    column-gap: 10px;
   }
 `;
 
-export const StyledCreatorWrappar = styled(StyledIssuerWrappar)``;
-
-export const StyledHolderWrappar = styled(StyledIssuerWrappar)`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin: 0 8px 0 8px;
-  justify-items: center;
-
-  @media ${sm} {
-    margin: 0 48px 0 48px;
-  }
+export const StyledBuyButton = styled.button`
+  width: 100%;
+  background: rgba(255, 129, 1, 1);
+  border-radius: 5px;
+  padding: 7px 0;
 
   @media ${md} {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @media ${lg} {
-    grid-template-columns: repeat(5, 1fr);
-  }
-
-  @media ${xl} {
-    margin: 0;
-    grid-template-columns: repeat(6, 1fr);
+    width: 50%;
   }
 `;
+
+export const StyledMakeOfferButton = styled(StyledBuyButton)`
+  background: rgba(255, 255, 255, 0.2);
+`;
+
+export const StyledCardInfo = styled.div``;

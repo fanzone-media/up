@@ -1,7 +1,13 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
-import { UniversalProfileIcon } from '../../assets';
+import {
+  OptionIcon,
+  ReloadIcon,
+  ShareIcon,
+  UniversalProfileIcon,
+  WethIcon,
+} from '../../assets';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import { fetchCard, selectCardById } from '../../features/cards';
@@ -18,36 +24,34 @@ import { useMemo } from 'react';
 import { IProfile } from '../../services/models';
 import {
   StyledAssetDetailContent,
-  StyledAssetDetailsContentWrappar,
-  StyledGrid,
-  StyledAssetDetailGrid,
-  StyledExtraInfo,
-  StyledCreatorLabel,
-  StyledIssuerLabel,
-  StyledIssuerWrappar,
-  StyledCreatorWrappar,
-  StyledHolderLabel,
-  StyledHolderWrappar,
-  StyledMediaWrappar,
-  StyledMetaCardImg,
-  StyledDetailsWrappar,
-  StyledCardInfoLabel,
-  StyledInfoGrid,
-  StyledLabel,
-  StyledValue,
-  StyledFullName,
-  StyledUniversalProfileIcon,
-  StyledBlockScoutIcon,
-  StyledStatsName,
   StyledCardError,
   StyledLoader,
   StyledLoadingHolder,
+  StyledAssetDetailsContentWrappar,
+  StyledCardInfoWrapper,
+  StyledCardPriceWrapper,
+  StyledCardInfo,
+  StyledCardMainDetails,
+  StyledMedia,
+  StyledMediaWrapper,
+  StyledCardPriceWrapperHeader,
+  StyledCardPriceLabel,
+  StyledQuickActions,
+  StyledReloadPriceAction,
+  StyledActionIcon,
+  StyledCardPriceValue,
+  StyledCardPriceValueWrapper,
+  StyledTokenIcon,
+  StyledActionsButtonWrapper,
+  StyledBuyButton,
+  StyledMakeOfferButton,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer } from '../../utility';
 import ReactTooltip from 'react-tooltip';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 import { useSigner } from 'wagmi';
+import { Accordion } from '../../components/Accordion';
 
 interface IPrams {
   add: string;
@@ -243,36 +247,36 @@ const AssetDetails: React.FC = () => {
     { text: 'Team', data: asset?.ls8MetaData.teamLabel },
   ];
 
-  const renderCardProperties = useMemo(() => {
-    const keys = asset && Object.keys(asset && asset.ls8MetaData);
-    if (
-      keys &&
-      keys.includes('attributes') &&
-      asset &&
-      asset.ls8MetaData.attributes.length > 0
-    ) {
-      return asset.ls8MetaData.attributes.map((attribute: any, i) => (
-        <React.Fragment key={i}>
-          <StyledLabel>{attribute.trait_type}</StyledLabel>
-          {Object.keys(attribute).includes('max_value') ? (
-            <StyledValue>
-              {attribute.value} of {attribute.max_value}
-            </StyledValue>
-          ) : (
-            <StyledValue>{attribute.value}</StyledValue>
-          )}
-        </React.Fragment>
-      ));
-    } else {
-      return metaCardInfo.map((items, i) => (
-        <React.Fragment key={i}>
-          <StyledLabel>{items.text}</StyledLabel>
-          <StyledValue>{items.data}</StyledValue>
-        </React.Fragment>
-      ));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [asset]);
+  // const renderCardProperties = useMemo(() => {
+  //   const keys = asset && Object.keys(asset && asset.ls8MetaData);
+  //   if (
+  //     keys &&
+  //     keys.includes('attributes') &&
+  //     asset &&
+  //     asset.ls8MetaData.attributes.length > 0
+  //   ) {
+  //     return asset.ls8MetaData.attributes.map((attribute: any, i) => (
+  //       <React.Fragment key={i}>
+  //         <StyledLabel>{attribute.trait_type}</StyledLabel>
+  //         {Object.keys(attribute).includes('max_value') ? (
+  //           <StyledValue>
+  //             {attribute.value} of {attribute.max_value}
+  //           </StyledValue>
+  //         ) : (
+  //           <StyledValue>{attribute.value}</StyledValue>
+  //         )}
+  //       </React.Fragment>
+  //     ));
+  //   } else {
+  //     return metaCardInfo.map((items, i) => (
+  //       <React.Fragment key={i}>
+  //         <StyledLabel>{items.text}</StyledLabel>
+  //         <StyledValue>{items.data}</StyledValue>
+  //       </React.Fragment>
+  //     ));
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [asset]);
 
   return (
     <StyledAssetDetailsContentWrappar>
@@ -288,7 +292,43 @@ const AssetDetails: React.FC = () => {
             </>
           ) : (
             <StyledAssetDetailContent>
-              <StyledGrid>
+              <StyledCardMainDetails>
+                <StyledMediaWrapper>
+                  <StyledMedia src={asset?.ls8MetaData.image} alt="" />
+                </StyledMediaWrapper>
+                <StyledCardInfoWrapper>
+                  <StyledCardPriceWrapper>
+                    <StyledCardPriceWrapperHeader>
+                      <StyledCardPriceLabel>Current Price</StyledCardPriceLabel>
+                      <StyledQuickActions>
+                        <StyledReloadPriceAction>
+                          <StyledActionIcon src={ReloadIcon} />
+                        </StyledReloadPriceAction>
+                        <StyledReloadPriceAction>
+                          <StyledActionIcon src={ShareIcon} />
+                        </StyledReloadPriceAction>
+                        <StyledReloadPriceAction>
+                          <StyledActionIcon src={OptionIcon} />
+                        </StyledReloadPriceAction>
+                      </StyledQuickActions>
+                    </StyledCardPriceWrapperHeader>
+                    <StyledCardPriceValueWrapper>
+                      <StyledTokenIcon src={WethIcon} alt="" />
+                      <StyledCardPriceValue>
+                        11.5 ($35,023.25)
+                      </StyledCardPriceValue>
+                    </StyledCardPriceValueWrapper>
+                    <StyledActionsButtonWrapper>
+                      <StyledBuyButton>Buy now</StyledBuyButton>
+                      <StyledMakeOfferButton>Make offer</StyledMakeOfferButton>
+                    </StyledActionsButtonWrapper>
+                  </StyledCardPriceWrapper>
+                  <Accordion title="Card Info" enableToggle>
+                    <StyledCardInfo></StyledCardInfo>
+                  </Accordion>
+                </StyledCardInfoWrapper>
+              </StyledCardMainDetails>
+              {/* <StyledGrid>
                 <StyledAssetDetailGrid>
                   <StyledMediaWrappar>
                     {params.network === 'l14' && (
@@ -330,7 +370,7 @@ const AssetDetails: React.FC = () => {
                 </StyledExtraInfo>
               </StyledGrid>
               <StyledHolderLabel>Holder</StyledHolderLabel>
-              <StyledHolderWrappar>{renderHolders}</StyledHolderWrappar>
+              <StyledHolderWrappar>{renderHolders}</StyledHolderWrappar> */}
             </StyledAssetDetailContent>
           )}
         </>

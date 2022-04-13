@@ -1,7 +1,6 @@
 import React from 'react';
 import { HashRouter as Router } from 'react-router-dom';
 import { FanzoneHexagon } from '../../assets';
-import { StyledLabel } from '../../pages/AssetDetails/styles';
 import {
   StyledFooterContent,
   StyledFooter,
@@ -11,6 +10,7 @@ import {
   StyledDivider,
   StyledNetworksText,
   StyledNetworks,
+  StyledLabel,
 } from './styles';
 
 export const Footer: React.FC = () => {
