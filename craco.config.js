@@ -1,14 +1,10 @@
 module.exports = {
-    style: {
-      postcss: {
-        plugins: [
-          require('tailwindcss'),
-          require('autoprefixer'),
-        ],
-      },
+  style: {
+    postcss: {
+      plugins: [require('tailwindcss'), require('autoprefixer')],
     },
-    typescript: {
-      allowSyntheticDefaultImports: true,
-    }
-  }
-  
+  },
+  typescript: {
+    allowSyntheticDefaultImports: true,
+  },
+};

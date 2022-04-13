@@ -1,4 +1,4 @@
-import type { Overrides } from "@ethersproject/contracts";
+import type { Overrides } from '@ethersproject/contracts';
 
 export const prepareTxOverrides = (overrides: Overrides): Overrides => {
   // we want to always use tx.type 2 (EIP-1559)

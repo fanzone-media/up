@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 
 export const nameHashMap = {
   //
@@ -6,13 +6,13 @@ export const nameHashMap = {
   //
 
   FeeCollector: ethers.utils.keccak256(
-    ethers.utils.toUtf8Bytes("FeeCollector")
+    ethers.utils.toUtf8Bytes('FeeCollector'),
   ),
   CardTokenScoring: ethers.utils.keccak256(
-    ethers.utils.toUtf8Bytes("CardTokenScoring")
+    ethers.utils.toUtf8Bytes('CardTokenScoring'),
   ),
   OpenSeaProxy: ethers.utils.keccak256(
-    ethers.utils.toUtf8Bytes("OpenSeaProxy")
+    ethers.utils.toUtf8Bytes('OpenSeaProxy'),
   ),
 
   //
@@ -20,18 +20,18 @@ export const nameHashMap = {
   //
 
   CardTokenProxyFactory: ethers.utils.keccak256(
-    ethers.utils.toUtf8Bytes("CardTokenProxyFactory")
+    ethers.utils.toUtf8Bytes('CardTokenProxyFactory'),
   ),
   FeeReceiverProxyFactory: ethers.utils.keccak256(
-    ethers.utils.toUtf8Bytes("FeeReceiverProxyFactory")
+    ethers.utils.toUtf8Bytes('FeeReceiverProxyFactory'),
   ),
   UniversalProfileProxyFactory: ethers.utils.keccak256(
-    ethers.utils.toUtf8Bytes("UniversalProfileProxyFactory")
+    ethers.utils.toUtf8Bytes('UniversalProfileProxyFactory'),
   ),
   LSP6KeyManagerProxyFactory: ethers.utils.keccak256(
-    ethers.utils.toUtf8Bytes("LSP6KeyManagerProxyFactory")
+    ethers.utils.toUtf8Bytes('LSP6KeyManagerProxyFactory'),
   ),
   LSP1UniversalReceiverDelegateUPProxyFactory: ethers.utils.keccak256(
-    ethers.utils.toUtf8Bytes("LSP1UniversalReceiverDelegateUPProxyFactory")
+    ethers.utils.toUtf8Bytes('LSP1UniversalReceiverDelegateUPProxyFactory'),
   ),
 };

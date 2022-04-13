@@ -1,18 +1,18 @@
-import axios from "axios";
-import { ethers } from "ethers";
+import axios from 'axios';
+import { ethers } from 'ethers';
 
-import { displayTxData } from "./display";
+import { displayTxData } from './display';
 
-import type { BigNumber } from "@ethersproject/bignumber";
+import type { BigNumber } from '@ethersproject/bignumber';
 import type {
   ContractReceipt,
   ContractTransaction,
-} from "@ethersproject/contracts";
+} from '@ethersproject/contracts';
 import type {
   TransactionReceipt,
   TransactionResponse,
-} from "@ethersproject/abstract-provider/lib/index";
-import { Provider } from "@ethersproject/providers";
+} from '@ethersproject/abstract-provider/lib/index';
+import { Provider } from '@ethersproject/providers';
 
 // would like to use "timers/promise" but this is not available for the web client
 const setTimeoutPromise = <T>(delay: number, value: T): Promise<T> => {
@@ -23,15 +23,15 @@ const sanitizeNetworkName = (networkName: string): string =>
   networkName.toLowerCase();
 
 export const isLocalTestnet = (networkName: string) =>
-  ["hardhat", "local-testnet"].includes(sanitizeNetworkName(networkName));
+  ['hardhat', 'local-testnet'].includes(sanitizeNetworkName(networkName));
 
 const expectedBlockTimeInSeconds = (networkName: string): number => {
   switch (sanitizeNetworkName(networkName)) {
-    case "l14":
+    case 'l14':
       return 5;
-    case "mumbai":
+    case 'mumbai':
       return 2;
-    case "polygon":
+    case 'polygon':
       return 5;
     default:
       return 1;
@@ -61,7 +61,7 @@ export type WaitForTxOnNetworkResult = {
 export const waitForTxOnNetwork = async (
   networkName: string,
   txPromise: Promise<ContractTransaction>,
-  logger = (..._data: Array<any>) => {}
+  logger = (..._data: Array<any>) => {},
 ): Promise<WaitForTxOnNetworkResult> => {
   const { confirmationCount, confirmationTimeoutInSeconds } =
     getConfirmationConfigForNetwork(networkName);
@@ -69,15 +69,15 @@ export const waitForTxOnNetwork = async (
   const sentTx = await txPromise;
   logger(
     `sent tx ${displayTxData(
-      sentTx.hash
-    )} and waiting for ${confirmationCount} confirmations`
+      sentTx.hash,
+    )} and waiting for ${confirmationCount} confirmations`,
   );
 
   const maybeTxReceipt = await Promise.race([
     sentTx.wait(confirmationCount),
     setTimeoutPromise(
       confirmationTimeoutInSeconds * 1000,
-      new Error(`tx timed out after ${confirmationTimeoutInSeconds} seconds`)
+      new Error(`tx timed out after ${confirmationTimeoutInSeconds} seconds`),
     ),
   ]);
 
@@ -91,7 +91,7 @@ export const waitForTxOnNetwork = async (
 export const waitForFactoryDeployTxOnNetwork = async (
   networkName: string,
   deployTransaction: TransactionResponse,
-  logger = (..._data: Array<any>) => {}
+  logger = (..._data: Array<any>) => {},
 ): Promise<{
   txReceipt: TransactionReceipt;
 }> => {
@@ -100,15 +100,15 @@ export const waitForFactoryDeployTxOnNetwork = async (
 
   logger(
     `sent contract deploy tx ${displayTxData(
-      deployTransaction.hash
-    )} and waiting for ${confirmationCount} confirmations`
+      deployTransaction.hash,
+    )} and waiting for ${confirmationCount} confirmations`,
   );
 
   const maybeTxReceipt = await Promise.race([
     deployTransaction.wait(confirmationCount),
     setTimeoutPromise(
       confirmationTimeoutInSeconds * 1000,
-      new Error(`tx timed out after ${confirmationTimeoutInSeconds} seconds`)
+      new Error(`tx timed out after ${confirmationTimeoutInSeconds} seconds`),
     ),
   ]);
 
@@ -121,19 +121,19 @@ export const waitForFactoryDeployTxOnNetwork = async (
 
 export const getGasPrice = async (
   networkName: string,
-  provider: Provider
+  provider: Provider,
 ): Promise<BigNumber> => {
   // NOTE: callers of this function should choose a max gas price as during network congestion the
   // fees can become extremely high
 
   switch (sanitizeNetworkName(networkName)) {
-    case "hardhat": {
-      return ethers.utils.parseUnits("1", "gwei");
+    case 'hardhat': {
+      return ethers.utils.parseUnits('1', 'gwei');
     }
-    case "local-testnet": {
-      return ethers.utils.parseUnits("1", "gwei");
+    case 'local-testnet': {
+      return ethers.utils.parseUnits('1', 'gwei');
     }
-    case "polygon": {
+    case 'polygon': {
       const gasPrices: {
         safeLow: number;
         standard: number;
@@ -142,12 +142,12 @@ export const getGasPrice = async (
         blockTime: number;
         blockNumber: number;
       } = await axios
-        .get("https://gasstation-mainnet.matic.network")
+        .get('https://gasstation-mainnet.matic.network')
         .then((res) => res.data);
 
-      return ethers.utils.parseUnits(String(gasPrices.fastest), "gwei");
+      return ethers.utils.parseUnits(String(gasPrices.fastest), 'gwei');
     }
-    case "mumbai": {
+    case 'mumbai': {
       const rpcGasPrice = await provider.getGasPrice();
 
       return rpcGasPrice.mul(10);

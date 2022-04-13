@@ -14,9 +14,9 @@ module.exports = {
       coolgray: colors.coolGray,
       gray: colors.gray,
       truegray: colors.trueGray,
-      warmgray:colors.warmGray,
+      warmgray: colors.warmGray,
       red: colors.red,
-      orange:colors.orange,
+      orange: colors.orange,
       amber: colors.amber,
       yellow: colors.amber,
       lime: colors.lime,
@@ -34,67 +34,67 @@ module.exports = {
       rose: colors.rose,
       fanzoneGray: '#212121',
       fanzoneTextGray: '#BCBCBC',
-      fanzoneGray2: '#3B3B3B'
+      fanzoneGray2: '#3B3B3B',
     },
     screens: {
-      'xs': '320px',
+      xs: '320px',
 
-      'sm': '640px',
+      sm: '640px',
       // => @media (min-width: 640px) { ... }
 
-      'md': '768px',
+      md: '768px',
       // => @media (min-width: 768px) { ... }
 
-      'lg': '1024px',
+      lg: '1024px',
       // => @media (min-width: 1024px) { ... }
 
-      'xl': '1280px',
+      xl: '1280px',
       // => @media (min-width: 1280px) { ... }
 
       '2xl': '1536px',
       // => @media (min-width: 1536px) { ... }
-      
+
       '3xl': '2000px',
     },
     extend: {
-      backgroundImage: theme => ({
+      backgroundImage: (theme) => ({
         metaCard: "url('./assets/bg-meta-card.png')",
-        fanzoneBg: "url('./assets/fanzone-bg.png')" ,
+        fanzoneBg: "url('./assets/fanzone-bg.png')",
         profileHero: "url('./assets/profilepage-hero-bg.svg')",
-        profileCard: "url('./assets/bg-profile-card.png')"
+        profileCard: "url('./assets/bg-profile-card.png')",
       }),
       zIndex: {
-        '-10':'-10',
+        '-10': '-10',
       },
       margin: {
-        '-22':'-5.5rem',
-        '-30':'-7.5rem',
-        '-18':'-4.5rem'
+        '-22': '-5.5rem',
+        '-30': '-7.5rem',
+        '-18': '-4.5rem',
       },
       width: {
-        'lg': '1280px'
+        lg: '1280px',
       },
       height: {
-        'grid': '473px'
-      }
+        grid: '473px',
+      },
     },
     keyframes: {
       scale: {
-        "0%,100%": {transform: 'scale(1.2)'},
-        "50%": {transform: 'scale(1)'}
+        '0%,100%': { transform: 'scale(1.2)' },
+        '50%': { transform: 'scale(1)' },
       },
       cardrender: {
-        "0%": {opacity:0,},
-        "100%": {opacity:1,}
-      }
+        '0%': { opacity: 0 },
+        '100%': { opacity: 1 },
+      },
     },
     animation: {
       scale: 'scale 2s ease-in-out infinite',
-      cardrender: 'cardrender 1s linear'
-    }
+      cardrender: 'cardrender 1s linear',
+    },
   },
   variants: {
     extend: {},
   },
   plugins: [],
-}
+};

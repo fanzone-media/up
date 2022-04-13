@@ -1,0 +1,5 @@
+# Ignore artifacts
+**/build
+
+# Ignore third party code
+**/submodules
