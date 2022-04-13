@@ -11,7 +11,7 @@ import {
 import Utils from '../utilities/util';
 import { LSP3ProfileApi } from './LSP3Profile';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
-import { tokenIdAsBytes32 } from '../../submodules/fanzone-smart-contracts/utils/cardToken';
+import { tokenIdAsBytes32 } from '../../utils/cardToken';
 
 const fetchCard = async (
   address: string,
