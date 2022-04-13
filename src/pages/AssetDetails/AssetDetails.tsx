@@ -1,13 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
-import {
-  OptionIcon,
-  ReloadIcon,
-  ShareIcon,
-  UniversalProfileIcon,
-  WethIcon,
-} from '../../assets';
+import { OptionIcon, ReloadIcon, ShareIcon, WethIcon } from '../../assets';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import { fetchCard, selectCardById } from '../../features/cards';
@@ -61,9 +55,6 @@ interface IPrams {
 
 const AssetDetails: React.FC = () => {
   const params = useParams<IPrams>();
-  const [{ data: signer, error: signerError, loading }, getSigner] =
-    useSigner();
-  const explorer = getChainExplorer(params.network);
 
   const profiles = useSelector((state: RootState) =>
     selectUserIds(state.userData[params.network]),

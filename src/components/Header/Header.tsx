@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
-import { useAccount, useConnect } from 'wagmi';
+import { useConnect } from 'wagmi';
 import { FanzoneHexagon, hamburgerIcon, Logo } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
@@ -31,7 +31,7 @@ type HeaderContentType = {
 
 export const Header: React.FC = () => {
   const isTablet = useMediaQuery(md);
-  const [{ data, error }, connect] = useConnect();
+  const [{ data }, connect] = useConnect();
   const [showAccountDetail, setShowAccountDetail] = useState<boolean>(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState<boolean>(false);
 
