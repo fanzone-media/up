@@ -9,7 +9,7 @@ import {
   LSP6KeyManagerProxy__factory,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
-import { tokenIdAsBytes32 } from '../../submodules/fanzone-smart-contracts/utils/cardToken';
+import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import KeyChain from '../utilities/KeyChain';
 
 const LSP6KeyManagerSchemaList: ERC725JSONSchema = {

@@ -24,7 +24,7 @@ import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
-import { tokenIdAsBytes32 } from '../../submodules/fanzone-smart-contracts/utils/cardToken';
+import { tokenIdAsBytes32 } from '../../utils/cardToken';
 
 const fetchProfile = async (
   address: string,
