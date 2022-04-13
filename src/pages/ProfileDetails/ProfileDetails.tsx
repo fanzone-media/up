@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { selectCardIds } from '../../features/cards';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import { useAppDispatch } from '../../boot/store';
@@ -16,9 +15,6 @@ import {
   StyledLinkIcon,
   StyledOpenTransferModalButton,
   StyledProfileAddress,
-  StyledProfileBio,
-  StyledProfileBioHeading,
-  StyledProfileBioWrappar,
   StyledProfileCoverImg,
   StyledProfileDetails,
   StyledProfileDetailsContent,
@@ -52,7 +48,6 @@ import {
 } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
-import { StyledAssetsHeading } from '../../features/pagination/styles';
 import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 import { useAccount, useSigner } from 'wagmi';
@@ -67,9 +62,8 @@ interface IParams {
 const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
-  const [{ data, error }] = useAccount();
-  const [{ data: signer, error: signerError, loading }, getSigner] =
-    useSigner();
+  const [{ data }] = useAccount();
+  const [{ data: signer }] = useSigner();
   const [openEditProfileModal, setOpenEditProfileModal] =
     useState<boolean>(false);
   const [openTransferCardModal, setOpenTransferCardModal] =
@@ -80,8 +74,6 @@ const ProfileDetails: React.FC = () => {
   const profile = useSelector((state: RootState) =>
     selectUserById(state.userData[params.network], params.add),
   );
-
-  const cards = useSelector((state: RootState) => selectCardIds(state));
 
   const profileError = useSelector(
     (state: RootState) => state.userData[params.network].error,
@@ -204,18 +196,6 @@ const ProfileDetails: React.FC = () => {
 
   const shareButtonHandler = () => {
     setIsShare((isShare) => !isShare);
-  };
-
-  const getEditPermission = () => {
-    if (
-      profile &&
-      data &&
-      (keyManagerSetDataPermission ||
-        profile.owner.toLowerCase() === data.address.toLowerCase())
-    ) {
-      return true;
-    }
-    return false;
   };
 
   useEffect(() => {

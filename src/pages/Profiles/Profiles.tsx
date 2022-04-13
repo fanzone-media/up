@@ -5,7 +5,6 @@ import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { NetworkName, RootState } from '../../boot/types';
 import { fetchAllProfiles, selectAllUsersItems } from '../../features/profiles';
 import { IProfile } from '../../services/models';
-import { fetchAllCards, selectAllCardItems } from '../../features/cards';
 import Pagination from '../../features/pagination/Pagination';
 import {
   StyledContentwrappar,
@@ -22,7 +21,6 @@ import {
 import { Search } from '../../components/Search';
 import { useAppDispatch } from '../../boot/store';
 import { useParams } from 'react-router-dom';
-import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 
 interface IParams {
   network: NetworkName;

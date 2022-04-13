@@ -1,8 +1,7 @@
 import { Puff } from 'react-loader-spinner';
 import styled from 'styled-components';
 import { BgMetaCard } from '../../assets';
-import { pulseAnimate } from '../../features/cards/MetaCard/styles';
-import { lg, md, sm, xl } from '../../utility';
+import { md, xl } from '../../utility';
 
 export const StyledAssetDetailsContentWrappar = styled.div`
   display: flex;

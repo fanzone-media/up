@@ -720,7 +720,7 @@ export const LSPMappings = {
     parseValue: (
       hexValue: string, // bytes20(address)[]
     ) => {
-      if (hexValue == '0x') return null;
+      if (hexValue.toLowerCase() === '0x') return null;
 
       const decodedValue = ethers.utils.defaultAbiCoder.decode(
         ['address[]'],
@@ -742,7 +742,7 @@ export const LSPMappings = {
     parseValue: (
       hexValue: string, // bytes4(function signature)[]
     ) => {
-      if (hexValue == '0x') return null;
+      if (hexValue.toLowerCase() === '0x') return null;
 
       const decodedValue = ethers.utils.defaultAbiCoder.decode(
         ['bytes4[]'],
@@ -764,7 +764,7 @@ export const LSPMappings = {
     parseValue: (
       hexValue: string, // bytes4(ERC165 interface id)[]
     ) => {
-      if (hexValue == '0x') return null;
+      if (hexValue.toLowerCase() === '0x') return null;
 
       const decodedValue = ethers.utils.defaultAbiCoder.decode(
         ['bytes4[]'],

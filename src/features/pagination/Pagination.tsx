@@ -26,10 +26,6 @@ import {
   selectAllCardItems,
 } from '../cards';
 import { useSelector } from 'react-redux';
-import {
-  StyledLoader,
-  StyledLoadingHolder,
-} from '../../pages/AssetDetails/styles';
 import { STATUS } from '../../utility';
 
 interface IPagination {
@@ -90,11 +86,14 @@ const Pagination: React.FC<IPagination> = ({
 
   const cardStatus = useSelector((state: RootState) => state.cards.status);
 
-  const [search, setSearch] = useState<string>('');
+  const [
+    search,
+    // setSearch
+  ] = useState<string>('');
 
   const { screenWidth } = useViewPort();
 
-  const [filterCollection, setFilterCollection] = useState<ICard[]>();
+  // const [filterCollection, setFilterCollection] = useState<ICard[]>();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 

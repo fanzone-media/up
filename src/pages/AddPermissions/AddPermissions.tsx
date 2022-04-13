@@ -31,11 +31,8 @@ type formInput = {
 };
 
 export const AddPermissions: React.FC = () => {
-  const [{ data, error, loading }, getSigner] = useSigner();
-  const [
-    { data: networkData, error: networkError, loading: networkLoading },
-    getNetwork,
-  ] = useNetwork();
+  const [{ data }] = useSigner();
+  const [{ data: networkData }] = useNetwork();
   const [permissionsForm, setpermissionsForm] = useState<formInput>({
     universalProfileAddress: '',
     addressTo: '',
