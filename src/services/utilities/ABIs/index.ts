@@ -4,6 +4,7 @@ import LSP4DigitalCertificateABI from './LSP4DigitalCertificateABI';
 import { UniversalReceiverABI } from './UniversalReceiverABI';
 import { LnsABI } from './LnsABI';
 import { ContractInterface } from 'ethers';
+import { FanzoneClubABI } from './FanzoneClubABI';
 
 export default Object.freeze({
   LSP3AccountABI: LSP3AccountABI,
@@ -11,4 +12,5 @@ export default Object.freeze({
   FactoryContractABI: FactoryContractABI,
   UniversalReceiverABI: UniversalReceiverABI,
   LnsABI: LnsABI,
+  FanzoneClubABI: FanzoneClubABI,
 }) as { [key: string]: ContractInterface };

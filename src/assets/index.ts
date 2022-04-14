@@ -31,6 +31,7 @@ import CategoryPropertyIcon from './category-property-icon.svg';
 import SubzonePropertyIcon from './subzone-property-icon.svg';
 import SetPropertyIcon from './set-property-icon.svg';
 import TeamPropertyIcon from './team-property-icon.svg';
+import FanzoneClubCardsImg from './fanzone-club-cards.png';
 
 export {
   BgMetaCard,
@@ -66,4 +67,5 @@ export {
   SubzonePropertyIcon,
   SetPropertyIcon,
   TeamPropertyIcon,
+  FanzoneClubCardsImg,
 };

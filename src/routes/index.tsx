@@ -3,6 +3,7 @@ import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import NoMatch from '../pages/NoMatch/NoMatch';
 import { CreateName } from '../pages/CreateName';
 import { AddPermissions } from '../pages/AddPermissions';
+import { FanzoneClub } from '../pages/FanzoneClub';
 
 const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
 const LazyProfileDetails = React.lazy(
@@ -17,6 +18,9 @@ const Routes: React.FC = () => {
     <Router>
       <Suspense fallback={<h1>Loading....</h1>}>
         <Switch>
+          <Route exact path="/fanzoneclub">
+            <FanzoneClub />
+          </Route>
           <Route exact path="/addpermissions">
             <AddPermissions />
           </Route>
