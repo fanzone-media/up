@@ -1,7 +1,8 @@
 import { Puff } from 'react-loader-spinner';
 import styled from 'styled-components';
 import { BgMetaCard } from '../../assets';
-import { md, xl } from '../../utility';
+import { Accordion } from '../../components/Accordion';
+import { lg, md, sm, xl } from '../../utility';
 
 export const StyledAssetDetailsContentWrappar = styled.div`
   display: flex;
@@ -27,6 +28,7 @@ export const StyledAssetDetailContent = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+  row-gap: 30px;
 
   @media ${md} {
     max-width: 1440px;
@@ -426,4 +428,76 @@ export const StyledMakeOfferButton = styled(StyledBuyButton)`
   background: rgba(255, 255, 255, 0.2);
 `;
 
-export const StyledCardInfo = styled.div``;
+export const StyledCardInfoAccordion = styled(Accordion)``;
+
+export const StyledCardInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const StyledCardInfoContainer = styled.div`
+  display: flex;
+  width: 100%;
+  margin: auto 0;
+`;
+
+export const StyledCardInfoLabel = styled.p`
+  color: white;
+  opacity: 0.5;
+  width: 50%;
+`;
+
+export const StyledCardInfoValue = styled.p`
+  width: 50%;
+`;
+
+export const StyledCardPropertiesAccordion = styled(Accordion)``;
+
+export const StyledCardProperties = styled.div`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  row-gap: 20px;
+  padding: 20px 0;
+
+  @media ${sm} {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 20px;
+  }
+
+  @media ${md} {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media ${lg} {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
+
+export const StyledCardPropertyContainer = styled.div`
+  display: flex;
+  padding: 15px 20px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  column-gap: 10px;
+`;
+
+export const StyledCardPropertyIconWrapper = styled.div`
+  display: flex;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  height: 50px;
+  width: 50px;
+`;
+
+export const StyledCardPropertyIcon = styled.img`
+  margin: auto;
+`;
+
+export const StyledCardProperty = styled.div``;
+
+export const StyledCardPropertyLabel = styled.p`
+  color: white;
+  opacity: 0.5;
+`;
+
+export const StyledCardPropertyValue = styled.p``;

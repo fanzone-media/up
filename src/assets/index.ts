@@ -23,6 +23,14 @@ import ReloadIcon from './reload-icon.svg';
 import OptionIcon from './option-icon.svg';
 import WethIcon from './weth-icon.png';
 import AccordionToggleIcon from './accordion-toggle-icon.svg';
+import TierPropertyIcon from './tier-property-icon.svg';
+import SeasonPropertyIcon from './season-property-icon.svg';
+import EditionPropertyIcon from './edition-property-icon.svg';
+import ZonePropertyIcon from './zone-property-icon.svg';
+import CategoryPropertyIcon from './category-property-icon.svg';
+import SubzonePropertyIcon from './subzone-property-icon.svg';
+import SetPropertyIcon from './set-property-icon.svg';
+import TeamPropertyIcon from './team-property-icon.svg';
 
 export {
   BgMetaCard,
@@ -50,4 +58,12 @@ export {
   OptionIcon,
   WethIcon,
   AccordionToggleIcon,
+  TierPropertyIcon,
+  SeasonPropertyIcon,
+  ZonePropertyIcon,
+  EditionPropertyIcon,
+  CategoryPropertyIcon,
+  SubzonePropertyIcon,
+  SetPropertyIcon,
+  TeamPropertyIcon,
 };

@@ -5,7 +5,7 @@ export const StyledAccordionWrapper = styled.div<{ $expanded: boolean }>`
   display: flex;
   flex-direction: column;
   padding: 10px;
-  height: ${({ $expanded }) => ($expanded ? 'max-content' : '62px')};
+  height: ${({ $expanded }) => ($expanded ? '100%' : '62px')};
   overflow: hidden;
 
   @media ${md} {

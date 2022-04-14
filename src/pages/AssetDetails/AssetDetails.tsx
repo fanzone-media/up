@@ -1,7 +1,20 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
-import { OptionIcon, ReloadIcon, ShareIcon, WethIcon } from '../../assets';
+import {
+  CategoryPropertyIcon,
+  EditionPropertyIcon,
+  OptionIcon,
+  ReloadIcon,
+  SeasonPropertyIcon,
+  SetPropertyIcon,
+  ShareIcon,
+  SubzonePropertyIcon,
+  TeamPropertyIcon,
+  TierPropertyIcon,
+  WethIcon,
+  ZonePropertyIcon,
+} from '../../assets';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import { fetchCard, selectCardById } from '../../features/cards';
@@ -39,6 +52,18 @@ import {
   StyledActionsButtonWrapper,
   StyledBuyButton,
   StyledMakeOfferButton,
+  StyledCardInfoContainer,
+  StyledCardInfoLabel,
+  StyledCardInfoValue,
+  StyledCardInfoAccordion,
+  StyledCardPropertiesAccordion,
+  StyledCardProperties,
+  StyledCardPropertyIconWrapper,
+  StyledCardPropertyContainer,
+  StyledCardPropertyIcon,
+  StyledCardProperty,
+  StyledCardPropertyLabel,
+  StyledCardPropertyValue,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer } from '../../utility';
@@ -226,16 +251,62 @@ const AssetDetails: React.FC = () => {
   );
 
   const metaCardInfo = [
-    { text: 'Name', data: asset?.name.split('•')[0] },
-    { text: 'Card Type', data: asset?.ls8MetaData.cardType },
-    { text: 'Rarity', data: asset?.ls8MetaData.tierLabel },
-    { text: 'Edition', data: asset?.ls8MetaData.edition },
-    { text: 'Category', data: asset?.ls8MetaData.editionCategory },
-    { text: 'Set', data: asset?.ls8MetaData.editionSet },
-    { text: 'Season', data: asset?.ls8MetaData.season },
-    { text: 'Zone', data: asset?.ls8MetaData.zoneLabel },
-    { text: 'League', data: asset?.ls8MetaData.leagueLabel },
-    { text: 'Team', data: asset?.ls8MetaData.teamLabel },
+    // { text: 'Name', data: asset?.name.split('•')[0] },
+    // { text: 'Card Type', data: asset?.ls8MetaData.cardType },
+    {
+      label: 'Tier',
+      value: asset?.ls8MetaData.tierLabel,
+      icon: TierPropertyIcon,
+    },
+    {
+      label: 'Edition',
+      value: asset?.ls8MetaData.edition,
+      icon: EditionPropertyIcon,
+    },
+    {
+      label: 'Category',
+      value: asset?.ls8MetaData.editionCategory,
+      icon: CategoryPropertyIcon,
+    },
+    {
+      label: 'Set',
+      value: asset?.ls8MetaData.editionSet,
+      icon: SetPropertyIcon,
+    },
+    {
+      label: 'Season',
+      value: asset?.ls8MetaData.season,
+      icon: SeasonPropertyIcon,
+    },
+    {
+      label: 'Zone',
+      value: asset?.ls8MetaData.zoneLabel,
+      icon: ZonePropertyIcon,
+    },
+    {
+      label: 'League',
+      value: asset?.ls8MetaData.leagueLabel,
+      icon: SubzonePropertyIcon,
+    },
+    {
+      label: 'Team',
+      value: asset?.ls8MetaData.teamLabel,
+      icon: TeamPropertyIcon,
+    },
+  ];
+
+  const cardInfo: { label: string; value: string; valueType?: string }[] = [
+    {
+      label: 'Contract Address',
+      value: asset ? asset.address : '',
+      valueType: 'address',
+    },
+    { label: 'Mint', value: '' },
+    { label: 'Total amount of Tokens', value: '' },
+    { label: 'Token Standard', value: '' },
+    { label: 'Network', value: asset ? asset.network : '' },
+    { label: 'Score', value: '' },
+    { label: 'Current owner', value: '', valueType: 'address' },
   ];
 
   // const renderCardProperties = useMemo(() => {
@@ -314,11 +385,46 @@ const AssetDetails: React.FC = () => {
                       <StyledMakeOfferButton>Make offer</StyledMakeOfferButton>
                     </StyledActionsButtonWrapper>
                   </StyledCardPriceWrapper>
-                  <Accordion title="Card Info" enableToggle>
-                    <StyledCardInfo></StyledCardInfo>
-                  </Accordion>
+                  <StyledCardInfoAccordion title="Card Info" enableToggle>
+                    <StyledCardInfo>
+                      {cardInfo.map((item) => (
+                        <StyledCardInfoContainer key={item.label}>
+                          <StyledCardInfoLabel>
+                            {item.label}
+                          </StyledCardInfoLabel>
+                          <StyledCardInfoValue>
+                            {item.valueType === 'address'
+                              ? `${item.value.slice(0, 8)}...${item.value.slice(
+                                  item.value.length - 4,
+                                  item.value.length,
+                                )}`
+                              : item.value}
+                          </StyledCardInfoValue>
+                        </StyledCardInfoContainer>
+                      ))}
+                    </StyledCardInfo>
+                  </StyledCardInfoAccordion>
                 </StyledCardInfoWrapper>
               </StyledCardMainDetails>
+              <StyledCardPropertiesAccordion title="Details" enableToggle>
+                <StyledCardProperties>
+                  {metaCardInfo.map((item) => (
+                    <StyledCardPropertyContainer>
+                      <StyledCardPropertyIconWrapper>
+                        <StyledCardPropertyIcon src={item.icon} alt="" />
+                      </StyledCardPropertyIconWrapper>
+                      <StyledCardProperty>
+                        <StyledCardPropertyLabel>
+                          {item.label}
+                        </StyledCardPropertyLabel>
+                        <StyledCardPropertyValue>
+                          {item.value}
+                        </StyledCardPropertyValue>
+                      </StyledCardProperty>
+                    </StyledCardPropertyContainer>
+                  ))}
+                </StyledCardProperties>
+              </StyledCardPropertiesAccordion>
               {/* <StyledGrid>
                 <StyledAssetDetailGrid>
                   <StyledMediaWrappar>

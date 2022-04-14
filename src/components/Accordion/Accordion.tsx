@@ -35,7 +35,7 @@ export const Accordion: React.FC<IProps> = ({
           </StyledAccordionToggleButton>
         )}
       </StyledAccordionHeader>
-      {children}
+      {expand && children}
     </StyledAccordionWrapper>
   );
 };
