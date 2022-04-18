@@ -501,3 +501,5 @@ export const StyledCardPropertyLabel = styled.p`
 `;
 
 export const StyledCardPropertyValue = styled.p``;
+
+export const StyledHoldersAccordion = styled(Accordion)``;

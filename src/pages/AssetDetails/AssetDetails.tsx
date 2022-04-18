@@ -64,6 +64,7 @@ import {
   StyledCardProperty,
   StyledCardPropertyLabel,
   StyledCardPropertyValue,
+  StyledHoldersAccordion,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer } from '../../utility';
@@ -71,6 +72,7 @@ import ReactTooltip from 'react-tooltip';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 import { useSigner } from 'wagmi';
 import { Accordion } from '../../components/Accordion';
+import { HolderPagination } from './HoldersPagination';
 
 interface IPrams {
   add: string;
@@ -95,14 +97,6 @@ const AssetDetails: React.FC = () => {
       asset?.owner ? asset.owner : '',
     ),
   );
-
-  const holders = useSelector((state: RootState) => {
-    return selectAllUsersItems(state.userData[params.network]);
-  })?.filter((item) => {
-    return asset?.holders.some((i) => {
-      return i === item.address && item.network === params.network;
-    });
-  });
 
   const creators = useSelector((state: RootState) =>
     selectAllUsersItems(state.userData[params.network]),
@@ -146,33 +140,33 @@ const AssetDetails: React.FC = () => {
     }
   }, [asset, dispatch, params.add, params.network]);
 
-  useMemo(() => {
-    let addresses: string[] = [];
-    asset?.holders.forEach((item) => {
-      if (!profiles?.includes(item)) {
-        addresses.push(item);
-      }
-    });
-    if (addresses.length > 0) {
-      dispatch(
-        fetchAssetHolders({ address: addresses, network: params.network }),
-      );
-    }
-  }, [asset?.holders, dispatch, params.network, profiles]);
+  // useMemo(() => {
+  //   let addresses: string[] = [];
+  //   asset?.holders.forEach((item) => {
+  //     if (!profiles?.includes(item)) {
+  //       addresses.push(item);
+  //     }
+  //   });
+  //   if (addresses.length > 0) {
+  //     dispatch(
+  //       fetchAssetHolders({ address: addresses, network: params.network }),
+  //     );
+  //   }
+  // }, [asset?.holders, dispatch, params.network, profiles]);
 
-  useMemo(() => {
-    let addresses: string[] = [];
-    asset?.creators.forEach((item) => {
-      if (!profiles?.includes(item)) {
-        addresses.push(item);
-      }
-    });
-    if (addresses.length > 0) {
-      dispatch(
-        fetchAssetCreator({ address: addresses, network: params.network }),
-      );
-    }
-  }, [asset?.creators, dispatch, params.network, profiles]);
+  // useMemo(() => {
+  //   let addresses: string[] = [];
+  //   asset?.creators.forEach((item) => {
+  //     if (!profiles?.includes(item)) {
+  //       addresses.push(item);
+  //     }
+  //   });
+  //   if (addresses.length > 0) {
+  //     dispatch(
+  //       fetchAssetCreator({ address: addresses, network: params.network }),
+  //     );
+  //   }
+  // }, [asset?.creators, dispatch, params.network, profiles]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -226,33 +220,12 @@ const AssetDetails: React.FC = () => {
     [creators, params.add],
   );
 
-  const renderHolders = useMemo(
-    () =>
-      holders?.map((holder: IProfile) => {
-        const findBalanceOf = holder.ownedAssets.find(
-          (item) => item.assetAddress === params.add.toLowerCase(),
-        );
-        return (
-          <React.Fragment key={holder.address}>
-            <ProfileCard
-              userProfile={holder}
-              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-              type="holder"
-              tooltipId="holderTooltip"
-            />
-            <ReactTooltip
-              id="holderTooltip"
-              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-            ></ReactTooltip>
-          </React.Fragment>
-        );
-      }),
-    [holders, params.add],
+  const renderHolderPagination = useMemo(
+    () => <HolderPagination holdersAddresses={asset ? asset.holders : []} />,
+    [asset],
   );
 
   const metaCardInfo = [
-    // { text: 'Name', data: asset?.name.split('•')[0] },
-    // { text: 'Card Type', data: asset?.ls8MetaData.cardType },
     {
       label: 'Tier',
       value: asset?.ls8MetaData.tierLabel,
@@ -409,7 +382,7 @@ const AssetDetails: React.FC = () => {
               <StyledCardPropertiesAccordion title="Details" enableToggle>
                 <StyledCardProperties>
                   {metaCardInfo.map((item) => (
-                    <StyledCardPropertyContainer>
+                    <StyledCardPropertyContainer key={item.label}>
                       <StyledCardPropertyIconWrapper>
                         <StyledCardPropertyIcon src={item.icon} alt="" />
                       </StyledCardPropertyIconWrapper>
@@ -425,6 +398,9 @@ const AssetDetails: React.FC = () => {
                   ))}
                 </StyledCardProperties>
               </StyledCardPropertiesAccordion>
+              <StyledHoldersAccordion title="Other Holders" enableToggle>
+                {renderHolderPagination}
+              </StyledHoldersAccordion>
               {/* <StyledGrid>
                 <StyledAssetDetailGrid>
                   <StyledMediaWrappar>
