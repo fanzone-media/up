@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { MetaCard } from '../cards/MetaCard';
 import { ICard, IProfile } from '../../services/models';
@@ -27,6 +27,7 @@ import {
 } from '../cards';
 import { useSelector } from 'react-redux';
 import { STATUS } from '../../utility';
+import { useViewPort } from '../../hooks/useViewPort';
 
 interface IPagination {
   type: string;
@@ -40,22 +41,6 @@ interface IParams {
   add: string;
   network: NetworkName;
 }
-
-const useViewPort = () => {
-  const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth);
-
-  useEffect(() => {
-    const handleSize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
-    window.addEventListener('resize', handleSize);
-
-    return () => window.removeEventListener('resize', handleSize);
-  }, []);
-
-  return { screenWidth };
-};
 
 const Pagination: React.FC<IPagination> = ({
   type,
