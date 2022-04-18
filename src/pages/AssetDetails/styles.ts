@@ -28,13 +28,14 @@ export const StyledAssetDetailContent = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  row-gap: 30px;
+  row-gap: 5px;
 
   @media ${md} {
     max-width: 1440px;
     margin-left: auto;
     margin-right: auto;
     padding: 48px 40px 0 40px;
+    row-gap: 30px;
   }
 
   @media ${xl} {
@@ -433,6 +434,7 @@ export const StyledCardInfoAccordion = styled(Accordion)``;
 export const StyledCardInfo = styled.div`
   display: flex;
   flex-direction: column;
+  height: 100%;
 `;
 
 export const StyledCardInfoContainer = styled.div`

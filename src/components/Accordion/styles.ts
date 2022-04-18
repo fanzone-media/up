@@ -22,9 +22,13 @@ export const StyledAccordionWrapper = styled.div<{ $expanded: boolean }>`
 
 export const StyledAccordionHeader = styled.div<{ $expanded: boolean }>`
   display: flex;
-  border-bottom: ${({ $expanded }) =>
-    $expanded ? '1px solid rgba(223, 223, 223, 0.2)' : 'none'};
+  border-bottom: 1px solid rgba(223, 223, 223, 0.2);
   height: 40px;
+
+  @media ${md} {
+    border-bottom: ${({ $expanded }) =>
+      $expanded ? '1px solid rgba(223, 223, 223, 0.2)' : 'none'};
+  }
 `;
 
 export const StyledAccordionTitle = styled.h3`
