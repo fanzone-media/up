@@ -32,6 +32,8 @@ import SubzonePropertyIcon from './subzone-property-icon.svg';
 import SetPropertyIcon from './set-property-icon.svg';
 import TeamPropertyIcon from './team-property-icon.svg';
 import FanzoneClubCardsImg from './fanzone-club-cards.png';
+import ForwardsIcon from './forwards-button-icon.svg';
+import BackwardsIcon from './backwards-button-icon.svg';
 
 export {
   BgMetaCard,
@@ -68,4 +70,6 @@ export {
   SetPropertyIcon,
   TeamPropertyIcon,
   FanzoneClubCardsImg,
+  ForwardsIcon,
+  BackwardsIcon,
 };

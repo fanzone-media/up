@@ -35,13 +35,14 @@ const fetchCard = async (
       contract.totalSupply(),
       contract.owner(),
       contract.allTokenHolders(),
-      contract.getData([KeyChain.LSP4Metadata]),
+      contract.tokenURI(0),
     ]);
 
+  console.log(hashedUrl);
   if (!hashedUrl) {
     throw new Error('No card data');
   }
-  const result = await getLSP4Metadata(hashedUrl[0]);
+  const result = await getLSP4Metadata(hashedUrl);
   let creators: string[] = [];
   await LSP3ProfileApi.fetchCreatorsAddresses(address, network)
     .then((result) => {

@@ -48,7 +48,11 @@ import {
 } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
-import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
+import {
+  currentProfile,
+  fetchProfileByAddress,
+  selectUserById,
+} from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 import { useAccount, useSigner } from 'wagmi';
 import { ProfileEditModal } from './ProfileEditModal';
@@ -62,6 +66,7 @@ interface IParams {
 const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
+
   const [{ data }] = useAccount();
   const [{ data: signer }] = useSigner();
   const [openEditProfileModal, setOpenEditProfileModal] =
@@ -121,6 +126,7 @@ const ProfileDetails: React.FC = () => {
   };
 
   useEffect(() => {
+    dispatch(currentProfile(params.add));
     if (!profile)
       dispatch(
         fetchProfileByAddress({ address: params.add, network: params.network }),

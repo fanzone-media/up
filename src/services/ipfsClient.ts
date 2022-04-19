@@ -28,8 +28,8 @@ export const getLSP3ProfileData = async (hashedUrl: string) => {
 export const getLSP4Metadata = async (
   hashedUrl: string,
 ): Promise<ILSP8MetaData> => {
-  const ipfsPath = getIpfsPath(hashedUrl);
-  const result = await axios.get(url + ipfsPath);
+  //const ipfsPath = getIpfsPath(hashedUrl);
+  const result = await axios.get(url + hashedUrl.replace('ipfs://', ''));
   return result.data as ILSP8MetaData;
 };
 

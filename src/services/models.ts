@@ -19,7 +19,6 @@ interface ILSP4Metadata {
 }
 
 export interface StringTrait {
-  display_type: 'string';
   trait_type: string;
   value: string;
 }

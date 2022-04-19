@@ -2,6 +2,7 @@ import {
   createAsyncThunk,
   createEntityAdapter,
   createSlice,
+  PayloadAction,
 } from '@reduxjs/toolkit';
 import { NetworkName, ThunkExtra } from '../../boot/types';
 import { IProfile } from '../../services/models';
@@ -19,6 +20,7 @@ const usersAdapter = createEntityAdapter<IProfile>({
 });
 
 const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
+  me: null,
   status: STATUS.IDLE,
   holderStatus: STATUS.IDLE,
   creatorStatus: STATUS.IDLE,
@@ -113,21 +115,12 @@ const userDataSlice = createSlice({
   name: 'userData',
   initialState,
   reducers: {
-    // Example
-    anyEvent: {
-      reducer(_state, _action) {
-        // some mutation
-      },
-      prepare() {
-        // do something before calling the reducer
-        return {
-          meta: undefined,
-          error: null,
-          payload: null,
-        };
-      },
+    currentProfile: (state, action: PayloadAction<string>) => {
+      return {
+        ...state,
+        me: action.payload,
+      };
     },
-    // Example-End
   },
   extraReducers: (builder) => {
     builder
@@ -213,4 +206,4 @@ export const {
  * ************
  */
 
-export const { anyEvent } = userDataSlice.actions;
+export const { currentProfile } = userDataSlice.actions;

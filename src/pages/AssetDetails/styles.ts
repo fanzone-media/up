@@ -2,6 +2,7 @@ import { Puff } from 'react-loader-spinner';
 import styled from 'styled-components';
 import { BgMetaCard } from '../../assets';
 import { Accordion } from '../../components/Accordion';
+import { pulseAnimate } from '../../features/cards/MetaCard/styles';
 import { lg, md, sm, xl } from '../../utility';
 
 export const StyledAssetDetailsContentWrappar = styled.div`
@@ -113,14 +114,15 @@ export const StyledAssetDetailContent = styled.div`
 //   animation: ${pulseAnimate} 2s ease-in-out infinite;
 // `;
 
-// export const StyledBlockScoutIcon = styled.img`
-//   position: absolute;
-//   width: 44px;
-//   height: 44px;
-//   bottom: 5%;
-//   right: 10%;
-//   animation: ${pulseAnimate} 2s ease-in-out infinite;
-// `;
+export const StyledExplorerIcon = styled.img`
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  bottom: 0;
+  left: 0;
+  margin: 0 0 20px 20px;
+  animation: ${pulseAnimate} 2s ease-in-out infinite;
+`;
 
 // export const StyledDetailsWrappar = styled.div`
 //   display: flex;
@@ -312,6 +314,7 @@ export const StyledCardMainDetails = styled.div`
 `;
 
 export const StyledMediaWrapper = styled.div`
+  position: relative;
   display: flex;
   background: url(${BgMetaCard});
   background-position: center;
@@ -330,6 +333,28 @@ export const StyledMediaWrapper = styled.div`
 
 export const StyledMedia = styled.img`
   width: 230px;
+  margin: auto;
+`;
+
+export const StyledMintControls = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: max-content;
+  display: flex;
+  column-gap: 20px;
+  margin: 0 20px 20px 0;
+`;
+
+export const StyledMintSkipButton = styled.button`
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 100%;
+  height: 40px;
+  width: 40px;
+  display: flex;
+`;
+
+export const StyledMintSkipButtonImg = styled.img`
   margin: auto;
 `;
 
@@ -503,5 +528,7 @@ export const StyledCardPropertyLabel = styled.p`
 `;
 
 export const StyledCardPropertyValue = styled.p``;
+
+export const StyledMarketAccordion = styled(Accordion)``;
 
 export const StyledHoldersAccordion = styled(Accordion)``;

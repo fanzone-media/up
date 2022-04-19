@@ -3,6 +3,7 @@ import { IProfile } from '../../../services/models';
 import { STATUS } from '../../../utility';
 
 interface IBaseState {
+  me: string | null;
   status: STATUS;
   holderStatus: STATUS;
   creatorStatus: STATUS;

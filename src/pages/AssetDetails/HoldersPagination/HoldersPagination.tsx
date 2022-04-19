@@ -46,26 +46,26 @@ export const HolderPagination = ({ holdersAddresses }: IProps) => {
   const { pageCount, limit } = useMemo(() => {
     if (screenWidth > 1280) {
       return {
+        pageCount: Math.ceil(holdersAddresses.length / 12),
+        limit: 12,
+      };
+    }
+    if (screenWidth > 1024) {
+      return {
         pageCount: Math.ceil(holdersAddresses.length / 10),
         limit: 10,
       };
     }
-    if (screenWidth > 1024) {
+    if (screenWidth > 768) {
       return {
         pageCount: Math.ceil(holdersAddresses.length / 8),
         limit: 8,
       };
     }
-    if (screenWidth > 768) {
-      return {
-        pageCount: Math.ceil(holdersAddresses.length / 6),
-        limit: 6,
-      };
-    }
 
     return {
-      pageCount: Math.ceil(holdersAddresses.length / 4),
-      limit: 4,
+      pageCount: Math.ceil(holdersAddresses.length / 6),
+      limit: 6,
     };
   }, [holdersAddresses.length, screenWidth]);
 

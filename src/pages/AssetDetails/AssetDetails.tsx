@@ -2,8 +2,10 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import {
+  BackwardsIcon,
   CategoryPropertyIcon,
   EditionPropertyIcon,
+  ForwardsIcon,
   OptionIcon,
   ReloadIcon,
   SeasonPropertyIcon,
@@ -65,9 +67,14 @@ import {
   StyledCardPropertyLabel,
   StyledCardPropertyValue,
   StyledHoldersAccordion,
+  StyledMarketAccordion,
+  StyledMintControls,
+  StyledMintSkipButton,
+  StyledMintSkipButtonImg,
+  StyledExplorerIcon,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
-import { getChainExplorer } from '../../utility';
+import { getChainExplorer, STATUS } from '../../utility';
 import ReactTooltip from 'react-tooltip';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 import { useSigner } from 'wagmi';
@@ -82,6 +89,8 @@ interface IPrams {
 
 const AssetDetails: React.FC = () => {
   const params = useParams<IPrams>();
+
+  const explorer = getChainExplorer(params.network);
 
   const profiles = useSelector((state: RootState) =>
     selectUserIds(state.userData[params.network]),
@@ -134,12 +143,6 @@ const AssetDetails: React.FC = () => {
     }
   }, [asset, dispatch, owner, params.network]);
 
-  useMemo(() => {
-    if (!asset) {
-      dispatch(fetchCard({ address: params.add, network: params.network }));
-    }
-  }, [asset, dispatch, params.add, params.network]);
-
   // useMemo(() => {
   //   let addresses: string[] = [];
   //   asset?.holders.forEach((item) => {
@@ -169,8 +172,11 @@ const AssetDetails: React.FC = () => {
   // }, [asset?.creators, dispatch, params.network, profiles]);
 
   useEffect(() => {
+    if (!asset && cardStatus !== STATUS.LOADING) {
+      dispatch(fetchCard({ address: params.add, network: params.network }));
+    }
     window.scrollTo(0, 0);
-  }, [params.add, params.network]);
+  }, [asset, cardStatus, dispatch, params.add, params.network]);
 
   const renderOwner = useMemo(() => {
     if (asset?.address === params.add) {
@@ -225,57 +231,32 @@ const AssetDetails: React.FC = () => {
     [asset],
   );
 
-  const metaCardInfo = [
-    {
-      label: 'Tier',
-      value: asset?.ls8MetaData.tierLabel,
-      icon: TierPropertyIcon,
-    },
-    {
-      label: 'Edition',
-      value: asset?.ls8MetaData.edition,
-      icon: EditionPropertyIcon,
-    },
-    {
-      label: 'Category',
-      value: asset?.ls8MetaData.editionCategory,
-      icon: CategoryPropertyIcon,
-    },
-    {
-      label: 'Set',
-      value: asset?.ls8MetaData.editionSet,
-      icon: SetPropertyIcon,
-    },
-    {
-      label: 'Season',
-      value: asset?.ls8MetaData.season,
-      icon: SeasonPropertyIcon,
-    },
-    {
-      label: 'Zone',
-      value: asset?.ls8MetaData.zoneLabel,
-      icon: ZonePropertyIcon,
-    },
-    {
-      label: 'League',
-      value: asset?.ls8MetaData.leagueLabel,
-      icon: SubzonePropertyIcon,
-    },
-    {
-      label: 'Team',
-      value: asset?.ls8MetaData.teamLabel,
-      icon: TeamPropertyIcon,
-    },
-  ];
+  const propertiesImages: { [key: string]: string } = {
+    Tier: TierPropertyIcon,
+    Edition: EditionPropertyIcon,
+    'Edition Category': CategoryPropertyIcon,
+    'Edition Set': SetPropertyIcon,
+    Season: SeasonPropertyIcon,
+    Zone: ZonePropertyIcon,
+    League: SubzonePropertyIcon,
+    Team: TeamPropertyIcon,
+  };
 
-  const cardInfo: { label: string; value: string; valueType?: string }[] = [
+  const cardInfo: {
+    label: string;
+    value: string;
+    valueType?: string;
+  }[] = [
     {
       label: 'Contract Address',
       value: asset ? asset.address : '',
       valueType: 'address',
     },
     { label: 'Mint', value: '' },
-    { label: 'Total amount of Tokens', value: '' },
+    {
+      label: 'Total amount of Tokens',
+      value: asset ? asset.totalSupply.toString() : '',
+    },
     { label: 'Token Standard', value: '' },
     { label: 'Network', value: asset ? asset.network : '' },
     { label: 'Score', value: '' },
@@ -330,6 +311,21 @@ const AssetDetails: React.FC = () => {
               <StyledCardMainDetails>
                 <StyledMediaWrapper>
                   <StyledMedia src={asset?.ls8MetaData.image} alt="" />
+                  <a
+                    href={explorer && explorer.exploreUrl + asset?.address}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <StyledExplorerIcon src={explorer?.icon} alt="" />
+                  </a>
+                  <StyledMintControls>
+                    <StyledMintSkipButton>
+                      <StyledMintSkipButtonImg src={BackwardsIcon} alt="" />
+                    </StyledMintSkipButton>
+                    <StyledMintSkipButton>
+                      <StyledMintSkipButtonImg src={ForwardsIcon} alt="" />
+                    </StyledMintSkipButton>
+                  </StyledMintControls>
                 </StyledMediaWrapper>
                 <StyledCardInfoWrapper>
                   <StyledCardPriceWrapper>
@@ -381,7 +377,7 @@ const AssetDetails: React.FC = () => {
               </StyledCardMainDetails>
               <StyledCardPropertiesAccordion title="Details" enableToggle>
                 <StyledCardProperties>
-                  {metaCardInfo.map((item) => (
+                  {/* {metaCardInfo.map((item) => (
                     <StyledCardPropertyContainer key={item.label}>
                       <StyledCardPropertyIconWrapper>
                         <StyledCardPropertyIcon src={item.icon} alt="" />
@@ -395,9 +391,35 @@ const AssetDetails: React.FC = () => {
                         </StyledCardPropertyValue>
                       </StyledCardProperty>
                     </StyledCardPropertyContainer>
-                  ))}
+                  ))} */}
+                  {asset?.ls8MetaData.attributes.map((item) => {
+                    if ('trait_type' in item) {
+                      return (
+                        <StyledCardPropertyContainer key={item.trait_type}>
+                          <StyledCardPropertyIconWrapper>
+                            <StyledCardPropertyIcon
+                              src={propertiesImages[item.trait_type]}
+                              alt=""
+                            />
+                          </StyledCardPropertyIconWrapper>
+                          <StyledCardProperty>
+                            <StyledCardPropertyLabel>
+                              {item.trait_type}
+                            </StyledCardPropertyLabel>
+                            <StyledCardPropertyValue>
+                              {item.value}
+                            </StyledCardPropertyValue>
+                          </StyledCardProperty>
+                        </StyledCardPropertyContainer>
+                      );
+                    }
+                    return null;
+                  })}
                 </StyledCardProperties>
               </StyledCardPropertiesAccordion>
+              <StyledMarketAccordion title="Market" enableToggle>
+                <p>Market in progress...</p>
+              </StyledMarketAccordion>
               <StyledHoldersAccordion title="Other Holders" enableToggle>
                 {renderHolderPagination}
               </StyledHoldersAccordion>
