@@ -28,10 +28,10 @@ export const FanzoneClubTest: FC = () => {
   });
   const [priceInEth, setPriceInEth] = useState<BigNumberish>(0);
   const [formInput, setFormInput] = useState<{
-    maticAmount: number;
+    maticAmount: BigNumber;
     amount: number;
   }>({
-    maticAmount: 0,
+    maticAmount: BigNumber.from(0),
     amount: 1,
   });
   const [error, setError] = useState<string>();
@@ -68,18 +68,15 @@ export const FanzoneClubTest: FC = () => {
   useEffect(() => {
     (async () => {
       if (!fanzoneClubContract || !validConnection) return;
-      const priceInGwei: BigNumber = await fanzoneClubContract.price();
 
       setFormInput({
         ...formInput,
-        maticAmount: parseInt(ethers.utils.formatEther(priceInGwei.mul(1e9))),
+        maticAmount: await fanzoneClubContract.price(),
       });
     })();
     // Adding formInput to the dependencies array will end up in an infinit loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fanzoneClubContract, validConnection]);
-
-  console.log(validConnection);
 
   return (
     <StyledFanzoneClubPage>
@@ -98,7 +95,10 @@ export const FanzoneClubTest: FC = () => {
       {error !== '' && <StyledErrorMessage>{error}</StyledErrorMessage>}
       <StyledInputWrapper>
         <StyledInputLabel>
-          Amount in Matic: {formInput.maticAmount}
+          Amount in Matic:{' '}
+          {parseFloat(ethers.utils.formatEther(formInput.maticAmount)).toFixed(
+            7,
+          )}
         </StyledInputLabel>
         {/* <StyledInput
           name="maticAmount"
