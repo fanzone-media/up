@@ -4,6 +4,7 @@ import NoMatch from '../pages/NoMatch/NoMatch';
 import { CreateName } from '../pages/CreateName';
 import { AddPermissions } from '../pages/AddPermissions';
 import { FanzoneClub } from '../pages/FanzoneClub';
+import { FanzoneClubTest } from '../pages/FanzoneClubTest';
 
 const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
 const LazyProfileDetails = React.lazy(
@@ -20,6 +21,9 @@ const Routes: React.FC = () => {
         <Switch>
           <Route exact path="/fanzoneclub">
             <FanzoneClub />
+          </Route>
+          <Route exact path="/test/fanzoneclub">
+            <FanzoneClubTest />
           </Route>
           <Route exact path="/addpermissions">
             <AddPermissions />
