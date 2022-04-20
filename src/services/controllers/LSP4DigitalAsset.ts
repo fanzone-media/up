@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import KeyChain from '../utilities/KeyChain';
 import { NetworkName } from '../../boot/types';
-import { ICard } from '../models';
+import { ICard, ILSP8MetaData } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
-import { ethers } from 'ethers';
+import { BigNumberish, ethers } from 'ethers';
 import {
   CardTokenProxy__factory,
+  LSP8Metadata,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import Utils from '../utilities/util';
@@ -57,10 +58,12 @@ const fetchCard = async (
     symbol,
     totalSupply: ethers.BigNumber.from(totalSupply).toNumber(),
     ls8MetaData: {
-      ...result,
-      image: result.image.startsWith('ipfs://')
-        ? Utils.convertImageURL(result.image)
-        : result.image,
+      '0': {
+        ...result,
+        image: result.image.startsWith('ipfs://')
+          ? Utils.convertImageURL(result.image)
+          : result.image,
+      },
     },
     owner,
     holders: holders.map((holder: string) => `0x${holder.slice(26)}`),
@@ -88,6 +91,27 @@ const fetchAllCards = async (
     }),
   );
   return assets;
+};
+
+const fetchMetaDataForTokenID = async (
+  assetAddress: string,
+  tokenId: BigNumberish,
+  network: string,
+): Promise<ILSP8MetaData> => {
+  const provider = useRpcProvider(network);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  await contract
+    .supportsInterface('0x49399145')
+    .then((result) => {
+      if (result === false) throw new Error('Not an lsp8 asset');
+    })
+    .catch(() => {
+      throw new Error('Not an lsp8 asset');
+    });
+  const tokenUri = await contract.tokenURI(tokenId);
+  const metaData = await getLSP4Metadata(tokenUri);
+
+  return metaData;
 };
 
 const fetchProfileIssuedAssetsAddresses = async (
@@ -205,4 +229,5 @@ export const LSP4DigitalAssetApi = {
   fetchAllCards,
   getTokenSale,
   sellCard,
+  fetchMetaDataForTokenID,
 };

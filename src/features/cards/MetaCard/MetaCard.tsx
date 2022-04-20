@@ -80,7 +80,7 @@ export const MetaCard: React.FC<IProps> = ({
       </a>
       <Link to={`/${params.network}/asset/` + digitalCard.address}>
         <StyledMediaWrappar>
-          <StyledMetaCardImg src={digitalCard.ls8MetaData.image} alt="" />
+          <StyledMetaCardImg src={digitalCard.ls8MetaData[0].image} alt="" />
         </StyledMediaWrappar>
         <StyledCardDetail>
           <StyledCardName>{digitalCard.name.split('•')[0]}</StyledCardName>

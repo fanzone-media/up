@@ -3,8 +3,9 @@ import {
   createEntityAdapter,
   createSlice,
 } from '@reduxjs/toolkit';
+import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
-import { ICard } from '../../services/models';
+import { ICard, ILSP8MetaData } from '../../services/models';
 import { STATUS } from '../../utility';
 import { ICardItemsState, ICardState } from './types';
 
@@ -77,6 +78,29 @@ export const fetchOwnedCards = createAsyncThunk<
   async ({ network, addresses }, { extra: { api } }) => {
     const res = await api.cards.fetchAllCards(network, addresses);
     return res as ICard[];
+  },
+);
+
+export const fetchMetaDataForTokenId = createAsyncThunk<
+  ICard,
+  { assetAddress: string; tokenId: BigNumberish; network: NetworkName },
+  { state: RootState; extra: ThunkExtra }
+>(
+  'cards/fetchMetaDataForTokenId',
+  async ({ assetAddress, tokenId, network }, { extra: { api }, getState }) => {
+    const res = await api.cards.fetchMetaDataForTokenID(
+      assetAddress,
+      tokenId,
+      network,
+    );
+    const state: RootState = getState();
+    return {
+      ...state.cards.entities[assetAddress],
+      ls8MetaData: {
+        ...state.cards.entities[assetAddress]?.ls8MetaData,
+        [`${tokenId}`]: res,
+      },
+    } as ICard;
   },
 );
 
@@ -154,6 +178,19 @@ const cardsSlice = createSlice({
       .addCase(fetchOwnedCards.rejected, (state, action) => {
         state.ownedError = action.error;
         state.ownedStatus = STATUS.FAILED;
+      });
+    builder
+      .addCase(fetchMetaDataForTokenId.pending, (state, _action) => {
+        state.status = STATUS.LOADING;
+      })
+      .addCase(fetchMetaDataForTokenId.fulfilled, (state, action) => {
+        if (action.payload)
+          cardsAdapter.upsertOne(state, action.payload as ICard);
+        state.status = STATUS.IDLE;
+      })
+      .addCase(fetchMetaDataForTokenId.rejected, (state, action) => {
+        state.error = action.error;
+        state.status = STATUS.FAILED;
       });
   },
 });

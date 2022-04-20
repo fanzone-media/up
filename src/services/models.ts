@@ -43,6 +43,7 @@ export type OpenseaAttribute =
   | DateTrait
   | GenericProperty;
 export interface ILSP8MetaData {
+  tokenId: number;
   batch: string;
   batchMax: string;
   cardType: string;
@@ -76,7 +77,9 @@ export interface ICard {
   totalSupply: number;
   holders: string[];
   creators: string[];
-  ls8MetaData: ILSP8MetaData;
+  ls8MetaData: {
+    [key: string]: ILSP8MetaData;
+  };
 }
 
 export interface IProfile {
