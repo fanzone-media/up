@@ -1,5 +1,4 @@
 const { MerkleTree } = require('merkletreejs')
-const SHA256 = require('crypto-js/sha256');
 const keccak256 = require('keccak256');
 //const { sha256 } = require('@ethersproject/sha2');
 
