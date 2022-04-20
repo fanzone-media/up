@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useCallback } from 'react';
+import { FC, useState, useEffect, useCallback, useMemo } from 'react';
 import { BigNumber, BigNumberish, ethers } from 'ethers';
 import {
   useAccount,
@@ -106,14 +106,16 @@ export const FanzoneClubTest: FC = () => {
     });
   };
 
-  const validConnection = useCallback(
+  const validConnection = useMemo(
     () =>
-      isValidConnection(
-        connectData.connected,
-        network.chain?.id || 0,
-        validChainIds,
-      ),
-    [connectData.connected, network.chain?.id],
+      network.chain
+        ? isValidConnection(
+            connectData.connected,
+            network.chain.id,
+            validChainIds,
+          )
+        : false,
+    [connectData.connected, network.chain],
   );
 
   useEffect(() => {
