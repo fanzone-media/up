@@ -8,6 +8,8 @@ export enum STATUS {
   FAILED = 'failed',
 }
 
+export const xs = '(min-width: 480px)';
+
 export const sm = '(min-width: 640px)';
 
 export const md = '(min-width: 768px)';

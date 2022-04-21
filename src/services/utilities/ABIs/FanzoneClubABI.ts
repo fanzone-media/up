@@ -42,12 +42,7 @@ export const FanzoneClubABI: ContractInterface = [
         name: 'operator',
         type: 'address',
       },
-      {
-        indexed: false,
-        internalType: 'bool',
-        name: 'approved',
-        type: 'bool',
-      },
+      { indexed: false, internalType: 'bool', name: 'approved', type: 'bool' },
     ],
     name: 'ApprovalForAll',
     type: 'event',
@@ -74,12 +69,7 @@ export const FanzoneClubABI: ContractInterface = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
+      { indexed: true, internalType: 'address', name: 'from', type: 'address' },
       { indexed: true, internalType: 'address', name: 'to', type: 'address' },
       {
         indexed: true,

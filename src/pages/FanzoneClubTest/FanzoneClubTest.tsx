@@ -1,19 +1,32 @@
 import { FC, useState, useEffect, useCallback } from 'react';
-import { BigNumber, BigNumberish, ethers } from 'ethers';
-import { useConnect, useContract, useNetwork, useSigner } from 'wagmi';
+import { BigNumber, ethers } from 'ethers';
+import {
+  useAccount,
+  useConnect,
+  useContract,
+  useNetwork,
+  useSigner,
+} from 'wagmi';
 import { FanzoneClubCardsImg } from '../../assets';
 import { FanzoneClubABI } from '../../services/utilities/ABIs/FanzoneClubABI';
-import { isValidConnection } from '../../utility';
+import { isValidConnection, STATUS } from '../../utility';
 import {
-  StyledInput,
   StyledInputLabel,
   StyledBuyClubCardButton,
   StyledInputWrapper,
   StyledErrorMessage,
   StyledFanzoneClubCardsImg,
   StyledFanzoneClubPage,
+  StyledFanzoneClubFormContainer,
+  StyledTransactionResponseWrapper,
+  StyledOpenSeaLink,
+  StyledPolygonScanLink,
+  StyledWelcomeTest,
+  StyledBackToBuyButton,
+  StyledBalanceLabel,
 } from './styles';
-import { connected } from 'process';
+import { TransactionResponse } from '@ethersproject/providers';
+import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 
 const validChainIds = [137];
 
@@ -21,38 +34,55 @@ export const FanzoneClubTest: FC = () => {
   const [{ data: connectData }] = useConnect();
   const [{ data: network }] = useNetwork();
   const [{ data: signer }] = useSigner();
+  const [{ data: accountData }] = useAccount();
   const fanzoneClubContract = useContract({
     addressOrName: '0x5514ef21dDBc956E4f4c2346371867594a6a026E',
     contractInterface: FanzoneClubABI,
     signerOrProvider: signer,
   });
-  const [priceInEth, setPriceInEth] = useState<BigNumberish>(0);
+  const [status, setStatus] = useState<STATUS>(STATUS.IDLE);
+  const [transactionResponse, setTransactionResponse] = useState<{
+    tokenIdMinted: number | null;
+    transactionHash: string | null;
+  }>({
+    transactionHash: null,
+    tokenIdMinted: null,
+  });
   const [formInput, setFormInput] = useState<{
     maticAmount: BigNumber;
     amount: number;
+    publicSale: boolean;
+    whiteListSale: boolean;
+    ownedPasses: BigNumber;
   }>({
     maticAmount: BigNumber.from(0),
     amount: 1,
+    publicSale: false,
+    whiteListSale: false,
+    ownedPasses: BigNumber.from(0),
   });
   const [error, setError] = useState<string>();
 
   const mintFanzoneClubCard = async () => {
     setError('');
+    setStatus(STATUS.LOADING);
     await fanzoneClubContract
       .mint(formInput.amount, true, {
         value: formInput.maticAmount,
       })
+      .then(async (transaction: TransactionResponse) => {
+        await transaction.wait(1).then((receipt) => {
+          setTransactionResponse({
+            tokenIdMinted: parseInt(receipt.logs[1].topics[3]),
+            transactionHash: receipt.transactionHash,
+          });
+          setStatus(STATUS.SUCCESSFUL);
+        });
+      })
       .catch((err: any) => {
         setError(err.data ? err.data.message : err.message);
+        setStatus(STATUS.IDLE);
       });
-  };
-
-  const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setError('');
-    setFormInput({
-      ...formInput,
-      [event.currentTarget.name]: event.currentTarget.value,
-    });
   };
 
   const validConnection = useCallback(
@@ -67,11 +97,13 @@ export const FanzoneClubTest: FC = () => {
 
   useEffect(() => {
     (async () => {
-      if (!fanzoneClubContract || !validConnection) return;
-
+      if (!fanzoneClubContract || !validConnection()) return;
       setFormInput({
         ...formInput,
         maticAmount: await fanzoneClubContract.price(),
+        publicSale: await fanzoneClubContract.publicSale(),
+        whiteListSale: await fanzoneClubContract.whiteListSale(),
+        ownedPasses: await fanzoneClubContract.balanceOf(accountData?.address),
       });
     })();
     // Adding formInput to the dependencies array will end up in an infinit loop
@@ -80,46 +112,80 @@ export const FanzoneClubTest: FC = () => {
 
   return (
     <StyledFanzoneClubPage>
-      <StyledFanzoneClubCardsImg src={FanzoneClubCardsImg} alt="" />
-      {!connectData.connected ? (
-        <StyledErrorMessage>
-          Wallet not connected! Please connect via Metamask first
-        </StyledErrorMessage>
-      ) : (
-        !validConnection && (
+      <StyledFanzoneClubFormContainer>
+        <StyledFanzoneClubCardsImg src={FanzoneClubCardsImg} alt="" />
+        {!connectData.connected ? (
           <StyledErrorMessage>
-            Wrong Chain! Please switch to Polygon Matic
+            Wallet not connected! Please connect via Metamask first
           </StyledErrorMessage>
-        )
-      )}
-      {error !== '' && <StyledErrorMessage>{error}</StyledErrorMessage>}
-      <StyledInputWrapper>
-        <StyledInputLabel>
-          Amount in Matic:{' '}
-          {parseFloat(ethers.utils.formatEther(formInput.maticAmount)).toFixed(
-            7,
-          )}
-        </StyledInputLabel>
-        {/* <StyledInput
-          name="maticAmount"
-          type="number"
-          onChange={inputChangeHandler}
-        /> */}
-      </StyledInputWrapper>
-      <StyledInputWrapper>
-        <StyledInputLabel>Amount to mint: {formInput.amount}</StyledInputLabel>
-        {/* <StyledInput
-          name="amount"
-          type="number"
-          onChange={inputChangeHandler}
-        /> */}
-      </StyledInputWrapper>
-      <StyledBuyClubCardButton
-        disabled={!validConnection}
-        onClick={mintFanzoneClubCard}
-      >
-        Buy now
-      </StyledBuyClubCardButton>
+        ) : (
+          !validConnection() && (
+            <StyledErrorMessage>
+              Wrong Chain! Please switch to Polygon Matic
+            </StyledErrorMessage>
+          )
+        )}
+        {error !== '' && <StyledErrorMessage>{error}</StyledErrorMessage>}
+        {status === STATUS.IDLE && (
+          <>
+            <StyledBalanceLabel>
+              Your owned passes: {formInput.ownedPasses.toNumber()}
+            </StyledBalanceLabel>
+            <StyledInputWrapper>
+              <StyledInputLabel>
+                Amount in Matic:{' '}
+                {parseFloat(
+                  ethers.utils.formatEther(formInput.maticAmount),
+                ).toFixed(7)}
+              </StyledInputLabel>
+            </StyledInputWrapper>
+            <StyledInputWrapper>
+              <StyledInputLabel>
+                Amount to mint: {formInput.amount}
+              </StyledInputLabel>
+            </StyledInputWrapper>
+            {(formInput.whiteListSale || formInput.publicSale) && (
+              <StyledBuyClubCardButton
+                disabled={!validConnection}
+                onClick={mintFanzoneClubCard}
+              >
+                {formInput.whiteListSale
+                  ? 'Buy pass now (private sale)'
+                  : 'Buy pass now (public sale)'}
+              </StyledBuyClubCardButton>
+            )}
+          </>
+        )}
+        {status === STATUS.LOADING && (
+          <StyledLoadingHolder>
+            <StyledLoader color="#ed7a2d" />
+          </StyledLoadingHolder>
+        )}
+        {status === STATUS.SUCCESSFUL && (
+          <>
+            <StyledBackToBuyButton onClick={() => setStatus(STATUS.IDLE)}>
+              {'<'}-- Back to buy more
+            </StyledBackToBuyButton>
+            <StyledWelcomeTest>
+              Welcome to the Fanzone Sports Club!
+            </StyledWelcomeTest>
+            <StyledTransactionResponseWrapper>
+              <StyledOpenSeaLink
+                target="_blank"
+                href={`https://opensea.io/assets/matic/0x5514ef21ddbc956e4f4c2346371867594a6a026e/${transactionResponse.tokenIdMinted}`}
+              >
+                View pass on OpenSea
+              </StyledOpenSeaLink>
+              <StyledPolygonScanLink
+                target="_blank"
+                href={`https://polygonscan.com/tx/${transactionResponse.transactionHash}`}
+              >
+                View tx on polygonscan
+              </StyledPolygonScanLink>
+            </StyledTransactionResponseWrapper>
+          </>
+        )}
+      </StyledFanzoneClubFormContainer>
     </StyledFanzoneClubPage>
   );
 };
