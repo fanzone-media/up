@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useCallback } from 'react';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, BigNumberish, ethers } from 'ethers';
 import {
   useAccount,
   useConnect,
@@ -9,7 +9,8 @@ import {
 } from 'wagmi';
 import { FanzoneClubCardsImg } from '../../assets';
 import { FanzoneClubABI } from '../../services/utilities/ABIs/FanzoneClubABI';
-import { isValidConnection, STATUS } from '../../utility';
+import { STATUS, isValidConnection } from '../../utility';
+import { getHexProof } from '../../utility/merkleHash';
 import {
   StyledInputLabel,
   StyledBuyClubCardButton,
@@ -34,7 +35,7 @@ export const FanzoneClubTest: FC = () => {
   const [{ data: connectData }] = useConnect();
   const [{ data: network }] = useNetwork();
   const [{ data: signer }] = useSigner();
-  const [{ data: accountData }] = useAccount();
+  const [{ data: account }] = useAccount();
   const fanzoneClubContract = useContract({
     addressOrName: '0x5514ef21dDBc956E4f4c2346371867594a6a026E',
     contractInterface: FanzoneClubABI,
@@ -85,6 +86,26 @@ export const FanzoneClubTest: FC = () => {
       });
   };
 
+  const whitelistMint = useCallback(async () => {
+    setError('');
+    if (!account) return;
+    await fanzoneClubContract
+      .whitelistMint(formInput.amount, true, getHexProof(account.address), {
+        value: formInput.maticAmount,
+      })
+      .catch((err: any) => {
+        setError(err.data ? err.data.message : err.message);
+      });
+  }, [fanzoneClubContract, formInput.amount, formInput.maticAmount]);
+
+  const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setError('');
+    setFormInput({
+      ...formInput,
+      [event.currentTarget.name]: event.currentTarget.value,
+    });
+  };
+
   const validConnection = useCallback(
     () =>
       isValidConnection(
@@ -97,18 +118,18 @@ export const FanzoneClubTest: FC = () => {
 
   useEffect(() => {
     (async () => {
-      if (!fanzoneClubContract || !validConnection()) return;
+      if (!fanzoneClubContract || !validConnection() || !account) return;
       setFormInput({
         ...formInput,
         maticAmount: await fanzoneClubContract.price(),
         publicSale: await fanzoneClubContract.publicSale(),
         whiteListSale: await fanzoneClubContract.whiteListSale(),
-        ownedPasses: await fanzoneClubContract.balanceOf(accountData?.address),
+        ownedPasses: await fanzoneClubContract.balanceOf(account.address),
       });
     })();
     // Adding formInput to the dependencies array will end up in an infinit loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fanzoneClubContract, validConnection]);
+  }, [fanzoneClubContract, validConnection, account]);
 
   return (
     <StyledFanzoneClubPage>
@@ -147,7 +168,11 @@ export const FanzoneClubTest: FC = () => {
             {(formInput.whiteListSale || formInput.publicSale) && (
               <StyledBuyClubCardButton
                 disabled={!validConnection}
-                onClick={mintFanzoneClubCard}
+                onClick={() =>
+                  formInput.whiteListSale
+                    ? whitelistMint()
+                    : mintFanzoneClubCard()
+                }
               >
                 {formInput.whiteListSale
                   ? 'Buy pass now (private sale)'
