@@ -40,7 +40,7 @@ export const getChainExplorer = (network: NetworkName) => {
 
 export const isValidChainId = (
   currenChainId: number,
-  validChainIds: Array<number> = [137, 22, 8001],
+  validChainIds: Array<number> = [1, 137, 22, 8001],
 ): boolean => {
   return validChainIds.includes(currenChainId);
 };

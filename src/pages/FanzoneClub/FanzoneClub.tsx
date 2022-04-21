@@ -29,8 +29,8 @@ import {
 import { TransactionResponse } from '@ethersproject/providers';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 
-const validChainIds = [137];
-const fanzoneClubContractAddress = '0x5514ef21dDBc956E4f4c2346371867594a6a026E';
+const validChainIds = [1];
+const fanzoneClubContractAddress = '0x4b406ACb6C43Caf306e4662AAf3a4C8e085e6439';
 
 const FanzoneClub: FC = () => {
   const [{ data: connectData }] = useConnect();
@@ -146,7 +146,7 @@ const FanzoneClub: FC = () => {
         ) : (
           !validConnection && (
             <StyledErrorMessage>
-              Wrong Chain! Please switch to Polygon Matic
+              Wrong Chain! Please switch to Ethereum
             </StyledErrorMessage>
           )
         )}
@@ -158,7 +158,7 @@ const FanzoneClub: FC = () => {
             </StyledBalanceLabel>
             <StyledInputWrapper>
               <StyledInputLabel>
-                Amount in Matic:{' '}
+                Amount in Ether:{' '}
                 {parseFloat(
                   ethers.utils.formatEther(formInput.maticAmount),
                 ).toFixed(7)}
@@ -201,15 +201,15 @@ const FanzoneClub: FC = () => {
             <StyledTransactionResponseWrapper>
               <StyledOpenSeaLink
                 target="_blank"
-                href={`https://opensea.io/assets/matic/${fanzoneClubContractAddress}/${transactionResponse.tokenIdMinted}`}
+                href={`https://opensea.io/assets/${fanzoneClubContractAddress}/${transactionResponse.tokenIdMinted}`}
               >
                 View pass on OpenSea
               </StyledOpenSeaLink>
               <StyledPolygonScanLink
                 target="_blank"
-                href={`https://polygonscan.com/tx/${transactionResponse.transactionHash}`}
+                href={`https://etherscan.io/tx/${transactionResponse.transactionHash}`}
               >
-                View tx on polygonscan
+                View tx on etherscan
               </StyledPolygonScanLink>
             </StyledTransactionResponseWrapper>
           </>
