@@ -3,8 +3,6 @@ import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import NoMatch from '../pages/NoMatch/NoMatch';
 import { CreateName } from '../pages/CreateName';
 import { AddPermissions } from '../pages/AddPermissions';
-import { FanzoneClub } from '../pages/FanzoneClub';
-import { FanzoneClubTest } from '../pages/FanzoneClubTest';
 
 const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
 const LazyProfileDetails = React.lazy(
@@ -13,17 +11,17 @@ const LazyProfileDetails = React.lazy(
 const LazyAssetDetails = React.lazy(
   () => import('../pages/AssetDetails/AssetDetails'),
 );
+const FanzoneClub = React.lazy(
+  () => import('../pages/FanzoneClub/FanzoneClub'),
+);
 
 const Routes: React.FC = () => {
   return (
     <Router>
       <Suspense fallback={<h1>Loading....</h1>}>
         <Switch>
-          <Route exact path="/fanzoneclub">
+          <Route exact path="/fanzoneSportsClub">
             <FanzoneClub />
-          </Route>
-          <Route exact path="/test/fanzoneclub">
-            <FanzoneClubTest />
           </Route>
           <Route exact path="/addpermissions">
             <AddPermissions />
