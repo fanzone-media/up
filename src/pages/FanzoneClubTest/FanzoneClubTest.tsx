@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useCallback, useMemo } from 'react';
-import { BigNumber, BigNumberish, ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import {
   useAccount,
   useConnect,
@@ -88,39 +88,40 @@ export const FanzoneClubTest: FC = () => {
 
   const whitelistMint = useCallback(async () => {
     setError('');
+    setStatus(STATUS.LOADING);
     if (!account) return;
     await fanzoneClubContract
       .whitelistMint(formInput.amount, true, getHexProof(account.address), {
         value: formInput.maticAmount,
       })
+      .then(async (transaction: TransactionResponse) => {
+        await transaction.wait(1).then((receipt) => {
+          setTransactionResponse({
+            tokenIdMinted: parseInt(receipt.logs[1].topics[3]),
+            transactionHash: receipt.transactionHash,
+          });
+          setStatus(STATUS.SUCCESSFUL);
+        });
+      })
       .catch((err: any) => {
         setError(err.data ? err.data.message : err.message);
+        setStatus(STATUS.IDLE);
       });
-  }, [fanzoneClubContract, formInput.amount, formInput.maticAmount]);
-
-  const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setError('');
-    setFormInput({
-      ...formInput,
-      [event.currentTarget.name]: event.currentTarget.value,
-    });
-  };
+  }, [fanzoneClubContract, formInput.amount, formInput.maticAmount, account]);
 
   const validConnection = useMemo(
     () =>
-      network.chain
-        ? isValidConnection(
-            connectData.connected,
-            network.chain.id,
-            validChainIds,
-          )
-        : false,
+      isValidConnection(
+        connectData.connected,
+        network.chain?.id || 0,
+        validChainIds,
+      ),
     [connectData.connected, network.chain],
   );
 
   useEffect(() => {
     (async () => {
-      if (!fanzoneClubContract || !validConnection() || !account) return;
+      if (!fanzoneClubContract || !validConnection || !account) return;
       setFormInput({
         ...formInput,
         maticAmount: await fanzoneClubContract.price(),
@@ -142,7 +143,7 @@ export const FanzoneClubTest: FC = () => {
             Wallet not connected! Please connect via Metamask first
           </StyledErrorMessage>
         ) : (
-          !validConnection() && (
+          !validConnection && (
             <StyledErrorMessage>
               Wrong Chain! Please switch to Polygon Matic
             </StyledErrorMessage>
