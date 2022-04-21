@@ -1,5 +1,5 @@
 const fs = require("fs");
-totalNumber = 2;
+totalNumber = 555;
 for (let index = 0; index <= totalNumber; index++) {
     let tempNum = Math.floor(Math.random() * 100);
     let tempString = "Gold";
