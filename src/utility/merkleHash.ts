@@ -7,7 +7,6 @@ export const getHexProof = async (claimingAddress: Address) => {
   //List of addresses stored in seperate js file
   const whiteListAdsresses = await fetch('./whitelistedAddresses.json').then(
     function (response) {
-      console.log(response);
       return response.json();
     },
   );
