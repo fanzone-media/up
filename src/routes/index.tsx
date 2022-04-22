@@ -1,5 +1,10 @@
 import React, { Suspense } from 'react';
-import { HashRouter as Router, Route, Switch } from 'react-router-dom';
+import {
+  HashRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from 'react-router-dom';
 import NoMatch from '../pages/NoMatch/NoMatch';
 import { CreateName } from '../pages/CreateName';
 import { AddPermissions } from '../pages/AddPermissions';
@@ -24,6 +29,9 @@ const Routes: React.FC = () => {
     <Router>
       <Suspense fallback={<h1>Loading....</h1>}>
         <Switch>
+          <Route exact path="/">
+            <Redirect to="/polygon" />
+          </Route>
           <Route exact path="/fanzoneSportsClub">
             <FanzoneClub />
           </Route>
