@@ -1,6 +1,6 @@
 import { ethers, Signer } from 'ethers';
 import React, { useEffect, useState } from 'react';
-import { Modal } from '../../../components/Modal';
+import { Modal } from '../../../components';
 import { KeyManagerApi } from '../../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { IProfile } from '../../../services/models';

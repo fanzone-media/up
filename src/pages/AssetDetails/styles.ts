@@ -1,7 +1,7 @@
 import { Puff } from 'react-loader-spinner';
 import styled from 'styled-components';
 import { BgMetaCard } from '../../assets';
-import { Accordion } from '../../components/Accordion';
+import { Accordion } from '../../components';
 import { pulseAnimate } from '../../features/cards/MetaCard/styles';
 
 export const StyledAssetDetailsContentWrapper = styled.div`

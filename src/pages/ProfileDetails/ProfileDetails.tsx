@@ -4,10 +4,10 @@ import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import { theme } from '../../boot/styles';
 import { useAppDispatch } from '../../boot/store';
+import { HideOnScreen } from '../../components';
 import Pagination from '../../features/pagination/Pagination';
 import makeBlockie from 'ethereum-blockies-base64';
 import {
-  HideOnScreen,
   StyledAssetsWrapper,
   StyledCopyLink,
   StyledCopyLinkIcon,

@@ -3,8 +3,7 @@ import { ThemeProvider } from 'styled-components';
 import './App.css';
 import { theme } from './boot/styles';
 import Routes from './routes';
-import { Header } from './components/Header';
-import { Footer } from './components/Footer';
+import { Footer, Header } from './components';
 import { Chain, defaultChains, InjectedConnector, WagmiProvider } from 'wagmi';
 
 const chains: Chain[] = [

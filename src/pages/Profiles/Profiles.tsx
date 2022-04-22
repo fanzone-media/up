@@ -18,7 +18,7 @@ import {
   StyledProfileHeading,
   StyledProfilesWrapper,
 } from './styles';
-import { Search } from '../../components/Search';
+import { Search } from '../../components';
 import { useAppDispatch } from '../../boot/store';
 import { useParams } from 'react-router-dom';
 
