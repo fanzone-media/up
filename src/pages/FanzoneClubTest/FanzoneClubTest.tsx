@@ -155,7 +155,9 @@ const FanzoneClub: FC = () => {
             </StyledErrorMessage>
           )
         )}
-        {error !== '' && <StyledErrorMessage>{error}</StyledErrorMessage>}
+        {error !== '' && (
+          <StyledErrorMessage>Attention: an error accured!</StyledErrorMessage>
+        )}
         {status === STATUS.IDLE && (
           <>
             <StyledBalanceLabel>
