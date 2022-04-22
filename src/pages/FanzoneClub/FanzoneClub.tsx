@@ -92,9 +92,14 @@ const FanzoneClub: FC = () => {
     setStatus(STATUS.LOADING);
     if (!account) return;
     await fanzoneClubContract
-      .whitelistMint(formInput.amount, true, getHexProof(account.address), {
-        value: formInput.maticAmount,
-      })
+      .whitelistMint(
+        formInput.amount,
+        true,
+        await getHexProof(account.address),
+        {
+          value: formInput.maticAmount,
+        },
+      )
       .then(async (transaction: TransactionResponse) => {
         await transaction.wait(1).then((receipt) => {
           setTransactionResponse({

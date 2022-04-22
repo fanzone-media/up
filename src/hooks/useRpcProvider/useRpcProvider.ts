@@ -21,7 +21,7 @@ export const useRpcProvider = (network: string): Provider => {
   if (network === 'ethereum') {
     const ETHEREUM_MAINNET_PROVIDER =
       new ethers.providers.StaticJsonRpcProvider(
-        'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+        'https://eth-mainnet.alchemyapi.io/v2/hhezpl-iF6BGSLuXWN7HIXEOIsbZ5FnD',
         { name: 'ethereum', chainId: 1 },
       );
     return ETHEREUM_MAINNET_PROVIDER;
