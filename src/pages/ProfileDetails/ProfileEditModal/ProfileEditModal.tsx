@@ -2,7 +2,7 @@ import { Signer } from 'ethers';
 import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { NetworkName } from '../../../boot/types';
-import { Modal } from '../../../components/Modal';
+import { Modal } from '../../../components';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { IProfile, ISetProfileData } from '../../../services/models';
 import { StyledLoader, StyledLoadingHolder } from '../../AssetDetails/styles';

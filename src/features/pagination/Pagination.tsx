@@ -17,7 +17,7 @@ import {
   StyledPrevIcon,
   StyledPreviousButton,
 } from './styles';
-import { Search } from '../../components/Search';
+import { Search } from '../../components';
 import { useAppDispatch } from '../../boot/store';
 import {
   fetchAllCards,

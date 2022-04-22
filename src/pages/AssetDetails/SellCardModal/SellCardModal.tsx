@@ -2,7 +2,7 @@ import { Signer } from 'ethers';
 import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { NetworkName } from '../../../boot/types';
-import { Modal } from '../../../components/Modal';
+import { Modal } from '../../../components';
 import { KeyManagerApi } from '../../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { LSP4DigitalAssetApi } from '../../../services/controllers/LSP4DigitalAsset';
