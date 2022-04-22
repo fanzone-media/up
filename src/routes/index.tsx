@@ -8,6 +8,10 @@ import {
 import NoMatch from '../pages/NoMatch/NoMatch';
 import { CreateName } from '../pages/CreateName';
 import { AddPermissions } from '../pages/AddPermissions';
+import {
+  StyledLoader,
+  StyledLoadingHolder,
+} from '../pages/AssetDetails/styles';
 
 const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
 const LazyProfileDetails = React.lazy(
@@ -27,7 +31,13 @@ const FanzoneClubTest = React.lazy(
 const Routes: React.FC = () => {
   return (
     <Router>
-      <Suspense fallback={<h1>Loading....</h1>}>
+      <Suspense
+        fallback={
+          <StyledLoadingHolder>
+            <StyledLoader color="#ed7a2d" />
+          </StyledLoadingHolder>
+        }
+      >
         <Switch>
           <Route exact path="/">
             <Redirect to="/polygon" />
