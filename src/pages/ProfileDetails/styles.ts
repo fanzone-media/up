@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { md } from '../../utility';
 
 export const StyledProfileDetails = styled.div`
   color: white;
@@ -44,10 +43,12 @@ export const StyledProfileInfo1Content = styled.div`
   padding: 20px 0 20px 0;
   width: 100%;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
+    align-items: center;
     display: grid;
     width: 1440px;
     grid-template-columns: calc(50% - 90px) 180px calc(50% - 90px);
+    grid-column-gap: 2.5em;
     padding: 20px 40px 20px 40px;
     margin: 0 auto 0 auto;
   }
@@ -56,31 +57,36 @@ export const StyledProfileInfo1Content = styled.div`
 export const StyledProfileMediaWrapper = styled.div`
   position: relative;
   padding: 0 5% 0 5%;
+  width: 100%;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     padding: 0;
   }
 `;
 
 export const StyledProfileMedia = styled.div`
   position: relative;
+  margin-left: auto;
+  margin-right: auto;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     position: absolute;
-    bottom: 50%;
-    transform: translate3d(0, 50%, 0);
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    left: 50%;
+    width: 100%;
   }
 `;
 
 export const StyledProfileAddress = styled.p`
-  font-weight: 300;
+  font-weight: ${({ theme }) => theme.font.weight.light};
   letter-spacing: 1.5px;
   width: calc(100% - 180px);
   overflow-wrap: break-word;
   color: rgba(165, 165, 165, 1);
   font-size: 14px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     width: 100%;
     font-size: 16px;
   }
@@ -93,31 +99,32 @@ export const StyledProfileNameBioWrapper = styled.div`
   row-gap: 5px;
   width: 100%;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     flex-direction: row;
+    align-items: center;
   }
 `;
 
 export const StyledProfileName = styled.h2`
   font-size: 17px;
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
   margin: auto 0 auto 0;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     font-size: 15px;
     margin: 0 0 0 5%;
   }
 `;
 
 export const StyledProfileBioHeading = styled.h2`
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
   font-size: 15px;
 `;
 
 export const StyledProfileBioWrapper = styled.div`
   margin: auto 0 auto 0;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     width: calc(50% - 90px);
     margin-left: auto;
     padding-left: 2.5%;
@@ -133,7 +140,7 @@ export const StyledProfileLinks = styled.div`
   margin: auto 0 auto 0;
   column-gap: 10px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     margin: auto 0 auto auto;
   }
 `;
@@ -143,7 +150,7 @@ export const StyledProfileInfo2 = styled.div`
   padding: 0 8px 0 8px;
   background-color: rgba(59, 59, 59, 1);
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     max-width: 1440px;
     padding: 0 40px 0 40px;
     margin: 0 auto 0 auto;
@@ -159,7 +166,7 @@ export const StyledProfileInfo2Content = styled.div`
 export const StyledShareProfileHolder = styled.div`
   position: relative;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     margin-left: auto;
   }
 `;
@@ -177,7 +184,7 @@ export const StyledShareProfileWrapper = styled.div<{ expand: boolean }>`
   margin: auto 0;
   position: ${({ expand }) => (expand ? 'absolute' : '')};
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     margin: 0;
     right: 0;
   }
@@ -227,7 +234,7 @@ export const StyledAssetsWrapper = styled.div`
   width: 100%;
   padding: 0 8px 0 8px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     padding: 0 40px 0 40px;
     max-width: 1440px;
     margin: 0 auto 0 auto;
@@ -243,7 +250,7 @@ export const StyledOpenTransferModalButton = styled.button`
   padding: 5px 10px;
   border-radius: 8px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     margin: 0 auto;
   }
 `;

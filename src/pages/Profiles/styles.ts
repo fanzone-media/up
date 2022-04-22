@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { BgFanzoneHero } from '../../assets';
-import { lg, md, xl } from '../../utility';
 
 export const StyledMainContent = styled.div`
   position: relative;
@@ -27,7 +26,7 @@ export const StyledContentwrappar = styled.div`
   display: flex;
   flex-direction: column;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     padding: 0 40px 0 40px;
     max-width: 1440px;
   }
@@ -39,12 +38,12 @@ export const StyledGreeting = styled.div`
 
 export const StyledWelcomeHeading = styled.h1`
   font-size: 24px;
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
 `;
 
 export const StyledDescription = styled.p`
   font-size: 18px;
-  font-weight: 400;
+  font-weight: ${({ theme }) => theme.font.weight.regular};
 `;
 
 export const StyledDivider = styled.span`
@@ -60,7 +59,7 @@ export const StyledProfilesHeader = styled.div`
 
 export const StyledProfileHeading = styled.h1`
   font-size: 24px;
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
   margin-right: auto;
 `;
 
@@ -71,13 +70,13 @@ export const StyledProfilesWrapper = styled.div`
   padding: 20px 0 20px 0;
   justify-items: center;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  @media ${lg} {
+  @media ${({ theme }) => theme.screen.lg} {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  @media ${xl} {
+  @media ${({ theme }) => theme.screen.xl} {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 `;

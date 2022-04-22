@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { md } from '../../utility';
 import { StyledInputRow } from '../ProfileDetails/ProfileEditModal/styles';
 
 export const StyledAddPermissions = styled.div`
@@ -7,7 +6,7 @@ export const StyledAddPermissions = styled.div`
   flex-direction: column;
   padding: 0 8px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     padding: 0 40px;
   }
 `;
@@ -15,7 +14,7 @@ export const StyledAddPermissions = styled.div`
 export const StyledNetworkLabel = styled.p`
   color: white;
   font-size: 25px;
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
 `;
 
 export const StyledLabel = styled.p`

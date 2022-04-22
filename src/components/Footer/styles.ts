@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { md } from '../../utility';
 
 export const StyledFooter = styled.footer`
   display: flex;
@@ -36,7 +35,7 @@ export const StyledNetworksWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     flex-direction: row;
   }
 `;
@@ -45,7 +44,7 @@ export const StyledNetworks = styled.div`
   display: flex;
   flex-direction: column;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     flex-direction: row;
   }
 `;
@@ -56,7 +55,7 @@ export const StyledDivider = styled.span`
   width: 2px;
   display: none;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     display: flex;
   }
 `;

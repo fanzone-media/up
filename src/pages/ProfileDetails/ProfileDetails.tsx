@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
+import { theme } from '../../boot/styles';
 import { useAppDispatch } from '../../boot/store';
 import Pagination from '../../features/pagination/Pagination';
 import makeBlockie from 'ethereum-blockies-base64';
@@ -47,7 +48,6 @@ import {
   Twitter,
 } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { md } from '../../utility';
 import {
   currentProfile,
   fetchProfileByAddress,
@@ -92,7 +92,7 @@ const ProfileDetails: React.FC = () => {
 
   const [copied, setCopied] = useState<boolean>(false);
 
-  const isTablet = useMediaQuery(md);
+  const isTablet = useMediaQuery(theme.screen.md);
 
   const keyManagerSetDataPermission = useMemo(
     () =>

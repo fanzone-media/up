@@ -1,6 +1,5 @@
 import styled, { keyframes } from 'styled-components';
 import { BgMetaCard } from '../../../assets';
-import { sm } from '../../../utility';
 
 export const pulseAnimate = keyframes`
     0%, 100% {
@@ -17,7 +16,7 @@ export const StyledCardWrapper = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     width: 212px;
   }
 `;
@@ -31,19 +30,19 @@ export const StyledMediaWrapper = styled.div`
   background-position: center;
   border-radius: 10px 10px 0 0;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     height: 257px;
   }
 `;
 
 export const StyledMetaCardImg = styled.img`
   width: 115px;
-  height: 171px;
+  height: auto;
   margin: auto;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     width: 137px;
-    height: 203px;
+    height: auto;
   }
 `;
 
@@ -60,16 +59,16 @@ export const StyledCardDetail = styled.div`
 
 export const StyledCardName = styled.h3`
   font-size: 15px;
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     font-size: 18px;
   }
 `;
 
 export const StyledCardFullName = styled.p`
   font-size: 14px;
-  font-weight: 400;
+  font-weight: ${({ theme }) => theme.font.weight.regular};
   line-height: 17.5px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -86,7 +85,7 @@ export const StyledBlockScoutIcon = styled.img`
   height: 40px;
   animation: ${pulseAnimate} 2s ease-in-out infinite;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     top: 205px;
     height: 45px;
     margin-right: 15px;
@@ -101,7 +100,7 @@ export const StyledUniversalProfileIcon = styled.img`
   margin-left: 8px;
   animation: ${pulseAnimate} 2s ease-in-out infinite;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     top: 205px;
     margin-left: 15px;
     height: 40px;
@@ -119,7 +118,7 @@ export const StyledTransferButton = styled.button`
   background-color: white;
   border-radius: 100%;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     top: 205px;
     margin-left: 15px;
     height: 40px;

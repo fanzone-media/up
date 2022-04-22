@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
+import { ThemeProvider } from 'styled-components';
 import './App.css';
+import { theme } from './boot/styles';
 import Routes from './routes';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -67,13 +69,15 @@ function App() {
   useEffect(() => {});
 
   return (
-    <WagmiProvider autoConnect connectors={connectors}>
-      <div className="App">
-        <Header />
-        <Routes />
-        <Footer />
-      </div>
-    </WagmiProvider>
+    <ThemeProvider theme={theme}>
+      <WagmiProvider autoConnect connectors={connectors}>
+        <div className="App">
+          <Header />
+          <Routes />
+          <Footer />
+        </div>
+      </WagmiProvider>
+    </ThemeProvider>
   );
 }
 

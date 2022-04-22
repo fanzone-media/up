@@ -14,5 +14,5 @@ export const StyledNoMatchContent = styled.div`
 
 export const StyledError = styled.p`
   font-size: 48px;
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
 `;

@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { pulseAnimate } from '../../../features/cards/MetaCard/styles';
-import { md } from '../../../utility';
 
 export const StyledProfileImageWrapper = styled.div`
   position: relative;
@@ -41,7 +40,7 @@ export const StyledBlockScoutLogo = styled.img`
   bottom: 0;
   animation: ${pulseAnimate} 2s ease-in-out infinite;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     width: 55px;
   }
 `;

@@ -1,5 +1,4 @@
 import styled from 'styled-components/macro';
-import { lg, md, xl } from '../../utility';
 
 export const StyledPaginationWrapper = styled.div`
   display: flex;
@@ -14,7 +13,7 @@ export const StyledAssetsHeader = styled.div`
 
 export const StyledAssetsHeading = styled.h1`
   font-size: 24px;
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
   margin-right: auto;
 `;
 
@@ -28,13 +27,13 @@ export const StyledAssetsWrapper = styled.div`
   grid-auto-flow: unset;
   justify-items: center;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     grid-template-columns: repeat(3, 1fr);
   }
-  @media ${lg} {
+  @media ${({ theme }) => theme.screen.lg} {
     grid-template-columns: repeat(4, 1fr);
   }
-  @media ${xl} {
+  @media ${({ theme }) => theme.screen.xl} {
     grid-template-columns: repeat(5, 1fr);
   }
 `;
