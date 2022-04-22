@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { BgProfileCard } from '../../../assets';
 import { sm } from '../../../utility';
+import { cardrender } from '../../../boot/styles/animation';
 
 export const StyledProfileCard = styled(Link)<{ demo?: boolean }>`
+  animation: ${cardrender} 1s linear;
   width: ${({ demo }) => (demo ? '165px' : '117px')};
   border-radius: 10px;
   position: relative;
