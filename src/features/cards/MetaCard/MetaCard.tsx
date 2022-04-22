@@ -9,8 +9,8 @@ import {
   StyledCardDetail,
   StyledCardFullName,
   StyledCardName,
-  StyledCardWrappar,
-  StyledMediaWrappar,
+  StyledCardWrapper,
+  StyledMediaWrapper,
   StyledMetaCardImg,
   StyledTransferButton,
   StyledTransferIcon,
@@ -20,7 +20,7 @@ import { getChainExplorer } from '../../../utility';
 import { NetworkName } from '../../../boot/types';
 import {
   StyledBalance,
-  StyledBalanceWrappar,
+  StyledBalanceWrapper,
   StyledPolygon,
 } from '../../profiles/ProfileCard/styles';
 
@@ -46,7 +46,7 @@ export const MetaCard: React.FC<IProps> = ({
   const params = useParams<IParams>();
   const explorer = getChainExplorer(params.network);
   return (
-    <StyledCardWrappar>
+    <StyledCardWrapper>
       {params.network === 'l14' && (
         <a
           href={'https://universalprofile.cloud/asset/' + digitalCard.address}
@@ -58,9 +58,9 @@ export const MetaCard: React.FC<IProps> = ({
       )}
       {type === 'owned' && (
         <>
-          <StyledBalanceWrappar demo={true}>
+          <StyledBalanceWrapper demo={true}>
             <StyledBalance demo={true}>{balance}</StyledBalance>
-          </StyledBalanceWrappar>
+          </StyledBalanceWrapper>
           <StyledPolygon src={polygon} alt="" demo={true} />
         </>
       )}
@@ -79,14 +79,14 @@ export const MetaCard: React.FC<IProps> = ({
         <StyledBlockScoutIcon src={explorer?.icon} alt="" />
       </a>
       <Link to={`/${params.network}/asset/` + digitalCard.address}>
-        <StyledMediaWrappar>
+        <StyledMediaWrapper>
           <StyledMetaCardImg src={digitalCard.ls8MetaData[0].image} alt="" />
-        </StyledMediaWrappar>
+        </StyledMediaWrapper>
         <StyledCardDetail>
           <StyledCardName>{digitalCard.name.split('•')[0]}</StyledCardName>
           <StyledCardFullName>{digitalCard.name}</StyledCardFullName>
         </StyledCardDetail>
       </Link>
-    </StyledCardWrappar>
+    </StyledCardWrapper>
   );
 };

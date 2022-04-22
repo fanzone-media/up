@@ -14,7 +14,7 @@ export const StyledInput = styled.input`
   }
 `;
 
-export const StyledInputWrappar = styled.div`
+export const StyledInputWrapper = styled.div`
   position: relative;
 `;
 

@@ -23,7 +23,7 @@ export const StyledLabel = styled.p`
   width: 200px;
 `;
 
-export const StyledInputWrappar = styled(StyledInputRow)`
+export const StyledInputWrapper = styled(StyledInputRow)`
   display: flex;
 `;
 
@@ -37,7 +37,7 @@ export const StyledCheckboxInput = styled.input`
   margin: auto 10px auto 0;
 `;
 
-export const StyledPermissionInputWrappar = styled.div`
+export const StyledPermissionInputWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;

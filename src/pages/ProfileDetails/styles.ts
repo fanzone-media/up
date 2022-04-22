@@ -27,7 +27,7 @@ export const StyledProfileCoverImg = styled.img`
   display: block;
 `;
 
-export const StyledProfileInfoWrappar = styled.div`
+export const StyledProfileInfoWrapper = styled.div`
   width: 100%;
 `;
 
@@ -53,7 +53,7 @@ export const StyledProfileInfo1Content = styled.div`
   }
 `;
 
-export const StyledProfileMediaWrappar = styled.div`
+export const StyledProfileMediaWrapper = styled.div`
   position: relative;
   padding: 0 5% 0 5%;
 
@@ -84,7 +84,7 @@ export const StyledProfileAddress = styled.p`
   }
 `;
 
-export const StyledProfileNameBioWrappar = styled.div`
+export const StyledProfileNameBioWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin: auto 0 auto 0;
@@ -112,7 +112,7 @@ export const StyledProfileBioHeading = styled.h2`
   font-size: 15px;
 `;
 
-export const StyledProfileBioWrappar = styled.div`
+export const StyledProfileBioWrapper = styled.div`
   margin: auto 0 auto 0;
 
   @media ${md} {
@@ -162,7 +162,7 @@ export const StyledShareProfileHolder = styled.div`
   }
 `;
 
-export const StyledShareProfileWrappar = styled.div<{ expand: boolean }>`
+export const StyledShareProfileWrapper = styled.div<{ expand: boolean }>`
   background-color: rgba(59, 59, 59, 1);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;
@@ -221,7 +221,7 @@ export const StyledCopyLinkIcon = styled.img`
   margin: auto 7px auto 0;
 `;
 
-export const StyledAssetsWrappar = styled.div`
+export const StyledAssetsWrapper = styled.div`
   width: 100%;
   padding: 0 8px 0 8px;
 

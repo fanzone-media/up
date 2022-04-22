@@ -21,7 +21,7 @@ export const StyledProfileCard = styled(Link)<{ demo?: boolean }>`
   }
 `;
 
-export const StyledProfileDetailWrappar = styled.div<{ demo?: boolean }>`
+export const StyledProfileDetailWrapper = styled.div<{ demo?: boolean }>`
   display: flex;
   flex-direction: column;
   height: ${({ demo }) => (demo ? '68px' : '53px')};
@@ -30,7 +30,7 @@ export const StyledProfileDetailWrappar = styled.div<{ demo?: boolean }>`
   padding: 5px 10px 5px 10px;
 `;
 
-export const StyledBalanceWrappar = styled.div<{ demo?: boolean }>`
+export const StyledBalanceWrapper = styled.div<{ demo?: boolean }>`
   display: flex;
   width: ${({ demo }) => (demo ? '30px' : '19px')};
   position: absolute;

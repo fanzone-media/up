@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { pulseAnimate } from '../../../features/cards/MetaCard/styles';
 import { md } from '../../../utility';
 
-export const StyledProfileImageWrappar = styled.div`
+export const StyledProfileImageWrapper = styled.div`
   position: relative;
   display: flex;
   z-index: 0;

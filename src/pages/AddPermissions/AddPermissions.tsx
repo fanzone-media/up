@@ -4,10 +4,10 @@ import { useNetwork, useSigner } from 'wagmi';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import {
   StyledAddPermissions,
-  StyledInputWrappar,
+  StyledInputWrapper,
   StyledInput,
   StyledLabel,
-  StyledPermissionInputWrappar,
+  StyledPermissionInputWrapper,
   StyledCheckboxInput,
   StyledSetPermisssionButton,
   StyledNetworkLabel,
@@ -95,20 +95,20 @@ export const AddPermissions: React.FC = () => {
       <StyledNetworkLabel>
         You are connected to {networkData.chain?.name} network
       </StyledNetworkLabel>
-      <StyledInputWrappar>
+      <StyledInputWrapper>
         <StyledLabel>Universal Profile Address: </StyledLabel>
         <StyledInput
           name="universalProfileAddress"
           onChange={changeHandler}
         ></StyledInput>
-      </StyledInputWrappar>
-      <StyledInputWrappar>
+      </StyledInputWrapper>
+      <StyledInputWrapper>
         <StyledLabel>Grant permission to Address: </StyledLabel>
         <StyledInput name="addressTo" onChange={changeHandler}></StyledInput>
-      </StyledInputWrappar>
-      <StyledPermissionInputWrappar>
+      </StyledInputWrapper>
+      <StyledPermissionInputWrapper>
         {Object.keys(permissionsForm.permissions).map((key) => (
-          <StyledInputWrappar key={key}>
+          <StyledInputWrapper key={key}>
             <StyledCheckboxInput
               type="checkbox"
               name={key}
@@ -116,9 +116,9 @@ export const AddPermissions: React.FC = () => {
               onChange={changeHandler}
             ></StyledCheckboxInput>
             <StyledLabel>{key}</StyledLabel>
-          </StyledInputWrappar>
+          </StyledInputWrapper>
         ))}
-      </StyledPermissionInputWrappar>
+      </StyledPermissionInputWrapper>
       <StyledSetPermisssionButton onClick={setPermissions}>
         Set Permissions
       </StyledSetPermisssionButton>

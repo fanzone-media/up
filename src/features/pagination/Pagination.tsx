@@ -8,12 +8,12 @@ import { NetworkName, RootState } from '../../boot/types';
 import {
   StyledAssetsHeader,
   StyledAssetsHeading,
-  StyledAssetsWrappar,
+  StyledAssetsWrapper,
   StyledNextButton,
   StyledNextIcon,
   StyledPageNumButton,
   StyledPaginationControls,
-  StyledPaginationWrappar,
+  StyledPaginationWrapper,
   StyledPrevIcon,
   StyledPreviousButton,
 } from './styles';
@@ -271,7 +271,7 @@ const Pagination: React.FC<IPagination> = ({
   );
 
   return (
-    <StyledPaginationWrappar>
+    <StyledPaginationWrapper>
       <StyledAssetsHeader className="flex">
         <StyledAssetsHeading>
           {type === 'demo' ? 'Assets' : `${type} Assets`}
@@ -285,7 +285,7 @@ const Pagination: React.FC<IPagination> = ({
           <StyledLoader color="#ed7a2d" />
         </StyledLoadingHolder>
       ) : ( */}
-      <StyledAssetsWrappar>{renderCollection}</StyledAssetsWrappar>
+      <StyledAssetsWrapper>{renderCollection}</StyledAssetsWrapper>
       {pagesCount > 1 && search === '' && (
         <StyledPaginationControls>
           <StyledPreviousButton
@@ -325,7 +325,7 @@ const Pagination: React.FC<IPagination> = ({
           </StyledNextButton>
         </StyledPaginationControls>
       )}
-    </StyledPaginationWrappar>
+    </StyledPaginationWrapper>
   );
 };
 
