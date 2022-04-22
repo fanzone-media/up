@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { sm } from '../../utility';
 
 export const StyledInput = styled.input`
   background: rgba(255, 255, 255, 0.05);
@@ -9,7 +8,7 @@ export const StyledInput = styled.input`
   border-radius: 5px;
   padding: 0 10px 0 30px;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     width: 353px;
   }
 `;

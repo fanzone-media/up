@@ -8,16 +8,6 @@ export enum STATUS {
   FAILED = 'failed',
 }
 
-export const xs = '(min-width: 480px)';
-
-export const sm = '(min-width: 640px)';
-
-export const md = '(min-width: 768px)';
-
-export const lg = '(min-width: 1024px)';
-
-export const xl = '(min-width: 1280px)';
-
 export const getChainExplorer = (network: NetworkName) => {
   switch (network) {
     case 'polygon':

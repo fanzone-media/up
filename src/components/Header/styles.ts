@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { md, sm } from '../../utility';
 
 export const StyledHeader = styled.header`
   background-color: black;
@@ -9,7 +8,7 @@ export const StyledHeader = styled.header`
   color: white;
   border-bottom: 1px solid #858585;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     height: 65px;
   }
 `;
@@ -20,7 +19,7 @@ export const StyledHeaderContent = styled.div`
   height: 100%;
   padding: 0 8px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     display: grid;
     max-width: 1440px;
     margin: 0 auto;
@@ -73,7 +72,7 @@ export const StyledLogo = styled.img`
 export const StyledFanzoneAppLink = styled.a`
   margin: 0 auto;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     margin: auto 0 auto auto;
   }
 `;
@@ -81,7 +80,7 @@ export const StyledFanzoneAppLink = styled.a`
 export const StyledOurNftLink = styled.a`
   margin: 0 auto;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     margin: auto auto auto 0;
   }
 `;
@@ -91,7 +90,7 @@ export const StyledButtonConainer = styled.div`
   flex-direction: column;
   row-gap: 20px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     height: 100%;
     width: 100%;
     column-gap: 20px;
@@ -111,7 +110,7 @@ export const StyledSignUpLink = styled.a`
   box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.15);
   border-radius: 3px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     margin: auto 0 auto auto;
   }
 `;
@@ -125,7 +124,7 @@ export const StyledConnectMetaMask = styled.button`
   filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.15));
   border-radius: 3px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     margin: auto 0;
   }
 `;

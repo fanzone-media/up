@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { BgProfileCard } from '../../../assets';
-import { sm } from '../../../utility';
-import { cardrender } from '../../../boot/styles/animation';
 
 export const StyledProfileCard = styled(Link)<{ demo?: boolean }>`
-  animation: ${cardrender} 1s linear;
+  animation: ${({ theme }) => theme.animation.cardrender} 1s linear;
   width: ${({ demo }) => (demo ? '165px' : '117px')};
   border-radius: 10px;
   position: relative;
@@ -16,7 +14,7 @@ export const StyledProfileCard = styled(Link)<{ demo?: boolean }>`
     transform: scale(1.05);
   }
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     width: ${({ demo }) => (demo ? '212px' : '117px')};
   }
 `;
@@ -42,7 +40,7 @@ export const StyledBalanceWrapper = styled.div<{ demo?: boolean }>`
 
 export const StyledBalance = styled.p<{ demo?: boolean }>`
   font-size: ${({ demo }) => (demo ? '12px' : '8px')};
-  font-weight: 400;
+  font-weight: ${({ theme }) => theme.font.weight.regular};
   margin: auto;
 `;
 
@@ -62,7 +60,7 @@ export const StyledProfileDetail = styled.div`
 
 export const StyledProfileName = styled.h3<{ demo?: boolean }>`
   font-size: ${({ demo }) => (demo ? '18px' : '13px')};
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -95,7 +93,7 @@ export const StyledProfileBlockie = styled.img<{ demo?: boolean }>`
   transform: translate3d(-50%, -50%, 0);
   z-index: -1;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     height: ${({ demo }) => (demo ? '154px' : '89px')};
     width: ${({ demo }) => (demo ? '154px' : '89px')};
   }
@@ -108,7 +106,7 @@ export const StyledProfileImg = styled.img<{ demo?: boolean }>`
   border-radius: 100%;
   object-fit: cover;
 
-  @media ${sm} {
+  @media ${({ theme }) => theme.screen.sm} {
     width: ${({ demo }) => (demo ? '132px' : '80px')};
     height: ${({ demo }) => (demo ? '132px' : '80px')};
   }

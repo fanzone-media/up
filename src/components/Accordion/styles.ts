@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { md } from '../../utility';
 
 export const StyledAccordionWrapper = styled.div<{ $expanded: boolean }>`
   display: flex;
@@ -8,7 +7,7 @@ export const StyledAccordionWrapper = styled.div<{ $expanded: boolean }>`
   height: ${({ $expanded }) => ($expanded ? '100%' : '62px')};
   overflow: hidden;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10px;
     background: linear-gradient(
@@ -25,7 +24,7 @@ export const StyledAccordionHeader = styled.div<{ $expanded: boolean }>`
   border-bottom: 1px solid rgba(223, 223, 223, 0.2);
   height: 40px;
 
-  @media ${md} {
+  @media ${({ theme }) => theme.screen.md} {
     border-bottom: ${({ $expanded }) =>
       $expanded ? '1px solid rgba(223, 223, 223, 0.2)' : 'none'};
   }

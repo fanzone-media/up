@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { xs } from '../../utility';
 
 export const StyledFanzoneClubPage = styled.div`
   display: flex;
@@ -20,7 +19,7 @@ export const StyledFanzoneClubFormContainer = styled.div`
     ),
     rgba(33, 33, 33, 0.6);
 
-  @media ${xs} {
+  @media ${({ theme }) => theme.screen.xs} {
     max-width: 500px;
     margin: 20px auto 0 auto;
     border-radius: 20px;
@@ -31,7 +30,7 @@ export const StyledFanzoneClubCardsImg = styled.img`
   width: 100%;
   margin: 0 auto;
 
-  @media ${xs} {
+  @media ${({ theme }) => theme.screen.xs} {
     border-radius: 20px 20px 0 0;
   }
 `;
@@ -90,7 +89,7 @@ export const StyledWelcomeTest = styled.h3`
   font-size: 28px;
   color: white;
   text-align: center;
-  font-weight: 600;
+  font-weight: ${({ theme }) => theme.font.weight.bold};
 `;
 
 export const StyledOpenSeaLink = styled.a`
