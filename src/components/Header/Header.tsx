@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
 import { useConnect } from 'wagmi';
 import { FanzoneHexagon, hamburgerIcon, Logo } from '../../assets';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { md } from '../../utility';
+import { useOutsideClick } from '../../hooks/useOutsideClick';
 import { AccountDetails } from './AccountDetails';
 import {
   StyledButtonConainer,
@@ -34,6 +35,12 @@ export const Header: React.FC = () => {
   const [{ data }, connect] = useConnect();
   const [showAccountDetail, setShowAccountDetail] = useState<boolean>(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState<boolean>(false);
+
+  const accountDetailsRef = useRef(null);
+  useOutsideClick(
+    accountDetailsRef,
+    () => showAccountDetail && setShowAccountDetail(false),
+  );
 
   return (
     <StyledHeader id="header">
@@ -111,7 +118,9 @@ export const Header: React.FC = () => {
             <StyledHmamburgerMenuIcon src={hamburgerIcon} />
           </StyledHamburgerMenuButton>
         )}
-        {showAccountDetail && data.connected && <AccountDetails />}
+        {showAccountDetail && data.connected && (
+          <AccountDetails ref={accountDetailsRef} />
+        )}
       </StyledHeaderContent>
     </StyledHeader>
   );

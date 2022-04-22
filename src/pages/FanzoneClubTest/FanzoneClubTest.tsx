@@ -25,12 +25,12 @@ import {
   StyledWelcomeTest,
   StyledBackToBuyButton,
   StyledBalanceLabel,
-} from './styles';
+} from '../FanzoneClub/styles';
 import { TransactionResponse } from '@ethersproject/providers';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 
-const validChainIds = [1];
-const fanzoneClubContractAddress = '0x4b406ACb6C43Caf306e4662AAf3a4C8e085e6439';
+const validChainIds = [137];
+const fanzoneClubContractAddress = '0x34c01dD64203b566C4CaE656C832d5a449A34c98';
 
 const FanzoneClub: FC = () => {
   const [{ data: connectData }] = useConnect();
@@ -146,7 +146,7 @@ const FanzoneClub: FC = () => {
         ) : (
           !validConnection && (
             <StyledErrorMessage>
-              Wrong Chain! Please switch to Ethereum
+              Wrong Chain! Please switch to Polygon Matic
             </StyledErrorMessage>
           )
         )}
@@ -158,7 +158,7 @@ const FanzoneClub: FC = () => {
             </StyledBalanceLabel>
             <StyledInputWrapper>
               <StyledInputLabel>
-                Amount in Ether:{' '}
+                Amount in Matic:{' '}
                 {parseFloat(
                   ethers.utils.formatEther(formInput.maticAmount),
                 ).toFixed(7)}
@@ -201,15 +201,15 @@ const FanzoneClub: FC = () => {
             <StyledTransactionResponseWrapper>
               <StyledOpenSeaLink
                 target="_blank"
-                href={`https://opensea.io/assets/${fanzoneClubContractAddress}/${transactionResponse.tokenIdMinted}`}
+                href={`https://opensea.io/assets/matic/${fanzoneClubContractAddress}/${transactionResponse.tokenIdMinted}`}
               >
                 View pass on OpenSea
               </StyledOpenSeaLink>
               <StyledPolygonScanLink
                 target="_blank"
-                href={`https://etherscan.io/tx/${transactionResponse.transactionHash}`}
+                href={`https://polygonscan.com/tx/${transactionResponse.transactionHash}`}
               >
-                View tx on etherscan
+                View tx on polygonscan
               </StyledPolygonScanLink>
             </StyledTransactionResponseWrapper>
           </>
