@@ -162,7 +162,12 @@ const ProfileDetails: React.FC = () => {
 
   const renderLinks = useMemo(
     () =>
-      profile?.links?.map((link) => {
+      [
+        { title: 'twitter', url: 'https://example.com' },
+        { title: 'instagram', url: 'https://example.com' },
+        { title: 'facebook', url: 'https://example.com' },
+        { title: 'web', url: 'https://example.com' },
+      ].map((link) => {
         const linkTitle = link.title.toLowerCase();
         if (linkTitle === 'twitter') {
           return (
@@ -263,42 +268,10 @@ const ProfileDetails: React.FC = () => {
                     </StyledProfileMediaWrapper>
                     <StyledProfileNameBioWrapper>
                       <StyledProfileName>@{profile?.name}</StyledProfileName>
-                      <StyledProfileLinks>{renderLinks}</StyledProfileLinks>
                       <StyledShareProfileHolder>
-                        <StyledShareProfileWrapper expand={isShare}>
-                          <StyledShareProfileHeader
-                            expand={isShare}
-                            onClick={shareButtonHandler}
-                          >
-                            <StyledShareIcon src={ShareIcon} />
-                            <HideOnScreen size="lg">Share Profile</HideOnScreen>
-                            <HideOnScreen size="lg">
-                              <StyledDropDownIcon src={DropDownIcon} />
-                            </HideOnScreen>
-                          </StyledShareProfileHeader>
-                          <HideOnScreen size="lg">
-                            <StyledTwitterShare
-                              expand={isShare}
-                              href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${profile?.name}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              <StyledTwitterIcon src={Twitter} />
-                              Twitter
-                            </StyledTwitterShare>
-                            <StyledFaceBookShare
-                              href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              <StyledFacebookIcon src={Facebook} />
-                              Facebook
-                            </StyledFaceBookShare>
-                            <StyledCopyLink onClick={copyText}>
-                              <StyledCopyLinkIcon src={Link} />
-                              {copied ? 'Copied' : 'Copy Link'}
-                            </StyledCopyLink>
-                          </HideOnScreen>
+                        <StyledProfileLinks>{renderLinks}</StyledProfileLinks>
+                        <StyledShareProfileWrapper>
+                          <StyledShareIcon src={ShareIcon} />
                         </StyledShareProfileWrapper>
                       </StyledShareProfileHolder>
                     </StyledProfileNameBioWrapper>

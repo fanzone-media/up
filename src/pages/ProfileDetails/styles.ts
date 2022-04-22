@@ -46,7 +46,7 @@ export const StyledProfileInfo1Content = styled.div`
   @media ${({ theme }) => theme.screen.md} {
     --profile-image-size: 11.25em;
     --outer-columns-width: calc(
-      50% - 1.25em - calc(var(--profile-image-size) / 2)
+      50% - 2.5em - calc(var(--profile-image-size) / 2)
     );
     align-items: center;
     display: grid;
@@ -143,12 +143,8 @@ export const StyledProfileBio = styled.p`
 
 export const StyledProfileLinks = styled.div`
   display: flex;
-  margin: auto 0 auto 0;
+  margin-right: 2.5em;
   column-gap: 0.625em;
-
-  @media ${({ theme }) => theme.screen.md} {
-    margin: auto 0 auto auto;
-  }
 `;
 
 export const StyledProfileInfo2 = styled.div`
@@ -170,6 +166,7 @@ export const StyledProfileInfo2Content = styled.div`
 `;
 
 export const StyledShareProfileHolder = styled.div`
+  display: flex;
   position: relative;
 
   @media ${({ theme }) => theme.screen.md} {
@@ -177,18 +174,13 @@ export const StyledShareProfileHolder = styled.div`
   }
 `;
 
-export const StyledShareProfileWrapper = styled.div<{ expand: boolean }>`
+export const StyledShareProfileWrapper = styled.div`
   background-color: rgba(59, 59, 59, 1);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;
-  width: 162px;
-  height: ${({ expand }) => (expand ? '160px' : '37px')};
-  display: flex;
-  flex-direction: column;
   padding: 6px;
   overflow: hidden;
   margin: auto 0;
-  position: ${({ expand }) => (expand ? 'absolute' : '')};
 
   @media ${({ theme }) => theme.screen.md} {
     margin: 0;
@@ -197,7 +189,7 @@ export const StyledShareProfileWrapper = styled.div<{ expand: boolean }>`
 `;
 
 export const StyledShareIcon = styled.img`
-  margin: auto;
+  height: 0.875em;
 `;
 
 export const StyledDropDownIcon = styled.img`
