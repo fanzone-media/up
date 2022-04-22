@@ -5,32 +5,23 @@ export const StyledProfileImageWrapper = styled.div`
   position: relative;
   display: flex;
   z-index: 0;
-  width: 120px;
-  height: 120px;
-
-  @media ${md} {
-    width: 175px;
-    height: 175px;
-  }
 `;
 
 export const StyledProfileImg = styled.img`
-  object-fit: cover;
-  object-position: center;
-  border-radius: 100%;
-  width: 110px;
+  border-radius: 50%;
+  height: calc(100% - 1em);
+  inset: 0;
   margin: auto;
-
-  @media ${md} {
-    width: 160px;
-  }
+  position: absolute;
+  width: auto;
 `;
 
 export const StyledBlockieImg = styled.img`
-  position: absolute;
-  z-index: -10;
+  align-items: center;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
   width: 100%;
-  border-radius: 100%;
 `;
 
 export const StyledBlockScoutLogo = styled.img`
@@ -39,6 +30,7 @@ export const StyledBlockScoutLogo = styled.img`
   right: 0;
   bottom: 0;
   animation: ${pulseAnimate} 2s ease-in-out infinite;
+  z-index: 10;
 
   @media ${({ theme }) => theme.screen.md} {
     width: 55px;
@@ -46,16 +38,8 @@ export const StyledBlockScoutLogo = styled.img`
 `;
 
 export const StyledUniversalProfileLogo = styled.img`
+  height: calc(100% - 1em);
+  inset: 0;
   position: absolute;
-  width: 30px;
-  top: 50%;
-  right: -14px;
-  margin-top: -15px;
-  animation: ${pulseAnimate} 2s ease-in-out infinite;
-
-  @media ${md} {
-    right: -20px;
-    width: 50px;
-    margin-top: -25px;
-  }
+  width: auto;
 `;

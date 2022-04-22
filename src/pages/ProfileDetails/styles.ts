@@ -14,13 +14,13 @@ export const StyledProfileDetailsContent = styled.div`
 `;
 
 export const StyledProfileNotFound = styled.h1`
-  font-size: 30px;
+  font-size: 1.875rem;
   margin: 60px auto 0 auto;
 `;
 
 export const StyledProfileCoverImg = styled.img`
   width: 100%;
-  height: 243px;
+  height: 15em;
   object-position: center;
   object-fit: cover;
   display: block;
@@ -32,7 +32,7 @@ export const StyledProfileInfoWrapper = styled.div`
 
 export const StyledProfileInfo1 = styled.div`
   width: 100%;
-  padding: 0 8px 0 8px;
+  padding: 0 0.5em;
   background-color: rgba(33, 33, 33, 1);
   display: flex;
 `;
@@ -40,16 +40,22 @@ export const StyledProfileInfo1 = styled.div`
 export const StyledProfileInfo1Content = styled.div`
   position: relative;
   display: flex;
-  padding: 20px 0 20px 0;
+  padding: 1.25em 0;
   width: 100%;
 
   @media ${({ theme }) => theme.screen.md} {
+    --profile-image-size: 11.25em;
+    --outer-columns-width: calc(
+      50% - 1.25em - calc(var(--profile-image-size) / 2)
+    );
     align-items: center;
     display: grid;
     width: 1440px;
-    grid-template-columns: calc(50% - 90px) 180px calc(50% - 90px);
+    grid-template-columns:
+      var(--outer-columns-width) var(--profile-image-size)
+      var(--outer-columns-width);
     grid-column-gap: 2.5em;
-    padding: 20px 40px 20px 40px;
+    padding: 1.25em 2.5em;
     margin: 0 auto 0 auto;
   }
 `;
@@ -81,14 +87,14 @@ export const StyledProfileMedia = styled.div`
 export const StyledProfileAddress = styled.p`
   font-weight: ${({ theme }) => theme.font.weight.light};
   letter-spacing: 1.5px;
-  width: calc(100% - 180px);
+  width: calc(100% - 12.85em);
   overflow-wrap: break-word;
   color: rgba(165, 165, 165, 1);
-  font-size: 14px;
+  font-size: 0.875rem;
 
   @media ${({ theme }) => theme.screen.md} {
     width: 100%;
-    font-size: 16px;
+    font-size: 1rem;
   }
 `;
 
@@ -96,7 +102,7 @@ export const StyledProfileNameBioWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin: auto 0 auto 0;
-  row-gap: 5px;
+  row-gap: 0.25em;
   width: 100%;
 
   @media ${({ theme }) => theme.screen.md} {
@@ -106,39 +112,39 @@ export const StyledProfileNameBioWrapper = styled.div`
 `;
 
 export const StyledProfileName = styled.h2`
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: ${({ theme }) => theme.font.weight.bolder};
   margin: auto 0 auto 0;
 
   @media ${({ theme }) => theme.screen.md} {
-    font-size: 15px;
+    font-size: 0.9375rem;
     margin: 0 0 0 5%;
   }
 `;
 
 export const StyledProfileBioHeading = styled.h2`
   font-weight: ${({ theme }) => theme.font.weight.bolder};
-  font-size: 15px;
+  font-size: 0.9375rem;
 `;
 
 export const StyledProfileBioWrapper = styled.div`
   margin: auto 0 auto 0;
 
   @media ${({ theme }) => theme.screen.md} {
-    width: calc(50% - 90px);
+    width: calc(50% - 5.625em);
     margin-left: auto;
     padding-left: 2.5%;
   }
 `;
 
 export const StyledProfileBio = styled.p`
-  font-size: 15px;
+  font-size: 0.9375rem;
 `;
 
 export const StyledProfileLinks = styled.div`
   display: flex;
   margin: auto 0 auto 0;
-  column-gap: 10px;
+  column-gap: 0.625em;
 
   @media ${({ theme }) => theme.screen.md} {
     margin: auto 0 auto auto;
@@ -147,12 +153,12 @@ export const StyledProfileLinks = styled.div`
 
 export const StyledProfileInfo2 = styled.div`
   width: 100%;
-  padding: 0 8px 0 8px;
+  padding: 0 0.5em;
   background-color: rgba(59, 59, 59, 1);
 
   @media ${({ theme }) => theme.screen.md} {
     max-width: 1440px;
-    padding: 0 40px 0 40px;
+    padding: 0 2.5em;
     margin: 0 auto 0 auto;
     background-color: transparent;
   }
@@ -160,7 +166,7 @@ export const StyledProfileInfo2 = styled.div`
 
 export const StyledProfileInfo2Content = styled.div`
   display: flex;
-  padding: 20px 0 20px 0;
+  padding: 1.25em 0 1.25em 0;
 `;
 
 export const StyledShareProfileHolder = styled.div`
@@ -232,10 +238,10 @@ export const StyledCopyLinkIcon = styled.img`
 
 export const StyledAssetsWrapper = styled.div`
   width: 100%;
-  padding: 0 8px 0 8px;
+  padding: 0 0.5em;
 
   @media ${({ theme }) => theme.screen.md} {
-    padding: 0 40px 0 40px;
+    padding: 0 2.5em;
     max-width: 1440px;
     margin: 0 auto 0 auto;
   }
@@ -246,19 +252,11 @@ export const StyledLinkIcon = styled.img``;
 export const StyledOpenTransferModalButton = styled.button`
   background-color: rgba(33, 33, 33, 1);
   max-width: max-content;
-  margin: 20px auto;
-  padding: 5px 10px;
+  margin: 1.25em auto;
+  padding: 5px 0.625em;
   border-radius: 8px;
 
   @media ${({ theme }) => theme.screen.md} {
     margin: 0 auto;
-  }
-`;
-
-export const HideOnScreen = styled.div<{
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-}>`
-  @media ${({ theme, size }) => theme.screen[size]} {
-    display: none;
   }
 `;
