@@ -7,6 +7,7 @@ import { useAppDispatch } from '../../boot/store';
 import Pagination from '../../features/pagination/Pagination';
 import makeBlockie from 'ethereum-blockies-base64';
 import {
+  HideOnScreen,
   StyledAssetsWrapper,
   StyledCopyLink,
   StyledCopyLinkIcon,
@@ -57,6 +58,7 @@ import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 import { useAccount, useSigner } from 'wagmi';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TransferCardModal } from './TransferCardModal';
+import { useCopyText } from '../../hooks/useCopyText';
 
 interface IParams {
   add: string;
@@ -90,7 +92,7 @@ const ProfileDetails: React.FC = () => {
 
   const [isShare, setIsShare] = useState<boolean>(false);
 
-  const [copied, setCopied] = useState<boolean>(false);
+  const { copied, copyText } = useCopyText();
 
   const isTablet = useMediaQuery(theme.screen.md);
 
@@ -192,14 +194,6 @@ const ProfileDetails: React.FC = () => {
     [profile?.links],
   );
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied((copied) => !copied);
-    setTimeout(() => {
-      setCopied((copied) => !copied);
-    }, 2000);
-  };
-
   const shareButtonHandler = () => {
     setIsShare((isShare) => !isShare);
   };
@@ -277,30 +271,34 @@ const ProfileDetails: React.FC = () => {
                             onClick={shareButtonHandler}
                           >
                             <StyledShareIcon src={ShareIcon} />
-                            Share Profile
-                            <StyledDropDownIcon src={DropDownIcon} />
+                            <HideOnScreen size="lg">Share Profile</HideOnScreen>
+                            <HideOnScreen size="lg">
+                              <StyledDropDownIcon src={DropDownIcon} />
+                            </HideOnScreen>
                           </StyledShareProfileHeader>
-                          <StyledTwitterShare
-                            expand={isShare}
-                            href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${profile?.name}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <StyledTwitterIcon src={Twitter} />
-                            Twitter
-                          </StyledTwitterShare>
-                          <StyledFaceBookShare
-                            href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <StyledFacebookIcon src={Facebook} />
-                            Facebook
-                          </StyledFaceBookShare>
-                          <StyledCopyLink onClick={copyLink}>
-                            <StyledCopyLinkIcon src={Link} />
-                            {copied ? 'Copied' : 'Copy Link'}
-                          </StyledCopyLink>
+                          <HideOnScreen size="lg">
+                            <StyledTwitterShare
+                              expand={isShare}
+                              href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${profile?.name}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <StyledTwitterIcon src={Twitter} />
+                              Twitter
+                            </StyledTwitterShare>
+                            <StyledFaceBookShare
+                              href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <StyledFacebookIcon src={Facebook} />
+                              Facebook
+                            </StyledFaceBookShare>
+                            <StyledCopyLink onClick={copyText}>
+                              <StyledCopyLinkIcon src={Link} />
+                              {copied ? 'Copied' : 'Copy Link'}
+                            </StyledCopyLink>
+                          </HideOnScreen>
                         </StyledShareProfileWrapper>
                       </StyledShareProfileHolder>
                     </StyledProfileNameBioWrapper>
