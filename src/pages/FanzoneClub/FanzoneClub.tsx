@@ -28,11 +28,27 @@ import {
 } from './styles';
 import { TransactionResponse } from '@ethersproject/providers';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
-
-const validChainIds = [1];
-const fanzoneClubContractAddress = '0x4b406ACb6C43Caf306e4662AAf3a4C8e085e6439';
+import { useLocation } from 'react-router-dom';
 
 const FanzoneClub: FC = () => {
+  const location = useLocation();
+  const [
+    validChainIds,
+    expectedChainName,
+    fanzoneClubContractAddress,
+    numbersAfterDecimal,
+  ] = useMemo(() => {
+    if (location.pathname.includes('test')) {
+      return [
+        [137],
+        'Polygon',
+        '0x34c01dD64203b566C4CaE656C832d5a449A34c98',
+        7,
+      ];
+    }
+    return [[1], 'Ethereum', '0x4b406ACb6C43Caf306e4662AAf3a4C8e085e6439', 2];
+  }, [location]);
+
   const [{ data: connectData }] = useConnect();
   const [{ data: network }] = useNetwork();
   const [{ data: signer }] = useSigner();
@@ -63,9 +79,9 @@ const FanzoneClub: FC = () => {
     whiteListSale: false,
     ownedPasses: BigNumber.from(0),
   });
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<string>('');
 
-  const mintFanzoneClubCard = async () => {
+  const mintFanzoneClubCard = useCallback(async () => {
     setError('');
     setStatus(STATUS.LOADING);
     await fanzoneClubContract
@@ -85,7 +101,7 @@ const FanzoneClub: FC = () => {
         setError(err.data ? err.data.message : err.message);
         setStatus(STATUS.IDLE);
       });
-  };
+  }, [fanzoneClubContract, formInput.amount, formInput.maticAmount]);
 
   const whitelistMint = useCallback(async () => {
     setError('');
@@ -110,7 +126,9 @@ const FanzoneClub: FC = () => {
         });
       })
       .catch((err: any) => {
-        setError(err.data ? err.data.message : err.message);
+        setError(
+          err.reason ? err.reason : err.data ? err.data.message : err.message,
+        );
         setStatus(STATUS.IDLE);
       });
   }, [fanzoneClubContract, formInput.amount, formInput.maticAmount, account]);
@@ -122,7 +140,7 @@ const FanzoneClub: FC = () => {
         network.chain?.id || 0,
         validChainIds,
       ),
-    [connectData.connected, network.chain],
+    [connectData.connected, network.chain, validChainIds],
   );
 
   useEffect(() => {
@@ -151,13 +169,11 @@ const FanzoneClub: FC = () => {
         ) : (
           !validConnection && (
             <StyledErrorMessage>
-              Wrong Chain! Please switch to Ethereum
+              Wrong Chain! Please switch to {expectedChainName}
             </StyledErrorMessage>
           )
         )}
-        {error !== '' && (
-          <StyledErrorMessage>Attention: an error accured!</StyledErrorMessage>
-        )}
+        {error !== '' && <StyledErrorMessage>{error}</StyledErrorMessage>}
         {status === STATUS.IDLE && (
           <>
             <StyledBalanceLabel>
@@ -168,7 +184,7 @@ const FanzoneClub: FC = () => {
                 Amount in Ether:{' '}
                 {parseFloat(
                   ethers.utils.formatEther(formInput.maticAmount),
-                ).toFixed(7)}
+                ).toFixed(numbersAfterDecimal)}
               </StyledInputLabel>
             </StyledInputWrapper>
             <StyledInputWrapper>

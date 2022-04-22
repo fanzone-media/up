@@ -24,10 +24,6 @@ const FanzoneClub = React.lazy(
   () => import('../pages/FanzoneClub/FanzoneClub'),
 );
 
-const FanzoneClubTest = React.lazy(
-  () => import('../pages/FanzoneClubTest/FanzoneClubTest'),
-);
-
 const Routes: React.FC = () => {
   return (
     <Router>
@@ -46,7 +42,7 @@ const Routes: React.FC = () => {
             <FanzoneClub />
           </Route>
           <Route exact path="/test/fanzoneSportsClub">
-            <FanzoneClubTest />
+            <FanzoneClub />
           </Route>
           <Route exact path="/addpermissions">
             <AddPermissions />
