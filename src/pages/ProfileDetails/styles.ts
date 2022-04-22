@@ -254,3 +254,11 @@ export const StyledOpenTransferModalButton = styled.button`
     margin: 0 auto;
   }
 `;
+
+export const HideOnScreen = styled.div<{
+  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+}>`
+  @media ${({ theme, size }) => theme.screen[size]} {
+    display: none;
+  }
+`;
