@@ -6,7 +6,7 @@ import { useAppDispatch } from '../../boot/store';
 import Pagination from '../../features/pagination/Pagination';
 import makeBlockie from 'ethereum-blockies-base64';
 import {
-  StyledAssetsWrappar,
+  StyledAssetsWrapper,
   StyledCopyLink,
   StyledCopyLinkIcon,
   StyledDropDownIcon,
@@ -22,17 +22,17 @@ import {
   StyledProfileInfo1Content,
   StyledProfileInfo2,
   StyledProfileInfo2Content,
-  StyledProfileInfoWrappar,
+  StyledProfileInfoWrapper,
   StyledProfileLinks,
   StyledProfileMedia,
-  StyledProfileMediaWrappar,
+  StyledProfileMediaWrapper,
   StyledProfileName,
-  StyledProfileNameBioWrappar,
+  StyledProfileNameBioWrapper,
   StyledProfileNotFound,
   StyledShareIcon,
   StyledShareProfileHeader,
   StyledShareProfileHolder,
-  StyledShareProfileWrappar,
+  StyledShareProfileWrapper,
   StyledTwitterIcon,
   StyledTwitterShare,
 } from './styles';
@@ -248,7 +248,7 @@ const ProfileDetails: React.FC = () => {
           ) : (
             <>
               <StyledProfileCoverImg src={profile?.backgroundImage} alt="" />
-              <StyledProfileInfoWrappar>
+              <StyledProfileInfoWrapper>
                 <StyledProfileInfo1>
                   <StyledProfileInfo1Content>
                     {isTablet && (
@@ -256,7 +256,7 @@ const ProfileDetails: React.FC = () => {
                         {profile?.address}
                       </StyledProfileAddress>
                     )}
-                    <StyledProfileMediaWrappar>
+                    <StyledProfileMediaWrapper>
                       <StyledProfileMedia>
                         <ProfileImage
                           profileImgSrc={profile?.profileImage}
@@ -266,12 +266,12 @@ const ProfileDetails: React.FC = () => {
                           profileAddress={profile?.address}
                         />
                       </StyledProfileMedia>
-                    </StyledProfileMediaWrappar>
-                    <StyledProfileNameBioWrappar>
+                    </StyledProfileMediaWrapper>
+                    <StyledProfileNameBioWrapper>
                       <StyledProfileName>@{profile?.name}</StyledProfileName>
                       <StyledProfileLinks>{renderLinks}</StyledProfileLinks>
                       <StyledShareProfileHolder>
-                        <StyledShareProfileWrappar expand={isShare}>
+                        <StyledShareProfileWrapper expand={isShare}>
                           <StyledShareProfileHeader
                             expand={isShare}
                             onClick={shareButtonHandler}
@@ -301,9 +301,9 @@ const ProfileDetails: React.FC = () => {
                             <StyledCopyLinkIcon src={Link} />
                             {copied ? 'Copied' : 'Copy Link'}
                           </StyledCopyLink>
-                        </StyledShareProfileWrappar>
+                        </StyledShareProfileWrapper>
                       </StyledShareProfileHolder>
-                    </StyledProfileNameBioWrappar>
+                    </StyledProfileNameBioWrapper>
                   </StyledProfileInfo1Content>
                 </StyledProfileInfo1>
                 <StyledProfileInfo2>
@@ -313,7 +313,7 @@ const ProfileDetails: React.FC = () => {
                     )}
                   </StyledProfileInfo2Content>
                 </StyledProfileInfo2>
-              </StyledProfileInfoWrappar>
+              </StyledProfileInfoWrapper>
               {signer &&
                 profile &&
                 data &&
@@ -327,7 +327,7 @@ const ProfileDetails: React.FC = () => {
                     Transfer Cards
                   </StyledOpenTransferModalButton>
                 )}
-              <StyledAssetsWrappar>
+              <StyledAssetsWrapper>
                 {profile && profile.issuedAssets.length > 0 ? (
                   renderIssuedAssetsPagination
                 ) : (
@@ -336,7 +336,7 @@ const ProfileDetails: React.FC = () => {
                 {profile &&
                   profile.ownedAssets.length > 0 &&
                   renderOwnedAssetsPagination}
-              </StyledAssetsWrappar>
+              </StyledAssetsWrapper>
             </>
           )}
         </StyledProfileDetailsContent>

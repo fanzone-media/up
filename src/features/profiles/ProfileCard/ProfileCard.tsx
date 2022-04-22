@@ -5,12 +5,12 @@ import { NetworkName } from '../../../boot/types';
 import makeBlockie from 'ethereum-blockies-base64';
 import {
   StyledBalance,
-  StyledBalanceWrappar,
+  StyledBalanceWrapper,
   StyledPolygon,
   StyledProfileBlockie,
   StyledProfileCard,
   StyledProfileDetail,
-  StyledProfileDetailWrappar,
+  StyledProfileDetailWrapper,
   StyledProfileImg,
   StyledProfileMedia,
   StyledProfileName,
@@ -54,18 +54,17 @@ export const ProfileCard: React.FC<Iprops> = ({
         `/${params.network}/profile/` +
         Web3.utils.toChecksumAddress(userProfile.address)
       }
-      className="animate-cardrender"
       demo={type === 'demo' ? true : false}
       data-tip={
         type !== 'demo' && getTooltipTokenIds && getTooltipTokenIds.tokenIds
       }
       data-for={tooltipId}
     >
-      <StyledBalanceWrappar demo={type === 'demo' ? true : false}>
+      <StyledBalanceWrapper demo={type === 'demo' ? true : false}>
         <StyledBalance demo={type === 'demo' ? true : false}>
           {type === 'demo' ? userProfile.ownedAssets.length : balance}
         </StyledBalance>
-      </StyledBalanceWrappar>
+      </StyledBalanceWrapper>
       <StyledPolygon
         src={polygon}
         alt=""
@@ -83,7 +82,7 @@ export const ProfileCard: React.FC<Iprops> = ({
           demo={type === 'demo' ? true : false}
         />
       </StyledProfileMedia>
-      <StyledProfileDetailWrappar demo={type === 'demo' ? true : false}>
+      <StyledProfileDetailWrapper demo={type === 'demo' ? true : false}>
         <StyledProfileDetail>
           <StyledProfileName demo={type === 'demo' ? true : false}>
             {' '}
@@ -91,7 +90,7 @@ export const ProfileCard: React.FC<Iprops> = ({
           </StyledProfileName>
           <StyledProfileRole>FANZONE user</StyledProfileRole>
         </StyledProfileDetail>
-      </StyledProfileDetailWrappar>
+      </StyledProfileDetailWrapper>
     </StyledProfileCard>
   );
 };

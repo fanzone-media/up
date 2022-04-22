@@ -31,7 +31,7 @@ import {
   StyledCardError,
   StyledLoader,
   StyledLoadingHolder,
-  StyledAssetDetailsContentWrappar,
+  StyledAssetDetailsContentWrapper,
   StyledCardInfoWrapper,
   StyledCardPriceWrapper,
   StyledCardInfo,
@@ -459,7 +459,7 @@ const AssetDetails: React.FC = () => {
   }, [asset, cardProperties, currentIndex, ownedTokenIds, propertiesImages]);
 
   return (
-    <StyledAssetDetailsContentWrappar>
+    <StyledAssetDetailsContentWrapper>
       {cardStatus === 'loading' ? (
         <StyledLoadingHolder>
           <StyledLoader color="#ed7a2d" />
@@ -558,7 +558,7 @@ const AssetDetails: React.FC = () => {
               </StyledHoldersAccordion>
               {/* <StyledGrid>
                 <StyledAssetDetailGrid>
-                  <StyledMediaWrappar>
+                  <StyledMediaWrapper>
                     {params.network === 'l14' && (
                       <a
                         href={
@@ -583,27 +583,27 @@ const AssetDetails: React.FC = () => {
                     </a>
                     <StyledStatsName>{metaCardInfo[0].data}</StyledStatsName>
                     <StyledMetaCardImg src={asset?.ls8MetaData.image} alt="" />
-                  </StyledMediaWrappar>
-                  <StyledDetailsWrappar>
+                  </StyledMediaWrapper>
+                  <StyledDetailsWrapper>
                     <StyledCardInfoLabel>Card Info</StyledCardInfoLabel>
                     <StyledInfoGrid>{renderCardProperties}</StyledInfoGrid>
                     <StyledFullName>{asset?.name}</StyledFullName>
-                  </StyledDetailsWrappar>
+                  </StyledDetailsWrapper>
                 </StyledAssetDetailGrid>
                 <StyledExtraInfo>
                   <StyledIssuerLabel>Issuer</StyledIssuerLabel>
-                  <StyledIssuerWrappar>{renderOwner}</StyledIssuerWrappar>
+                  <StyledIssuerWrapper>{renderOwner}</StyledIssuerWrapper>
                   <StyledCreatorLabel>Creator</StyledCreatorLabel>
-                  <StyledCreatorWrappar>{renderDesigners}</StyledCreatorWrappar>
+                  <StyledCreatorWrapper>{renderDesigners}</StyledCreatorWrapper>
                 </StyledExtraInfo>
               </StyledGrid>
               <StyledHolderLabel>Holder</StyledHolderLabel>
-              <StyledHolderWrappar>{renderHolders}</StyledHolderWrappar> */}
+              <StyledHolderWrapper>{renderHolders}</StyledHolderWrapper> */}
             </StyledAssetDetailContent>
           )}
         </>
       )}
-    </StyledAssetDetailsContentWrappar>
+    </StyledAssetDetailsContentWrapper>
   );
 };
 

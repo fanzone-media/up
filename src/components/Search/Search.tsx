@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyledInput, StyledInputWrappar, StyledSearchIcon } from './styles';
+import { StyledInput, StyledInputWrapper, StyledSearchIcon } from './styles';
 import { SearchIcon } from '../../assets';
 
 interface IProps {
@@ -8,9 +8,9 @@ interface IProps {
 
 export const Search: React.FC<IProps> = ({ onChange }: IProps) => {
   return (
-    <StyledInputWrappar>
+    <StyledInputWrapper>
       <StyledSearchIcon src={SearchIcon} />
       <StyledInput placeholder="Search" onChange={onChange}></StyledInput>
-    </StyledInputWrappar>
+    </StyledInputWrapper>
   );
 };

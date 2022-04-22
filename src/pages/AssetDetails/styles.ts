@@ -5,7 +5,7 @@ import { Accordion } from '../../components/Accordion';
 import { pulseAnimate } from '../../features/cards/MetaCard/styles';
 import { lg, md, sm, xl } from '../../utility';
 
-export const StyledAssetDetailsContentWrappar = styled.div`
+export const StyledAssetDetailsContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   color: white;
@@ -76,7 +76,7 @@ export const StyledAssetDetailContent = styled.div`
 //   }
 // `;
 
-// export const StyledMediaWrappar = styled.div`
+// export const StyledMediaWrapper = styled.div`
 //   position: relative;
 //   background: url(${BgMetaCard});
 //   background-position: center;
@@ -124,7 +124,7 @@ export const StyledExplorerIcon = styled.img`
   animation: ${pulseAnimate} 2s ease-in-out infinite;
 `;
 
-// export const StyledDetailsWrappar = styled.div`
+// export const StyledDetailsWrapper = styled.div`
 //   display: flex;
 //   flex-direction: column;
 //   padding: 10px 0px 0px 0px;
@@ -253,7 +253,7 @@ export const StyledLabel = styled.p`
 //   }
 // `;
 
-// export const StyledIssuerWrappar = styled.div`
+// export const StyledIssuerWrapper = styled.div`
 //   display: grid;
 //   grid-template-columns: repeat(3, 1fr);
 //   justify-items: center;
@@ -273,9 +273,9 @@ export const StyledLabel = styled.p`
 //   }
 // `;
 
-// export const StyledCreatorWrappar = styled(StyledIssuerWrappar)``;
+// export const StyledCreatorWrapper = styled(StyledIssuerWrapper)``;
 
-// export const StyledHolderWrappar = styled(StyledIssuerWrappar)`
+// export const StyledHolderWrapper = styled(StyledIssuerWrapper)`
 //   display: grid;
 //   grid-template-columns: repeat(3, 1fr);
 //   margin: 0 8px 0 8px;

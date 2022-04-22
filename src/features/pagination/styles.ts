@@ -1,7 +1,7 @@
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { lg, md, xl } from '../../utility';
 
-export const StyledPaginationWrappar = styled.div`
+export const StyledPaginationWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
@@ -18,7 +18,7 @@ export const StyledAssetsHeading = styled.h1`
   margin-right: auto;
 `;
 
-export const StyledAssetsWrappar = styled.div`
+export const StyledAssetsWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   width: 100%;

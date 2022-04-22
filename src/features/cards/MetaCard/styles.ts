@@ -11,7 +11,7 @@ export const pulseAnimate = keyframes`
     }
 `;
 
-export const StyledCardWrappar = styled.div`
+export const StyledCardWrapper = styled.div`
   position: relative;
   width: 165px;
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -22,7 +22,7 @@ export const StyledCardWrappar = styled.div`
   }
 `;
 
-export const StyledMediaWrappar = styled.div`
+export const StyledMediaWrapper = styled.div`
   width: 100%;
   height: 211px;
   display: flex;

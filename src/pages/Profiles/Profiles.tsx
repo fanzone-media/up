@@ -16,7 +16,7 @@ import {
   StyledWelcomeHeading,
   StyledProfilesHeader,
   StyledProfileHeading,
-  StyledProfilesWrappar,
+  StyledProfilesWrapper,
 } from './styles';
 import { Search } from '../../components/Search';
 import { useAppDispatch } from '../../boot/store';
@@ -113,7 +113,7 @@ const Profiles: React.FC = () => {
             <StyledProfileHeading>Profiles</StyledProfileHeading>
             <Search />
           </StyledProfilesHeader>
-          <StyledProfilesWrappar>{renderProfiles}</StyledProfilesWrappar>
+          <StyledProfilesWrapper>{renderProfiles}</StyledProfilesWrapper>
           <Pagination
             type="demo"
             collectionAddresses={demoAssets[params.network]}

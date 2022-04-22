@@ -6,7 +6,7 @@ import { getChainExplorer } from '../../../utility';
 import {
   StyledBlockieImg,
   StyledBlockScoutLogo,
-  StyledProfileImageWrappar,
+  StyledProfileImageWrapper,
   StyledProfileImg,
   StyledUniversalProfileLogo,
 } from './styles';
@@ -29,7 +29,7 @@ export const ProfileImage: React.FC<IProps> = ({
   const params = useParams<IParams>();
   const explorer = getChainExplorer(params.network);
   return (
-    <StyledProfileImageWrappar>
+    <StyledProfileImageWrapper>
       <StyledBlockieImg src={blockieImgSrc} />
       <a
         href={explorer && explorer.exploreUrl + profileAddress}
@@ -42,13 +42,12 @@ export const ProfileImage: React.FC<IProps> = ({
         <a
           href={'https://universalprofile.cloud/' + profileAddress}
           target="_blank"
-          className=""
           rel="noreferrer"
         >
           <StyledUniversalProfileLogo src={UniversalProfileIcon} />
         </a>
       )}
       <StyledProfileImg src={profileImgSrc} />
-    </StyledProfileImageWrappar>
+    </StyledProfileImageWrapper>
   );
 };
