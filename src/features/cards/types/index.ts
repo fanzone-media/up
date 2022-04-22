@@ -8,6 +8,8 @@ interface IBaseState {
   ownedError: Error | SerializedError | null;
   issuedError: Error | SerializedError | null;
   status: STATUS;
+  metaDataError: Error | SerializedError | null;
+  metaDataStatus: STATUS;
   error: Error | SerializedError | null;
 }
 export type ICardItemsState = IBaseState;

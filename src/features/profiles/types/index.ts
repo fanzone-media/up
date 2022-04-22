@@ -3,7 +3,6 @@ import { IProfile } from '../../../services/models';
 import { STATUS } from '../../../utility';
 
 interface IBaseState {
-  me: string | null;
   status: STATUS;
   holderStatus: STATUS;
   creatorStatus: STATUS;
@@ -14,6 +13,7 @@ interface IBaseState {
 export type IUsersState = IBaseState;
 
 export type IUserDataSliceState = {
+  me: string | null;
   l14: IUsersState & EntityState<IProfile>;
   polygon: IUsersState & EntityState<IProfile>;
   mumbai: IUsersState & EntityState<IProfile>;

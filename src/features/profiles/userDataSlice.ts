@@ -20,7 +20,6 @@ const usersAdapter = createEntityAdapter<IProfile>({
 });
 
 const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
-  me: null,
   status: STATUS.IDLE,
   holderStatus: STATUS.IDLE,
   creatorStatus: STATUS.IDLE,
@@ -36,6 +35,7 @@ const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
  */
 
 const initialState: IUserDataSliceState = {
+  me: null,
   l14: usersAdapterInitialState,
   polygon: usersAdapterInitialState,
   mumbai: usersAdapterInitialState,

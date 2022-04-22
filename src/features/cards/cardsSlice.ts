@@ -5,7 +5,7 @@ import {
 } from '@reduxjs/toolkit';
 import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
-import { ICard, ILSP8MetaData } from '../../services/models';
+import { ICard } from '../../services/models';
 import { STATUS } from '../../utility';
 import { ICardItemsState, ICardState } from './types';
 
@@ -31,6 +31,8 @@ const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
   issuedError: null,
   status: STATUS.IDLE,
   error: null,
+  metaDataStatus: STATUS.IDLE,
+  metaDataError: null,
 });
 
 /**
@@ -181,16 +183,16 @@ const cardsSlice = createSlice({
       });
     builder
       .addCase(fetchMetaDataForTokenId.pending, (state, _action) => {
-        state.status = STATUS.LOADING;
+        state.metaDataStatus = STATUS.LOADING;
       })
       .addCase(fetchMetaDataForTokenId.fulfilled, (state, action) => {
         if (action.payload)
           cardsAdapter.upsertOne(state, action.payload as ICard);
-        state.status = STATUS.IDLE;
+        state.metaDataStatus = STATUS.IDLE;
       })
       .addCase(fetchMetaDataForTokenId.rejected, (state, action) => {
-        state.error = action.error;
-        state.status = STATUS.FAILED;
+        state.metaDataError = action.error;
+        state.metaDataStatus = STATUS.FAILED;
       });
   },
 });

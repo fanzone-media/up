@@ -358,6 +358,10 @@ export const StyledMintSkipButtonImg = styled.img`
   margin: auto;
 `;
 
+export const StyledMintSliderIndex = styled.p`
+  margin: auto 0;
+`;
+
 export const StyledCardInfoWrapper = styled.div`
   display: flex;
   flex-direction: column;

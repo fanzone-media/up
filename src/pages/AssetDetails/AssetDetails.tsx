@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ProfileCard } from '../../features/profiles/ProfileCard';
 import {
   BackwardsIcon,
   CategoryPropertyIcon,
@@ -25,16 +24,8 @@ import {
   selectCardById,
 } from '../../features/cards';
 import { useEffect } from 'react';
-import {
-  fetchAssetCreator,
-  fetchAssetHolders,
-  fetchProfileByAddress,
-  selectAllUsersItems,
-  selectUserById,
-  selectUserIds,
-} from '../../features/profiles';
+import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
 import { useMemo } from 'react';
-import { IProfile } from '../../services/models';
 import {
   StyledAssetDetailContent,
   StyledCardError,
@@ -76,14 +67,15 @@ import {
   StyledMintSkipButton,
   StyledMintSkipButtonImg,
   StyledExplorerIcon,
+  StyledMintSliderIndex,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer, STATUS } from '../../utility';
-import ReactTooltip from 'react-tooltip';
-import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
-import { useSigner } from 'wagmi';
-import { Accordion } from '../../components/Accordion';
-import { HolderPagination } from './HoldersPagination';
+// import ReactTooltip from 'react-tooltip';
+// import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
+// import { useSigner } from 'wagmi';
+// import { Accordion } from '../../components/Accordion';
+// import { HolderPagination } from './HoldersPagination';
 
 interface IPrams {
   add: string;
@@ -96,9 +88,17 @@ const AssetDetails: React.FC = () => {
 
   const explorer = getChainExplorer(params.network);
 
-  const profiles = useSelector((state: RootState) =>
-    selectUserIds(state.userData[params.network]),
+  const wasActiveProfile = useSelector((state: RootState) => state.userData.me);
+
+  const activeUser = useSelector(
+    (state: RootState) =>
+      wasActiveProfile &&
+      selectUserById(state.userData[params.network], wasActiveProfile),
   );
+
+  // const profiles = useSelector((state: RootState) =>
+  //   selectUserIds(state.userData[params.network]),
+  // );
 
   const asset = useSelector((state: RootState) =>
     selectCardById(state, params.add),
@@ -111,17 +111,35 @@ const AssetDetails: React.FC = () => {
     ),
   );
 
-  const creators = useSelector((state: RootState) =>
-    selectAllUsersItems(state.userData[params.network]),
-  )?.filter((item) => {
-    return asset?.creators.some((i) => {
-      return i === item.address && item.network === params.network;
-    });
-  });
+  const ownerStatus = useSelector(
+    (state: RootState) => state.userData[params.network].status,
+  );
+
+  // const creators = useSelector((state: RootState) =>
+  //   selectAllUsersItems(state.userData[params.network]),
+  // )?.filter((item) => {
+  //   return asset?.creators.some((i) => {
+  //     return i === item.address && item.network === params.network;
+  //   });
+  // });
 
   const cardError = useSelector((state: RootState) => state.cards.error);
 
   const cardStatus = useSelector((state: RootState) => state.cards.status);
+
+  const metaDataStatus = useSelector(
+    (state: RootState) => state.cards.metaDataStatus,
+  );
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+
+  const ownedTokenIds = useMemo(
+    () =>
+      activeUser &&
+      activeUser.ownedAssets.find(
+        (item) => item.assetAddress.toLowerCase() === params.add.toLowerCase(),
+      )?.tokenIds,
+    [activeUser, params.add],
+  );
 
   const dispatch = useAppDispatch();
 
@@ -137,27 +155,62 @@ const AssetDetails: React.FC = () => {
   // );
 
   useMemo(() => {
-    if (!owner && asset) {
-      dispatch(
-        fetchProfileByAddress({
-          address: asset.owner,
-          network: params.network,
-        }),
-      );
-    }
-  }, [asset, dispatch, owner, params.network]);
+    if (!asset || owner || ownerStatus === STATUS.LOADING) return;
+
+    dispatch(
+      fetchProfileByAddress({
+        address: asset.owner,
+        network: params.network,
+      }),
+    );
+  }, [asset, dispatch, owner, ownerStatus, params.network]);
 
   useMemo(() => {
-    if (asset && params.id) {
+    if (
+      !asset ||
+      !params.id ||
+      `${params.id}` in asset.ls8MetaData ||
+      metaDataStatus === STATUS.LOADING
+    )
+      return;
+    dispatch(
+      fetchMetaDataForTokenId({
+        assetAddress: params.add,
+        network: params.network,
+        tokenId: params.id,
+      }),
+    );
+  }, [asset, dispatch, metaDataStatus, params.add, params.id, params.network]);
+
+  useMemo(() => {
+    if (
+      !params.id &&
+      wasActiveProfile &&
+      ownedTokenIds &&
+      ownedTokenIds.length > 0 &&
+      asset &&
+      !(`${ownedTokenIds[currentIndex].toString()}` in asset.ls8MetaData) &&
+      metaDataStatus !== STATUS.LOADING
+    ) {
       dispatch(
         fetchMetaDataForTokenId({
           assetAddress: params.add,
           network: params.network,
-          tokenId: params.id,
+          tokenId: ownedTokenIds[currentIndex],
         }),
       );
     }
-  }, [asset, dispatch, params.add, params.id, params.network]);
+  }, [
+    asset,
+    currentIndex,
+    dispatch,
+    metaDataStatus,
+    ownedTokenIds,
+    params.add,
+    params.id,
+    params.network,
+    wasActiveProfile,
+  ]);
 
   // useMemo(() => {
   //   let addresses: string[] = [];
@@ -194,69 +247,81 @@ const AssetDetails: React.FC = () => {
     window.scrollTo(0, 0);
   }, [asset, cardStatus, dispatch, params.add, params.network]);
 
-  const renderOwner = useMemo(() => {
-    if (asset?.address === params.add) {
-      if (owner?.address === asset.owner) {
-        const findBalanceOf = owner.ownedAssets.find(
-          (item) => item.assetAddress === params.add.toLowerCase(),
-        );
-        return (
-          <React.Fragment key={owner.address}>
-            <ProfileCard
-              userProfile={owner}
-              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-              type="owner"
-              tooltipId="ownerTooltip"
-            />
-            <ReactTooltip
-              id="ownerTooltip"
-              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-            ></ReactTooltip>
-          </React.Fragment>
-        );
-      }
-    }
-  }, [asset?.address, asset?.owner, params.add, owner]);
-
-  const renderDesigners = useMemo(
-    () =>
-      creators?.map((creator: IProfile) => {
-        const findBalanceOf = creator.ownedAssets.find(
-          (item) => item.assetAddress === params.add.toLowerCase(),
-        );
-        return (
-          <React.Fragment key={creator.address}>
-            <ProfileCard
-              userProfile={creator}
-              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-              type="creator"
-              tooltipId="designerTooltip"
-            />
-            <ReactTooltip
-              id="designerTooltip"
-              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-            ></ReactTooltip>
-          </React.Fragment>
-        );
-      }),
-    [creators, params.add],
+  const propertiesImages: { [key: string]: string } = useMemo(
+    () => ({
+      Tier: TierPropertyIcon,
+      Edition: EditionPropertyIcon,
+      'Edition Category': CategoryPropertyIcon,
+      'Edition Set': SetPropertyIcon,
+      Season: SeasonPropertyIcon,
+      Zone: ZonePropertyIcon,
+      League: SubzonePropertyIcon,
+      Team: TeamPropertyIcon,
+    }),
+    [],
   );
 
-  const renderHolderPagination = useMemo(
-    () => <HolderPagination holdersAddresses={asset ? asset.holders : []} />,
-    [asset],
+  const cardProperties = useMemo(
+    () => [
+      {
+        label: 'Tier',
+        value:
+          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+            ?.tier,
+        icon: TierPropertyIcon,
+      },
+      {
+        label: 'Edition',
+        value:
+          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+            ?.edition,
+        icon: EditionPropertyIcon,
+      },
+      {
+        label: 'Category',
+        value:
+          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+            ?.editionCategory,
+        icon: CategoryPropertyIcon,
+      },
+      {
+        label: 'Set',
+        value:
+          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+            ?.editionSet,
+        icon: SetPropertyIcon,
+      },
+      {
+        label: 'Season',
+        value:
+          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+            ?.season,
+        icon: SeasonPropertyIcon,
+      },
+      {
+        label: 'Zone',
+        value:
+          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+            ?.zoneLabel,
+        icon: ZonePropertyIcon,
+      },
+      {
+        label: 'League',
+        value:
+          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+            ?.leagueLabel,
+        icon: SubzonePropertyIcon,
+      },
+      {
+        label: 'Team',
+        value:
+          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+            ?.teamLabel,
+        icon: TeamPropertyIcon,
+      },
+    ],
+    [asset, currentIndex, ownedTokenIds],
   );
-
-  const propertiesImages: { [key: string]: string } = {
-    Tier: TierPropertyIcon,
-    Edition: EditionPropertyIcon,
-    'Edition Category': CategoryPropertyIcon,
-    'Edition Set': SetPropertyIcon,
-    Season: SeasonPropertyIcon,
-    Zone: ZonePropertyIcon,
-    League: SubzonePropertyIcon,
-    Team: TeamPropertyIcon,
-  };
 
   const cardInfo: {
     label: string;
@@ -268,7 +333,10 @@ const AssetDetails: React.FC = () => {
       value: asset ? asset.address : '',
       valueType: 'address',
     },
-    { label: 'Mint', value: '' },
+    {
+      label: 'Mint',
+      value: ownedTokenIds ? ownedTokenIds[currentIndex].toString() : '',
+    },
     {
       label: 'Total amount of Tokens',
       value: asset ? asset.totalSupply.toString() : '',
@@ -279,36 +347,116 @@ const AssetDetails: React.FC = () => {
     { label: 'Current owner', value: '', valueType: 'address' },
   ];
 
-  // const renderCardProperties = useMemo(() => {
-  //   const keys = asset && Object.keys(asset && asset.ls8MetaData);
-  //   if (
-  //     keys &&
-  //     keys.includes('attributes') &&
-  //     asset &&
-  //     asset.ls8MetaData.attributes.length > 0
-  //   ) {
-  //     return asset.ls8MetaData.attributes.map((attribute: any, i) => (
-  //       <React.Fragment key={i}>
-  //         <StyledLabel>{attribute.trait_type}</StyledLabel>
-  //         {Object.keys(attribute).includes('max_value') ? (
-  //           <StyledValue>
-  //             {attribute.value} of {attribute.max_value}
-  //           </StyledValue>
-  //         ) : (
-  //           <StyledValue>{attribute.value}</StyledValue>
-  //         )}
-  //       </React.Fragment>
-  //     ));
-  //   } else {
-  //     return metaCardInfo.map((items, i) => (
-  //       <React.Fragment key={i}>
-  //         <StyledLabel>{items.text}</StyledLabel>
-  //         <StyledValue>{items.data}</StyledValue>
-  //       </React.Fragment>
-  //     ));
+  const nextMint = () => {
+    const nextIndex = currentIndex + 1;
+    if (!ownedTokenIds || nextIndex >= ownedTokenIds.length) return;
+    setCurrentIndex(nextIndex);
+  };
+
+  const previousMint = () => {
+    const previousIndex = currentIndex - 1;
+    if (!ownedTokenIds || previousIndex < 0) return;
+    setCurrentIndex(previousIndex);
+  };
+
+  // const renderOwner = useMemo(() => {
+  //   if (asset?.address === params.add) {
+  //     if (owner?.address === asset.owner) {
+  //       const findBalanceOf = owner.ownedAssets.find(
+  //         (item) => item.assetAddress === params.add.toLowerCase(),
+  //       );
+  //       return (
+  //         <React.Fragment key={owner.address}>
+  //           <ProfileCard
+  //             userProfile={owner}
+  //             balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
+  //             type="owner"
+  //             tooltipId="ownerTooltip"
+  //           />
+  //           <ReactTooltip
+  //             id="ownerTooltip"
+  //             getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+  //           ></ReactTooltip>
+  //         </React.Fragment>
+  //       );
+  //     }
   //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [asset]);
+  // }, [asset?.address, asset?.owner, params.add, owner]);
+
+  // const renderDesigners = useMemo(
+  //   () =>
+  //     creators?.map((creator: IProfile) => {
+  //       const findBalanceOf = creator.ownedAssets.find(
+  //         (item) => item.assetAddress === params.add.toLowerCase(),
+  //       );
+  //       return (
+  //         <React.Fragment key={creator.address}>
+  //           <ProfileCard
+  //             userProfile={creator}
+  //             balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
+  //             type="creator"
+  //             tooltipId="designerTooltip"
+  //           />
+  //           <ReactTooltip
+  //             id="designerTooltip"
+  //             getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+  //           ></ReactTooltip>
+  //         </React.Fragment>
+  //       );
+  //     }),
+  //   [creators, params.add],
+  // );
+
+  // const renderHolderPagination = useMemo(
+  //   () => <HolderPagination holdersAddresses={asset ? asset.holders : []} />,
+  //   [asset],
+  // );
+
+  const renderCardProperties = useMemo(() => {
+    if (
+      asset &&
+      asset.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+        ?.attributes &&
+      asset.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+        .attributes.length > 0
+    ) {
+      return asset?.ls8MetaData[
+        ownedTokenIds ? ownedTokenIds[currentIndex] : 0
+      ].attributes.map((item) => {
+        if ('trait_type' in item) {
+          return (
+            <StyledCardPropertyContainer key={item.trait_type}>
+              <StyledCardPropertyIconWrapper>
+                <StyledCardPropertyIcon
+                  src={propertiesImages[item.trait_type]}
+                  alt=""
+                />
+              </StyledCardPropertyIconWrapper>
+              <StyledCardProperty>
+                <StyledCardPropertyLabel>
+                  {item.trait_type}
+                </StyledCardPropertyLabel>
+                <StyledCardPropertyValue>{item.value}</StyledCardPropertyValue>
+              </StyledCardProperty>
+            </StyledCardPropertyContainer>
+          );
+        }
+        return null;
+      });
+    } else {
+      return cardProperties.map((item) => (
+        <StyledCardPropertyContainer key={item.label}>
+          <StyledCardPropertyIconWrapper>
+            <StyledCardPropertyIcon src={item.icon} alt="" />
+          </StyledCardPropertyIconWrapper>
+          <StyledCardProperty>
+            <StyledCardPropertyLabel>{item.label}</StyledCardPropertyLabel>
+            <StyledCardPropertyValue>{item.value}</StyledCardPropertyValue>
+          </StyledCardProperty>
+        </StyledCardPropertyContainer>
+      ));
+    }
+  }, [asset, cardProperties, currentIndex, ownedTokenIds, propertiesImages]);
 
   return (
     <StyledAssetDetailsContentWrappar>
@@ -327,7 +475,7 @@ const AssetDetails: React.FC = () => {
               <StyledCardMainDetails>
                 <StyledMediaWrapper>
                   <StyledMedia
-                    src={asset?.ls8MetaData[params.id ? params.id : 0].image}
+                    src={asset?.ls8MetaData[currentIndex]?.image}
                     alt=""
                   />
                   <a
@@ -337,14 +485,19 @@ const AssetDetails: React.FC = () => {
                   >
                     <StyledExplorerIcon src={explorer?.icon} alt="" />
                   </a>
-                  <StyledMintControls>
-                    <StyledMintSkipButton>
-                      <StyledMintSkipButtonImg src={BackwardsIcon} alt="" />
-                    </StyledMintSkipButton>
-                    <StyledMintSkipButton>
-                      <StyledMintSkipButtonImg src={ForwardsIcon} alt="" />
-                    </StyledMintSkipButton>
-                  </StyledMintControls>
+                  {wasActiveProfile && ownedTokenIds && (
+                    <StyledMintControls>
+                      <StyledMintSkipButton onClick={previousMint}>
+                        <StyledMintSkipButtonImg src={BackwardsIcon} alt="" />
+                      </StyledMintSkipButton>
+                      <StyledMintSliderIndex>
+                        {currentIndex + 1}/{ownedTokenIds?.length}
+                      </StyledMintSliderIndex>
+                      <StyledMintSkipButton onClick={nextMint}>
+                        <StyledMintSkipButtonImg src={ForwardsIcon} alt="" />
+                      </StyledMintSkipButton>
+                    </StyledMintControls>
+                  )}
                 </StyledMediaWrapper>
                 <StyledCardInfoWrapper>
                   <StyledCardPriceWrapper>
@@ -364,9 +517,7 @@ const AssetDetails: React.FC = () => {
                     </StyledCardPriceWrapperHeader>
                     <StyledCardPriceValueWrapper>
                       <StyledTokenIcon src={WethIcon} alt="" />
-                      <StyledCardPriceValue>
-                        11.5 ($35,023.25)
-                      </StyledCardPriceValue>
+                      <StyledCardPriceValue>-</StyledCardPriceValue>
                     </StyledCardPriceValueWrapper>
                     <StyledActionsButtonWrapper>
                       <StyledBuyButton>Buy now</StyledBuyButton>
@@ -396,53 +547,14 @@ const AssetDetails: React.FC = () => {
               </StyledCardMainDetails>
               <StyledCardPropertiesAccordion title="Details" enableToggle>
                 <StyledCardProperties>
-                  {/* {metaCardInfo.map((item) => (
-                    <StyledCardPropertyContainer key={item.label}>
-                      <StyledCardPropertyIconWrapper>
-                        <StyledCardPropertyIcon src={item.icon} alt="" />
-                      </StyledCardPropertyIconWrapper>
-                      <StyledCardProperty>
-                        <StyledCardPropertyLabel>
-                          {item.label}
-                        </StyledCardPropertyLabel>
-                        <StyledCardPropertyValue>
-                          {item.value}
-                        </StyledCardPropertyValue>
-                      </StyledCardProperty>
-                    </StyledCardPropertyContainer>
-                  ))} */}
-                  {asset?.ls8MetaData[params.id ? params.id : 0].attributes.map(
-                    (item) => {
-                      if ('trait_type' in item) {
-                        return (
-                          <StyledCardPropertyContainer key={item.trait_type}>
-                            <StyledCardPropertyIconWrapper>
-                              <StyledCardPropertyIcon
-                                src={propertiesImages[item.trait_type]}
-                                alt=""
-                              />
-                            </StyledCardPropertyIconWrapper>
-                            <StyledCardProperty>
-                              <StyledCardPropertyLabel>
-                                {item.trait_type}
-                              </StyledCardPropertyLabel>
-                              <StyledCardPropertyValue>
-                                {item.value}
-                              </StyledCardPropertyValue>
-                            </StyledCardProperty>
-                          </StyledCardPropertyContainer>
-                        );
-                      }
-                      return null;
-                    },
-                  )}
+                  {renderCardProperties}
                 </StyledCardProperties>
               </StyledCardPropertiesAccordion>
               <StyledMarketAccordion title="Market" enableToggle>
                 <p>Market in progress...</p>
               </StyledMarketAccordion>
               <StyledHoldersAccordion title="Other Holders" enableToggle>
-                {renderHolderPagination}
+                {/* {renderHolderPagination} */}
               </StyledHoldersAccordion>
               {/* <StyledGrid>
                 <StyledAssetDetailGrid>

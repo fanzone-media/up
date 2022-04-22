@@ -6,7 +6,6 @@ import { getLSP4Metadata } from '../ipfsClient';
 import { BigNumberish, ethers } from 'ethers';
 import {
   CardTokenProxy__factory,
-  LSP8Metadata,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import Utils from '../utilities/util';
@@ -39,7 +38,6 @@ const fetchCard = async (
       contract.tokenURI(0),
     ]);
 
-  console.log(hashedUrl);
   if (!hashedUrl) {
     throw new Error('No card data');
   }
@@ -111,7 +109,12 @@ const fetchMetaDataForTokenID = async (
   const tokenUri = await contract.tokenURI(tokenId);
   const metaData = await getLSP4Metadata(tokenUri);
 
-  return metaData;
+  return {
+    ...metaData,
+    image: metaData.image.startsWith('ipfs://')
+      ? Utils.convertImageURL(metaData.image)
+      : metaData.image,
+  };
 };
 
 const fetchProfileIssuedAssetsAddresses = async (
