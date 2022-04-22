@@ -73,6 +73,8 @@ export const StyledProfileMedia = styled.div`
 `;
 
 export const StyledProfileAddress = styled.p`
+  font-weight: 300;
+  letter-spacing: 1.5px;
   width: calc(100% - 180px);
   overflow-wrap: break-word;
   color: rgba(165, 165, 165, 1);
