@@ -456,6 +456,13 @@ export const StyledBuyButton = styled.button`
 export const StyledMakeOfferButton = styled(StyledBuyButton)`
   background: rgba(255, 255, 255, 0.2);
 `;
+export const StyledSetPriceButton = styled(StyledMakeOfferButton)`
+  width: 100%;
+`;
+
+export const StyledChangePriceButton = styled(StyledMakeOfferButton)``;
+
+export const StyledWithdrawButton = styled(StyledMakeOfferButton)``;
 
 export const StyledCardInfoAccordion = styled(Accordion)``;
 

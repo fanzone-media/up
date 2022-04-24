@@ -33,6 +33,8 @@ const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
   error: null,
   metaDataStatus: STATUS.IDLE,
   metaDataError: null,
+  marketsStatus: STATUS.IDLE,
+  marketsError: null,
 });
 
 /**
@@ -102,6 +104,22 @@ export const fetchMetaDataForTokenId = createAsyncThunk<
         ...state.cards.entities[assetAddress]?.ls8MetaData,
         [`${tokenId}`]: res,
       },
+    } as ICard;
+  },
+);
+
+export const fetchAllMarkets = createAsyncThunk<
+  ICard,
+  { assetAddress: string; network: NetworkName },
+  { state: RootState; extra: ThunkExtra }
+>(
+  'cards/fetchAllMarkets',
+  async ({ assetAddress, network }, { extra: { api }, getState }) => {
+    const res = await api.cards.fetchAllMarkets(assetAddress, network);
+    const state: RootState = getState();
+    return {
+      ...state.cards.entities[assetAddress],
+      markets: res,
     } as ICard;
   },
 );
@@ -193,6 +211,19 @@ const cardsSlice = createSlice({
       .addCase(fetchMetaDataForTokenId.rejected, (state, action) => {
         state.metaDataError = action.error;
         state.metaDataStatus = STATUS.FAILED;
+      });
+    builder
+      .addCase(fetchAllMarkets.pending, (state, _action) => {
+        state.marketsStatus = STATUS.LOADING;
+      })
+      .addCase(fetchAllMarkets.fulfilled, (state, action) => {
+        if (action.payload)
+          cardsAdapter.upsertOne(state, action.payload as ICard);
+        state.marketsStatus = STATUS.IDLE;
+      })
+      .addCase(fetchAllMarkets.rejected, (state, action) => {
+        state.marketsError = action.error;
+        state.marketsStatus = STATUS.FAILED;
       });
   },
 });

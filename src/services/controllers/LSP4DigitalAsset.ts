@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import KeyChain from '../utilities/KeyChain';
 import { NetworkName } from '../../boot/types';
-import { ICard, ILSP8MetaData } from '../models';
+import { ICard, ILSP8MetaData, IMarket } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
-import { BigNumberish, ethers } from 'ethers';
+import { BigNumber, BigNumberish, ethers } from 'ethers';
 import {
   CardTokenProxy__factory,
   UniversalProfileProxy__factory,
@@ -67,6 +67,7 @@ const fetchCard = async (
     holders: holders.map((holder: string) => `0x${holder.slice(26)}`),
     creators,
     network: network,
+    markets: [],
   };
 };
 
@@ -94,7 +95,7 @@ const fetchAllCards = async (
 const fetchMetaDataForTokenID = async (
   assetAddress: string,
   tokenId: BigNumberish,
-  network: string,
+  network: NetworkName,
 ): Promise<ILSP8MetaData> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
@@ -115,6 +116,20 @@ const fetchMetaDataForTokenID = async (
       ? Utils.convertImageURL(metaData.image)
       : metaData.image,
   };
+};
+
+const fetchAllMarkets = async (
+  assetAddress: string,
+  network: NetworkName,
+): Promise<IMarket[]> => {
+  const provider = useRpcProvider(network);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  try {
+    const markets = await contract.getAllMarkets();
+    return markets;
+  } catch (error) {
+    throw new Error('No Markets available');
+  }
 };
 
 const fetchProfileIssuedAssetsAddresses = async (
@@ -233,4 +248,5 @@ export const LSP4DigitalAssetApi = {
   getTokenSale,
   sellCard,
   fetchMetaDataForTokenID,
+  fetchAllMarkets,
 };

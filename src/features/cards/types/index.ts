@@ -11,12 +11,9 @@ interface IBaseState {
   metaDataError: Error | SerializedError | null;
   metaDataStatus: STATUS;
   error: Error | SerializedError | null;
+  marketsStatus: STATUS;
+  marketsError: Error | SerializedError | null;
 }
 export type ICardItemsState = IBaseState;
-
-export type ICardsSliceState = {
-  issuedItems: ICardItemsState & EntityState<ICard>;
-  ownedItems: ICardItemsState & EntityState<ICard>;
-};
 
 export type ICardState = ICardItemsState & EntityState<ICard>;

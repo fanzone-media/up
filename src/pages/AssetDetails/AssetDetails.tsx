@@ -19,6 +19,7 @@ import {
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import {
+  fetchAllMarkets,
   fetchCard,
   fetchMetaDataForTokenId,
   selectCardById,
@@ -68,6 +69,9 @@ import {
   StyledMintSkipButtonImg,
   StyledExplorerIcon,
   StyledMintSliderIndex,
+  StyledChangePriceButton,
+  StyledWithdrawButton,
+  StyledSetPriceButton,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer, STATUS } from '../../utility';
@@ -127,6 +131,10 @@ const AssetDetails: React.FC = () => {
 
   const cardStatus = useSelector((state: RootState) => state.cards.status);
 
+  const marketsStatus = useSelector(
+    (state: RootState) => state.cards.marketsStatus,
+  );
+
   const metaDataStatus = useSelector(
     (state: RootState) => state.cards.metaDataStatus,
   );
@@ -164,6 +172,20 @@ const AssetDetails: React.FC = () => {
       }),
     );
   }, [asset, dispatch, owner, ownerStatus, params.network]);
+
+  //getAllMarkets
+  useMemo(() => {
+    if (
+      !asset ||
+      marketsStatus === STATUS.LOADING ||
+      marketsStatus === STATUS.FAILED
+    )
+      return;
+
+    dispatch(
+      fetchAllMarkets({ assetAddress: params.add, network: params.network }),
+    );
+  }, [asset, dispatch, marketsStatus, params.add, params.network]);
 
   useMemo(() => {
     if (
@@ -412,6 +434,73 @@ const AssetDetails: React.FC = () => {
   //   [asset],
   // );
 
+  const renderCardPrice = useMemo(() => {
+    const marketsForOwnedTokens =
+      ownedTokenIds &&
+      asset?.markets.filter((item) => {
+        return ownedTokenIds.some((i) => {
+          return i === Number(item.tokenId);
+        });
+      });
+    const currentMintMarket =
+      marketsForOwnedTokens &&
+      ownedTokenIds &&
+      marketsForOwnedTokens.find(
+        (item) => Number(item.tokenId) === ownedTokenIds[currentIndex],
+      );
+
+    const urlTokenIdMarket = asset?.markets.find(
+      (item) => Number(item.tokenId) === Number(params.id),
+    );
+
+    if (urlTokenIdMarket && params.id) {
+      return (
+        <>
+          <StyledCardPriceValueWrapper>
+            <StyledTokenIcon src={WethIcon} alt="" />
+            <StyledCardPriceValue>
+              {urlTokenIdMarket.minimumAmount.toNumber()}
+            </StyledCardPriceValue>
+          </StyledCardPriceValueWrapper>
+          <StyledActionsButtonWrapper>
+            <StyledBuyButton>Buy now</StyledBuyButton>
+            <StyledMakeOfferButton>Make offer</StyledMakeOfferButton>
+          </StyledActionsButtonWrapper>
+        </>
+      );
+    }
+
+    if (!currentMintMarket && ownedTokenIds) {
+      return (
+        <>
+          <StyledCardPriceValueWrapper>
+            <StyledTokenIcon src={WethIcon} alt="" />
+            <StyledCardPriceValue>-</StyledCardPriceValue>
+          </StyledCardPriceValueWrapper>
+          <StyledActionsButtonWrapper>
+            <StyledSetPriceButton>Set price</StyledSetPriceButton>
+          </StyledActionsButtonWrapper>
+        </>
+      );
+    }
+    if (currentMintMarket && ownedTokenIds) {
+      return (
+        <>
+          <StyledCardPriceValueWrapper>
+            <StyledTokenIcon src={WethIcon} alt="" />
+            <StyledCardPriceValue>
+              {currentMintMarket.minimumAmount.toNumber()}
+            </StyledCardPriceValue>
+          </StyledCardPriceValueWrapper>
+          <StyledActionsButtonWrapper>
+            <StyledChangePriceButton>Change price</StyledChangePriceButton>
+            <StyledWithdrawButton>Withdraw from sale</StyledWithdrawButton>
+          </StyledActionsButtonWrapper>
+        </>
+      );
+    }
+  }, [asset?.markets, currentIndex, ownedTokenIds, params.id]);
+
   const renderCardProperties = useMemo(() => {
     if (
       asset &&
@@ -515,14 +604,7 @@ const AssetDetails: React.FC = () => {
                         </StyledReloadPriceAction>
                       </StyledQuickActions>
                     </StyledCardPriceWrapperHeader>
-                    <StyledCardPriceValueWrapper>
-                      <StyledTokenIcon src={WethIcon} alt="" />
-                      <StyledCardPriceValue>-</StyledCardPriceValue>
-                    </StyledCardPriceValueWrapper>
-                    <StyledActionsButtonWrapper>
-                      <StyledBuyButton>Buy now</StyledBuyButton>
-                      <StyledMakeOfferButton>Make offer</StyledMakeOfferButton>
-                    </StyledActionsButtonWrapper>
+                    {renderCardPrice}
                   </StyledCardPriceWrapper>
                   <StyledCardInfoAccordion title="Card Info" enableToggle>
                     <StyledCardInfo>

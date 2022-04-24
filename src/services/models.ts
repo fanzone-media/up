@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { NetworkName } from '../boot/types';
 
 export interface IOwnedAssets {
@@ -80,6 +81,13 @@ export interface ICard {
   ls8MetaData: {
     [key: string]: ILSP8MetaData;
   };
+  markets: IMarket[];
+}
+
+export interface IMarket {
+  tokenId: string;
+  minimumAmount: BigNumber;
+  acceptedToken: string;
 }
 
 export interface IProfile {
