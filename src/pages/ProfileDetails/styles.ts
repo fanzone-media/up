@@ -87,12 +87,12 @@ export const StyledProfileMedia = styled.div`
 export const StyledProfileAddress = styled.p`
   font-weight: ${({ theme }) => theme.font.weight.light};
   letter-spacing: 1.5px;
-  width: calc(100% - 12.85em);
   overflow-wrap: break-word;
   color: rgba(165, 165, 165, 1);
-  font-size: 0.875rem;
+  font-size: min(0.875rem, 3.5vw);
 
   @media ${({ theme }) => theme.screen.md} {
+    width: calc(100% - 12.85em);
     width: 100%;
     font-size: 1rem;
   }
@@ -105,7 +105,7 @@ export const StyledProfileNameBioWrapper = styled.div`
   row-gap: 0.25em;
   width: 100%;
 
-  @media ${({ theme }) => theme.screen.md} {
+  @media ${({ theme }) => theme.screen.lg} {
     flex-direction: row;
     align-items: center;
   }
@@ -117,7 +117,7 @@ export const StyledProfileName = styled.h2`
   margin: auto 0 auto 0;
 
   @media ${({ theme }) => theme.screen.md} {
-    font-size: 0.9375rem;
+    font-size: 1.125rem;
     margin: 0 0 0 5%;
   }
 `;
@@ -128,11 +128,10 @@ export const StyledProfileBioHeading = styled.h2`
 `;
 
 export const StyledProfileBioWrapper = styled.div`
-  margin: auto 0 auto 0;
+  margin: auto 0;
 
   @media ${({ theme }) => theme.screen.md} {
     width: calc(50% - 5.625em);
-    margin-left: auto;
     padding-left: 2.5%;
   }
 `;
@@ -144,7 +143,7 @@ export const StyledProfileBio = styled.p`
 export const StyledProfileLinks = styled.div`
   display: flex;
   margin-right: 2.5em;
-  column-gap: 0.625em;
+  column-gap: 1.5em;
 `;
 
 export const StyledProfileInfo2 = styled.div`
@@ -167,25 +166,22 @@ export const StyledProfileInfo2Content = styled.div`
 
 export const StyledShareProfileHolder = styled.div`
   display: flex;
+  flex-direction: column;
   position: relative;
+  row-gap: 1.35em;
+  margin-top: 1.35em;
 
-  @media ${({ theme }) => theme.screen.md} {
+  @media ${({ theme }) => theme.screen.lg} {
+    flex-direction: row;
     margin-left: auto;
+    margin-top: 0;
   }
 `;
 
 export const StyledShareProfileWrapper = styled.div`
-  background-color: rgba(59, 59, 59, 1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 5px;
-  padding: 6px;
-  overflow: hidden;
-  margin: auto 0;
-
-  @media ${({ theme }) => theme.screen.md} {
-    margin: 0;
-    right: 0;
-  }
+  position: relative;
+  overflow: visible;
+  width: max-content;
 `;
 
 export const StyledShareIcon = styled.img`
@@ -193,7 +189,8 @@ export const StyledShareIcon = styled.img`
 `;
 
 export const StyledDropDownIcon = styled.img`
-  margin: auto;
+  display: inline-block;
+  margin-left: 0.5em;
 `;
 
 export const StyledShareProfileHeader = styled.div<{ expand: boolean }>`
@@ -239,6 +236,11 @@ export const StyledAssetsWrapper = styled.div`
   }
 `;
 
+export const StyledLinkIconWrapper = styled.a`
+  display: flex;
+  justify-content: center;
+`;
+
 export const StyledLinkIcon = styled.img``;
 
 export const StyledOpenTransferModalButton = styled.button`
@@ -250,5 +252,70 @@ export const StyledOpenTransferModalButton = styled.button`
 
   @media ${({ theme }) => theme.screen.md} {
     margin: 0 auto;
+  }
+`;
+
+export const StyledShareProfileButton = styled.button<{ isShare: boolean }>`
+  align-items: center;
+  column-gap: 1.25em;
+  background-color: rgba(59, 59, 59, 1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  padding: 0.5em 0.75em;
+  font-size: 0.9375rem;
+  overflow: hidden;
+  margin: auto 0;
+  display: flex;
+
+  @media ${({ theme }) => theme.screen.md} {
+    margin: 0;
+    right: 0;
+    border-bottom-color: rgba(255, 255, 255, 0.15);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  ${({ isShare }) =>
+    isShare &&
+    `
+    border-bottom-color: transparent;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  `}
+`;
+
+export const StyledShareDropDown = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 100%;
+  background-color: rgba(59, 59, 59, 1);
+  border-width: 0px 1px 1px;
+  border-color: rgba(255, 255, 255, 0.15);
+  border-style: solid;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  z-index: 10;
+  animation: ${({ theme }) => theme.animation.cardrender} 0.2s linear;
+
+  @media ${({ theme }) => theme.screen.md} {
+    border-top-width: 1px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    top: calc(100% + 0.5em);
+    width: max-content;
+  }
+`;
+
+export const ShareLink = styled.a.attrs({
+  target: '_blank',
+})`
+  align-items: center;
+  display: flex;
+  column-gap: 1.25em;
+  padding: 0.5em 0.75em;
+
+  @media ${({ theme }) => theme.screen.md} {
+    width: max-content;
   }
 `;
