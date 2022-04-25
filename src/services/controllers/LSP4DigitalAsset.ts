@@ -3,7 +3,7 @@ import KeyChain from '../utilities/KeyChain';
 import { NetworkName } from '../../boot/types';
 import { ICard, ILSP8MetaData, IMarket } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
-import { BigNumber, BigNumberish, ethers } from 'ethers';
+import { BigNumberish, ethers } from 'ethers';
 import {
   CardTokenProxy__factory,
   UniversalProfileProxy__factory,

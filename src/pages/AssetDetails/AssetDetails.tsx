@@ -75,6 +75,8 @@ import {
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer, STATUS } from '../../utility';
+import { BuyCardModal } from './BuyCardModal';
+import { SellCardModal } from './SellCardModal';
 // import ReactTooltip from 'react-tooltip';
 // import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 // import { useSigner } from 'wagmi';
@@ -139,6 +141,8 @@ const AssetDetails: React.FC = () => {
     (state: RootState) => state.cards.metaDataStatus,
   );
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [openBuyModal, setOpenBuyModal] = useState<boolean>(false);
+  const [openSellModal, setOpenSellModal] = useState<boolean>(false);
 
   const ownedTokenIds = useMemo(
     () =>
@@ -345,6 +349,33 @@ const AssetDetails: React.FC = () => {
     [asset, currentIndex, ownedTokenIds],
   );
 
+  const marketsForOwnedTokens = useMemo(
+    () =>
+      ownedTokenIds &&
+      asset?.markets.filter((item) => {
+        return ownedTokenIds.some((i) => {
+          return i === Number(item.tokenId);
+        });
+      }),
+    [asset?.markets, ownedTokenIds],
+  );
+
+  const currentMintMarket = useMemo(
+    () =>
+      marketsForOwnedTokens &&
+      ownedTokenIds &&
+      marketsForOwnedTokens.find(
+        (item) => Number(item.tokenId) === ownedTokenIds[currentIndex],
+      ),
+    [currentIndex, marketsForOwnedTokens, ownedTokenIds],
+  );
+
+  const urlTokenIdMarket = useMemo(
+    () =>
+      asset?.markets.find((item) => Number(item.tokenId) === Number(params.id)),
+    [asset?.markets, params.id],
+  );
+
   const cardInfo: {
     label: string;
     value: string;
@@ -366,7 +397,11 @@ const AssetDetails: React.FC = () => {
     { label: 'Token Standard', value: '' },
     { label: 'Network', value: asset ? asset.network : '' },
     { label: 'Score', value: '' },
-    { label: 'Current owner', value: '', valueType: 'address' },
+    {
+      label: 'Current owner',
+      value: wasActiveProfile ? wasActiveProfile : '',
+      valueType: 'address',
+    },
   ];
 
   const nextMint = () => {
@@ -435,24 +470,6 @@ const AssetDetails: React.FC = () => {
   // );
 
   const renderCardPrice = useMemo(() => {
-    const marketsForOwnedTokens =
-      ownedTokenIds &&
-      asset?.markets.filter((item) => {
-        return ownedTokenIds.some((i) => {
-          return i === Number(item.tokenId);
-        });
-      });
-    const currentMintMarket =
-      marketsForOwnedTokens &&
-      ownedTokenIds &&
-      marketsForOwnedTokens.find(
-        (item) => Number(item.tokenId) === ownedTokenIds[currentIndex],
-      );
-
-    const urlTokenIdMarket = asset?.markets.find(
-      (item) => Number(item.tokenId) === Number(params.id),
-    );
-
     if (urlTokenIdMarket && params.id) {
       return (
         <>
@@ -463,7 +480,9 @@ const AssetDetails: React.FC = () => {
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
-            <StyledBuyButton>Buy now</StyledBuyButton>
+            <StyledBuyButton onClick={() => setOpenBuyModal(!openBuyModal)}>
+              Buy now
+            </StyledBuyButton>
             <StyledMakeOfferButton>Make offer</StyledMakeOfferButton>
           </StyledActionsButtonWrapper>
         </>
@@ -478,7 +497,11 @@ const AssetDetails: React.FC = () => {
             <StyledCardPriceValue>-</StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
-            <StyledSetPriceButton>Set price</StyledSetPriceButton>
+            <StyledSetPriceButton
+              onClick={() => setOpenSellModal(!openSellModal)}
+            >
+              Set price
+            </StyledSetPriceButton>
           </StyledActionsButtonWrapper>
         </>
       );
@@ -493,13 +516,24 @@ const AssetDetails: React.FC = () => {
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
-            <StyledChangePriceButton>Change price</StyledChangePriceButton>
+            <StyledChangePriceButton
+              onClick={() => setOpenSellModal(!openSellModal)}
+            >
+              Change price
+            </StyledChangePriceButton>
             <StyledWithdrawButton>Withdraw from sale</StyledWithdrawButton>
           </StyledActionsButtonWrapper>
         </>
       );
     }
-  }, [asset?.markets, currentIndex, ownedTokenIds, params.id]);
+  }, [
+    currentMintMarket,
+    openBuyModal,
+    openSellModal,
+    ownedTokenIds,
+    params.id,
+    urlTokenIdMarket,
+  ]);
 
   const renderCardProperties = useMemo(() => {
     if (
@@ -561,6 +595,24 @@ const AssetDetails: React.FC = () => {
             </>
           ) : (
             <StyledAssetDetailContent>
+              {openBuyModal && asset && (
+                <BuyCardModal
+                  address={params.add}
+                  mint={1234}
+                  price={urlTokenIdMarket?.minimumAmount.toNumber()}
+                  cardImg={asset.ls8MetaData[params.id ? params.id : 0].image}
+                  onClose={() => setOpenBuyModal(!openBuyModal)}
+                />
+              )}
+              {openSellModal && asset && (
+                <SellCardModal
+                  address={params.add}
+                  mint={1234}
+                  price={urlTokenIdMarket?.minimumAmount.toNumber()}
+                  cardImg={asset.ls8MetaData[params.id ? params.id : 0].image}
+                  onClose={() => setOpenSellModal(!openSellModal)}
+                />
+              )}
               <StyledCardMainDetails>
                 <StyledMediaWrapper>
                   <StyledMedia
@@ -638,49 +690,6 @@ const AssetDetails: React.FC = () => {
               <StyledHoldersAccordion title="Other Holders" enableToggle>
                 {/* {renderHolderPagination} */}
               </StyledHoldersAccordion>
-              {/* <StyledGrid>
-                <StyledAssetDetailGrid>
-                  <StyledMediaWrapper>
-                    {params.network === 'l14' && (
-                      <a
-                        href={
-                          'https://universalprofile.cloud/asset/' +
-                          asset?.address
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <StyledUniversalProfileIcon
-                          src={UniversalProfileIcon}
-                          alt=""
-                        />
-                      </a>
-                    )}
-                    <a
-                      href={explorer && explorer.exploreUrl + asset?.address}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <StyledBlockScoutIcon src={explorer?.icon} alt="" />
-                    </a>
-                    <StyledStatsName>{metaCardInfo[0].data}</StyledStatsName>
-                    <StyledMetaCardImg src={asset?.ls8MetaData.image} alt="" />
-                  </StyledMediaWrapper>
-                  <StyledDetailsWrapper>
-                    <StyledCardInfoLabel>Card Info</StyledCardInfoLabel>
-                    <StyledInfoGrid>{renderCardProperties}</StyledInfoGrid>
-                    <StyledFullName>{asset?.name}</StyledFullName>
-                  </StyledDetailsWrapper>
-                </StyledAssetDetailGrid>
-                <StyledExtraInfo>
-                  <StyledIssuerLabel>Issuer</StyledIssuerLabel>
-                  <StyledIssuerWrapper>{renderOwner}</StyledIssuerWrapper>
-                  <StyledCreatorLabel>Creator</StyledCreatorLabel>
-                  <StyledCreatorWrapper>{renderDesigners}</StyledCreatorWrapper>
-                </StyledExtraInfo>
-              </StyledGrid>
-              <StyledHolderLabel>Holder</StyledHolderLabel>
-              <StyledHolderWrapper>{renderHolders}</StyledHolderWrapper> */}
             </StyledAssetDetailContent>
           )}
         </>

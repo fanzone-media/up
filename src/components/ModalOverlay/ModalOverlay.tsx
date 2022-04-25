@@ -19,7 +19,7 @@ export const ModalOverlay: React.FC<IProps> = ({ children, onClose }) => {
   return (
     <StyledModalOverlay>
       <StyledModal ref={modalRef}>
-        <StyledCloseModalButton>
+        <StyledCloseModalButton onClick={onClose}>
           <StyledCloseButtonIcon src={CloseIcon} alt="" />
         </StyledCloseModalButton>
         {children}
