@@ -270,20 +270,6 @@ const AssetDetails: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asset, allProfiles, dispatch, params.network]);
 
-  // useMemo(() => {
-  //   let addresses: string[] = [];
-  //   asset?.holders.forEach((item) => {
-  //     if (!profiles?.includes(item)) {
-  //       addresses.push(item);
-  //     }
-  //   });
-  //   if (addresses.length > 0) {
-  //     dispatch(
-  //       fetchAssetHolders({ address: addresses, network: params.network }),
-  //     );
-  //   }
-  // }, [asset?.holders, dispatch, params.network, profiles]);
-
   useEffect(() => {
     if (!asset && cardStatus !== STATUS.LOADING) {
       dispatch(fetchCard({ address: params.add, network: params.network }));

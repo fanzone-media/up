@@ -45,7 +45,6 @@ export const HolderPagination = ({ holdersAddresses }: IProps) => {
     currentPage,
     setCurrentPage,
     pageCount,
-    limit,
     paginationGroup,
     start,
     end,
@@ -95,10 +94,6 @@ export const HolderPagination = ({ holdersAddresses }: IProps) => {
     const pageNumber = Number(event.currentTarget.textContent);
     setCurrentPage(pageNumber);
   };
-
-  useMemo(() => {
-    console.log(start, end, pageCount);
-  }, [end, pageCount, start]);
 
   const renderHolders = useMemo(
     () =>
