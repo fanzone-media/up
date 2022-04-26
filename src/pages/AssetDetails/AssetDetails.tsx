@@ -78,7 +78,8 @@ import {
   StyledChangePriceButton,
   StyledWithdrawButton,
   StyledSetPriceButton,
-  StyledCreatorsAccordion,
+  StyledTabContent,
+  StyledNoProfileLabel,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer, STATUS } from '../../utility';
@@ -86,10 +87,11 @@ import { BuyCardModal } from './BuyCardModal';
 import { SellCardModal } from './SellCardModal';
 import { TabedAccordion } from '../../components/TabedAccordion';
 import { StyledAccordionTitle } from '../../components/Accordion/styles';
-// import ReactTooltip from 'react-tooltip';
+import { ProfileCard } from '../../features/profiles/ProfileCard';
+import ReactTooltip from 'react-tooltip';
+import { IProfile } from '../../services/models';
 // import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 // import { useSigner } from 'wagmi';
-// import { Accordion } from '../../components/Accordion';
 // import { HolderPagination } from './HoldersPagination';
 
 interface IPrams {
@@ -265,6 +267,7 @@ const AssetDetails: React.FC = () => {
         fetchAssetCreator({ address: addresses, network: params.network }),
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asset, allProfiles, dispatch, params.network]);
 
   // useMemo(() => {
@@ -431,53 +434,62 @@ const AssetDetails: React.FC = () => {
     setCurrentIndex(previousIndex);
   };
 
-  // const renderOwner = useMemo(() => {
-  //   if (asset?.address === params.add) {
-  //     if (owner?.address === asset.owner) {
-  //       const findBalanceOf = owner.ownedAssets.find(
-  //         (item) => item.assetAddress === params.add.toLowerCase(),
-  //       );
-  //       return (
-  //         <React.Fragment key={owner.address}>
-  //           <ProfileCard
-  //             userProfile={owner}
-  //             balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-  //             type="owner"
-  //             tooltipId="ownerTooltip"
-  //           />
-  //           <ReactTooltip
-  //             id="ownerTooltip"
-  //             getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-  //           ></ReactTooltip>
-  //         </React.Fragment>
-  //       );
-  //     }
-  //   }
-  // }, [asset?.address, asset?.owner, params.add, owner]);
+  const renderOwner = useMemo(() => {
+    const findBalanceOf =
+      owner &&
+      owner.ownedAssets.find(
+        (item) => item.assetAddress === params.add.toLowerCase(),
+      );
+    return (
+      <StyledTabContent>
+        {asset?.address === params.add && owner?.address === asset.owner && (
+          <>
+            <ProfileCard
+              userProfile={owner}
+              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
+              type="owner"
+              tooltipId="ownerTooltip"
+            />
+            <ReactTooltip
+              id="ownerTooltip"
+              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+            ></ReactTooltip>
+          </>
+        )}
+        {!owner && <StyledNoProfileLabel>Owner not found</StyledNoProfileLabel>}
+      </StyledTabContent>
+    );
+  }, [asset?.address, asset?.owner, params.add, owner]);
 
-  // const renderDesigners = useMemo(
-  //   () =>
-  //     creators?.map((creator: IProfile) => {
-  //       const findBalanceOf = creator.ownedAssets.find(
-  //         (item) => item.assetAddress === params.add.toLowerCase(),
-  //       );
-  //       return (
-  //         <React.Fragment key={creator.address}>
-  //           <ProfileCard
-  //             userProfile={creator}
-  //             balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-  //             type="creator"
-  //             tooltipId="designerTooltip"
-  //           />
-  //           <ReactTooltip
-  //             id="designerTooltip"
-  //             getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-  //           ></ReactTooltip>
-  //         </React.Fragment>
-  //       );
-  //     }),
-  //   [creators, params.add],
-  // );
+  const renderCreators = useMemo(
+    () => (
+      <StyledTabContent>
+        {creators?.map((creator: IProfile) => {
+          const findBalanceOf = creator.ownedAssets.find(
+            (item) => item.assetAddress === params.add.toLowerCase(),
+          );
+          return (
+            <React.Fragment key={creator.address}>
+              <ProfileCard
+                userProfile={creator}
+                balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
+                type="creator"
+                tooltipId="designerTooltip"
+              />
+              <ReactTooltip
+                id="designerTooltip"
+                getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+              ></ReactTooltip>
+            </React.Fragment>
+          );
+        })}
+        {creators.length === 0 && (
+          <StyledNoProfileLabel>Creators not found</StyledNoProfileLabel>
+        )}
+      </StyledTabContent>
+    ),
+    [creators, params.add],
+  );
 
   // const renderHolderPagination = useMemo(
   //   () => <HolderPagination holdersAddresses={asset ? asset.holders : []} />,
@@ -701,8 +713,8 @@ const AssetDetails: React.FC = () => {
               </StyledCardMainDetails>
               <TabedAccordion
                 tabs={[
-                  { name: 'Creators', content: <p>Creators</p> },
-                  { name: 'Issuer', content: <p>Issuer</p> },
+                  { name: 'Creators', content: renderCreators },
+                  { name: 'Issuer', content: renderOwner },
                 ]}
               />
               <StyledCardPropertiesAccordion

@@ -488,7 +488,14 @@ export const StyledCardInfoValue = styled.p`
   width: 50%;
 `;
 
-export const StyledCreatorsAccordion = styled(Accordion)``;
+export const StyledTabContent = styled.div`
+  display: grid;
+  grid-template-columns: auto;
+  column-gap: 1em;
+  padding: 2em 0;
+`;
+
+export const StyledNoProfileLabel = styled.p``;
 
 export const StyledCardPropertiesAccordion = styled(Accordion)``;
 
