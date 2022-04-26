@@ -3,19 +3,18 @@ import { AccordionToggleIcon } from '../../assets';
 import {
   StyledAccordiomToggleIcon,
   StyledAccordionHeader,
-  StyledAccordionTitle,
   StyledAccordionToggleButton,
   StyledAccordionWrapper,
 } from './styles';
 
 interface IProps {
-  title: string;
+  header: ReactNode;
   children: ReactNode;
   enableToggle: boolean;
 }
 
 export const Accordion: React.FC<IProps> = ({
-  title,
+  header,
   children,
   enableToggle,
 }) => {
@@ -24,7 +23,7 @@ export const Accordion: React.FC<IProps> = ({
   return (
     <StyledAccordionWrapper $expanded={expand}>
       <StyledAccordionHeader $expanded={expand}>
-        <StyledAccordionTitle>{title}</StyledAccordionTitle>
+        {header}
         {enableToggle && (
           <StyledAccordionToggleButton onClick={() => setExpand(!expand)}>
             <StyledAccordiomToggleIcon

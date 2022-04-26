@@ -25,7 +25,13 @@ import {
   selectCardById,
 } from '../../features/cards';
 import { useEffect } from 'react';
-import { fetchProfileByAddress, selectUserById } from '../../features/profiles';
+import {
+  fetchAssetCreator,
+  fetchProfileByAddress,
+  selectAllUsersItems,
+  selectUserById,
+  selectUserIds,
+} from '../../features/profiles';
 import { useMemo } from 'react';
 import {
   StyledAssetDetailContent,
@@ -72,11 +78,14 @@ import {
   StyledChangePriceButton,
   StyledWithdrawButton,
   StyledSetPriceButton,
+  StyledCreatorsAccordion,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { getChainExplorer, STATUS } from '../../utility';
 import { BuyCardModal } from './BuyCardModal';
 import { SellCardModal } from './SellCardModal';
+import { TabedAccordion } from '../../components/TabedAccordion';
+import { StyledAccordionTitle } from '../../components/Accordion/styles';
 // import ReactTooltip from 'react-tooltip';
 // import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 // import { useSigner } from 'wagmi';
@@ -102,9 +111,9 @@ const AssetDetails: React.FC = () => {
       selectUserById(state.userData[params.network], wasActiveProfile),
   );
 
-  // const profiles = useSelector((state: RootState) =>
-  //   selectUserIds(state.userData[params.network]),
-  // );
+  const allProfiles = useSelector((state: RootState) =>
+    selectUserIds(state.userData[params.network]),
+  );
 
   const asset = useSelector((state: RootState) =>
     selectCardById(state, params.add),
@@ -121,13 +130,13 @@ const AssetDetails: React.FC = () => {
     (state: RootState) => state.userData[params.network].status,
   );
 
-  // const creators = useSelector((state: RootState) =>
-  //   selectAllUsersItems(state.userData[params.network]),
-  // )?.filter((item) => {
-  //   return asset?.creators.some((i) => {
-  //     return i === item.address && item.network === params.network;
-  //   });
-  // });
+  const creators = useSelector((state: RootState) =>
+    selectAllUsersItems(state.userData[params.network]),
+  )?.filter((item) => {
+    return asset?.creators.some((i) => {
+      return i === item.address && item.network === params.network;
+    });
+  });
 
   const cardError = useSelector((state: RootState) => state.cards.error);
 
@@ -140,6 +149,11 @@ const AssetDetails: React.FC = () => {
   const metaDataStatus = useSelector(
     (state: RootState) => state.cards.metaDataStatus,
   );
+
+  const creatorsStatus = useSelector(
+    (state: RootState) => state.userData[params.network].creatorStatus,
+  );
+
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [openBuyModal, setOpenBuyModal] = useState<boolean>(false);
   const [openSellModal, setOpenSellModal] = useState<boolean>(false);
@@ -238,6 +252,21 @@ const AssetDetails: React.FC = () => {
     wasActiveProfile,
   ]);
 
+  useMemo(() => {
+    if (!asset || creatorsStatus === STATUS.LOADING) return;
+    let addresses: string[] = [];
+    asset.creators.forEach((item) => {
+      if (!allProfiles?.includes(item)) {
+        addresses.push(item);
+      }
+    });
+    if (addresses.length > 0) {
+      dispatch(
+        fetchAssetCreator({ address: addresses, network: params.network }),
+      );
+    }
+  }, [asset, allProfiles, dispatch, params.network]);
+
   // useMemo(() => {
   //   let addresses: string[] = [];
   //   asset?.holders.forEach((item) => {
@@ -251,20 +280,6 @@ const AssetDetails: React.FC = () => {
   //     );
   //   }
   // }, [asset?.holders, dispatch, params.network, profiles]);
-
-  // useMemo(() => {
-  //   let addresses: string[] = [];
-  //   asset?.creators.forEach((item) => {
-  //     if (!profiles?.includes(item)) {
-  //       addresses.push(item);
-  //     }
-  //   });
-  //   if (addresses.length > 0) {
-  //     dispatch(
-  //       fetchAssetCreator({ address: addresses, network: params.network }),
-  //     );
-  //   }
-  // }, [asset?.creators, dispatch, params.network, profiles]);
 
   useEffect(() => {
     if (!asset && cardStatus !== STATUS.LOADING) {
@@ -658,7 +673,12 @@ const AssetDetails: React.FC = () => {
                     </StyledCardPriceWrapperHeader>
                     {renderCardPrice}
                   </StyledCardPriceWrapper>
-                  <StyledCardInfoAccordion title="Card Info" enableToggle>
+                  <StyledCardInfoAccordion
+                    header={
+                      <StyledAccordionTitle>Card Info</StyledAccordionTitle>
+                    }
+                    enableToggle
+                  >
                     <StyledCardInfo>
                       {cardInfo.map((item) => (
                         <StyledCardInfoContainer key={item.label}>
@@ -679,15 +699,32 @@ const AssetDetails: React.FC = () => {
                   </StyledCardInfoAccordion>
                 </StyledCardInfoWrapper>
               </StyledCardMainDetails>
-              <StyledCardPropertiesAccordion title="Details" enableToggle>
+              <TabedAccordion
+                tabs={[
+                  { name: 'Creators', content: <p>Creators</p> },
+                  { name: 'Issuer', content: <p>Issuer</p> },
+                ]}
+              />
+              <StyledCardPropertiesAccordion
+                header={<StyledAccordionTitle>Details</StyledAccordionTitle>}
+                enableToggle
+              >
                 <StyledCardProperties>
                   {renderCardProperties}
                 </StyledCardProperties>
               </StyledCardPropertiesAccordion>
-              <StyledMarketAccordion title="Market" enableToggle>
+              <StyledMarketAccordion
+                header={<StyledAccordionTitle>Market</StyledAccordionTitle>}
+                enableToggle
+              >
                 <p>Market in progress...</p>
               </StyledMarketAccordion>
-              <StyledHoldersAccordion title="Other Holders" enableToggle>
+              <StyledHoldersAccordion
+                header={
+                  <StyledAccordionTitle>Other Holders</StyledAccordionTitle>
+                }
+                enableToggle
+              >
                 {/* {renderHolderPagination} */}
               </StyledHoldersAccordion>
             </StyledAssetDetailContent>

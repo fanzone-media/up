@@ -488,6 +488,8 @@ export const StyledCardInfoValue = styled.p`
   width: 50%;
 `;
 
+export const StyledCreatorsAccordion = styled(Accordion)``;
+
 export const StyledCardPropertiesAccordion = styled(Accordion)``;
 
 export const StyledCardProperties = styled.div`
