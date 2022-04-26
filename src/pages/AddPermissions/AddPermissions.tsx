@@ -112,10 +112,11 @@ export const AddPermissions: React.FC = () => {
             <StyledCheckboxInput
               type="checkbox"
               name={key}
+              id={key}
               value={key}
               onChange={changeHandler}
             ></StyledCheckboxInput>
-            <StyledLabel>{key}</StyledLabel>
+            <StyledLabel htmlFor={key}>{key}</StyledLabel>
           </StyledInputWrapper>
         ))}
       </StyledPermissionInputWrapper>

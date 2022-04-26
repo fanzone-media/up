@@ -17,7 +17,7 @@ export const StyledNetworkLabel = styled.p`
   font-weight: ${({ theme }) => theme.font.weight.bolder};
 `;
 
-export const StyledLabel = styled.p`
+export const StyledLabel = styled.label`
   color: white;
   width: 200px;
 `;
