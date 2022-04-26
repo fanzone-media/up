@@ -89,10 +89,12 @@ import { TabedAccordion } from '../../components/TabedAccordion';
 import { StyledAccordionTitle } from '../../components/Accordion/styles';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import ReactTooltip from 'react-tooltip';
-import { IProfile } from '../../services/models';
+import { IPermissionSet, IProfile } from '../../services/models';
 // import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 // import { useSigner } from 'wagmi';
 import { HolderPagination } from './HoldersPagination';
+import { getAddressPermissionsOnUniversalProfile } from '../../utility/permissions';
+import { useAccount } from 'wagmi';
 
 interface IPrams {
   add: string;
@@ -101,6 +103,20 @@ interface IPrams {
 }
 
 const AssetDetails: React.FC = () => {
+  const [currentUsersPermissionsSet, setCurrentUsersPermissionsSet] = useState<
+    IPermissionSet['permissions']
+  >({
+    sign: '0',
+    transferValue: '0',
+    deploy: '0',
+    delegateCall: '0',
+    staticCall: '0',
+    call: '0',
+    setData: '0',
+    addPermissions: '0',
+    changePermissions: '0',
+    changeOwner: '0',
+  });
   const params = useParams<IPrams>();
 
   const explorer = getChainExplorer(params.network);
@@ -127,6 +143,18 @@ const AssetDetails: React.FC = () => {
       asset?.owner ? asset.owner : '',
     ),
   );
+
+  const [{ data: account }] = useAccount();
+
+  useEffect(() => {
+    if (!owner?.permissionSet || !account) return;
+    const _currentUsersPermissionsSet = getAddressPermissionsOnUniversalProfile(
+      owner.permissionSet,
+      account.address,
+    );
+    if (_currentUsersPermissionsSet !== undefined)
+      setCurrentUsersPermissionsSet(_currentUsersPermissionsSet.permissions);
+  }, [owner, account]);
 
   const ownerStatus = useSelector(
     (state: RootState) => state.userData[params.network].status,
