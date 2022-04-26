@@ -92,7 +92,7 @@ import ReactTooltip from 'react-tooltip';
 import { IProfile } from '../../services/models';
 // import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 // import { useSigner } from 'wagmi';
-// import { HolderPagination } from './HoldersPagination';
+import { HolderPagination } from './HoldersPagination';
 
 interface IPrams {
   add: string;
@@ -491,10 +491,10 @@ const AssetDetails: React.FC = () => {
     [creators, params.add],
   );
 
-  // const renderHolderPagination = useMemo(
-  //   () => <HolderPagination holdersAddresses={asset ? asset.holders : []} />,
-  //   [asset],
-  // );
+  const renderHolderPagination = useMemo(() => {
+    if (!asset) return;
+    return <HolderPagination holdersAddresses={asset.holders} />;
+  }, [asset]);
 
   const renderCardPrice = useMemo(() => {
     if (urlTokenIdMarket && params.id) {
@@ -737,7 +737,7 @@ const AssetDetails: React.FC = () => {
                 }
                 enableToggle
               >
-                {/* {renderHolderPagination} */}
+                {renderHolderPagination}
               </StyledHoldersAccordion>
             </StyledAssetDetailContent>
           )}

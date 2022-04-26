@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import ReactTooltip from 'react-tooltip';
@@ -16,9 +16,10 @@ import {
 import {
   fetchAssetHolders,
   selectAllUsersItems,
+  selectUserIds,
 } from '../../../features/profiles';
 import { ProfileCard } from '../../../features/profiles/ProfileCard';
-import { useViewPort } from '../../../hooks/useViewPort';
+import { usePaginate } from '../../../hooks/usePaginate';
 import { STATUS } from '../../../utility';
 import {
   StyledHolderPagination,
@@ -40,64 +41,19 @@ export const HolderPagination = ({ holdersAddresses }: IProps) => {
     (state: RootState) => state.userData[params.network].holderStatus,
   );
 
-  const { screenWidth } = useViewPort();
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const {
+    currentPage,
+    setCurrentPage,
+    pageCount,
+    limit,
+    paginationGroup,
+    start,
+    end,
+  } = usePaginate({ totalItems: holdersAddresses.length });
 
-  const { pageCount, limit } = useMemo(() => {
-    if (screenWidth > 1280) {
-      return {
-        pageCount: Math.ceil(holdersAddresses.length / 12),
-        limit: 12,
-      };
-    }
-    if (screenWidth > 1024) {
-      return {
-        pageCount: Math.ceil(holdersAddresses.length / 10),
-        limit: 10,
-      };
-    }
-    if (screenWidth > 768) {
-      return {
-        pageCount: Math.ceil(holdersAddresses.length / 8),
-        limit: 8,
-      };
-    }
-
-    return {
-      pageCount: Math.ceil(holdersAddresses.length / 6),
-      limit: 6,
-    };
-  }, [holdersAddresses.length, screenWidth]);
-
-  const range = (from: number, to: number) => {
-    const range: number[] = [];
-    let i = from;
-    while (i <= to) {
-      range.push(i);
-      i++;
-    }
-    return range;
-  };
-
-  const paginationGroup = () => {
-    if (pageCount === 2) {
-      return range(1, 2);
-    }
-    switch (currentPage) {
-      case 1:
-        return range(currentPage, currentPage + 2);
-      case pageCount:
-        return range(currentPage - 2, currentPage);
-      default:
-        return range(currentPage - 1, currentPage + 1);
-    }
-  };
-
-  const start = useMemo(
-    () => currentPage * limit - limit,
-    [currentPage, limit],
+  const allProfiles = useSelector((state: RootState) =>
+    selectUserIds(state.userData[params.network]),
   );
-  const end = useMemo(() => start + limit, [limit, start]);
 
   const holders = useSelector((state: RootState) => {
     return selectAllUsersItems(state.userData[params.network]);
@@ -108,13 +64,20 @@ export const HolderPagination = ({ holdersAddresses }: IProps) => {
   });
 
   useMemo(() => {
-    dispatch(
-      fetchAssetHolders({
-        address: holdersAddresses.slice(start, end),
-        network: params.network,
-      }),
-    );
-  }, [dispatch, end, holdersAddresses, params.network, start]);
+    if (holderStatus === STATUS.LOADING) return;
+    let addresses: string[] = [];
+    holdersAddresses.slice(start, end).forEach((item) => {
+      if (!allProfiles?.includes(item)) {
+        addresses.push(item);
+      }
+    });
+    if (addresses.length > 0) {
+      dispatch(
+        fetchAssetHolders({ address: addresses, network: params.network }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allProfiles, dispatch, end, holdersAddresses, params.network, start]);
 
   const nextPage = () => {
     setCurrentPage((currentPage) =>
