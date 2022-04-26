@@ -1,5 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import { theme } from '../../boot/styles';
@@ -9,11 +15,8 @@ import Pagination from '../../features/pagination/Pagination';
 import makeBlockie from 'ethereum-blockies-base64';
 import {
   StyledAssetsWrapper,
-  StyledCopyLink,
-  StyledCopyLinkIcon,
   StyledDropDownIcon,
-  StyledFacebookIcon,
-  StyledFaceBookShare,
+  StyledLinkIconWrapper,
   StyledLinkIcon,
   StyledOpenTransferModalButton,
   StyledProfileAddress,
@@ -32,11 +35,11 @@ import {
   StyledProfileNameBioWrapper,
   StyledProfileNotFound,
   StyledShareIcon,
-  StyledShareProfileHeader,
   StyledShareProfileHolder,
+  StyledShareProfileButton,
+  StyledShareDropDown,
+  ShareLink,
   StyledShareProfileWrapper,
-  StyledTwitterIcon,
-  StyledTwitterShare,
 } from './styles';
 import { ProfileImage } from './ProfileImage';
 import {
@@ -59,6 +62,7 @@ import { useAccount, useSigner } from 'wagmi';
 import { ProfileEditModal } from './ProfileEditModal';
 import { TransferCardModal } from './TransferCardModal';
 import { useCopyText } from '../../hooks/useCopyText';
+import { useOutsideClick } from '../../hooks/useOutsideClick';
 
 interface IParams {
   add: string;
@@ -68,7 +72,7 @@ interface IParams {
 const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
-
+  const { pathname } = useLocation();
   const [{ data }] = useAccount();
   const [{ data: signer }] = useSigner();
   const [openEditProfileModal, setOpenEditProfileModal] =
@@ -92,7 +96,7 @@ const ProfileDetails: React.FC = () => {
 
   const [isShare, setIsShare] = useState<boolean>(false);
 
-  const { copied, copyText } = useCopyText();
+  const { copied, copyText, canCopy } = useCopyText();
 
   const isTablet = useMediaQuery(theme.screen.md);
 
@@ -162,46 +166,52 @@ const ProfileDetails: React.FC = () => {
 
   const renderLinks = useMemo(
     () =>
-      [
-        { title: 'twitter', url: 'https://example.com' },
-        { title: 'instagram', url: 'https://example.com' },
-        { title: 'facebook', url: 'https://example.com' },
-        { title: 'web', url: 'https://example.com' },
-      ].map((link) => {
+      profile?.links?.map((link) => {
         const linkTitle = link.title.toLowerCase();
-        if (linkTitle === 'twitter') {
-          return (
-            <a href={link.url} target="_blank" rel="noreferrer" key={link.url}>
-              <StyledLinkIcon src={Twitter} />
-            </a>
-          );
-        }
-        if (linkTitle === 'instagram') {
-          return (
-            <a href={link.url} target="_blank" rel="noreferrer" key={link.url}>
-              <StyledLinkIcon src={Instagram} />
-            </a>
-          );
-        }
-        if (linkTitle === 'facebook') {
-          return (
-            <a href={link.url} target="_blank" rel="noreferrer" key={link.url}>
-              <StyledLinkIcon src={Facebook} />
-            </a>
-          );
-        }
         return (
-          <a href={link.url} target="_blank" rel="noreferrer" key={link.url}>
-            <StyledLinkIcon src={Globe} />
-          </a>
+          <StyledProfileLinks>
+            <StyledLinkIconWrapper
+              href={link.url}
+              target="_blank"
+              rel="noreferrer"
+              key={link.url}
+            >
+              <StyledLinkIcon
+                src={
+                  linkTitle === 'twitter'
+                    ? Twitter
+                    : linkTitle === 'instagram'
+                    ? Instagram
+                    : linkTitle === 'facebook'
+                    ? Facebook
+                    : Globe
+                }
+              />
+            </StyledLinkIconWrapper>
+          </StyledProfileLinks>
         );
       }),
     [profile?.links],
   );
 
-  const shareButtonHandler = () => {
-    setIsShare((isShare) => !isShare);
-  };
+  const shareButtonRef = useRef(null);
+  useOutsideClick(shareButtonRef, () => isShare && setIsShare(false));
+
+  const shareButtonHandler = useCallback(async () => {
+    try {
+      await navigator.share({
+        title: `Fanzone.io Universal Profile – ${profile && profile.address}`,
+        text: `This is Fanzone.io's Universal Profile page for ${
+          profile && profile.address
+        }`,
+        url: `${window.location.origin}/#${pathname}`,
+      });
+      console.log('shared successfully');
+    } catch (err) {
+      setIsShare((isShare) => !isShare);
+      console.error('Error: ' + err);
+    }
+  }, [pathname, profile]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -269,9 +279,53 @@ const ProfileDetails: React.FC = () => {
                     <StyledProfileNameBioWrapper>
                       <StyledProfileName>@{profile?.name}</StyledProfileName>
                       <StyledShareProfileHolder>
-                        <StyledProfileLinks>{renderLinks}</StyledProfileLinks>
-                        <StyledShareProfileWrapper>
-                          <StyledShareIcon src={ShareIcon} />
+                        {renderLinks}
+                        <StyledShareProfileWrapper ref={shareButtonRef}>
+                          <StyledShareProfileButton
+                            onClick={shareButtonHandler}
+                            isShare={isShare}
+                          >
+                            <StyledShareIcon src={ShareIcon} />
+                            <HideOnScreen size="lg">
+                              Share profile{' '}
+                              {!navigator['share'] && (
+                                <StyledDropDownIcon src={DropDownIcon} />
+                              )}
+                            </HideOnScreen>
+                          </StyledShareProfileButton>
+                          {isShare && (
+                            <StyledShareDropDown>
+                              <ShareLink
+                                href={`https://twitter.com/intent/tweet?url=${window.location.origin}/#${pathname}`}
+                              >
+                                <img src={Twitter} alt="Twitter" />
+                                Twitter
+                              </ShareLink>
+                              {/* <ShareLink>
+                                <img src={Instagram} alt="Instagram" />
+                                Instagram
+                              </ShareLink> */}
+                              <ShareLink
+                                href={`https://www.facebook.com/sharer.php?u=${window.location.origin}/#${pathname}`}
+                              >
+                                <img src={Facebook} alt="Facebook" />
+                                Facebook
+                              </ShareLink>
+                              {canCopy && (
+                                <ShareLink
+                                  as="button"
+                                  onClick={() =>
+                                    copyText(
+                                      `${window.location.origin}/#${pathname}`,
+                                    )
+                                  }
+                                >
+                                  <img src={Link} alt="Copy Link" />
+                                  {copied ? 'Copied!' : 'Copy Link'}
+                                </ShareLink>
+                              )}
+                            </StyledShareDropDown>
+                          )}
                         </StyledShareProfileWrapper>
                       </StyledShareProfileHolder>
                     </StyledProfileNameBioWrapper>
