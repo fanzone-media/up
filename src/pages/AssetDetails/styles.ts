@@ -490,9 +490,15 @@ export const StyledCardInfoValue = styled.p`
 
 export const StyledTabContent = styled.div`
   display: grid;
-  grid-template-columns: auto;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 1.5em;
   column-gap: 1em;
   padding: 2em 0;
+
+  @media ${({ theme }) => theme.screen.xs} {
+    display: flex;
+    column-gap: 20px;
+  }
 `;
 
 export const StyledNoProfileLabel = styled.p``;

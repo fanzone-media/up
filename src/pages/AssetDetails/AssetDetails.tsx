@@ -96,6 +96,9 @@ import { IPermissionSet, IProfile } from '../../services/models';
 import { HolderPagination } from './HoldersPagination';
 import { getAddressPermissionsOnUniversalProfile } from '../../utility/permissions';
 import { useAccount } from 'wagmi';
+import { DesktopCreatorsAccordion } from './DesktopCreatorsAccordion';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { theme } from '../../boot/styles';
 
 interface IPrams {
   add: string;
@@ -121,6 +124,8 @@ const AssetDetails: React.FC = () => {
   const params = useParams<IPrams>();
 
   const explorer = getChainExplorer(params.network);
+
+  const isDesktop = useMediaQuery(theme.screen.md);
 
   const wasActiveProfile = useSelector((state: RootState) => state.userData.me);
 
@@ -724,12 +729,20 @@ const AssetDetails: React.FC = () => {
                   </StyledCardInfoAccordion>
                 </StyledCardInfoWrapper>
               </StyledCardMainDetails>
-              <TabedAccordion
-                tabs={[
-                  { name: 'Creators', content: renderCreators },
-                  { name: 'Issuer', content: renderOwner },
-                ]}
-              />
+              {!isDesktop ? (
+                <TabedAccordion
+                  tabs={[
+                    { name: 'Creators', content: renderCreators },
+                    { name: 'Issuer', content: renderOwner },
+                  ]}
+                />
+              ) : (
+                <DesktopCreatorsAccordion
+                  creatorsContent={renderCreators}
+                  issuerContent={renderOwner}
+                  enableToggle
+                />
+              )}
               <StyledCardPropertiesAccordion
                 header={<StyledAccordionTitle>Details</StyledAccordionTitle>}
                 enableToggle
