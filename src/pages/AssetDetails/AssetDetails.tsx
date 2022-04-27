@@ -19,6 +19,7 @@ import {
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import {
+  clearState,
   fetchAllMarkets,
   fetchCard,
   fetchMetaDataForTokenId,
@@ -211,7 +212,7 @@ const AssetDetails: React.FC = () => {
   // );
 
   useMemo(() => {
-    if (!asset || owner || ownerStatus === STATUS.LOADING) return;
+    if (!asset || owner || ownerStatus !== STATUS.IDLE) return;
 
     dispatch(
       fetchProfileByAddress({
@@ -223,12 +224,7 @@ const AssetDetails: React.FC = () => {
 
   //getAllMarkets
   useMemo(() => {
-    if (
-      !asset ||
-      marketsStatus === STATUS.LOADING ||
-      marketsStatus === STATUS.FAILED
-    )
-      return;
+    if (!asset || marketsStatus !== STATUS.IDLE) return;
 
     dispatch(
       fetchAllMarkets({ assetAddress: params.add, network: params.network }),
@@ -240,7 +236,7 @@ const AssetDetails: React.FC = () => {
       !asset ||
       !params.id ||
       `${params.id}` in asset.ls8MetaData ||
-      metaDataStatus === STATUS.LOADING
+      metaDataStatus !== STATUS.IDLE
     )
       return;
     dispatch(
@@ -299,10 +295,13 @@ const AssetDetails: React.FC = () => {
   }, [asset, allProfiles, dispatch, params.network]);
 
   useEffect(() => {
-    if (!asset && cardStatus !== STATUS.LOADING) {
-      dispatch(fetchCard({ address: params.add, network: params.network }));
-    }
+    dispatch(clearState());
+  }, [dispatch]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
+    if (asset || cardStatus !== STATUS.IDLE) return;
+    dispatch(fetchCard({ address: params.add, network: params.network }));
   }, [asset, cardStatus, dispatch, params.add, params.network]);
 
   const propertiesImages: { [key: string]: string } = useMemo(

@@ -2,6 +2,7 @@ import {
   createAsyncThunk,
   createEntityAdapter,
   createSlice,
+  PayloadAction,
 } from '@reduxjs/toolkit';
 import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
@@ -133,6 +134,21 @@ const cardsSlice = createSlice({
   name: 'cards',
   initialState,
   reducers: {
+    clearState: (state) => {
+      return {
+        ...state,
+        ownedStatus: STATUS.IDLE,
+        ownedError: null,
+        issuedStatus: STATUS.IDLE,
+        issuedError: null,
+        status: STATUS.IDLE,
+        error: null,
+        metaDataStatus: STATUS.IDLE,
+        metaDataError: null,
+        marketsStatus: STATUS.IDLE,
+        marketsError: null,
+      };
+    },
     anyEvent: {
       reducer(_state, _action) {
         // some mutation
@@ -155,7 +171,7 @@ const cardsSlice = createSlice({
       })
       .addCase(fetchAllCards.fulfilled, (state, action) => {
         cardsAdapter.upsertMany(state, action.payload as ICard[]);
-        state.status = STATUS.IDLE;
+        state.status = STATUS.SUCCESSFUL;
       })
       .addCase(fetchAllCards.rejected, (state, action) => {
         state.error = action.error;
@@ -167,7 +183,7 @@ const cardsSlice = createSlice({
       })
       .addCase(fetchIssuedCards.fulfilled, (state, action) => {
         cardsAdapter.upsertMany(state, action.payload as ICard[]);
-        state.issuedStatus = STATUS.IDLE;
+        state.issuedStatus = STATUS.SUCCESSFUL;
       })
       .addCase(fetchIssuedCards.rejected, (state, action) => {
         state.issuedError = action.error;
@@ -180,7 +196,7 @@ const cardsSlice = createSlice({
       .addCase(fetchCard.fulfilled, (state, action) => {
         if (action.payload)
           cardsAdapter.upsertOne(state, action.payload as ICard);
-        state.status = STATUS.IDLE;
+        state.status = STATUS.SUCCESSFUL;
       })
       .addCase(fetchCard.rejected, (state, action) => {
         state.error = action.error;
@@ -193,7 +209,7 @@ const cardsSlice = createSlice({
       .addCase(fetchOwnedCards.fulfilled, (state, action) => {
         if (action.payload)
           cardsAdapter.upsertMany(state, action.payload as ICard[]);
-        state.ownedStatus = STATUS.IDLE;
+        state.ownedStatus = STATUS.SUCCESSFUL;
       })
       .addCase(fetchOwnedCards.rejected, (state, action) => {
         state.ownedError = action.error;
@@ -206,7 +222,7 @@ const cardsSlice = createSlice({
       .addCase(fetchMetaDataForTokenId.fulfilled, (state, action) => {
         if (action.payload)
           cardsAdapter.upsertOne(state, action.payload as ICard);
-        state.metaDataStatus = STATUS.IDLE;
+        state.metaDataStatus = STATUS.SUCCESSFUL;
       })
       .addCase(fetchMetaDataForTokenId.rejected, (state, action) => {
         state.metaDataError = action.error;
@@ -219,7 +235,7 @@ const cardsSlice = createSlice({
       .addCase(fetchAllMarkets.fulfilled, (state, action) => {
         if (action.payload)
           cardsAdapter.upsertOne(state, action.payload as ICard);
-        state.marketsStatus = STATUS.IDLE;
+        state.marketsStatus = STATUS.SUCCESSFUL;
       })
       .addCase(fetchAllMarkets.rejected, (state, action) => {
         state.marketsError = action.error;
@@ -249,4 +265,4 @@ export const {
  * ************
  */
 
-export const { anyEvent } = cardsSlice.actions;
+export const { anyEvent, clearState } = cardsSlice.actions;
