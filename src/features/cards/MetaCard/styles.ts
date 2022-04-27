@@ -60,9 +60,15 @@ export const StyledCardDetail = styled.div`
 export const StyledCardName = styled.h3`
   font-size: 15px;
   font-weight: ${({ theme }) => theme.font.weight.bolder};
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   @media ${({ theme }) => theme.screen.sm} {
     font-size: 18px;
+    line-height: 22px;
   }
 `;
 
