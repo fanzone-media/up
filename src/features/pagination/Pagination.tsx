@@ -42,7 +42,7 @@ interface IParams {
   network: NetworkName;
 }
 
-const Pagination: React.FC<IPagination> = ({
+const AssetsPagination: React.FC<IPagination> = ({
   type,
   profile,
   openTransferCardModal,
@@ -329,4 +329,4 @@ const Pagination: React.FC<IPagination> = ({
   );
 };
 
-export default Pagination;
+export default AssetsPagination;

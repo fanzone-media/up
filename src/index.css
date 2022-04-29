@@ -62,6 +62,9 @@ textarea {
 button {
   background-color: transparent;
   background-image: none;
+}
+
+button:hover:not([disabled]) {
   cursor: pointer;
 }
 

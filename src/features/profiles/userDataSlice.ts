@@ -5,7 +5,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { BigNumberish } from 'ethers';
-import { NetworkName, ThunkExtra } from '../../boot/types';
+import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
 import { IProfile } from '../../services/models';
 import { CONSTANTS, STATUS } from '../../utility';
 import { IUserDataSliceState, IUsersState } from './types';
@@ -119,16 +119,21 @@ export const fetchAssetCreator = createAsyncThunk<
 export const fetchAllProfiles = createAsyncThunk<
   IProfile[],
   { addresses: string[]; network: NetworkName },
-  { extra: ThunkExtra }
+  { extra: ThunkExtra; state: RootState }
 >(
   'userData/fetchAllProfiles',
-  async ({ addresses, network }, { extra: { api } }) => {
+  async ({ addresses, network }, { extra: { api }, getState }) => {
+    const state = getState();
     const profile = (await api.profiles.fetchAllProfiles(
       addresses,
       network,
     )) as IProfile[];
 
-    return profile;
+    const currentEntities = Object.values(
+      state.userData[network].entities,
+    ) as IProfile[];
+
+    return [...currentEntities, ...profile];
   },
 );
 

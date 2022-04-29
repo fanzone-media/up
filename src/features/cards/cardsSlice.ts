@@ -47,10 +47,13 @@ export const fetchAllCards = createAsyncThunk<
   ICard[],
   { network: NetworkName; addresses: string[] },
   { state: RootState; extra: ThunkExtra }
->('cards/fetchAllCards', async ({ network, addresses }, { extra: { api } }) => {
-  const res = await api.cards.fetchAllCards(network, addresses);
-  return res as ICard[];
-});
+>(
+  'cards/fetchAllCards',
+  async ({ network, addresses }, { getState, extra: { api } }) => {
+    const res = await api.cards.fetchAllCards(network, addresses);
+    return [...Object.values(getState().cards.entities), ...res] as ICard[];
+  },
+);
 
 export const fetchIssuedCards = createAsyncThunk<
   ICard[],

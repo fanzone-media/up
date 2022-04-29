@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
-import { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { NetworkName, RootState } from '../../boot/types';
 import { fetchAllProfiles, selectAllUsersItems } from '../../features/profiles';
-import { IProfile } from '../../services/models';
-import Pagination from '../../features/pagination/Pagination';
+import { ICard, IProfile } from '../../services/models';
+import { Pagination } from '../../components';
 import {
   StyledContentwrappar,
   StyledDescription,
@@ -16,11 +15,14 @@ import {
   StyledWelcomeHeading,
   StyledProfilesHeader,
   StyledProfileHeading,
-  StyledProfilesWrapper,
 } from './styles';
 import { Search } from '../../components';
 import { useAppDispatch } from '../../boot/store';
 import { useParams } from 'react-router-dom';
+import { getDefaultAddresses } from '../../utility/content/addresses';
+import { Address } from '../../utils/types';
+import { fetchAllCards, selectAllCardItems } from '../../features/cards';
+import { MetaCard } from '../../features/cards/MetaCard';
 
 interface IParams {
   network: NetworkName;
@@ -29,70 +31,90 @@ interface IParams {
 const Profiles: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
+  const [demoProfiles, setDemoProfiles] = useState<Array<Address>>([]);
+  // @TODO: show error message
+  const [errorLoadingProfileAddresses, setErrorLoadingProfileAddresses] =
+    useState();
+  const [demoAssets, setDemoAssets] = useState<Array<Address>>([]);
+  const [errorLoadingAssetsAddresses, setErrorLoadingAssetsAddresses] =
+    useState();
 
-  const demoProfiles = {
-    l14: ['', ''],
-    mumbai: [
-      '0x0044FA45A42b78A8cbAF6764D770864CBC94214C',
-      '0x77de7a8c94789263Ba24D41D9D799190C73D3Acc',
-    ],
-    polygon: [
-      '0x775e1dA80Bbe4C507D7009AB8D3a45c87b7f9D8A',
-      '0x5e3Aa02aEE55c64a1253BFbe267CF9df94B8Cdbf',
-    ],
-    ethereum: ['', ''],
-  };
+  useEffect(() => {
+    getDefaultAddresses(params.network, 'profileAddresses').then(
+      (result) => {
+        setDemoProfiles(result);
+      },
+      (error) => {
+        setErrorLoadingProfileAddresses(error);
+      },
+    );
+    getDefaultAddresses(params.network, 'assetsAddresses').then(
+      (result) => {
+        setDemoAssets(result);
+      },
+      (error) => {
+        setErrorLoadingAssetsAddresses(error);
+      },
+    );
+    // empty array to only call once
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const [demoProfilesRange, setDemoProfilesRange] = useState<[number, number]>([
+    0, 9,
+  ]); // load first 11 by default
+  const [demoAssetsRange, setDemoAssetsRange] = useState<[number, number]>([
+    0, 9,
+  ]); // load first 11 by default
 
-  const demoAssets = {
-    l14: ['', ''],
-    mumbai: [
-      '0x8839E144Bd2EddfDBC53B5b6323008bb3CE3eb7F',
-      '0x9c7072122178107bf66571c1f3e379368e0e47a3',
-    ],
-    polygon: [
-      '0xd83Bc6fB61fD75beDe9d3999d7345b5C1cB8b393',
-      '0x90ada08949d5B32C9bF8d4DeCD27BE483bc5B0e2',
-    ],
-    ethereum: ['', ''],
-  };
+  useEffect(() => {
+    if (demoProfiles.length === 0) return;
+    console.log(
+      demoProfiles.slice(demoProfilesRange[0], demoProfilesRange[1] + 1),
+    );
+    dispatch(
+      fetchAllProfiles({
+        addresses: demoProfiles.slice(
+          demoProfilesRange[0],
+          demoProfilesRange[1] + 1,
+        ),
+        network: params.network,
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, demoProfiles, params.network, demoProfilesRange]);
 
   const userProfiles = useSelector(
     (state: RootState) => selectAllUsersItems(state.userData[params.network]),
     // eslint-disable-next-line array-callback-return
   )?.filter((item) => {
-    if (demoProfiles)
-      return demoProfiles[params.network].some((i) => {
-        return i === item.address && item.network === params.network;
-      });
-  });
-
-  const fetchDemoProfiles = () => {
-    if (userProfiles?.length === 0) {
-      dispatch(
-        fetchAllProfiles({
-          addresses: demoProfiles[params.network],
-          network: params.network,
-        }),
+    if (demoProfiles.length > 0) {
+      return demoProfiles?.some(
+        (i) => i === item.address && item.network === params.network,
       );
     }
-  };
+  });
+
+  // console.log(userProfiles);
+
+  const useProfilesState = useSelector(
+    (state: RootState) => state.userData[params.network].status,
+  );
+
+  const allCollection = useSelector(selectAllCardItems).filter((item) =>
+    demoAssets.some((i) => i === item.address),
+  );
 
   useEffect(() => {
-    fetchDemoProfiles();
+    if (demoAssets.length === 0) return;
+    dispatch(
+      fetchAllCards({
+        addresses: demoAssets.slice(demoAssetsRange[0], demoAssetsRange[1] + 1),
+        network: params.network,
+      }),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.network]);
+  }, [dispatch, demoAssets, params.network, demoAssetsRange]);
 
-  const renderProfiles = useMemo(
-    () =>
-      userProfiles?.map((userProfile: IProfile) => (
-        <ProfileCard
-          key={userProfile.address}
-          userProfile={userProfile}
-          type="demo"
-        />
-      )),
-    [userProfiles],
-  );
+  const useAssetsState = useSelector((state: RootState) => state.cards.status);
 
   return (
     <StyledMainContent>
@@ -113,10 +135,36 @@ const Profiles: React.FC = () => {
             <StyledProfileHeading>Profiles</StyledProfileHeading>
             <Search />
           </StyledProfilesHeader>
-          <StyledProfilesWrapper>{renderProfiles}</StyledProfilesWrapper>
           <Pagination
-            type="demo"
-            collectionAddresses={demoAssets[params.network]}
+            status={useProfilesState}
+            components={userProfiles.map((userProfile: IProfile) => (
+              <ProfileCard
+                key={userProfile.address}
+                userProfile={userProfile}
+                type="demo"
+              />
+            ))}
+            nbrOfAllComponents={demoProfiles.length}
+            setComponentsRange={setDemoProfilesRange}
+          />
+          {/* <Pagination type="demo" collectionAddresses={demoAssets} /> */}
+          <StyledProfilesHeader>
+            <StyledProfileHeading>Assets</StyledProfileHeading>
+            <Search />
+          </StyledProfilesHeader>
+          <Pagination
+            status={useAssetsState}
+            components={allCollection.map((digitalCard: ICard) => {
+              return (
+                <MetaCard
+                  key={digitalCard.address}
+                  digitalCard={digitalCard}
+                  type="demo"
+                />
+              );
+            })}
+            nbrOfAllComponents={demoAssets.length}
+            setComponentsRange={setDemoAssetsRange}
           />
         </>
       </StyledContentwrappar>
