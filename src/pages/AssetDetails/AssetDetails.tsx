@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   BackwardsIcon,
@@ -28,6 +28,8 @@ import {
 import { useEffect } from 'react';
 import {
   fetchAssetCreator,
+  fetchOwnerAddressOfTokenId,
+  fetchOwnerOfTokenId,
   fetchProfileByAddress,
   selectAllUsersItems,
   selectUserById,
@@ -99,6 +101,7 @@ import { useAccount } from 'wagmi';
 import { DesktopCreatorsAccordion } from './DesktopCreatorsAccordion';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { theme } from '../../boot/styles';
+import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 
 interface IPrams {
   add: string;
@@ -151,16 +154,6 @@ const AssetDetails: React.FC = () => {
   );
 
   const [{ data: account }] = useAccount();
-
-  useEffect(() => {
-    if (!owner?.permissionSet || !account) return;
-    const _currentUsersPermissionsSet = getAddressPermissionsOnUniversalProfile(
-      owner.permissionSet,
-      account.address,
-    );
-    if (_currentUsersPermissionsSet !== undefined)
-      setCurrentUsersPermissionsSet(_currentUsersPermissionsSet.permissions);
-  }, [owner, account]);
 
   const ownerStatus = useSelector(
     (state: RootState) => state.userData[params.network].status,
@@ -226,6 +219,18 @@ const AssetDetails: React.FC = () => {
       }),
     );
   }, [asset, dispatch, owner, ownerStatus, params.network]);
+
+  useMemo(() => {
+    if (activeUser) return;
+
+    wasActiveProfile &&
+      dispatch(
+        fetchOwnerOfTokenId({
+          address: wasActiveProfile,
+          network: params.network,
+        }),
+      );
+  }, [activeUser, dispatch, params.network, wasActiveProfile]);
 
   //getAllMarkets
   useMemo(() => {
@@ -301,13 +306,40 @@ const AssetDetails: React.FC = () => {
 
   useEffect(() => {
     dispatch(clearState());
-  }, [dispatch]);
+  }, [dispatch, params]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     if (asset || cardStatus !== STATUS.IDLE) return;
-    dispatch(fetchCard({ address: params.add, network: params.network }));
-  }, [asset, cardStatus, dispatch, params.add, params.network]);
+    dispatch(
+      fetchCard({
+        address: params.add,
+        network: params.network,
+        tokenId: params.id,
+      }),
+    );
+  }, [asset, cardStatus, dispatch, params.add, params.id, params.network]);
+
+  useEffect(() => {
+    if (!params.id || !params.add) return;
+    dispatch(
+      fetchOwnerAddressOfTokenId({
+        assetAddress: params.add,
+        tokenId: params.id,
+        network: params.network,
+      }),
+    );
+  }, [dispatch, params.add, params.id, params.network]);
+
+  useEffect(() => {
+    if (!activeUser || !account) return;
+    const _currentUsersPermissionsSet = getAddressPermissionsOnUniversalProfile(
+      activeUser.permissionSet,
+      account.address,
+    );
+    if (_currentUsersPermissionsSet !== undefined)
+      setCurrentUsersPermissionsSet(_currentUsersPermissionsSet.permissions);
+  }, [owner, account, activeUser]);
 
   const propertiesImages: { [key: string]: string } = useMemo(
     () => ({

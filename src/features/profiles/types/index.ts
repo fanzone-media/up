@@ -9,6 +9,12 @@ interface IBaseState {
   holderError: Error | SerializedError | null;
   creatorError: Error | SerializedError | null;
   error: Error | SerializedError | null;
+  newError: {
+    [key: string]: Error | SerializedError | null;
+  };
+  newStatus: {
+    [key: string]: STATUS;
+  };
 }
 export type IUsersState = IBaseState;
 

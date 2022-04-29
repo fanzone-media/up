@@ -4,6 +4,7 @@ import {
   createSlice,
   PayloadAction,
 } from '@reduxjs/toolkit';
+import { BigNumberish } from 'ethers';
 import { NetworkName, ThunkExtra } from '../../boot/types';
 import { IProfile } from '../../services/models';
 import { STATUS } from '../../utility';
@@ -26,6 +27,8 @@ const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
   error: null,
   holderError: null,
   creatorError: null,
+  newError: {},
+  newStatus: {},
 });
 
 /**
@@ -48,19 +51,26 @@ const initialState: IUserDataSliceState = {
  * **************
  */
 
-export const fetchProfileByAddress = createAsyncThunk<
-  IProfile,
-  { address: string; network: NetworkName },
-  { extra: ThunkExtra }
->(
-  'userData/fetchUserById',
-  async ({ address, network }, { extra: { api } }) => {
+const profileFetcherThunk = (thunkName: string) => {
+  return createAsyncThunk<
+    IProfile,
+    { address: string; network: NetworkName },
+    { extra: ThunkExtra }
+  >(thunkName, async ({ address, network }, { extra: { api } }) => {
     const profile = (await api.profiles.fetchProfile(
       address,
       network,
     )) as IProfile;
     return profile;
-  },
+  });
+};
+
+export const fetchProfileByAddress = profileFetcherThunk(
+  'userData/fetchUserById',
+);
+
+export const fetchOwnerOfTokenId = profileFetcherThunk(
+  'userData/fetchOwnerOfTokenId',
 );
 
 export const fetchAssetHolders = createAsyncThunk<
@@ -74,6 +84,22 @@ export const fetchAssetHolders = createAsyncThunk<
   )) as IProfile[];
   return profile;
 });
+
+export const fetchOwnerAddressOfTokenId = createAsyncThunk<
+  string,
+  { assetAddress: string; tokenId: BigNumberish; network: NetworkName },
+  { extra: ThunkExtra }
+>(
+  'userData/fetchOwnerAddressOfTokenId',
+  async ({ assetAddress, tokenId, network }, { extra: { api } }) => {
+    const ownerAddress = await api.cards.fetchOwnerOfTokenId(
+      assetAddress,
+      tokenId,
+      network,
+    );
+    return ownerAddress;
+  },
+);
 
 export const fetchAssetCreator = createAsyncThunk<
   IProfile[],
@@ -139,6 +165,29 @@ const userDataSlice = createSlice({
         state[action.meta.arg.network].status = STATUS.FAILED;
       });
     builder
+      .addCase(fetchOwnerOfTokenId.pending, (state, action) => {
+        state[action.meta.arg.network].newStatus = {
+          [`${action.type}`]: STATUS.LOADING,
+        };
+      })
+      .addCase(fetchOwnerOfTokenId.fulfilled, (state, action) => {
+        usersAdapter.upsertOne(
+          state[action.meta.arg.network],
+          action.payload as IProfile,
+        );
+        state[action.meta.arg.network].newStatus = {
+          [`${action.type}`]: STATUS.IDLE,
+        };
+      })
+      .addCase(fetchOwnerOfTokenId.rejected, (state, action) => {
+        state[action.meta.arg.network].error = {
+          [`${action.type}`]: action.error,
+        };
+        state[action.meta.arg.network].newStatus = {
+          [`${action.type}`]: STATUS.FAILED,
+        };
+      });
+    builder
       .addCase(fetchAssetHolders.pending, (state, action) => {
         state[action.meta.arg.network].holderStatus = STATUS.LOADING;
       })
@@ -183,6 +232,9 @@ const userDataSlice = createSlice({
         state[action.meta.arg.network].error = action.error;
         state[action.meta.arg.network].status = STATUS.FAILED;
       });
+    builder.addCase(fetchOwnerAddressOfTokenId.fulfilled, (state, action) => {
+      state.me = action.payload;
+    });
   },
 });
 

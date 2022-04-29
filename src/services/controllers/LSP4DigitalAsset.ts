@@ -16,6 +16,7 @@ import { tokenIdAsBytes32 } from '../../utils/cardToken';
 const fetchCard = async (
   address: string,
   network: NetworkName,
+  tokenId?: BigNumberish,
 ): Promise<ICard> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(address, provider);
@@ -27,6 +28,11 @@ const fetchCard = async (
     .catch(() => {
       throw new Error('Not an lsp8 asset');
     });
+
+  tokenId &&
+    (await contract.ownerOf(tokenId).catch(() => {
+      throw new Error('Not a valid token id');
+    }));
 
   const [name, symbol, totalSupply, owner, holders, hashedUrl] =
     await Promise.all([
@@ -90,6 +96,26 @@ const fetchAllCards = async (
     }),
   );
   return assets;
+};
+
+const fetchOwnerOfTokenId = async (
+  assetAddress: string,
+  tokenId: BigNumberish,
+  network: NetworkName,
+): Promise<string> => {
+  const provider = useRpcProvider(network);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  await contract
+    .supportsInterface('0x49399145')
+    .then((result) => {
+      if (result === false) throw new Error('Not an lsp8 asset');
+    })
+    .catch(() => {
+      throw new Error('Not an lsp8 asset');
+    });
+  const ownerOf = await contract.ownerOf(tokenId);
+
+  return ownerOf;
 };
 
 const fetchMetaDataForTokenID = async (
@@ -249,4 +275,5 @@ export const LSP4DigitalAssetApi = {
   sellCard,
   fetchMetaDataForTokenID,
   fetchAllMarkets,
+  fetchOwnerOfTokenId,
 };

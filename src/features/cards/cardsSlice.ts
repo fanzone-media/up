@@ -2,7 +2,6 @@ import {
   createAsyncThunk,
   createEntityAdapter,
   createSlice,
-  PayloadAction,
 } from '@reduxjs/toolkit';
 import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
@@ -67,12 +66,15 @@ export const fetchIssuedCards = createAsyncThunk<
 
 export const fetchCard = createAsyncThunk<
   ICard,
-  { network: NetworkName; address: string },
+  { network: NetworkName; address: string; tokenId?: BigNumberish },
   { state: RootState; extra: ThunkExtra }
->('cards/fetchCard', async ({ address, network }, { extra: { api } }) => {
-  const res = await api.cards.fetchCard(address, network);
-  return res as ICard;
-});
+>(
+  'cards/fetchCard',
+  async ({ address, network, tokenId }, { extra: { api } }) => {
+    const res = await api.cards.fetchCard(address, network, tokenId);
+    return res as ICard;
+  },
+);
 
 export const fetchOwnedCards = createAsyncThunk<
   ICard[],
