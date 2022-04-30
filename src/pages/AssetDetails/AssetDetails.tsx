@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   BackwardsIcon,
@@ -101,7 +101,6 @@ import { useAccount } from 'wagmi';
 import { DesktopCreatorsAccordion } from './DesktopCreatorsAccordion';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { theme } from '../../boot/styles';
-import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 
 interface IPrams {
   add: string;
@@ -242,25 +241,12 @@ const AssetDetails: React.FC = () => {
   }, [asset, dispatch, marketsStatus, params.add, params.network]);
 
   useMemo(() => {
-    if (
-      !asset ||
-      !params.id ||
-      `${params.id}` in asset.ls8MetaData ||
-      metaDataStatus !== STATUS.IDLE
-    )
-      return;
-    dispatch(
-      fetchMetaDataForTokenId({
-        assetAddress: params.add,
-        network: params.network,
-        tokenId: params.id,
-      }),
-    );
-  }, [asset, dispatch, metaDataStatus, params.add, params.id, params.network]);
+    if (!params.id || !ownedTokenIds) return;
+    setCurrentIndex(ownedTokenIds.indexOf(Number(params.id)));
+  }, [ownedTokenIds, params.id]);
 
   useMemo(() => {
     if (
-      !params.id &&
       wasActiveProfile &&
       ownedTokenIds &&
       ownedTokenIds.length > 0 &&
@@ -283,7 +269,6 @@ const AssetDetails: React.FC = () => {
     metaDataStatus,
     ownedTokenIds,
     params.add,
-    params.id,
     params.network,
     wasActiveProfile,
   ]);
@@ -547,13 +532,17 @@ const AssetDetails: React.FC = () => {
   }, [asset]);
 
   const renderCardPrice = useMemo(() => {
-    if (urlTokenIdMarket && params.id) {
+    if (
+      (!currentUsersPermissionsSet ||
+        currentUsersPermissionsSet.call === '0') &&
+      currentMintMarket
+    ) {
       return (
         <>
           <StyledCardPriceValueWrapper>
             <StyledTokenIcon src={WethIcon} alt="" />
             <StyledCardPriceValue>
-              {urlTokenIdMarket.minimumAmount.toNumber()}
+              {currentMintMarket.minimumAmount.toNumber()}
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
@@ -566,7 +555,11 @@ const AssetDetails: React.FC = () => {
       );
     }
 
-    if (!currentMintMarket && ownedTokenIds) {
+    if (
+      !currentMintMarket &&
+      ownedTokenIds &&
+      currentUsersPermissionsSet.call === '1'
+    ) {
       return (
         <>
           <StyledCardPriceValueWrapper>
@@ -583,7 +576,11 @@ const AssetDetails: React.FC = () => {
         </>
       );
     }
-    if (currentMintMarket && ownedTokenIds) {
+    if (
+      currentMintMarket &&
+      ownedTokenIds &&
+      currentUsersPermissionsSet.call === '1'
+    ) {
       return (
         <>
           <StyledCardPriceValueWrapper>
@@ -605,11 +602,10 @@ const AssetDetails: React.FC = () => {
     }
   }, [
     currentMintMarket,
+    currentUsersPermissionsSet,
     openBuyModal,
     openSellModal,
     ownedTokenIds,
-    params.id,
-    urlTokenIdMarket,
   ]);
 
   const renderCardProperties = useMemo(() => {
@@ -692,10 +688,14 @@ const AssetDetails: React.FC = () => {
               )}
               <StyledCardMainDetails>
                 <StyledMediaWrapper>
-                  <StyledMedia
-                    src={asset?.ls8MetaData[currentIndex]?.image}
-                    alt=""
-                  />
+                  {asset && ownedTokenIds && (
+                    <StyledMedia
+                      src={
+                        asset.ls8MetaData[ownedTokenIds[currentIndex]]?.image
+                      }
+                      alt=""
+                    />
+                  )}
                   <a
                     href={explorer && explorer.exploreUrl + asset?.address}
                     target="_blank"

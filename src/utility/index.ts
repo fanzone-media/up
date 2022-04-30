@@ -8,6 +8,11 @@ export enum STATUS {
   FAILED = 'failed',
 }
 
+export const CONSTANTS = {
+  MINT_OWNER_ERROR: 'mintOwnerError',
+  MINT_OWNER_STATUS: 'mintOwnerStatus',
+};
+
 export const getChainExplorer = (network: NetworkName) => {
   switch (network) {
     case 'polygon':

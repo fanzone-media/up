@@ -7,7 +7,7 @@ import {
 import { BigNumberish } from 'ethers';
 import { NetworkName, ThunkExtra } from '../../boot/types';
 import { IProfile } from '../../services/models';
-import { STATUS } from '../../utility';
+import { CONSTANTS, STATUS } from '../../utility';
 import { IUserDataSliceState, IUsersState } from './types';
 
 /**
@@ -167,7 +167,7 @@ const userDataSlice = createSlice({
     builder
       .addCase(fetchOwnerOfTokenId.pending, (state, action) => {
         state[action.meta.arg.network].newStatus = {
-          [`${action.type}`]: STATUS.LOADING,
+          [`${CONSTANTS.MINT_OWNER_STATUS}`]: STATUS.LOADING,
         };
       })
       .addCase(fetchOwnerOfTokenId.fulfilled, (state, action) => {
@@ -176,15 +176,15 @@ const userDataSlice = createSlice({
           action.payload as IProfile,
         );
         state[action.meta.arg.network].newStatus = {
-          [`${action.type}`]: STATUS.IDLE,
+          [`${CONSTANTS.MINT_OWNER_STATUS}`]: STATUS.IDLE,
         };
       })
       .addCase(fetchOwnerOfTokenId.rejected, (state, action) => {
         state[action.meta.arg.network].error = {
-          [`${action.type}`]: action.error,
+          [`${CONSTANTS.MINT_OWNER_ERROR}`]: action.error,
         };
         state[action.meta.arg.network].newStatus = {
-          [`${action.type}`]: STATUS.FAILED,
+          [`${CONSTANTS.MINT_OWNER_STATUS}`]: STATUS.FAILED,
         };
       });
     builder
