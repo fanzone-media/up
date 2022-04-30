@@ -16,6 +16,8 @@ export const StyledModalHeader = styled.h3`
 
 export const StyledInputGroup = styled.div`
   position: relative;
+  display: flex;
+  column-gap: 1em;
 `;
 
 export const StyledPriceLabel = styled.p`
@@ -35,6 +37,10 @@ export const StyledPriceInput = styled.input`
   padding: 0.5em 0.5em;
   text-align: end;
   width: 100%;
+`;
+
+export const StyledTokenSelectorDropDown = styled.select`
+  background: none;
 `;
 
 export const StyledButtonGroup = styled.div``;

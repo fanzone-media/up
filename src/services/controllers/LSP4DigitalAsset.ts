@@ -3,15 +3,17 @@ import KeyChain from '../utilities/KeyChain';
 import { NetworkName } from '../../boot/types';
 import { ICard, ILSP8MetaData, IMarket } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
-import { BigNumberish, ethers } from 'ethers';
+import { BigNumberish, ethers, Signer } from 'ethers';
 import {
   CardTokenProxy__factory,
+  ContractRegistry__factory,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import Utils from '../utilities/util';
 import { LSP3ProfileApi } from './LSP3Profile';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
+import { erc20ABI } from 'wagmi';
 
 const fetchCard = async (
   address: string,
@@ -228,17 +230,60 @@ const fetchProfileIssuedAssetsAddresses = async (
   return assets;
 };
 
-const sellCard = async (
+const fetchAcceptedTokens = async (
   assetAddress: string,
+  network: NetworkName,
+): Promise<{ tokenAddress: string; symbol: string }[]> => {
+  const provider = useRpcProvider(network);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  const contractRegistryAddress = await contract.contractRegistry();
+  const contractRegistry = ContractRegistry__factory.connect(
+    contractRegistryAddress,
+    provider,
+  );
+  const whiteListedTokens = await contractRegistry.allWhitelistedTokens();
+  const res = await Promise.all(
+    whiteListedTokens.map(async (item) => {
+      const erc20Contract = new ethers.Contract(item, erc20ABI, provider);
+      const symbol: string = await erc20Contract.symbol();
+      return {
+        tokenAddress: item,
+        symbol,
+      };
+    }),
+  );
+  return res;
+};
+
+const setMarketViaUniversalProfile = async (
+  assetAddress: string,
+  universalProfileAddress: string,
   tokenId: number,
   acceptedToken: string,
   minimumAmount: number,
-  network: NetworkName,
+  signer: Signer,
 ) => {
-  const provider = useRpcProvider(network);
-  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
-  await contract.setMarketFor(tokenIdAsBytes, acceptedToken, minimumAmount);
+  const encodedSetMarketFor = assetContract.interface.encodeFunctionData(
+    'setMarketFor',
+    [tokenIdAsBytes, acceptedToken, minimumAmount],
+  );
+  const transaction = await universalProfileContract.execute(
+    '0x0',
+    assetAddress,
+    0,
+    encodedSetMarketFor,
+  );
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
 };
 
 const getTokenSale = async (
@@ -272,8 +317,9 @@ export const LSP4DigitalAssetApi = {
   fetchProfileIssuedAssetsAddresses,
   fetchAllCards,
   getTokenSale,
-  sellCard,
+  setMarketViaUniversalProfile,
   fetchMetaDataForTokenID,
   fetchAllMarkets,
   fetchOwnerOfTokenId,
+  fetchAcceptedTokens,
 };

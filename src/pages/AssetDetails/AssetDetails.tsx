@@ -101,6 +101,7 @@ import { useAccount } from 'wagmi';
 import { DesktopCreatorsAccordion } from './DesktopCreatorsAccordion';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { theme } from '../../boot/styles';
+import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 
 interface IPrams {
   add: string;
@@ -131,7 +132,7 @@ const AssetDetails: React.FC = () => {
 
   const wasActiveProfile = useSelector((state: RootState) => state.userData.me);
 
-  const activeUser = useSelector(
+  const activeProfile = useSelector(
     (state: RootState) =>
       wasActiveProfile &&
       selectUserById(state.userData[params.network], wasActiveProfile),
@@ -188,11 +189,11 @@ const AssetDetails: React.FC = () => {
 
   const ownedTokenIds = useMemo(
     () =>
-      activeUser &&
-      activeUser.ownedAssets.find(
+      activeProfile &&
+      activeProfile.ownedAssets.find(
         (item) => item.assetAddress.toLowerCase() === params.add.toLowerCase(),
       )?.tokenIds,
-    [activeUser, params.add],
+    [activeProfile, params.add],
   );
 
   const dispatch = useAppDispatch();
@@ -220,7 +221,7 @@ const AssetDetails: React.FC = () => {
   }, [asset, dispatch, owner, ownerStatus, params.network]);
 
   useMemo(() => {
-    if (activeUser) return;
+    if (activeProfile) return;
 
     wasActiveProfile &&
       dispatch(
@@ -229,7 +230,7 @@ const AssetDetails: React.FC = () => {
           network: params.network,
         }),
       );
-  }, [activeUser, dispatch, params.network, wasActiveProfile]);
+  }, [activeProfile, dispatch, params.network, wasActiveProfile]);
 
   //getAllMarkets
   useMemo(() => {
@@ -317,14 +318,14 @@ const AssetDetails: React.FC = () => {
   }, [dispatch, params.add, params.id, params.network]);
 
   useEffect(() => {
-    if (!activeUser || !account) return;
+    if (!activeProfile || !account) return;
     const _currentUsersPermissionsSet = getAddressPermissionsOnUniversalProfile(
-      activeUser.permissionSet,
+      activeProfile.permissionSet,
       account.address,
     );
     if (_currentUsersPermissionsSet !== undefined)
       setCurrentUsersPermissionsSet(_currentUsersPermissionsSet.permissions);
-  }, [owner, account, activeUser]);
+  }, [owner, account, activeProfile]);
 
   const propertiesImages: { [key: string]: string } = useMemo(
     () => ({
@@ -677,10 +678,11 @@ const AssetDetails: React.FC = () => {
                   onClose={() => setOpenBuyModal(!openBuyModal)}
                 />
               )}
-              {openSellModal && asset && (
+              {openSellModal && asset && ownedTokenIds && activeProfile && (
                 <SellCardModal
+                  ownerProfile={activeProfile}
                   address={params.add}
-                  mint={1234}
+                  mint={ownedTokenIds[currentIndex]}
                   price={urlTokenIdMarket?.minimumAmount.toNumber()}
                   cardImg={asset.ls8MetaData[params.id ? params.id : 0].image}
                   onClose={() => setOpenSellModal(!openSellModal)}
@@ -688,10 +690,12 @@ const AssetDetails: React.FC = () => {
               )}
               <StyledCardMainDetails>
                 <StyledMediaWrapper>
-                  {asset && ownedTokenIds && (
+                  {asset && (
                     <StyledMedia
                       src={
-                        asset.ls8MetaData[ownedTokenIds[currentIndex]]?.image
+                        asset.ls8MetaData[
+                          ownedTokenIds ? ownedTokenIds[currentIndex] : 0
+                        ]?.image
                       }
                       alt=""
                     />
