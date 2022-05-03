@@ -3,9 +3,10 @@ import {
   encodeArrayKey,
   encodeKeyValue,
 } from '@erc725/erc725.js/build/main/lib/utils';
-import { ethers, Signer } from 'ethers';
+import { BigNumber, ethers, Signer } from 'ethers';
 import {
   CardTokenProxy__factory,
+  ERC20__factory,
   LSP6KeyManagerProxy__factory,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
@@ -157,8 +158,47 @@ const setCardMarketViaKeyManager = async (
   });
 };
 
+const approveTokenViaKeyManager = async (
+  keyManagerAddress: string,
+  universalProfileAddress: string,
+  spenderAddress: string,
+  tokenAddress: string,
+  amount: BigNumber,
+  signer: Signer,
+) => {
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+  const keyManagerContract = LSP6KeyManagerProxy__factory.connect(
+    keyManagerAddress,
+    signer,
+  );
+  const erc20Contract = ERC20__factory.connect(tokenAddress, signer);
+  const encodedApprove = erc20Contract.interface.encodeFunctionData('approve', [
+    spenderAddress,
+    amount,
+  ]);
+
+  const encodedExecuteFunction =
+    universalProfileContract.interface.encodeFunctionData('execute', [
+      '0x0',
+      tokenAddress,
+      0,
+      encodedApprove,
+    ]);
+
+  const transaction = await keyManagerContract.execute(encodedExecuteFunction);
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
 export const KeyManagerApi = {
   addPermissions,
   setCardMarketViaKeyManager,
   transferCardViaKeyManager,
+  approveTokenViaKeyManager,
 };

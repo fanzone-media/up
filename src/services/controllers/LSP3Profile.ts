@@ -11,6 +11,7 @@ import Utils from '../utilities/util';
 import { addData, addFile, getLSP3ProfileData } from '../ipfsClient';
 import {
   CardTokenProxy__factory,
+  ERC20__factory,
   ERC725Y__factory,
   LSP6KeyManagerProxy__factory,
   UniversalProfileProxy__factory,
@@ -19,12 +20,13 @@ import {
   isFetchDataForSchemaResultList,
   fetchLSP5Data,
 } from '../../utils/LSPSchema';
-import { ethers, Signer } from 'ethers';
+import { BigNumber, ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
+import { erc20ABI } from 'wagmi';
 
 const fetchProfile = async (
   address: string,
@@ -461,6 +463,46 @@ const setCardMarketViaUniversalProfile = async (
   });
 };
 
+const approveTokenViaUniversalProfile = async (
+  universalProfileAddress: string,
+  spenderAddress: string,
+  tokenAddress: string,
+  amount: BigNumber,
+  signer: Signer,
+) => {
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+  const erc20Contract = ERC20__factory.connect(tokenAddress, signer);
+  const encodedApprove = erc20Contract.interface.encodeFunctionData('approve', [
+    spenderAddress,
+    amount,
+  ]);
+
+  const transaction = await universalProfileContract.execute(
+    '0x0',
+    spenderAddress,
+    0,
+    encodedApprove,
+  );
+
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
+const buyFromCardMarketViaUniversalProfile = async (
+  assetAddress: string,
+  universalProfileAddress: string,
+  tokenId: number,
+  acceptedToken: string,
+  minimumAmount: number,
+  signer: Signer,
+) => {};
+
 export const LSP3ProfileApi = {
   fetchProfile,
   fetchAllProfiles,
@@ -470,4 +512,5 @@ export const LSP3ProfileApi = {
   setUniversalProfileDataViaKeyManager,
   transferCardViaUniversalProfile,
   setCardMarketViaUniversalProfile,
+  approveTokenViaUniversalProfile,
 };
