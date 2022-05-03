@@ -17,3 +17,8 @@ export type AsyncReturnType<T extends (...args: any) => Promise<any>> =
   T extends (...args: any) => Promise<infer R> ? R : any;
 
 export type UnpackedType<T> = T extends (infer U)[] ? U : T;
+
+export enum StringBoolean {
+  FALSE = '0',
+  TRUE = '1',
+}

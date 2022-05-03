@@ -8,3 +8,9 @@ export const getDefaultAddresses = async (
   const res = await fetch(`./api/${network}/${type}.json`);
   return res.json();
 };
+
+export const trimedAddress = (address: Address) =>
+  `${address.slice(0, 8)}...${address.slice(
+    address.length - 4,
+    address.length,
+  )}`;

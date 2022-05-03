@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ICard } from '../../../services/models';
+import { ICard, IProfile } from '../../../services/models';
 import universalprofile from '../../../assets/universalprofile.png';
 import transferIcon from '../../../assets/transfer-icon.png';
 import polygon from '../../../assets/polygon.svg';
@@ -23,13 +23,15 @@ import {
   StyledBalanceWrapper,
   StyledPolygon,
 } from '../../profiles/ProfileCard/styles';
+import { useModal } from '../../../hooks/useModal';
+import { TransferCardModal } from '../../../pages/ProfileDetails/TransferCardModal';
 
 interface IProps {
   digitalCard: ICard;
   type: string;
   balance?: number;
-  openTransferCardModal?: (address: string) => void;
-  transferPermission?: boolean;
+  profile?: IProfile;
+  canTransfer?: boolean;
 }
 
 interface IParams {
@@ -40,11 +42,32 @@ export const MetaCard: React.FC<IProps> = ({
   digitalCard,
   type,
   balance,
-  openTransferCardModal,
-  transferPermission,
+  profile,
+  canTransfer,
 }: IProps) => {
   const params = useParams<IParams>();
   const explorer = getChainExplorer(params.network);
+
+  const {
+    handlePresent: onPresentTransferCardModal,
+    onDismiss: onDismissTransferCardModal,
+  } = useModal(
+    <TransferCardModal
+      profile={{
+        address: profile?.address ? profile.address : '',
+        owner: profile?.owner ? profile.owner : '',
+        isOwnerKeyManager: profile?.isOwnerKeyManager
+          ? profile.isOwnerKeyManager
+          : false,
+        ownedAssets: profile?.ownedAssets ? profile.ownedAssets : [],
+      }}
+      asset={digitalCard}
+      onDismiss={() => onDismissTransferCardModal()}
+    />,
+    'Card Transfer Modal',
+    'Transfer Card',
+  );
+
   return (
     <StyledCardWrapper>
       {params.network === 'l14' && (
@@ -64,10 +87,8 @@ export const MetaCard: React.FC<IProps> = ({
           <StyledPolygon src={polygon} alt="" demo={true} />
         </>
       )}
-      {transferPermission === true && openTransferCardModal && (
-        <StyledTransferButton
-          onClick={() => openTransferCardModal(digitalCard.address)}
-        >
+      {canTransfer === true && (
+        <StyledTransferButton onClick={onPresentTransferCardModal}>
           <StyledTransferIcon src={transferIcon} alt="" />
         </StyledTransferButton>
       )}

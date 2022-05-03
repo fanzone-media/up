@@ -7,18 +7,24 @@ export const StyledEditProfileModalContent = styled.div`
 `;
 
 export const StyledInputRow = styled.div`
+  column-gap: 5em;
   width: 100%;
   display: flex;
+  justify-content: space-between;
   margin: 25px 0 0 0;
 `;
 
-export const StyledInput = styled.input`
+export const StyledInput = styled.input.attrs({
+  placeholder: '0x',
+})`
   color: black;
+  min-width: 25rem;
+  text-align: right;
   width: auto;
 `;
 
-export const StyledLabel = styled.p`
-  width: 150px;
+export const StyledLabel = styled.label`
+  color: #fff;
 `;
 
 export const StyledTextAreaInput = styled.textarea`

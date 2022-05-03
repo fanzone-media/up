@@ -67,9 +67,6 @@ const Profiles: React.FC = () => {
 
   useEffect(() => {
     if (demoProfiles.length === 0) return;
-    console.log(
-      demoProfiles.slice(demoProfilesRange[0], demoProfilesRange[1] + 1),
-    );
     dispatch(
       fetchAllProfiles({
         addresses: demoProfiles.slice(
@@ -93,8 +90,6 @@ const Profiles: React.FC = () => {
     }
   });
 
-  // console.log(userProfiles);
-
   const useProfilesState = useSelector(
     (state: RootState) => state.userData[params.network].status,
   );
@@ -109,6 +104,8 @@ const Profiles: React.FC = () => {
       fetchAllCards({
         addresses: demoAssets.slice(demoAssetsRange[0], demoAssetsRange[1] + 1),
         network: params.network,
+        index: demoAssetsRange[0],
+        arrayLength: demoAssets.length,
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps

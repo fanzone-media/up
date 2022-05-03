@@ -32,7 +32,6 @@ import { useViewPort } from '../../hooks/useViewPort';
 interface IPagination {
   type: string;
   profile?: IProfile;
-  openTransferCardModal?: (address: string) => void;
   transferPermission?: boolean;
   collectionAddresses: string[];
 }
@@ -45,12 +44,10 @@ interface IParams {
 const AssetsPagination: React.FC<IPagination> = ({
   type,
   profile,
-  openTransferCardModal,
   transferPermission,
   collectionAddresses,
 }) => {
   const params = useParams<IParams>();
-
   const dispatch = useAppDispatch();
 
   const [currentPageAssetAddresses, setCurrentPageAssetAddresses] = useState<
@@ -184,6 +181,8 @@ const AssetsPagination: React.FC<IPagination> = ({
         fetchAllCards({
           network: params.network,
           addresses: collectionAddresses.slice(start, end),
+          index: 0,
+          arrayLength: 1,
         }),
       );
     }
@@ -217,7 +216,7 @@ const AssetsPagination: React.FC<IPagination> = ({
   //   }
   // };
 
-  const searchHandler = (event: React.FormEvent<HTMLInputElement>) => {
+  const searchHandler = () => {
     // setSearch(event.currentTarget.value.toLowerCase());
     // if (search !== '') setCurrentPage(1);
     // const filter = collection.filter((item) => {
@@ -244,8 +243,7 @@ const AssetsPagination: React.FC<IPagination> = ({
               digitalCard={digitalCard}
               type={type}
               balance={findBalanceOf?.balance}
-              openTransferCardModal={openTransferCardModal}
-              transferPermission={transferPermission}
+              canTransfer={transferPermission}
             />
           );
         }
@@ -260,14 +258,7 @@ const AssetsPagination: React.FC<IPagination> = ({
         }
         return '';
       }),
-    [
-      allCollection,
-      currentPageAssetAddresses,
-      type,
-      profile?.ownedAssets,
-      openTransferCardModal,
-      transferPermission,
-    ],
+    [allCollection, type, profile?.ownedAssets, transferPermission],
   );
 
   return (

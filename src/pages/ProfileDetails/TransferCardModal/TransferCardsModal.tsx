@@ -4,7 +4,6 @@ import {
   StyledModalButton,
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
-import { ICard, IOwnedAssets } from '../../../services/models';
 import { StyledLoader, StyledLoadingHolder } from '../../AssetDetails/styles';
 import {
   StyledErrorLoadingContent,
@@ -16,8 +15,8 @@ import {
 } from '../ProfileEditModal/styles';
 import { StyledSelectInput, StyledTransferCardModalContent } from './styles';
 import { Address } from '../../../utils/types';
-import { trimedAddress } from '../../../utility/content/addresses';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
+import { IOwnedAssets } from '../../../services/models';
 
 interface IProps {
   profile: {
@@ -26,8 +25,7 @@ interface IProps {
     isOwnerKeyManager: boolean;
     ownedAssets: IOwnedAssets[];
   };
-  asset: ICard;
-  onDismiss: () => any;
+  onDismiss: () => void;
 }
 
 type formInput = {
@@ -36,20 +34,15 @@ type formInput = {
   tokenId: number | null;
 };
 
-export const TransferCardModal = ({ profile, asset, onDismiss }: IProps) => {
+export const TransferCardsModal: React.FC<IProps> = ({
+  profile,
+  onDismiss,
+}: IProps) => {
   const [transferCardForm, setTransferCardForm] = useState<formInput>({
     toAddress: '',
-    cardAddress: asset.address,
+    cardAddress: '',
     tokenId: null,
   });
-
-  const { transferCard, transfering, error } = useTransferLsp8Token(
-    transferCardForm.cardAddress,
-    transferCardForm.toAddress,
-    transferCardForm.tokenId,
-    profile,
-    onDismiss,
-  );
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -71,10 +64,17 @@ export const TransferCardModal = ({ profile, asset, onDismiss }: IProps) => {
     }
   };
 
+  const { transferCard, transfering, error } = useTransferLsp8Token(
+    transferCardForm.cardAddress,
+    transferCardForm.toAddress,
+    transferCardForm.tokenId,
+    profile,
+    onDismiss,
+  );
+
   const fields = [
     { name: 'toAddress', label: 'To', type: 'text' },
-    { name: 'cardName', label: 'Card Name', type: 'select' },
-    { name: 'cardAddress', label: 'Card Address', type: 'select' },
+    { name: 'cardAddress', label: 'Card Name', type: 'select' },
     { name: 'tokenId', label: 'Token Id', type: 'select' },
   ];
 
@@ -82,8 +82,8 @@ export const TransferCardModal = ({ profile, asset, onDismiss }: IProps) => {
     <Modal>
       {!transfering && !error ? (
         <StyledTransferCardModalContent>
-          {fields.map((item, i) => (
-            <StyledInputRow key={i}>
+          {fields.map((item, key) => (
+            <StyledInputRow key={key}>
               <StyledLabel htmlFor={item.name}>{item.label}</StyledLabel>
               {item.type === 'text' && (
                 <StyledInput
@@ -93,21 +93,35 @@ export const TransferCardModal = ({ profile, asset, onDismiss }: IProps) => {
                   onChange={changeHandler}
                 />
               )}
-              {item.type === 'select' && item.name === 'cardName' && (
-                <p>{asset.name}</p>
-              )}
               {item.type === 'select' && item.name === 'cardAddress' && (
-                <p>{trimedAddress(asset.address)}</p>
+                <StyledSelectInput
+                  name={item.name}
+                  onChange={changeHandler}
+                  defaultValue={profile.ownedAssets[0].assetAddress}
+                >
+                  <option>Token address</option>
+                  {profile.ownedAssets.map((ownedAsset, key) => (
+                    <option
+                      key={key}
+                      value={ownedAsset.assetAddress}
+                      defaultValue={ownedAsset.assetAddress}
+                    >
+                      {ownedAsset.assetAddress}
+                    </option>
+                  ))}
+                </StyledSelectInput>
               )}
               {item.type === 'select' && item.name === 'tokenId' && (
                 <StyledSelectInput name={item.name} onChange={changeHandler}>
                   <option>Select token id</option>
                   {profile.ownedAssets
                     .find(
-                      (ownedAsset) => ownedAsset.assetAddress === asset.address,
+                      (ownedAsset) =>
+                        ownedAsset.assetAddress ===
+                        transferCardForm.cardAddress,
                     )
                     ?.tokenIds.map((tokenId, key) => (
-                      <option key={key} value={tokenId} defaultValue={tokenId}>
+                      <option key={key} value={tokenId}>
                         {tokenId}
                       </option>
                     ))}
