@@ -12,12 +12,12 @@ export const pulseAnimate = keyframes`
 
 export const StyledCardWrapper = styled.div`
   position: relative;
-  width: 165px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
+  transition: transform 0.2s ease-in-out;
 
-  @media ${({ theme }) => theme.screen.sm} {
-    width: 212px;
+  &:hover {
+    transform: scale(1.05);
   }
 `;
 

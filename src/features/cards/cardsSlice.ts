@@ -7,6 +7,7 @@ import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
 import { ICard } from '../../services/models';
 import { STATUS } from '../../utility';
+import { Address } from '../../utils/types';
 import { ICardItemsState, ICardState } from './types';
 
 /**
@@ -45,16 +46,28 @@ const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
 
 export const fetchAllCards = createAsyncThunk<
   ICard[],
-  { network: NetworkName; addresses: string[] },
+  {
+    network: NetworkName;
+    addresses: Address[];
+    index: number;
+    arrayLength: number;
+  },
   { state: RootState; extra: ThunkExtra }
->('cards/fetchAllCards', async ({ network, addresses }, { extra: { api } }) => {
-  const res = await api.cards.fetchAllCards(network, addresses);
-  return res as ICard[];
-});
+>(
+  'cards/fetchAllCards',
+  async (
+    { network, addresses, index, arrayLength },
+    { getState, extra: { api } },
+  ) => {
+    const emptyArray = Array(arrayLength);
+    const res = await api.cards.fetchAllCards(network, addresses);
+    return [...Object.values(getState().cards.entities), ...res] as ICard[];
+  },
+);
 
 export const fetchIssuedCards = createAsyncThunk<
   ICard[],
-  { network: NetworkName; addresses: string[] },
+  { network: NetworkName; addresses: Address[] },
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchIssuedCards',
@@ -78,7 +91,7 @@ export const fetchCard = createAsyncThunk<
 
 export const fetchOwnedCards = createAsyncThunk<
   ICard[],
-  { network: NetworkName; addresses: string[] },
+  { network: NetworkName; addresses: Address[] },
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchOwnedCards',

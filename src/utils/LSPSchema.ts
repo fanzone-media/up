@@ -592,6 +592,7 @@ export const fetchLSP6Data = async (contract: ERC725Y) => {
   if (isFetchDataForSchemaResultList(addressPermissions)) {
     await Promise.all(
       addressPermissions.listEntries.map(async (addressWithPermission) => {
+        if (addressWithPermission.decodedValue === null) return;
         const [
           permissions,
           allowedAddresses,

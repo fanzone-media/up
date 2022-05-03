@@ -5,6 +5,7 @@ import { theme } from './boot/styles';
 import Routes from './routes';
 import { Footer, Header } from './components';
 import { Chain, defaultChains, InjectedConnector, WagmiProvider } from 'wagmi';
+import { ModalProvider } from './context/ModalProvider';
 
 const chains: Chain[] = [
   defaultChains[0],
@@ -64,20 +65,22 @@ const connectors = () => {
   return [new InjectedConnector({ chains, options: { shimDisconnect: true } })];
 };
 
-function App() {
+const App: React.FC = () => {
   useEffect(() => {});
 
   return (
     <ThemeProvider theme={theme}>
       <WagmiProvider autoConnect connectors={connectors}>
-        <div className="App">
-          <Header />
-          <Routes />
-          <Footer />
-        </div>
+        <ModalProvider>
+          <div className="App">
+            <Header />
+            <Routes />
+            <Footer />
+          </div>
+        </ModalProvider>
       </WagmiProvider>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

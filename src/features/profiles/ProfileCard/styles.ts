@@ -15,7 +15,8 @@ export const StyledProfileCard = styled(Link)<{ demo?: boolean }>`
   }
 
   @media ${({ theme }) => theme.screen.sm} {
-    width: ${({ demo }) => (demo ? '212px' : '117px')};
+    display: block;
+    width: 100%;
   }
 `;
 

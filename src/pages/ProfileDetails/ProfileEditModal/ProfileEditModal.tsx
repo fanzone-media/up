@@ -132,7 +132,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
       )
         .catch((error) => {
           setError(true);
-          onClose();
+          // onClose();
         })
         .finally(() => {
           setLoading(false);
@@ -141,7 +141,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
       await LSP3ProfileApi.setUniversalProfileData(params.add, data, signer)
         .catch((error) => {
           setError(true);
-          onClose();
+          // onClose();
         })
         .finally(() => {
           setLoading(false);
@@ -149,13 +149,8 @@ export const ProfileEditModal: React.FC<IProps> = ({
     }
   };
 
-  const extendedClose = () => {
-    setError(false);
-    onClose();
-  };
-
   return isOpen ? (
-    <Modal heading="Edit Profile" onClose={extendedClose}>
+    <Modal>
       {!loading && !error ? (
         <StyledEditProfileModalContent>
           {fields.map((item, i) => (

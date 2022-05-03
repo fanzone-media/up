@@ -4,7 +4,9 @@ import { Address } from '../utils/types';
 export const getAddressPermissionsOnUniversalProfile = (
   permissionSet: Array<IPermissionSet>,
   addressToCheck: Address,
-): IPermissionSet | undefined =>
-  permissionSet.find(
-    (x) => x.address.toLowerCase() === addressToCheck.toLowerCase(),
+): IPermissionSet | undefined => {
+  return permissionSet.find(
+    (x) =>
+      x.address.toLowerCase() === addressToCheck.toLowerCase() && x.permissions,
   );
+};

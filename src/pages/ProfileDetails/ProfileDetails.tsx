@@ -7,11 +7,10 @@ import React, {
 } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { NetworkName, RootState } from '../../boot/types';
+import { NetworkName, RootState, StringBoolean } from '../../boot/types';
 import { theme } from '../../boot/styles';
 import { useAppDispatch } from '../../boot/store';
-import { HideOnScreen } from '../../components';
-import Pagination from '../../features/pagination/Pagination';
+import { HideOnScreen, Pagination } from '../../components';
 import makeBlockie from 'ethereum-blockies-base64';
 import {
   StyledAssetsWrapper,
@@ -60,9 +59,19 @@ import {
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 import { useAccount, useSigner } from 'wagmi';
 import { ProfileEditModal } from './ProfileEditModal';
-import { TransferCardModal } from './TransferCardModal';
 import { useCopyText } from '../../hooks/useCopyText';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
+import { getAddressPermissionsOnUniversalProfile } from '../../utility/permissions';
+import {
+  fetchIssuedCards,
+  fetchOwnedCards,
+  selectAllCardItems,
+} from '../../features/cards';
+import { ICard } from '../../services/models';
+import { MetaCard } from '../../features/cards/MetaCard';
+import { StyledProfileHeading, StyledProfilesHeader } from '../Profiles/styles';
+import { TransferCardsModal } from './TransferCardModal/TransferCardsModal';
+import { useModal } from '../../hooks/useModal';
 
 interface IParams {
   add: string;
@@ -73,14 +82,10 @@ const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
-  const [{ data }] = useAccount();
+  const [{ data: account }] = useAccount();
   const [{ data: signer }] = useSigner();
   const [openEditProfileModal, setOpenEditProfileModal] =
     useState<boolean>(false);
-  const [openTransferCardModal, setOpenTransferCardModal] =
-    useState<boolean>(false);
-  const [preSelectedAssetAddress, setPreSelectedAssetAddress] =
-    useState<string>();
 
   const profile = useSelector((state: RootState) =>
     selectUserById(state.userData[params.network], params.add),
@@ -100,36 +105,17 @@ const ProfileDetails: React.FC = () => {
 
   const isTablet = useMediaQuery(theme.screen.md);
 
-  const keyManagerSetDataPermission = useMemo(
-    () =>
-      profile &&
-      data &&
-      profile.permissionSet.length > 0 &&
-      profile.permissionSet.some(
-        (set) =>
-          set.address.toLowerCase() === data.address.toLowerCase() &&
-          set.permissions.setData === '1',
-      ),
-    [data, profile],
-  );
-
-  const keyManagerCallPermission = useMemo(
-    () =>
-      profile &&
-      data &&
-      profile.permissionSet.length > 0 &&
-      profile.permissionSet.some(
-        (set) =>
-          set.address.toLowerCase() === data.address.toLowerCase() &&
-          set.permissions.call === '1',
-      ),
-    [data, profile],
-  );
-
-  const toggleTransferModal = (address: string) => {
-    setPreSelectedAssetAddress(address);
-    setOpenTransferCardModal(true);
-  };
+  const [canTransfer, canSetData] = useMemo(() => {
+    if (!profile || !account) return [false, false];
+    const permissionsSet = getAddressPermissionsOnUniversalProfile(
+      profile.permissionSet,
+      account.address,
+    );
+    return [
+      permissionsSet?.permissions.transferValue === StringBoolean.TRUE,
+      permissionsSet?.permissions.setData === StringBoolean.TRUE,
+    ];
+  }, [account, profile]);
 
   useEffect(() => {
     dispatch(currentProfile(params.add));
@@ -139,30 +125,43 @@ const ProfileDetails: React.FC = () => {
       );
   }, [dispatch, params.add, params.network, profile]);
 
-  const renderIssuedAssetsPagination = useMemo(
-    () => (
-      <Pagination
-        type="issued"
-        openTransferCardModal={toggleTransferModal}
-        collectionAddresses={profile ? profile.issuedAssets : []}
-      />
-    ),
-    [profile],
+  const issuedCardStatus = useSelector(
+    (state: RootState) => state.cards.issuedStatus,
   );
 
-  const renderOwnedAssetsPagination = useMemo(() => {
-    return (
-      <Pagination
-        type="owned"
-        profile={profile}
-        openTransferCardModal={toggleTransferModal}
-        transferPermission={keyManagerCallPermission}
-        collectionAddresses={
-          profile ? profile.ownedAssets.map((item) => item.assetAddress) : []
-        }
-      />
+  const issuedCards = useSelector(selectAllCardItems).filter((item) =>
+    profile?.issuedAssets.some((i) => i === item.address),
+  );
+
+  useEffect(() => {
+    if (!profile || profile?.issuedAssets.length === 0) return;
+    dispatch(
+      fetchIssuedCards({
+        network: params.network,
+        addresses: profile.issuedAssets.map((asset) => asset),
+      }),
     );
-  }, [keyManagerCallPermission, profile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, profile, params.network]);
+
+  const ownedCardStatus = useSelector(
+    (state: RootState) => state.cards.ownedStatus,
+  );
+
+  const ownedCards = useSelector(selectAllCardItems).filter((item) =>
+    profile?.ownedAssets.some((i) => i.assetAddress === item.address),
+  );
+
+  useEffect(() => {
+    if (!profile || profile?.ownedAssets.length === 0) return;
+    dispatch(
+      fetchOwnedCards({
+        network: params.network,
+        addresses: profile.ownedAssets.map((asset) => asset.assetAddress),
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, profile, params.network]);
 
   const renderLinks = useMemo(
     () =>
@@ -218,32 +217,37 @@ const ProfileDetails: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.add, profile]);
 
+  const {
+    handlePresent: onPresentTransferCardsModal,
+    onDismiss: onDismissTransferCardsModal,
+  } = useModal(
+    <TransferCardsModal
+      profile={{
+        address: profile?.address ? profile.address : '',
+        owner: profile?.owner ? profile.owner : '',
+        isOwnerKeyManager: profile?.isOwnerKeyManager
+          ? profile.isOwnerKeyManager
+          : false,
+        ownedAssets: profile?.ownedAssets ? profile.ownedAssets : [],
+      }}
+      onDismiss={() => onDismissTransferCardsModal()}
+    />,
+    'Cards Transfer Modal',
+    'Transfer Card',
+  );
+
   return (
     <StyledProfileDetails>
       {signer &&
         profile &&
-        data &&
-        (keyManagerSetDataPermission ||
-          profile.owner.toLowerCase() === data.address.toLowerCase()) && (
+        account &&
+        (canSetData ||
+          profile.owner.toLowerCase() === account.address.toLowerCase()) && (
           <ProfileEditModal
             isOpen={openEditProfileModal}
             onClose={() => setOpenEditProfileModal(false)}
             signer={signer}
             profile={profile}
-          />
-        )}
-      {signer &&
-        profile &&
-        data &&
-        profile.ownedAssets.length > 0 &&
-        (keyManagerCallPermission ||
-          profile.owner.toLowerCase() === data.address.toLowerCase()) && (
-          <TransferCardModal
-            isOpen={openTransferCardModal}
-            onClose={() => setOpenTransferCardModal(false)}
-            signer={signer}
-            profile={profile}
-            selectecAddress={preSelectedAssetAddress}
           />
         )}
       {profileStatus === 'loading' ? (
@@ -339,29 +343,66 @@ const ProfileDetails: React.FC = () => {
                   </StyledProfileInfo2Content>
                 </StyledProfileInfo2>
               </StyledProfileInfoWrapper>
-              {signer &&
-                profile &&
-                data &&
-                profile.ownedAssets.length > 0 &&
-                (keyManagerCallPermission ||
+              <StyledAssetsWrapper>
+                {profile && profile.issuedAssets.length > 0 && (
+                  <>
+                    <StyledProfilesHeader>
+                      <StyledProfileHeading>Issued Assets</StyledProfileHeading>
+                    </StyledProfilesHeader>
+                    <Pagination
+                      status={issuedCardStatus}
+                      components={issuedCards.map((digitalCard: ICard) => {
+                        return (
+                          <MetaCard
+                            key={digitalCard.address}
+                            digitalCard={digitalCard}
+                            type="demo"
+                            canTransfer={canTransfer}
+                            profile={profile}
+                          />
+                        );
+                      })}
+                      nbrOfAllComponents={issuedCards.length}
+                      setComponentsRange={() => null}
+                    />
+                  </>
+                )}
+                {/* @TODO: Change names of components StyledProfilesHeader and StyledProfileHeading */}
+                {profile && profile.ownedAssets.length > 0 && (
+                  <>
+                    <StyledProfilesHeader>
+                      <StyledProfileHeading>Owned Assets</StyledProfileHeading>
+                    </StyledProfilesHeader>
+                    <Pagination
+                      status={ownedCardStatus}
+                      components={ownedCards.map((digitalCard: ICard) => {
+                        return (
+                          <MetaCard
+                            key={digitalCard.address}
+                            digitalCard={digitalCard}
+                            type="demo"
+                            canTransfer={canTransfer}
+                            profile={profile}
+                          />
+                        );
+                      })}
+                      nbrOfAllComponents={ownedCards.length}
+                      setComponentsRange={() => null}
+                    />
+                  </>
+                )}
+              </StyledAssetsWrapper>
+              {profile &&
+                account &&
+                (canTransfer ||
                   profile.owner.toLowerCase() ===
-                    data.address.toLowerCase()) && (
+                    account.address.toLowerCase()) && (
                   <StyledOpenTransferModalButton
-                    onClick={() => setOpenTransferCardModal(true)}
+                    onClick={onPresentTransferCardsModal}
                   >
                     Transfer Cards
                   </StyledOpenTransferModalButton>
                 )}
-              <StyledAssetsWrapper>
-                {profile && profile.issuedAssets.length > 0 ? (
-                  renderIssuedAssetsPagination
-                ) : (
-                  <></>
-                )}
-                {profile &&
-                  profile.ownedAssets.length > 0 &&
-                  renderOwnedAssetsPagination}
-              </StyledAssetsWrapper>
             </>
           )}
         </StyledProfileDetailsContent>
