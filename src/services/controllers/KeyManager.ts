@@ -125,7 +125,7 @@ const setCardMarketViaKeyManager = async (
   keyManagerAddress: string,
   tokenId: number,
   acceptedToken: string,
-  minimumAmount: number,
+  minimumAmount: BigNumber,
   signer: Signer,
 ) => {
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
@@ -140,7 +140,7 @@ const setCardMarketViaKeyManager = async (
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
   const encodedSetMarketFor = assetContract.interface.encodeFunctionData(
     'setMarketFor',
-    [tokenIdAsBytes, acceptedToken, minimumAmount],
+    [tokenIdAsBytes, acceptedToken, minimumAmount.toString()],
   );
   const encodedExecuteFunction =
     universalProfileContract.interface.encodeFunctionData('execute', [
@@ -177,7 +177,7 @@ const approveTokenViaKeyManager = async (
   const erc20Contract = ERC20__factory.connect(tokenAddress, signer);
   const encodedApprove = erc20Contract.interface.encodeFunctionData('approve', [
     spenderAddress,
-    amount,
+    amount.toString(),
   ]);
 
   const encodedExecuteFunction =
@@ -196,9 +196,54 @@ const approveTokenViaKeyManager = async (
   });
 };
 
+const buyFromCardMarketViaKeyManager = async (
+  assetAddress: string,
+  keyManagerAddress: string,
+  universalProfileAddress: string,
+  tokenId: number,
+  minimumAmount: BigNumber,
+  signer: Signer,
+) => {
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const tokenIdBytes = tokenIdAsBytes32(tokenId);
+  const keyManagerContract = LSP6KeyManagerProxy__factory.connect(
+    keyManagerAddress,
+    signer,
+  );
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+
+  const encodedBuyFromMarket = assetContract.interface.encodeFunctionData(
+    'buyFromMarket',
+    [
+      tokenIdBytes,
+      minimumAmount.toString(),
+      '0x011468aEdC50A25b8C85ae7d3d84ece744E82976',
+    ],
+  );
+
+  const encodedExecuteFunction =
+    universalProfileContract.interface.encodeFunctionData('execute', [
+      '0x0',
+      assetAddress,
+      0,
+      encodedBuyFromMarket,
+    ]);
+
+  const transaction = await keyManagerContract.execute(encodedExecuteFunction);
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
 export const KeyManagerApi = {
   addPermissions,
   setCardMarketViaKeyManager,
   transferCardViaKeyManager,
   approveTokenViaKeyManager,
+  buyFromCardMarketViaKeyManager,
 };

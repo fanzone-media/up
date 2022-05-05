@@ -20,36 +20,51 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
     [provider, signer, tokenAddress],
   );
 
-  const approveViaUniversalProfile = async (
+  const approve = async (
     universalProfileAddress: string,
     spenderAddress: string,
     amount: BigNumber,
+    network: NetworkName,
   ) => {
-    signer &&
-      (await LSP3ProfileApi.approveTokenViaUniversalProfile(
+    const universalProfileCheck = await LSP3ProfileApi.isUniversalProfile(
+      universalProfileAddress,
+      network,
+    );
+    const owner =
+      universalProfileCheck &&
+      (await LSP3ProfileApi.fetchOwnerOfProfile(
         universalProfileAddress,
-        spenderAddress,
-        tokenAddress,
-        amount,
-        signer,
+        network,
       ));
-  };
-
-  const approveViaKeyManager = async (
-    keyManagerAddress: string,
-    universalProfileAddress: string,
-    spenderAddress: string,
-    amount: BigNumber,
-  ) => {
-    signer &&
-      (await KeyManagerApi.approveTokenViaKeyManager(
-        keyManagerAddress,
-        universalProfileAddress,
-        spenderAddress,
-        tokenAddress,
-        amount,
-        signer,
-      ));
+    const balance = await checkBalanceOf(universalProfileAddress);
+    const allowance =
+      balance >= amount &&
+      (await checkAllowance(universalProfileAddress, spenderAddress));
+    if (allowance && allowance >= amount) {
+      return;
+    }
+    const keyManagerCheck =
+      owner && (await LSP3ProfileApi.checkKeyManager(owner, network));
+    if (keyManagerCheck && owner) {
+      signer &&
+        (await KeyManagerApi.approveTokenViaKeyManager(
+          owner,
+          universalProfileAddress,
+          spenderAddress,
+          tokenAddress,
+          amount,
+          signer,
+        ));
+    } else {
+      signer &&
+        (await LSP3ProfileApi.approveTokenViaUniversalProfile(
+          universalProfileAddress,
+          spenderAddress,
+          tokenAddress,
+          amount,
+          signer,
+        ));
+    }
   };
 
   const checkAllowance = async (
@@ -69,8 +84,7 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
   };
 
   return {
-    approveViaUniversalProfile,
-    approveViaKeyManager,
+    approve,
     checkAllowance,
     checkBalanceOf,
   };

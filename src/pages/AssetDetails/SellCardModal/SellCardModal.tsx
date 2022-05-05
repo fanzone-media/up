@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSigner } from 'wagmi';
 import { NetworkName } from '../../../boot/types';
@@ -11,21 +11,24 @@ import {
   StyledCancelButton,
   StyledInputGroup,
   StyledModalHeader,
-  StyledPriceInput,
-  StyledPriceLabel,
   StyledSellCardModalContent,
   StyledSetPriceButton,
   StyledTokenSelectorDropDown,
 } from './styles';
-import { IProfile } from '../../../services/models';
+import { IProfile, IWhiteListedTokens } from '../../../services/models';
+import { InputField } from '../../../components/InputField';
+import { convertPrice, displayPrice } from '../../../utility';
+import { BigNumber, BigNumberish } from 'ethers';
 
 interface IProps {
   onClose: () => void;
   address: string;
   mint: number;
-  price?: number;
+  marketTokenAddress?: string;
+  price?: BigNumber;
   cardImg: string;
   ownerProfile: IProfile;
+  whiteListedTokens?: IWhiteListedTokens[];
 }
 
 interface IParams {
@@ -41,11 +44,14 @@ export const SellCardModal = ({
   price,
   cardImg,
   ownerProfile,
+  whiteListedTokens,
+  marketTokenAddress,
 }: IProps) => {
   const params = useParams<IParams>();
-  const [whiteListedTokens, setWhiteListedTokens] =
-    useState<{ tokenAddress: string; symbol: string }[]>();
-  const [sellForm, setSellForm] = useState({
+  const [sellForm, setSellForm] = useState<{
+    amount: BigNumberish;
+    tokenAddress: string;
+  }>({
     amount: 0,
     tokenAddress: whiteListedTokens ? whiteListedTokens[0].tokenAddress : '',
   });
@@ -60,6 +66,23 @@ export const SellCardModal = ({
     });
   };
 
+  const selectedTokenDecimals = useMemo(() => {
+    const selectedToken =
+      whiteListedTokens &&
+      whiteListedTokens.find(
+        (item) => item.tokenAddress === sellForm.tokenAddress,
+      );
+    if (selectedToken) {
+      return selectedToken.decimals;
+    }
+    return 1;
+  }, [sellForm.tokenAddress, whiteListedTokens]);
+
+  const marketTokenDecimals =
+    whiteListedTokens &&
+    whiteListedTokens.find((i) => i.tokenAddress === marketTokenAddress)
+      ?.decimals;
+
   const setCardForSale = async () => {
     if (ownerProfile.isOwnerKeyManager && signer) {
       await KeyManagerApi.setCardMarketViaKeyManager(
@@ -68,7 +91,7 @@ export const SellCardModal = ({
         ownerProfile.owner,
         mint,
         sellForm.tokenAddress,
-        sellForm.amount,
+        convertPrice(sellForm.amount, selectedTokenDecimals),
         signer,
       );
     }
@@ -78,19 +101,13 @@ export const SellCardModal = ({
         ownerProfile.address,
         mint,
         sellForm.tokenAddress,
-        sellForm.amount,
+        convertPrice(sellForm.amount, selectedTokenDecimals),
         signer,
       );
     }
   };
 
-  useEffect(() => {
-    LSP4DigitalAssetApi.fetchAcceptedTokens(params.add, params.network)
-      .then((res) => {
-        setWhiteListedTokens(res);
-      })
-      .catch(() => {});
-  }, [params.add, params.network]);
+  useEffect(() => {}, []);
 
   return (
     <ModalOverlay onClose={onClose}>
@@ -99,16 +116,18 @@ export const SellCardModal = ({
         <CardPriceInfoForModal
           address={address}
           mint={mint}
-          price={price}
+          price={
+            price &&
+            displayPrice(price, marketTokenDecimals ? marketTokenDecimals : 0)
+          }
           cardImg={cardImg}
         />
         <StyledInputGroup>
-          <StyledPriceLabel>Your price</StyledPriceLabel>
-          <StyledPriceInput
+          <InputField
             name="amount"
+            label="Your Price"
             type="number"
-            step="any"
-            onChange={changeHandler}
+            changeHandler={changeHandler}
           />
           <StyledTokenSelectorDropDown
             name="tokenAddress"

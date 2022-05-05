@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import React from 'react';
 import {
   StyledCardImg,
@@ -32,7 +33,7 @@ export const CardPriceInfoForModal = ({
         <StyledInfoLabel>Mint:</StyledInfoLabel>
         <StyledInfoValue>{mint}</StyledInfoValue>
         <StyledInfoLabel>Price:</StyledInfoLabel>
-        <StyledInfoValue>{price}</StyledInfoValue>
+        <StyledInfoValue>{price?.toString()}</StyledInfoValue>
       </StyledInfo>
     </StyledCardPriceInfoContainer>
   );

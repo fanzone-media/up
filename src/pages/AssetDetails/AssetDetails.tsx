@@ -85,7 +85,7 @@ import {
   StyledNoProfileLabel,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
-import { getChainExplorer, STATUS } from '../../utility';
+import { displayPrice, getChainExplorer, STATUS } from '../../utility';
 import { BuyCardModal } from './BuyCardModal';
 import { SellCardModal } from './SellCardModal';
 import { TabedAccordion } from '../../components/TabedAccordion';
@@ -101,7 +101,6 @@ import { useAccount } from 'wagmi';
 import { DesktopCreatorsAccordion } from './DesktopCreatorsAccordion';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { theme } from '../../boot/styles';
-import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 
 interface IPrams {
   add: string;
@@ -414,15 +413,21 @@ const AssetDetails: React.FC = () => {
     [asset?.markets, ownedTokenIds],
   );
 
-  const currentMintMarket = useMemo(
-    () =>
+  const currentMintMarket = useMemo(() => {
+    const market =
       marketsForOwnedTokens &&
       ownedTokenIds &&
       marketsForOwnedTokens.find(
         (item) => Number(item.tokenId) === ownedTokenIds[currentIndex],
-      ),
-    [currentIndex, marketsForOwnedTokens, ownedTokenIds],
-  );
+      );
+    const decimals =
+      market &&
+      asset &&
+      asset.whiteListedTokens.find(
+        (i) => i.tokenAddress === market.acceptedToken,
+      )?.decimals;
+    return { ...market, decimals };
+  }, [asset, currentIndex, marketsForOwnedTokens, ownedTokenIds]);
 
   const urlTokenIdMarket = useMemo(
     () =>
@@ -448,7 +453,7 @@ const AssetDetails: React.FC = () => {
       label: 'Total amount of Tokens',
       value: asset ? asset.totalSupply.toString() : '',
     },
-    { label: 'Token Standard', value: '' },
+    { label: 'Token Standard', value: 'LSP8' },
     { label: 'Network', value: asset ? asset.network : '' },
     { label: 'Score', value: '' },
     {
@@ -543,7 +548,12 @@ const AssetDetails: React.FC = () => {
           <StyledCardPriceValueWrapper>
             <StyledTokenIcon src={WethIcon} alt="" />
             <StyledCardPriceValue>
-              {currentMintMarket.minimumAmount.toNumber()}
+              {currentMintMarket.minimumAmount &&
+                currentMintMarket.decimals &&
+                displayPrice(
+                  currentMintMarket.minimumAmount,
+                  currentMintMarket.decimals,
+                ).toString()}
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
@@ -587,7 +597,12 @@ const AssetDetails: React.FC = () => {
           <StyledCardPriceValueWrapper>
             <StyledTokenIcon src={WethIcon} alt="" />
             <StyledCardPriceValue>
-              {currentMintMarket.minimumAmount.toNumber()}
+              {currentMintMarket.minimumAmount &&
+                currentMintMarket.decimals &&
+                displayPrice(
+                  currentMintMarket.minimumAmount,
+                  currentMintMarket.decimals,
+                ).toString()}
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
@@ -669,23 +684,33 @@ const AssetDetails: React.FC = () => {
             </>
           ) : (
             <StyledAssetDetailContent>
-              {openBuyModal && asset && (
-                <BuyCardModal
-                  address={params.add}
-                  mint={1234}
-                  price={urlTokenIdMarket?.minimumAmount.toNumber()}
-                  cardImg={asset.ls8MetaData[params.id ? params.id : 0].image}
-                  onClose={() => setOpenBuyModal(!openBuyModal)}
-                />
-              )}
+              {openBuyModal &&
+                asset &&
+                currentMintMarket.minimumAmount &&
+                currentMintMarket.acceptedToken &&
+                currentMintMarket.tokenId && (
+                  <BuyCardModal
+                    address={params.add}
+                    mint={Number(currentMintMarket.tokenId)}
+                    price={currentMintMarket.minimumAmount}
+                    tokenAddress={currentMintMarket.acceptedToken}
+                    whiteListedTokens={asset.whiteListedTokens}
+                    cardImg={
+                      asset.ls8MetaData[params.id ? params.id : 0]?.image
+                    }
+                    onClose={() => setOpenBuyModal(!openBuyModal)}
+                  />
+                )}
               {openSellModal && asset && ownedTokenIds && activeProfile && (
                 <SellCardModal
                   ownerProfile={activeProfile}
                   address={params.add}
                   mint={ownedTokenIds[currentIndex]}
-                  price={urlTokenIdMarket?.minimumAmount.toNumber()}
+                  price={currentMintMarket.minimumAmount}
+                  marketTokenAddress={currentMintMarket.acceptedToken}
                   cardImg={asset.ls8MetaData[params.id ? params.id : 0].image}
                   onClose={() => setOpenSellModal(!openSellModal)}
+                  whiteListedTokens={asset.whiteListedTokens}
                 />
               )}
               <StyledCardMainDetails>

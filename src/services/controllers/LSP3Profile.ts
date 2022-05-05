@@ -26,7 +26,39 @@ import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
-import { erc20ABI } from 'wagmi';
+
+const isUniversalProfile = async (
+  address: string,
+  network: NetworkName,
+): Promise<boolean> => {
+  const provider = useRpcProvider(network);
+  const contract = ERC725Y__factory.connect(address, provider);
+  let check = false;
+  await contract
+    .supportsInterface('0x63cb749b')
+    .then((result) => {
+      check = result;
+    })
+    .catch(() => {
+      check = false;
+    });
+  return check;
+};
+
+const fetchOwnerOfProfile = async (
+  address: string,
+  network: NetworkName,
+): Promise<string> => {
+  const provider = useRpcProvider(network);
+  const universalProfile = UniversalProfileProxy__factory.connect(
+    address,
+    provider,
+  );
+
+  const owner = await universalProfile.owner();
+
+  return owner;
+};
 
 const fetchProfile = async (
   address: string,
@@ -477,7 +509,7 @@ const approveTokenViaUniversalProfile = async (
   const erc20Contract = ERC20__factory.connect(tokenAddress, signer);
   const encodedApprove = erc20Contract.interface.encodeFunctionData('approve', [
     spenderAddress,
-    amount,
+    amount.toString(),
   ]);
 
   const transaction = await universalProfileContract.execute(
@@ -498,10 +530,33 @@ const buyFromCardMarketViaUniversalProfile = async (
   assetAddress: string,
   universalProfileAddress: string,
   tokenId: number,
-  acceptedToken: string,
   minimumAmount: number,
   signer: Signer,
-) => {};
+) => {
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const tokenIdBytes = tokenIdAsBytes32(tokenId);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+
+  const encodedBuyFromMarket = assetContract.interface.encodeFunctionData(
+    'buyFromMarket',
+    [tokenIdBytes, minimumAmount, ''],
+  );
+
+  const transaction = await universalProfileContract.execute(
+    '0x0',
+    assetAddress,
+    0,
+    encodedBuyFromMarket,
+  );
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
 
 export const LSP3ProfileApi = {
   fetchProfile,
@@ -513,4 +568,8 @@ export const LSP3ProfileApi = {
   transferCardViaUniversalProfile,
   setCardMarketViaUniversalProfile,
   approveTokenViaUniversalProfile,
+  buyFromCardMarketViaUniversalProfile,
+  checkKeyManager,
+  isUniversalProfile,
+  fetchOwnerOfProfile,
 };

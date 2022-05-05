@@ -82,6 +82,13 @@ export interface ICard {
     [key: string]: ILSP8MetaData;
   };
   markets: IMarket[];
+  whiteListedTokens: IWhiteListedTokens[];
+}
+
+export interface IWhiteListedTokens {
+  tokenAddress: string;
+  symbol: string;
+  decimals: number;
 }
 
 export interface IMarket {

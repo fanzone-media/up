@@ -32,3 +32,5 @@ export const StyledCancelButton = styled(StyledBuyButton)`
   background-color: rgba(76, 76, 76, 1);
   margin-top: 0.8em;
 `;
+
+export const StyledApproveButton = styled(StyledCancelButton)``;

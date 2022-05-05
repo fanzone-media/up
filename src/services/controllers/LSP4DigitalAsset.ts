@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import KeyChain from '../utilities/KeyChain';
 import { NetworkName } from '../../boot/types';
-import { ICard, ILSP8MetaData, IMarket } from '../models';
+import { ICard, ILSP8MetaData, IMarket, IWhiteListedTokens } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
-import { BigNumberish, ethers, Signer } from 'ethers';
+import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
 import {
   CardTokenProxy__factory,
   ContractRegistry__factory,
+  ERC20__factory,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import Utils from '../utilities/util';
@@ -14,6 +15,7 @@ import { LSP3ProfileApi } from './LSP3Profile';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { erc20ABI } from 'wagmi';
+import { Provider } from '@ethersproject/providers';
 
 const fetchCard = async (
   address: string,
@@ -36,15 +38,23 @@ const fetchCard = async (
       throw new Error('Not a valid token id');
     }));
 
-  const [name, symbol, totalSupply, owner, holders, hashedUrl] =
-    await Promise.all([
-      contract.name(),
-      contract.symbol(),
-      contract.totalSupply(),
-      contract.owner(),
-      contract.allTokenHolders(),
-      contract.tokenURI(0),
-    ]);
+  const [
+    name,
+    symbol,
+    totalSupply,
+    owner,
+    holders,
+    hashedUrl,
+    whiteListedTokens,
+  ] = await Promise.all([
+    contract.name(),
+    contract.symbol(),
+    contract.totalSupply(),
+    contract.owner(),
+    contract.allTokenHolders(),
+    contract.tokenURI(0),
+    fetchAcceptedTokens(address, network),
+  ]);
 
   if (!hashedUrl) {
     throw new Error('No card data');
@@ -76,6 +86,7 @@ const fetchCard = async (
     creators,
     network: network,
     markets: [],
+    whiteListedTokens,
   };
 };
 
@@ -233,7 +244,7 @@ const fetchProfileIssuedAssetsAddresses = async (
 const fetchAcceptedTokens = async (
   assetAddress: string,
   network: NetworkName,
-): Promise<{ tokenAddress: string; symbol: string }[]> => {
+): Promise<IWhiteListedTokens[]> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
   const contractRegistryAddress = await contract.contractRegistry();
@@ -243,16 +254,29 @@ const fetchAcceptedTokens = async (
   );
   const whiteListedTokens = await contractRegistry.allWhitelistedTokens();
   const res = await Promise.all(
-    whiteListedTokens.map(async (item) => {
-      const erc20Contract = new ethers.Contract(item, erc20ABI, provider);
-      const symbol: string = await erc20Contract.symbol();
-      return {
-        tokenAddress: item,
-        symbol,
-      };
-    }),
+    whiteListedTokens.map(
+      async (item) => await fetchErc20TokenInfo(item, provider),
+    ),
   );
   return res;
+};
+
+const fetchErc20TokenInfo = async (
+  address: string,
+  providerOrSigner: Signer | Provider,
+) => {
+  const erc20Contract = new ethers.Contract(
+    address,
+    erc20ABI,
+    providerOrSigner,
+  );
+  const symbol: string = await erc20Contract.symbol();
+  const decimals: number = await erc20Contract.decimals();
+  return {
+    tokenAddress: address,
+    symbol,
+    decimals,
+  };
 };
 
 const setMarketViaUniversalProfile = async (
@@ -260,7 +284,7 @@ const setMarketViaUniversalProfile = async (
   universalProfileAddress: string,
   tokenId: number,
   acceptedToken: string,
-  minimumAmount: number,
+  minimumAmount: BigNumberish,
   signer: Signer,
 ) => {
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
@@ -290,12 +314,12 @@ const getTokenSale = async (
   assetAddress: string,
   tokenId: number,
   network: NetworkName,
-): Promise<{ minimumAmount: number; acceptedToken: string }> => {
+): Promise<{ minimumAmount: BigNumber; acceptedToken: string }> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
-  let market: { minimumAmount: number; acceptedToken: string } = {
-    minimumAmount: 0,
+  let market: { minimumAmount: BigNumber; acceptedToken: string } = {
+    minimumAmount: BigNumber.from(0),
     acceptedToken: '',
   };
   await contract
@@ -303,7 +327,7 @@ const getTokenSale = async (
     .then((result) => {
       market = {
         ...result,
-        minimumAmount: ethers.BigNumber.from(result.minimumAmount).toNumber(),
+        minimumAmount: result.minimumAmount,
       };
     })
     .catch((error) => {
@@ -322,4 +346,5 @@ export const LSP4DigitalAssetApi = {
   fetchAllMarkets,
   fetchOwnerOfTokenId,
   fetchAcceptedTokens,
+  fetchErc20TokenInfo,
 };

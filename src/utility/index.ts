@@ -1,3 +1,4 @@
+import { BigNumber, BigNumberish } from 'ethers';
 import { BlockScoutIcon, polygonExplorerIcon } from '../assets';
 import { NetworkName } from '../boot/types';
 
@@ -45,3 +46,13 @@ export const isValidConnection = (
   currenChainId?: number,
   validChainIds?: Array<number>,
 ) => connected && isValidChainId(currenChainId || 0, validChainIds);
+
+export const displayPrice = (price: BigNumberish, decimals: number) => {
+  return Number(price) / 10 ** decimals;
+};
+
+export const convertPrice = (price: BigNumberish, decimals: number) => {
+  return BigNumber.isBigNumber(price)
+    ? price
+    : BigNumber.from(Number(price) * 10 ** decimals);
+};
