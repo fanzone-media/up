@@ -18,6 +18,7 @@ export const StyledInputGroup = styled.div`
   position: relative;
   display: flex;
   column-gap: 1em;
+  width: 100%;
 `;
 
 export const StyledTokenSelectorDropDown = styled.select`

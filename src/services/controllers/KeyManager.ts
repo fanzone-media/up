@@ -3,14 +3,17 @@ import {
   encodeArrayKey,
   encodeKeyValue,
 } from '@erc725/erc725.js/build/main/lib/utils';
-import { BigNumber, ethers, Signer } from 'ethers';
+import { Provider } from '@ethersproject/providers';
+import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
 import {
   CardTokenProxy__factory,
   ERC20__factory,
   LSP6KeyManagerProxy__factory,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
+import { executeCallToUniversalProfileViaKeyManager } from '../../submodules/fanzone-smart-contracts/utils/universalProfile';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
+import { getGasPrice } from '../../utils/network';
 import KeyChain from '../utilities/KeyChain';
 
 const LSP6KeyManagerSchemaList: ERC725JSONSchema = {
@@ -125,7 +128,7 @@ const setCardMarketViaKeyManager = async (
   keyManagerAddress: string,
   tokenId: number,
   acceptedToken: string,
-  minimumAmount: BigNumber,
+  minimumAmount: BigNumberish,
   signer: Signer,
 ) => {
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
@@ -220,7 +223,7 @@ const buyFromCardMarketViaKeyManager = async (
     [
       tokenIdBytes,
       minimumAmount.toString(),
-      '0x011468aEdC50A25b8C85ae7d3d84ece744E82976',
+      '0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b',
     ],
   );
 
@@ -232,12 +235,20 @@ const buyFromCardMarketViaKeyManager = async (
       encodedBuyFromMarket,
     ]);
 
-  const transaction = await keyManagerContract.execute(encodedExecuteFunction);
-  await transaction.wait(1).then((result) => {
-    if (result.status === 0) {
-      throw new Error('Transaction reverted');
-    }
-  });
+  await executeCallToUniversalProfileViaKeyManager(
+    {
+      type: 2,
+      gasPrice: await getGasPrice('mumbai'),
+    },
+    keyManagerContract,
+    encodedExecuteFunction,
+  );
+  //const transaction = await keyManagerContract.execute(encodedExecuteFunction);
+  // await transaction.wait(1).then((result) => {
+  //   if (result.status === 0) {
+  //     throw new Error('Transaction reverted');
+  //   }
+  // });
 };
 
 export const KeyManagerApi = {

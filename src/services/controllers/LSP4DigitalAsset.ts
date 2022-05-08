@@ -16,6 +16,7 @@ import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { erc20ABI } from 'wagmi';
 import { Provider } from '@ethersproject/providers';
+import { getGasPrice } from '../../utils/network';
 
 const fetchCard = async (
   address: string,
@@ -279,6 +280,59 @@ const fetchErc20TokenInfo = async (
   };
 };
 
+const buyFromCardMarketViaUniversalProfile = async (
+  assetAddress: string,
+  universalProfileAddress: string,
+  tokenId: number,
+  minimumAmount: BigNumber,
+  signer: Signer,
+) => {
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const tokenIdBytes = tokenIdAsBytes32(tokenId);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+
+  const encodedBuyFromMarket = assetContract.interface.encodeFunctionData(
+    'buyFromMarket',
+    [tokenIdBytes, minimumAmount, '0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b'],
+  );
+
+  const transaction = await universalProfileContract.execute(
+    '0x0',
+    assetAddress,
+    0,
+    encodedBuyFromMarket,
+  );
+
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
+const buyFromMarketViaEOA = async (
+  assetAddress: string,
+  tokenId: number,
+  minimumAmount: BigNumber,
+  signer: Signer,
+) => {
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
+  const transaction = await assetContract.buyFromMarket(
+    tokenIdAsBytes,
+    minimumAmount,
+    ethers.constants.AddressZero,
+  );
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
 const setMarketViaUniversalProfile = async (
   assetAddress: string,
   universalProfileAddress: string,
@@ -295,7 +349,7 @@ const setMarketViaUniversalProfile = async (
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
   const encodedSetMarketFor = assetContract.interface.encodeFunctionData(
     'setMarketFor',
-    [tokenIdAsBytes, acceptedToken, minimumAmount],
+    [tokenIdAsBytes, acceptedToken, minimumAmount.toString()],
   );
   const transaction = await universalProfileContract.execute(
     '0x0',
@@ -347,4 +401,6 @@ export const LSP4DigitalAssetApi = {
   fetchOwnerOfTokenId,
   fetchAcceptedTokens,
   fetchErc20TokenInfo,
+  buyFromMarketViaEOA,
+  buyFromCardMarketViaUniversalProfile,
 };

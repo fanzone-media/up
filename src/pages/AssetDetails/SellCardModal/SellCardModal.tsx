@@ -1,10 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSigner } from 'wagmi';
 import { NetworkName } from '../../../boot/types';
 import { ModalOverlay } from '../../../components/ModalOverlay';
-import { LSP4DigitalAssetApi } from '../../../services/controllers/LSP4DigitalAsset';
-import { KeyManagerApi } from '../../../services/controllers/KeyManager';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
   StyledButtonGroup,
@@ -17,8 +14,9 @@ import {
 } from './styles';
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
 import { InputField } from '../../../components/InputField';
-import { convertPrice, displayPrice } from '../../../utility';
+import { displayPrice } from '../../../utility';
 import { BigNumber, BigNumberish } from 'ethers';
+import { useSellBuyLsp8Token } from '../../../hooks/useSellBuyLsp8Token';
 
 interface IProps {
   onClose: () => void;
@@ -55,7 +53,7 @@ export const SellCardModal = ({
     amount: 0,
     tokenAddress: whiteListedTokens ? whiteListedTokens[0].tokenAddress : '',
   });
-  const [{ data: signer }] = useSigner();
+  const { setForSale } = useSellBuyLsp8Token(address, params.network);
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -83,30 +81,6 @@ export const SellCardModal = ({
     whiteListedTokens.find((i) => i.tokenAddress === marketTokenAddress)
       ?.decimals;
 
-  const setCardForSale = async () => {
-    if (ownerProfile.isOwnerKeyManager && signer) {
-      await KeyManagerApi.setCardMarketViaKeyManager(
-        params.add,
-        ownerProfile.address,
-        ownerProfile.owner,
-        mint,
-        sellForm.tokenAddress,
-        convertPrice(sellForm.amount, selectedTokenDecimals),
-        signer,
-      );
-    }
-    if (!ownerProfile.isOwnerKeyManager && signer) {
-      await LSP4DigitalAssetApi.setMarketViaUniversalProfile(
-        address,
-        ownerProfile.address,
-        mint,
-        sellForm.tokenAddress,
-        convertPrice(sellForm.amount, selectedTokenDecimals),
-        signer,
-      );
-    }
-  };
-
   useEffect(() => {}, []);
 
   return (
@@ -122,27 +96,40 @@ export const SellCardModal = ({
           }
           cardImg={cardImg}
         />
-        <StyledInputGroup>
-          <InputField
-            name="amount"
-            label="Your Price"
-            type="number"
-            changeHandler={changeHandler}
-          />
-          <StyledTokenSelectorDropDown
-            name="tokenAddress"
-            onChange={changeHandler}
-          >
-            <option>Token</option>
-            {whiteListedTokens?.map((item, i) => (
-              <option key={i} value={item.tokenAddress}>
-                {item.symbol}
-              </option>
-            ))}
-          </StyledTokenSelectorDropDown>
-        </StyledInputGroup>
+        {whiteListedTokens && (
+          <StyledInputGroup>
+            <InputField
+              name="amount"
+              label="Your Price"
+              type="number"
+              changeHandler={changeHandler}
+            />
+            <StyledTokenSelectorDropDown
+              name="tokenAddress"
+              onChange={changeHandler}
+            >
+              <option>Token</option>
+              {whiteListedTokens?.map((item, i) => (
+                <option key={i} value={item.tokenAddress}>
+                  {item.symbol}
+                </option>
+              ))}
+            </StyledTokenSelectorDropDown>
+          </StyledInputGroup>
+        )}
         <StyledButtonGroup>
-          <StyledSetPriceButton onClick={setCardForSale}>
+          <StyledSetPriceButton
+            onClick={() =>
+              setForSale(
+                address,
+                ownerProfile,
+                mint,
+                sellForm.tokenAddress,
+                sellForm.amount,
+                selectedTokenDecimals,
+              )
+            }
+          >
             Set for sale
           </StyledSetPriceButton>
           <StyledCancelButton onClick={onClose}>Cancel</StyledCancelButton>

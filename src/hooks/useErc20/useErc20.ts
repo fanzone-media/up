@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
-import { useMemo } from 'react';
-import { useSigner } from 'wagmi';
+import { useMemo, useState } from 'react';
+import { useAccount, useSigner } from 'wagmi';
 import { NetworkName } from '../../boot/types';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
@@ -14,6 +14,8 @@ interface IProps {
 
 export const useErc20 = ({ tokenAddress, network }: IProps) => {
   const [{ data: signer }] = useSigner();
+  const [{ data: account }] = useAccount();
+  const [error, setError] = useState();
   const provider = useRpcProvider(network);
   const erc20Contract = useMemo(
     () => ERC20__factory.connect(tokenAddress, signer ? signer : provider),
@@ -21,31 +23,42 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
   );
 
   const approve = async (
-    universalProfileAddress: string,
     spenderAddress: string,
     amount: BigNumber,
     network: NetworkName,
+    universalProfileAddress?: string,
   ) => {
-    const universalProfileCheck = await LSP3ProfileApi.isUniversalProfile(
-      universalProfileAddress,
-      network,
-    );
+    const buyer = universalProfileAddress
+      ? universalProfileAddress
+      : account
+      ? account.address
+      : '';
+
+    const balance = await checkBalanceOf(buyer);
+
+    const allowance =
+      balance >= amount && (await checkAllowance(buyer, spenderAddress));
+    if (allowance && allowance >= amount) {
+      return;
+    }
+
+    const universalProfileCheck =
+      universalProfileAddress &&
+      (await LSP3ProfileApi.isUniversalProfile(
+        universalProfileAddress,
+        network,
+      ));
     const owner =
+      universalProfileAddress &&
       universalProfileCheck &&
       (await LSP3ProfileApi.fetchOwnerOfProfile(
         universalProfileAddress,
         network,
       ));
-    const balance = await checkBalanceOf(universalProfileAddress);
-    const allowance =
-      balance >= amount &&
-      (await checkAllowance(universalProfileAddress, spenderAddress));
-    if (allowance && allowance >= amount) {
-      return;
-    }
+
     const keyManagerCheck =
       owner && (await LSP3ProfileApi.checkKeyManager(owner, network));
-    if (keyManagerCheck && owner) {
+    if (keyManagerCheck && owner && universalProfileAddress) {
       signer &&
         (await KeyManagerApi.approveTokenViaKeyManager(
           owner,
@@ -55,7 +68,8 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
           amount,
           signer,
         ));
-    } else {
+    }
+    if (owner && universalProfileAddress) {
       signer &&
         (await LSP3ProfileApi.approveTokenViaUniversalProfile(
           universalProfileAddress,
@@ -64,6 +78,8 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
           amount,
           signer,
         ));
+    } else {
+      await erc20Contract.approve(spenderAddress, amount);
     }
   };
 

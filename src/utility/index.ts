@@ -52,7 +52,5 @@ export const displayPrice = (price: BigNumberish, decimals: number) => {
 };
 
 export const convertPrice = (price: BigNumberish, decimals: number) => {
-  return BigNumber.isBigNumber(price)
-    ? price
-    : BigNumber.from(Number(price) * 10 ** decimals);
+  return BigNumber.isBigNumber(price) ? price : Number(price) * 10 ** decimals;
 };

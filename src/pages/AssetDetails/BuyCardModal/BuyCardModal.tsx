@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from 'ethers';
+import { BigNumber } from 'ethers';
 import { useState } from 'react';
 import { InputField } from '../../../components/InputField';
 import { ModalOverlay } from '../../../components/ModalOverlay';
@@ -16,6 +16,8 @@ import {
   StyledCancelButton,
   StyledInfoText,
   StyledModalHeader,
+  StyledToggleButton,
+  StyledToggleButtonGroup,
 } from './styles';
 
 interface IProps {
@@ -41,10 +43,11 @@ export const BuyCardModal = ({
   const { approve } = useErc20({ tokenAddress, network });
   const { buyFromMarket } = useSellBuyLsp8Token(address, network);
   const [upAddress, setUpAddress] = useState<string>('');
+  const [toggleEOABuy, setToggleEOABuy] = useState<boolean>(false);
 
-  const marketTokenDecimals =
+  const marketToken =
     whiteListedTokens &&
-    whiteListedTokens.find((i) => i.tokenAddress === tokenAddress)?.decimals;
+    whiteListedTokens.find((i) => i.tokenAddress === tokenAddress);
 
   const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUpAddress(event.currentTarget.value);
@@ -57,47 +60,56 @@ export const BuyCardModal = ({
         <CardPriceInfoForModal
           address={address}
           mint={mint}
-          price={displayPrice(
-            price,
-            marketTokenDecimals ? marketTokenDecimals : 0,
-          )}
+          price={displayPrice(price, marketToken ? marketToken.decimals : 0)}
           cardImg={cardImg}
         />
-        <InputField
-          name="universalProfileAddress"
-          label="UP Address"
-          type="text"
-          changeHandler={changeHandler}
-        />
+        <StyledToggleButtonGroup>
+          <StyledToggleButton
+            $active={!toggleEOABuy}
+            onClick={() => setToggleEOABuy(false)}
+          >
+            With UP
+          </StyledToggleButton>
+          <StyledToggleButton
+            $active={toggleEOABuy}
+            onClick={() => setToggleEOABuy(true)}
+          >
+            With EOA
+          </StyledToggleButton>
+        </StyledToggleButtonGroup>
+        {!toggleEOABuy && (
+          <InputField
+            name="universalProfileAddress"
+            label="UP Address"
+            type="text"
+            changeHandler={changeHandler}
+          />
+        )}
         <StyledApproveButton
           onClick={async () =>
             await approve(
-              upAddress,
               address,
-              convertPrice(
-                price,
-                marketTokenDecimals ? marketTokenDecimals : 0,
-              ),
+              price,
               network,
+              !toggleEOABuy ? upAddress : undefined,
             )
           }
         >
           Check balance & Approve
         </StyledApproveButton>
         <StyledInfoText>
-          Do you confirm the purchase of this card mint for xxx WETH?
+          Do you confirm the purchase of this card mint for{' '}
+          {displayPrice(price, marketToken ? marketToken.decimals : 0)}{' '}
+          {marketToken ? marketToken.symbol : ''}?
         </StyledInfoText>
         <StyledButtonGroup>
           <StyledBuyButton
             onClick={async () =>
               await buyFromMarket(
-                upAddress,
                 address,
-                convertPrice(
-                  price,
-                  marketTokenDecimals ? marketTokenDecimals : 0,
-                ),
+                price,
                 mint,
+                !toggleEOABuy ? upAddress : undefined,
               )
             }
           >

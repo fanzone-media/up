@@ -183,7 +183,7 @@ const AssetDetails: React.FC = () => {
   );
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [openBuyModal, setOpenBuyModal] = useState<boolean>(false);
+  const [openBuyModal, setOpenBuyModal] = useState<boolean>(true);
   const [openSellModal, setOpenSellModal] = useState<boolean>(false);
 
   const ownedTokenIds = useMemo(
@@ -420,20 +420,18 @@ const AssetDetails: React.FC = () => {
       marketsForOwnedTokens.find(
         (item) => Number(item.tokenId) === ownedTokenIds[currentIndex],
       );
-    const decimals =
+    const token =
       market &&
       asset &&
       asset.whiteListedTokens.find(
         (i) => i.tokenAddress === market.acceptedToken,
-      )?.decimals;
-    return { ...market, decimals };
+      );
+    return {
+      ...market,
+      decimals: token && token.decimals,
+      symbol: token && token.symbol,
+    };
   }, [asset, currentIndex, marketsForOwnedTokens, ownedTokenIds]);
-
-  const urlTokenIdMarket = useMemo(
-    () =>
-      asset?.markets.find((item) => Number(item.tokenId) === Number(params.id)),
-    [asset?.markets, params.id],
-  );
 
   const cardInfo: {
     label: string;
@@ -546,14 +544,14 @@ const AssetDetails: React.FC = () => {
       return (
         <>
           <StyledCardPriceValueWrapper>
-            <StyledTokenIcon src={WethIcon} alt="" />
             <StyledCardPriceValue>
               {currentMintMarket.minimumAmount &&
                 currentMintMarket.decimals &&
                 displayPrice(
                   currentMintMarket.minimumAmount,
                   currentMintMarket.decimals,
-                ).toString()}
+                ).toString()}{' '}
+              {currentMintMarket.symbol}
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
@@ -574,7 +572,6 @@ const AssetDetails: React.FC = () => {
       return (
         <>
           <StyledCardPriceValueWrapper>
-            <StyledTokenIcon src={WethIcon} alt="" />
             <StyledCardPriceValue>-</StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
@@ -595,14 +592,14 @@ const AssetDetails: React.FC = () => {
       return (
         <>
           <StyledCardPriceValueWrapper>
-            <StyledTokenIcon src={WethIcon} alt="" />
             <StyledCardPriceValue>
               {currentMintMarket.minimumAmount &&
                 currentMintMarket.decimals &&
                 displayPrice(
                   currentMintMarket.minimumAmount,
                   currentMintMarket.decimals,
-                ).toString()}
+                ).toString()}{' '}
+              {currentMintMarket.symbol}
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>

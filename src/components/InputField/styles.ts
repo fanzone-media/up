@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const StyledInputContainer = styled.div`
   position: relative;
   display: flex;
+  width: 100%;
 `;
 
 export const StyledPriceLabel = styled.p`

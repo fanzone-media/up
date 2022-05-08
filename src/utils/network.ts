@@ -119,13 +119,9 @@ export const waitForFactoryDeployTxOnNetwork = async (
   return { txReceipt: maybeTxReceipt };
 };
 
-export const getGasPrice = async (
-  networkName: string,
-  provider: Provider,
-): Promise<BigNumber> => {
+export const getGasPrice = async (networkName: string): Promise<BigNumber> => {
   // NOTE: callers of this function should choose a max gas price as during network congestion the
   // fees can become extremely high
-
   switch (sanitizeNetworkName(networkName)) {
     case 'hardhat': {
       return ethers.utils.parseUnits('1', 'gwei');
@@ -144,13 +140,22 @@ export const getGasPrice = async (
       } = await axios
         .get('https://gasstation-mainnet.matic.network')
         .then((res) => res.data);
-
       return ethers.utils.parseUnits(String(gasPrices.fastest), 'gwei');
     }
     case 'mumbai': {
-      const rpcGasPrice = await provider.getGasPrice();
-
-      return rpcGasPrice.mul(10);
+      const gasPrices: {
+        safeLow: number;
+        standard: number;
+        fast: number;
+        fastest: number;
+        blockTime: number;
+        blockNumber: number;
+      } = await axios
+        .get('https://gasstation-mumbai.matic.today')
+        .then((res) => res.data);
+      return ethers.utils.parseUnits(String(gasPrices.fastest), 'gwei');
+      // const rpcGasPrice = await provider.getGasPrice();
+      // return rpcGasPrice.mul(10);
     }
     default: {
       throw new Error(`cannot get gas price for network ${networkName}`);
