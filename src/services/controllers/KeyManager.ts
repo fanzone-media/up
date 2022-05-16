@@ -235,20 +235,12 @@ const buyFromCardMarketViaKeyManager = async (
       encodedBuyFromMarket,
     ]);
 
-  await executeCallToUniversalProfileViaKeyManager(
-    {
-      type: 2,
-      gasPrice: await getGasPrice('mumbai'),
-    },
-    keyManagerContract,
-    encodedExecuteFunction,
-  );
-  //const transaction = await keyManagerContract.execute(encodedExecuteFunction);
-  // await transaction.wait(1).then((result) => {
-  //   if (result.status === 0) {
-  //     throw new Error('Transaction reverted');
-  //   }
-  // });
+  const transaction = await keyManagerContract.execute(encodedExecuteFunction);
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
 };
 
 export const KeyManagerApi = {

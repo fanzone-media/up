@@ -51,7 +51,10 @@ export const SellCardModal = ({
     tokenAddress: string;
   }>({
     amount: 0,
-    tokenAddress: whiteListedTokens ? whiteListedTokens[0].tokenAddress : '',
+    tokenAddress:
+      whiteListedTokens && whiteListedTokens.length > 0
+        ? whiteListedTokens[0].tokenAddress
+        : '',
   });
   const { setForSale } = useSellBuyLsp8Token(address, params.network);
 
@@ -129,6 +132,7 @@ export const SellCardModal = ({
                 selectedTokenDecimals,
               )
             }
+            disabled={!whiteListedTokens || whiteListedTokens?.length === 0}
           >
             Set for sale
           </StyledSetPriceButton>

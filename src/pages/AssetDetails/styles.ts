@@ -447,22 +447,15 @@ export const StyledBuyButton = styled.button`
   background: rgba(255, 129, 1, 1);
   border-radius: 5px;
   padding: 7px 0;
-
-  @media ${({ theme }) => theme.screen.md} {
-    width: 50%;
-  }
 `;
 
-export const StyledMakeOfferButton = styled(StyledBuyButton)`
+export const StyledSetPriceButton = styled(StyledBuyButton)`
   background: rgba(255, 255, 255, 0.2);
 `;
-export const StyledSetPriceButton = styled(StyledMakeOfferButton)`
-  width: 100%;
-`;
 
-export const StyledChangePriceButton = styled(StyledMakeOfferButton)``;
+export const StyledChangePriceButton = styled(StyledSetPriceButton)``;
 
-export const StyledWithdrawButton = styled(StyledMakeOfferButton)``;
+export const StyledWithdrawButton = styled(StyledSetPriceButton)``;
 
 export const StyledCardInfoAccordion = styled(Accordion)``;
 

@@ -7,7 +7,6 @@ import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
 import {
   CardTokenProxy__factory,
   ContractRegistry__factory,
-  ERC20__factory,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import Utils from '../utilities/util';
@@ -16,7 +15,6 @@ import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { erc20ABI } from 'wagmi';
 import { Provider } from '@ethersproject/providers';
-import { getGasPrice } from '../../utils/network';
 
 const fetchCard = async (
   address: string,
@@ -248,18 +246,32 @@ const fetchAcceptedTokens = async (
 ): Promise<IWhiteListedTokens[]> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
-  const contractRegistryAddress = await contract.contractRegistry();
+  let whiteListedTokens = [] as IWhiteListedTokens[];
+  let contractRegistryAddress: string = ethers.constants.AddressZero;
+  await contract
+    .contractRegistry()
+    .then((res) => {
+      contractRegistryAddress = res;
+    })
+    .catch(() => {
+      return whiteListedTokens;
+    });
   const contractRegistry = ContractRegistry__factory.connect(
     contractRegistryAddress,
     provider,
   );
-  const whiteListedTokens = await contractRegistry.allWhitelistedTokens();
-  const res = await Promise.all(
-    whiteListedTokens.map(
-      async (item) => await fetchErc20TokenInfo(item, provider),
-    ),
-  );
-  return res;
+
+  await contractRegistry
+    .allWhitelistedTokens()
+    .then(async (res) => {
+      whiteListedTokens = await Promise.all(
+        res.map(async (item) => await fetchErc20TokenInfo(item, provider)),
+      );
+    })
+    .catch(() => {
+      return whiteListedTokens;
+    });
+  return whiteListedTokens;
 };
 
 const fetchErc20TokenInfo = async (

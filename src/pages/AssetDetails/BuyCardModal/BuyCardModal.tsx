@@ -47,6 +47,7 @@ export const BuyCardModal = ({
 
   const marketToken =
     whiteListedTokens &&
+    whiteListedTokens.length > 0 &&
     whiteListedTokens.find((i) => i.tokenAddress === tokenAddress);
 
   const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {

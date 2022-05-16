@@ -10,6 +10,8 @@
     "@ethersproject/providers": "^5.5.3",
     "@nomiclabs/hardhat-ethers": "^2.0.5",
     "@reduxjs/toolkit": "^1.6.0",
+    "@strikeentco/get": "^1.0.1",
+    "@strikeentco/set": "^1.0.2",
     "@testing-library/jest-dom": "^5.13.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
