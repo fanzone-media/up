@@ -17,12 +17,14 @@ import {
   StyledPaginationWrapper,
   StyledArrowButton,
 } from './styles';
+import { Address } from '../../utils/types';
 
 interface IPagination {
   status?: STATUS;
   components: Array<React.ReactNode>;
   nbrOfAllComponents: number;
   setComponentsRange: Dispatch<SetStateAction<[number, number]>>;
+  addressesToShow?: Array<Address>;
 }
 
 export const Pagination: React.FC<IPagination> = ({
@@ -30,27 +32,19 @@ export const Pagination: React.FC<IPagination> = ({
   components,
   nbrOfAllComponents,
   setComponentsRange,
+  addressesToShow = [],
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pagesCount, setPagesCount] = useState<number>(1);
   const [limit, setLimit] = useState<number>(4);
-  const [componentsToShow, setComponentsToShow] = useState(
-    components.slice(currentPage * limit - limit, currentPage * limit),
-  );
   const { screenWidth } = useViewPort();
 
   const changePage = useCallback(
     (pageNumber: number) => {
-      setComponentsToShow(
-        components.slice(currentPage * limit - limit, currentPage * limit),
-      );
-      setComponentsRange([
-        currentPage * limit - limit,
-        currentPage * limit + limit - 1,
-      ]);
+      setComponentsRange([pageNumber * limit - limit, pageNumber * limit - 1]);
       setCurrentPage(pageNumber);
     },
-    [components, currentPage, limit, setComponentsRange],
+    [limit, setComponentsRange],
   );
 
   //helper
@@ -81,10 +75,7 @@ export const Pagination: React.FC<IPagination> = ({
       setPagesCount(Math.ceil(nbrOfAllComponents / 10));
       setLimit(10);
     }
-    setComponentsToShow(
-      components.slice(currentPage * limit - limit, currentPage * limit),
-    );
-  }, [components, currentPage, limit, screenWidth, nbrOfAllComponents]);
+  }, [screenWidth, nbrOfAllComponents]);
 
   const paginationGroup = useMemo(() => {
     if (pagesCount === 2) {
@@ -104,13 +95,13 @@ export const Pagination: React.FC<IPagination> = ({
     <StyledPaginationWrapper>
       <StyledPaginationGrid>
         {status === 'loading'
-          ? [...Array(limit).keys()].map((el) => (
-              <StyledPaginationGridElement>
+          ? [...Array(limit).keys()].map((el, key) => (
+              <StyledPaginationGridElement key={key}>
                 <CardSkeleton />
               </StyledPaginationGridElement>
             ))
-          : componentsToShow.map((component) => (
-              <StyledPaginationGridElement>
+          : components.map((component, key) => (
+              <StyledPaginationGridElement key={key}>
                 {component}
               </StyledPaginationGridElement>
             ))}
@@ -125,10 +116,9 @@ export const Pagination: React.FC<IPagination> = ({
           >
             <img src={PrevIcon} alt="previous" />
           </StyledArrowButton>
-          {currentPage >= 3 && pagesCount > 3 && (
+          {currentPage >= 3 && pagesCount > 4 && (
             <>
               <StyledPageNumButton
-                disabled={true}
                 onClick={(e) => changePage(Number(e.currentTarget.textContent))}
               >
                 1
@@ -138,7 +128,6 @@ export const Pagination: React.FC<IPagination> = ({
           )}
           {paginationGroup.map((value) => (
             <StyledPageNumButton
-              disabled={true}
               key={value}
               active={currentPage === value ? true : false}
               onClick={(e) => changePage(Number(e.currentTarget.textContent))}
@@ -150,7 +139,6 @@ export const Pagination: React.FC<IPagination> = ({
             <>
               <p>...</p>
               <StyledPageNumButton
-                disabled={true}
                 onClick={(e) => changePage(Number(e.currentTarget.textContent))}
               >
                 {pagesCount}

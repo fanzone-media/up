@@ -72,6 +72,7 @@ import { MetaCard } from '../../features/cards/MetaCard';
 import { StyledProfileHeading, StyledProfilesHeader } from '../Profiles/styles';
 import { TransferCardsModal } from './TransferCardModal/TransferCardsModal';
 import { useModal } from '../../hooks/useModal';
+import { usePagination } from '../../hooks/usePagination';
 
 interface IParams {
   add: string;
@@ -112,7 +113,7 @@ const ProfileDetails: React.FC = () => {
       account.address,
     );
     return [
-      permissionsSet?.permissions.transferValue === StringBoolean.TRUE,
+      permissionsSet?.permissions.call === StringBoolean.TRUE,
       permissionsSet?.permissions.setData === StringBoolean.TRUE,
     ];
   }, [account, profile]);
@@ -125,43 +126,55 @@ const ProfileDetails: React.FC = () => {
       );
   }, [dispatch, params.add, params.network, profile]);
 
-  const issuedCardStatus = useSelector(
-    (state: RootState) => state.cards.issuedStatus,
-  );
+  const { range: issuedAssetsRange, setRange: setIssuedAssetsRange } =
+    usePagination();
+  const { range: ownedAssetsRange, setRange: setOwnedAssetsRange } =
+    usePagination();
 
   const issuedCards = useSelector(selectAllCardItems).filter((item) =>
-    profile?.issuedAssets.some((i) => i === item.address),
+    profile?.issuedAssets
+      .slice(issuedAssetsRange[0], issuedAssetsRange[1] + 1)
+      .some((i) => i === item.address),
+  );
+
+  const issuedCardStatus = useSelector(
+    (state: RootState) => state.cards.issuedStatus,
   );
 
   useEffect(() => {
     if (!profile || profile?.issuedAssets.length === 0) return;
     dispatch(
       fetchIssuedCards({
+        addresses: profile.issuedAssets.slice(
+          issuedAssetsRange[0],
+          issuedAssetsRange[1] + 1,
+        ),
         network: params.network,
-        addresses: profile.issuedAssets.map((asset) => asset),
       }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, profile, params.network]);
+  }, [dispatch, profile, params.network, issuedAssetsRange]);
 
   const ownedCardStatus = useSelector(
     (state: RootState) => state.cards.ownedStatus,
   );
 
   const ownedCards = useSelector(selectAllCardItems).filter((item) =>
-    profile?.ownedAssets.some((i) => i.assetAddress === item.address),
+    profile?.ownedAssets
+      .slice(ownedAssetsRange[0], ownedAssetsRange[1] + 1)
+      .some((i) => i.assetAddress === item.address),
   );
 
   useEffect(() => {
     if (!profile || profile?.ownedAssets.length === 0) return;
     dispatch(
       fetchOwnedCards({
+        addresses: profile.ownedAssets
+          .map((asset) => asset.assetAddress)
+          .slice(ownedAssetsRange[0], ownedAssetsRange[1] + 1),
         network: params.network,
-        addresses: profile.ownedAssets.map((asset) => asset.assetAddress),
       }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, profile, params.network]);
+  }, [dispatch, profile, params.network, ownedAssetsRange]);
 
   const renderLinks = useMemo(
     () =>
@@ -362,8 +375,8 @@ const ProfileDetails: React.FC = () => {
                           />
                         );
                       })}
-                      nbrOfAllComponents={issuedCards.length}
-                      setComponentsRange={() => null}
+                      nbrOfAllComponents={profile.issuedAssets.length}
+                      setComponentsRange={setIssuedAssetsRange}
                     />
                   </>
                 )}
@@ -386,8 +399,8 @@ const ProfileDetails: React.FC = () => {
                           />
                         );
                       })}
-                      nbrOfAllComponents={ownedCards.length}
-                      setComponentsRange={() => null}
+                      nbrOfAllComponents={profile.ownedAssets.length}
+                      setComponentsRange={setOwnedAssetsRange}
                     />
                   </>
                 )}

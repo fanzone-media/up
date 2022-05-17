@@ -5,6 +5,7 @@ import {
 } from '@reduxjs/toolkit';
 import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
+import { API } from '../../services/api';
 import { ICard } from '../../services/models';
 import { STATUS } from '../../utility';
 import { Address } from '../../utils/types';
@@ -44,25 +45,41 @@ const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
  * **************
  */
 
+// Helper function to fetch cards
+const fetchCardsByAddresses = async (
+  addresses: Array<Address>,
+  network: NetworkName,
+  api: API,
+  state: RootState,
+) => {
+  const currentEntities = Object.values(state.cards.entities) as Array<ICard>;
+
+  const existingAddresses = addresses.filter((address) =>
+    currentEntities.find((e) => e.address === address),
+  );
+
+  const cardAddressesToFetch = addresses.filter(
+    (address) => !existingAddresses.includes(address),
+  );
+
+  let res: Array<ICard> = [];
+  if (cardAddressesToFetch.length > 0) {
+    res = await api.cards.fetchAllCards(network, cardAddressesToFetch);
+  }
+  return [...Object.values(currentEntities), ...res] as ICard[];
+};
+
 export const fetchAllCards = createAsyncThunk<
   ICard[],
   {
     network: NetworkName;
     addresses: Address[];
-    index: number;
-    arrayLength: number;
   },
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchAllCards',
-  async (
-    { network, addresses, index, arrayLength },
-    { getState, extra: { api } },
-  ) => {
-    const emptyArray = Array(arrayLength);
-    const res = await api.cards.fetchAllCards(network, addresses);
-    return [...Object.values(getState().cards.entities), ...res] as ICard[];
-  },
+  async ({ network, addresses }, { getState, extra: { api } }) =>
+    fetchCardsByAddresses(addresses, network, api, getState()),
 );
 
 export const fetchIssuedCards = createAsyncThunk<
@@ -71,10 +88,8 @@ export const fetchIssuedCards = createAsyncThunk<
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchIssuedCards',
-  async ({ network, addresses }, { extra: { api } }) => {
-    const res = await api.cards.fetchAllCards(network, addresses);
-    return res as ICard[];
-  },
+  async ({ network, addresses }, { getState, extra: { api } }) =>
+    fetchCardsByAddresses(addresses, network, api, getState()),
 );
 
 export const fetchCard = createAsyncThunk<
@@ -95,10 +110,8 @@ export const fetchOwnedCards = createAsyncThunk<
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchOwnedCards',
-  async ({ network, addresses }, { extra: { api } }) => {
-    const res = await api.cards.fetchAllCards(network, addresses);
-    return res as ICard[];
-  },
+  async ({ network, addresses }, { getState, extra: { api } }) =>
+    fetchCardsByAddresses(addresses, network, api, getState()),
 );
 
 export const fetchMetaDataForTokenId = createAsyncThunk<
