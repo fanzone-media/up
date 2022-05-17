@@ -121,16 +121,11 @@ export const fetchAllProfiles = createAsyncThunk<
   {
     addresses: string[];
     network: NetworkName;
-    index: number;
-    maxNumber: number;
   },
   { extra: ThunkExtra; state: RootState }
 >(
   'userData/fetchAllProfiles',
-  async (
-    { addresses, network, index, maxNumber },
-    { extra: { api }, getState },
-  ) => {
+  async ({ addresses, network }, { extra: { api }, getState }) => {
     const currentEntities = Object.values(
       getState().userData[network].entities,
     ) as Array<IProfile>;

@@ -49,8 +49,6 @@ const Profiles: React.FC = () => {
           profilesRange[1] + 1,
         ),
         network: params.network,
-        index: profilesRange[0],
-        maxNumber: profileAddresses.length,
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
