@@ -118,22 +118,36 @@ export const fetchAssetCreator = createAsyncThunk<
 
 export const fetchAllProfiles = createAsyncThunk<
   IProfile[],
-  { addresses: string[]; network: NetworkName },
+  {
+    addresses: string[];
+    network: NetworkName;
+    index: number;
+    maxNumber: number;
+  },
   { extra: ThunkExtra; state: RootState }
 >(
   'userData/fetchAllProfiles',
-  async ({ addresses, network }, { extra: { api }, getState }) => {
-    const state = getState();
-    const profile = (await api.profiles.fetchAllProfiles(
-      addresses,
-      network,
-    )) as IProfile[];
-
+  async (
+    { addresses, network, index, maxNumber },
+    { extra: { api }, getState },
+  ) => {
     const currentEntities = Object.values(
-      state.userData[network].entities,
-    ) as IProfile[];
+      getState().userData[network].entities,
+    ) as Array<IProfile>;
 
-    return [...currentEntities, ...profile];
+    const existingAddresses = addresses.filter((address) =>
+      currentEntities.find((e) => e.address === address),
+    );
+
+    const cardAddressesToFetch = addresses.filter(
+      (address) => !existingAddresses.includes(address),
+    );
+
+    let res: Array<IProfile> = [];
+    if (cardAddressesToFetch.length > 0) {
+      res = await api.profiles.fetchAllProfiles(cardAddressesToFetch, network);
+    }
+    return [...Object.values(currentEntities), ...res] as IProfile[];
   },
 );
 
