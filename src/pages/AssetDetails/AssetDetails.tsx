@@ -484,7 +484,7 @@ const AssetDetails: React.FC = () => {
     setCurrentIndex(previousIndex);
   };
 
-  const renderOwner = useMemo(() => {
+  const renderIssuer = useMemo(() => {
     const findBalanceOf =
       owner &&
       owner.ownedAssets.find(
@@ -506,10 +506,41 @@ const AssetDetails: React.FC = () => {
             ></ReactTooltip>
           </>
         )}
-        {!owner && <StyledNoProfileLabel>Owner not found</StyledNoProfileLabel>}
+        {!owner && (
+          <StyledNoProfileLabel>Issuer not found</StyledNoProfileLabel>
+        )}
       </StyledTabContent>
     );
   }, [asset?.address, asset?.owner, params.add, owner]);
+
+  const renderCurrentMintOwner = useMemo(() => {
+    const findBalanceOf =
+      activeProfile &&
+      activeProfile.ownedAssets.find(
+        (item) => item.assetAddress === params.add.toLowerCase(),
+      );
+    return (
+      <StyledTabContent>
+        {activeProfile && (
+          <>
+            <ProfileCard
+              userProfile={activeProfile}
+              balance={findBalanceOf ? findBalanceOf.balance : 0}
+              type="owner"
+              tooltipId="ownerTooltip"
+            />
+            <ReactTooltip
+              id="ownerTooltip"
+              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
+            ></ReactTooltip>
+          </>
+        )}
+        {!activeProfile && (
+          <StyledNoProfileLabel>Owner not found</StyledNoProfileLabel>
+        )}
+      </StyledTabContent>
+    );
+  }, [activeProfile, params.add]);
 
   const renderCreators = useMemo(
     () => (
@@ -811,13 +842,15 @@ const AssetDetails: React.FC = () => {
                 <TabedAccordion
                   tabs={[
                     { name: 'Creators', content: renderCreators },
-                    { name: 'Issuer', content: renderOwner },
+                    { name: 'Owner', content: renderCurrentMintOwner },
+                    { name: 'Issuer', content: renderIssuer },
                   ]}
                 />
               ) : (
                 <DesktopCreatorsAccordion
                   creatorsContent={renderCreators}
-                  issuerContent={renderOwner}
+                  ownerContent={activeProfile && renderCurrentMintOwner}
+                  issuerContent={renderIssuer}
                   enableToggle
                 />
               )}

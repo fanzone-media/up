@@ -14,12 +14,14 @@ import {
 interface IProps {
   creatorsContent: ReactNode;
   issuerContent: ReactNode;
+  ownerContent?: ReactNode;
   enableToggle: boolean;
 }
 
 export const DesktopCreatorsAccordion: React.FC<IProps> = ({
   creatorsContent,
   issuerContent,
+  ownerContent,
   enableToggle,
 }) => {
   const [expand, setExpand] = useState<boolean>(true);
@@ -32,6 +34,14 @@ export const DesktopCreatorsAccordion: React.FC<IProps> = ({
         </StyledHeader>
         {creatorsContent}
       </StyledCreatorsContainer>
+      {ownerContent && (
+        <StyledIssuerContainer $expanded={expand}>
+          <StyledHeader $expanded={expand}>
+            <StyledHeaderTitle>Owner</StyledHeaderTitle>
+          </StyledHeader>
+          {ownerContent}
+        </StyledIssuerContainer>
+      )}
       <StyledIssuerContainer $expanded={expand}>
         <StyledHeader $expanded={expand}>
           <StyledHeaderTitle>Issuer</StyledHeaderTitle>
