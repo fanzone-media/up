@@ -1,4 +1,3 @@
-import { MetaCard } from '../../../features/cards/MetaCard';
 import { ICard, IMarket, IWhiteListedTokens } from '../../../services/models';
 import { displayPrice } from '../../../utility';
 import {
@@ -41,9 +40,9 @@ export const CardMarket = ({
     return symbol ? symbol : '';
   };
 
-  return cardMarkets && whiteListedTokens ? (
+  return cardMarkets && cardMarkets.length > 0 && whiteListedTokens ? (
     <StyledCardMarketContainer>
-      {asset && <MetaCard digitalCard={asset} type="" />}
+      {/* {asset && <MetaCard digitalCard={asset} type="" />} */}
       <StyledCardMarketTable>
         <StyledCardMarketListHeader>
           <StyledCardMarketListHeaderContent>

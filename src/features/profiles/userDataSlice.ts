@@ -6,8 +6,10 @@ import {
 } from '@reduxjs/toolkit';
 import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
+import { API } from '../../services/api';
 import { IProfile } from '../../services/models';
 import { CONSTANTS, STATUS } from '../../utility';
+import { Address } from '../../utils/types';
 import { IUserDataSliceState, IUsersState } from './types';
 
 /**
@@ -51,6 +53,32 @@ const initialState: IUserDataSliceState = {
  * **************
  */
 
+// Helper function to fetch profiles
+const fetchProfileByAddresses = async (
+  addresses: Array<Address>,
+  network: NetworkName,
+  api: API,
+  state: RootState,
+) => {
+  const currentEntities = Object.values(
+    state.userData[network].entities,
+  ) as Array<IProfile>;
+
+  const existingAddresses = addresses.filter((address) =>
+    currentEntities.find((e) => e.address === address),
+  );
+
+  const cardAddressesToFetch = addresses.filter(
+    (address) => !existingAddresses.includes(address),
+  );
+
+  let res: Array<IProfile> = [];
+  if (cardAddressesToFetch.length > 0) {
+    res = await api.profiles.fetchAllProfiles(cardAddressesToFetch, network);
+  }
+  return [...Object.values(currentEntities), ...res] as IProfile[];
+};
+
 const profileFetcherThunk = (thunkName: string) => {
   return createAsyncThunk<
     IProfile,
@@ -76,14 +104,12 @@ export const fetchOwnerOfTokenId = profileFetcherThunk(
 export const fetchAssetHolders = createAsyncThunk<
   IProfile[],
   { address: string[]; network: NetworkName },
-  { extra: ThunkExtra }
->('userData/fetchHolder', async ({ address, network }, { extra: { api } }) => {
-  const profile = (await api.profiles.fetchAllProfiles(
-    address,
-    network,
-  )) as IProfile[];
-  return profile;
-});
+  { extra: ThunkExtra; state: RootState }
+>(
+  'userData/fetchHolder',
+  async ({ address, network }, { extra: { api }, getState }) =>
+    fetchProfileByAddresses(address, network, api, getState()),
+);
 
 export const fetchOwnerAddressOfTokenId = createAsyncThunk<
   string,
@@ -125,25 +151,8 @@ export const fetchAllProfiles = createAsyncThunk<
   { extra: ThunkExtra; state: RootState }
 >(
   'userData/fetchAllProfiles',
-  async ({ addresses, network }, { extra: { api }, getState }) => {
-    const currentEntities = Object.values(
-      getState().userData[network].entities,
-    ) as Array<IProfile>;
-
-    const existingAddresses = addresses.filter((address) =>
-      currentEntities.find((e) => e.address === address),
-    );
-
-    const cardAddressesToFetch = addresses.filter(
-      (address) => !existingAddresses.includes(address),
-    );
-
-    let res: Array<IProfile> = [];
-    if (cardAddressesToFetch.length > 0) {
-      res = await api.profiles.fetchAllProfiles(cardAddressesToFetch, network);
-    }
-    return [...Object.values(currentEntities), ...res] as IProfile[];
-  },
+  async ({ addresses, network }, { extra: { api }, getState }) =>
+    fetchProfileByAddresses(addresses, network, api, getState()),
 );
 
 /**
