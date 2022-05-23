@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import {
   BackwardsIcon,
   CategoryPropertyIcon,
@@ -99,6 +99,7 @@ import { DesktopCreatorsAccordion } from './DesktopCreatorsAccordion';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { theme } from '../../boot/styles';
 import { CardMarket } from './CardMarket';
+import { useTransferLsp8Token } from '../../hooks/useTransferLsp8Token';
 
 interface IPrams {
   add: string;
@@ -122,6 +123,8 @@ const AssetDetails: React.FC = () => {
     changeOwner: '0',
   });
   const params = useParams<IPrams>();
+
+  const history = useHistory();
 
   const explorer = getChainExplorer(params.network);
 
@@ -198,6 +201,13 @@ const AssetDetails: React.FC = () => {
 
   const dispatch = useAppDispatch();
 
+  const { transferCard } = useTransferLsp8Token(
+    params.add,
+    account ? account.address : '',
+    ownedTokenIds ? ownedTokenIds[currentIndex] : 0,
+    activeProfile ? activeProfile : ({} as IProfile),
+  );
+
   useMemo(() => {
     if (!asset || owner || ownerStatus !== STATUS.IDLE) return;
 
@@ -234,6 +244,21 @@ const AssetDetails: React.FC = () => {
     if (!params.id || !ownedTokenIds) return;
     setCurrentIndex(ownedTokenIds.indexOf(Number(params.id)));
   }, [ownedTokenIds, params.id]);
+
+  useMemo(() => {
+    if (!params.id && ownedTokenIds) {
+      history.push(
+        `/${params.network}/asset/${params.add}/${ownedTokenIds[currentIndex]}`,
+      );
+    }
+  }, [
+    currentIndex,
+    history,
+    ownedTokenIds,
+    params.add,
+    params.id,
+    params.network,
+  ]);
 
   useMemo(() => {
     if (
@@ -475,12 +500,18 @@ const AssetDetails: React.FC = () => {
   const nextMint = () => {
     const nextIndex = currentIndex + 1;
     if (!ownedTokenIds || nextIndex >= ownedTokenIds.length) return;
+    history.push(
+      `/${params.network}/asset/${params.add}/${ownedTokenIds[nextIndex]}`,
+    );
     setCurrentIndex(nextIndex);
   };
 
   const previousMint = () => {
     const previousIndex = currentIndex - 1;
     if (!ownedTokenIds || previousIndex < 0) return;
+    history.push(
+      `/${params.network}/asset/${params.add}/${ownedTokenIds[previousIndex]}`,
+    );
     setCurrentIndex(previousIndex);
   };
 
@@ -626,6 +657,9 @@ const AssetDetails: React.FC = () => {
             >
               Set price
             </StyledSetPriceButton>
+            <StyledSetPriceButton onClick={transferCard}>
+              Transfer to metamask account
+            </StyledSetPriceButton>
           </StyledActionsButtonWrapper>
         </>
       );
@@ -656,6 +690,11 @@ const AssetDetails: React.FC = () => {
             </StyledChangePriceButton>
             <StyledWithdrawButton>Withdraw from sale</StyledWithdrawButton>
           </StyledActionsButtonWrapper>
+          <StyledActionsButtonWrapper>
+            <StyledSetPriceButton onClick={transferCard}>
+              Transfer to metamask account
+            </StyledSetPriceButton>
+          </StyledActionsButtonWrapper>
         </>
       );
     }
@@ -665,6 +704,7 @@ const AssetDetails: React.FC = () => {
     openBuyModal,
     openSellModal,
     ownedTokenIds,
+    transferCard,
   ]);
 
   const renderCardProperties = useMemo(() => {
