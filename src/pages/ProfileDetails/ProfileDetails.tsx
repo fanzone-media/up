@@ -73,6 +73,7 @@ import { StyledProfileHeading, StyledProfilesHeader } from '../Profiles/styles';
 import { TransferCardsModal } from './TransferCardModal/TransferCardsModal';
 import { useModal } from '../../hooks/useModal';
 import { usePagination } from '../../hooks/usePagination';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 interface IParams {
   add: string;
@@ -103,6 +104,7 @@ const ProfileDetails: React.FC = () => {
   const [isShare, setIsShare] = useState<boolean>(false);
 
   const { copied, copyText, canCopy } = useCopyText();
+  const { setItem, getItems } = useLocalStorage();
 
   const isTablet = useMediaQuery(theme.screen.md);
 
@@ -117,6 +119,11 @@ const ProfileDetails: React.FC = () => {
       permissionsSet?.permissions.setData === StringBoolean.TRUE,
     ];
   }, [account, profile]);
+
+  useMemo(() => {
+    if (!account || !profile || !canTransfer || !canSetData) return;
+    setItem(params.add, profile.permissionSet);
+  }, [account, canSetData, canTransfer, params.add, profile, setItem]);
 
   useEffect(() => {
     dispatch(currentProfile(params.add));

@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { InputField } from '../../../components/InputField';
 import { ModalOverlay } from '../../../components/ModalOverlay';
 import { useErc20 } from '../../../hooks/useErc20';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useSellBuyLsp8Token } from '../../../hooks/useSellBuyLsp8Token';
 import { useUrlParams } from '../../../hooks/useUrlParams';
 import { IWhiteListedTokens } from '../../../services/models';
-import { convertPrice, displayPrice } from '../../../utility';
+import { displayPrice } from '../../../utility';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
   StyledApproveButton,
@@ -16,8 +17,11 @@ import {
   StyledCancelButton,
   StyledInfoText,
   StyledModalHeader,
+  StyledSelectInputContainer,
   StyledToggleButton,
   StyledToggleButtonGroup,
+  StyledUpAddressSelectInput,
+  StyledUpAddressSelectLabel,
 } from './styles';
 
 interface IProps {
@@ -42,7 +46,16 @@ export const BuyCardModal = ({
   const { network } = useUrlParams();
   const { approve } = useErc20({ tokenAddress, network });
   const { buyFromMarket } = useSellBuyLsp8Token(address, network);
-  const [upAddress, setUpAddress] = useState<string>('');
+  const { getItems } = useLocalStorage();
+  const savedProfiles = getItems();
+  const savedProfilesAddresses = savedProfiles
+    ? Object.keys(savedProfiles)
+    : null;
+  const [upAddress, setUpAddress] = useState<string>(
+    savedProfilesAddresses && savedProfilesAddresses.length > 0
+      ? savedProfilesAddresses[0]
+      : '',
+  );
   const [toggleEOABuy, setToggleEOABuy] = useState<boolean>(false);
 
   const marketToken =
@@ -50,7 +63,9 @@ export const BuyCardModal = ({
     whiteListedTokens.length > 0 &&
     whiteListedTokens.find((i) => i.tokenAddress === tokenAddress);
 
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const changeHandler = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setUpAddress(event.currentTarget.value);
   };
 
@@ -78,14 +93,28 @@ export const BuyCardModal = ({
             With EOA
           </StyledToggleButton>
         </StyledToggleButtonGroup>
-        {!toggleEOABuy && (
-          <InputField
-            name="universalProfileAddress"
-            label="UP Address"
-            type="text"
-            changeHandler={changeHandler}
-          />
-        )}
+        {!toggleEOABuy &&
+          (savedProfilesAddresses ? (
+            <StyledSelectInputContainer>
+              <StyledUpAddressSelectLabel>
+                UP Address
+              </StyledUpAddressSelectLabel>
+              <StyledUpAddressSelectInput>
+                {savedProfilesAddresses.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </StyledUpAddressSelectInput>
+            </StyledSelectInputContainer>
+          ) : (
+            <InputField
+              name="universalProfileAddress"
+              label="UP Address"
+              type="text"
+              changeHandler={changeHandler}
+            />
+          ))}
         <StyledApproveButton
           onClick={async () =>
             await approve(

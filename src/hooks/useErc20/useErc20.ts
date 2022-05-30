@@ -33,7 +33,6 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
       : account
       ? account.address
       : '';
-
     const balance = await checkBalanceOf(buyer);
 
     const allowance =
