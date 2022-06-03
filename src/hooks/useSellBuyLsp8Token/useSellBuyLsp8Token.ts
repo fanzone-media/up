@@ -75,6 +75,7 @@ export const useSellBuyLsp8Token = (
     tokenAddress: string,
     amount: BigNumberish,
     decimals: number,
+    callback = (...data: Array<any>) => {},
   ) => {
     if (ownerProfile.isOwnerKeyManager && signer) {
       await KeyManagerApi.setCardMarketViaKeyManager(
@@ -97,6 +98,8 @@ export const useSellBuyLsp8Token = (
         signer,
       );
     }
+
+    callback();
   };
 
   return { buyFromMarket, setForSale };

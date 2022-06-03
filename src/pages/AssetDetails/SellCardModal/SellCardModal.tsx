@@ -130,6 +130,7 @@ export const SellCardModal = ({
                 sellForm.tokenAddress,
                 sellForm.amount,
                 selectedTokenDecimals,
+                onClose,
               )
             }
             disabled={!whiteListedTokens || whiteListedTokens?.length === 0}
