@@ -1,7 +1,6 @@
-import { Signer } from 'ethers';
-import React, { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { NetworkName } from '../../../boot/types';
+import { title } from 'process';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useSigner } from 'wagmi';
 import { Modal } from '../../../components';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { IProfile, ISetProfileData } from '../../../services/models';
@@ -18,15 +17,8 @@ import {
   StyledTextAreaInput,
 } from './styles';
 
-interface IParams {
-  add: string;
-  network: NetworkName;
-}
-
 interface IProps {
-  isOpen: boolean;
-  onClose: () => void;
-  signer: Signer;
+  onDismiss: () => void;
   profile: IProfile;
 }
 
@@ -35,22 +27,26 @@ type formInput = {
   background_image: File | null;
   name: string;
   bio: string;
+  facebook: string;
+  twitter: string;
+  instagram: string;
 };
 
 export const ProfileEditModal: React.FC<IProps> = ({
-  isOpen,
-  onClose,
-  signer,
+  onDismiss,
   profile,
 }: IProps) => {
-  const params = useParams<IParams>();
+  const [{ data: signer }] = useSigner();
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [editProfileForm, setEditProfileForm] = useState<formInput>({
     profile_image: null,
     background_image: null,
-    name: '',
-    bio: '',
+    name: profile.name,
+    bio: profile.description,
+    facebook: '',
+    twitter: '',
+    instagram: '',
   });
 
   const changeHandler = (
@@ -71,21 +67,30 @@ export const ProfileEditModal: React.FC<IProps> = ({
     }
   };
 
+  const linkFinder = useCallback(
+    (title: 'facebook' | 'twitter' | 'instagram') => {
+      const link = profile.links.find(
+        (item) => item.title.toLowerCase() === title,
+      );
+      return link ? link.url : '';
+    },
+    [profile.links],
+  );
+
   const fields = [
     { name: 'background_image', label: 'Background Image', type: 'file' },
     { name: 'profile_image', label: 'Profile Image', type: 'file' },
     { name: 'name', label: 'Name', type: 'text' },
     { name: 'bio', label: 'Bio', type: 'textarea' },
+    { name: 'twitter', label: 'Twitter', type: 'text' },
+    { name: 'facebook', label: 'Facebook', type: 'text' },
+    { name: 'instagram', label: 'Instagram', type: 'text' },
   ];
 
   const data: ISetProfileData = useMemo(
     () => ({
-      name:
-        editProfileForm.name.length > 0 ? editProfileForm.name : profile.name,
-      description:
-        editProfileForm.bio.length > 0
-          ? editProfileForm.bio
-          : profile.description,
+      name: editProfileForm.name,
+      description: editProfileForm.bio,
       backgroundImage: [
         {
           width: '',
@@ -108,15 +113,40 @@ export const ProfileEditModal: React.FC<IProps> = ({
               : profile.profileImage,
         },
       ],
+      links: [
+        {
+          title: 'facebook',
+          url:
+            editProfileForm.facebook.length > 0
+              ? `https://www.facebook.com/${editProfileForm.facebook}`
+              : linkFinder('facebook'),
+        },
+        {
+          title: 'twitter',
+          url:
+            editProfileForm.twitter.length > 0
+              ? `https://www.twitter.com/${editProfileForm.twitter}`
+              : linkFinder('twitter'),
+        },
+        {
+          title: 'instagram',
+          url:
+            editProfileForm.facebook.length > 0
+              ? `https://www.instagram.com/${editProfileForm.instagram}`
+              : linkFinder('instagram'),
+        },
+      ],
     }),
     [
       editProfileForm.background_image,
       editProfileForm.bio,
+      editProfileForm.facebook,
+      editProfileForm.instagram,
       editProfileForm.name,
       editProfileForm.profile_image,
+      editProfileForm.twitter,
+      linkFinder,
       profile.backgroundImage,
-      profile.description,
-      profile.name,
       profile.profileImage,
     ],
   );
@@ -124,32 +154,38 @@ export const ProfileEditModal: React.FC<IProps> = ({
   const setData = async () => {
     setLoading(true);
     if (profile.isOwnerKeyManager) {
-      await LSP3ProfileApi.setUniversalProfileDataViaKeyManager(
-        profile.owner,
-        profile.address,
-        data,
-        signer,
-      )
-        .catch((error) => {
-          setError(true);
-          // onClose();
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      signer &&
+        (await LSP3ProfileApi.setUniversalProfileDataViaKeyManager(
+          profile.owner,
+          profile.address,
+          data,
+          signer,
+        )
+          .catch((error) => {
+            setError(true);
+            // onDismiss();
+          })
+          .finally(() => {
+            setLoading(false);
+          }));
     } else {
-      await LSP3ProfileApi.setUniversalProfileData(params.add, data, signer)
-        .catch((error) => {
-          setError(true);
-          // onClose();
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      signer &&
+        (await LSP3ProfileApi.setUniversalProfileData(
+          profile.address,
+          data,
+          signer,
+        )
+          .catch((error) => {
+            setError(true);
+            // onDismiss();
+          })
+          .finally(() => {
+            setLoading(false);
+          }));
     }
   };
 
-  return isOpen ? (
+  return (
     <Modal>
       {!loading && !error ? (
         <StyledEditProfileModalContent>
@@ -193,7 +229,5 @@ export const ProfileEditModal: React.FC<IProps> = ({
         </StyledErrorLoadingContent>
       )}
     </Modal>
-  ) : (
-    <></>
   );
 };

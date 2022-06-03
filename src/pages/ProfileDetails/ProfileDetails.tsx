@@ -39,6 +39,7 @@ import {
   StyledShareDropDown,
   ShareLink,
   StyledShareProfileWrapper,
+  StyledOpenEditProfileModal,
 } from './styles';
 import { ProfileImage } from './ProfileImage';
 import {
@@ -67,7 +68,7 @@ import {
   fetchOwnedCards,
   selectAllCardItems,
 } from '../../features/cards';
-import { ICard } from '../../services/models';
+import { ICard, IProfile } from '../../services/models';
 import { MetaCard } from '../../features/cards/MetaCard';
 import { StyledProfileHeading, StyledProfilesHeader } from '../Profiles/styles';
 import { TransferCardsModal } from './TransferCardModal/TransferCardsModal';
@@ -86,8 +87,6 @@ const ProfileDetails: React.FC = () => {
   const { pathname } = useLocation();
   const [{ data: account }] = useAccount();
   const [{ data: signer }] = useSigner();
-  const [openEditProfileModal, setOpenEditProfileModal] =
-    useState<boolean>(false);
 
   const profile = useSelector((state: RootState) =>
     selectUserById(state.userData[params.network], params.add),
@@ -256,20 +255,20 @@ const ProfileDetails: React.FC = () => {
     'Transfer Card',
   );
 
+  const {
+    handlePresent: onPresentProfileEditModal,
+    onDismiss: onDismissProfileEditModal,
+  } = useModal(
+    <ProfileEditModal
+      profile={profile ? profile : ({} as IProfile)}
+      onDismiss={() => onDismissProfileEditModal()}
+    />,
+    'Profile Edit Modal',
+    'Profile Edit',
+  );
+
   return (
     <StyledProfileDetails>
-      {signer &&
-        profile &&
-        account &&
-        (canSetData ||
-          profile.owner.toLowerCase() === account.address.toLowerCase()) && (
-          <ProfileEditModal
-            isOpen={openEditProfileModal}
-            onClose={() => setOpenEditProfileModal(false)}
-            signer={signer}
-            profile={profile}
-          />
-        )}
       {profileStatus === 'loading' ? (
         <StyledLoadingHolder>
           <StyledLoader color="#ed7a2d" />
@@ -363,6 +362,29 @@ const ProfileDetails: React.FC = () => {
                   </StyledProfileInfo2Content>
                 </StyledProfileInfo2>
               </StyledProfileInfoWrapper>
+              {profile &&
+                account &&
+                (canTransfer ||
+                  profile.owner.toLowerCase() ===
+                    account.address.toLowerCase()) && (
+                  <StyledOpenTransferModalButton
+                    onClick={onPresentTransferCardsModal}
+                  >
+                    Transfer Cards
+                  </StyledOpenTransferModalButton>
+                )}
+              {signer &&
+                profile &&
+                account &&
+                (canSetData ||
+                  profile.owner.toLowerCase() ===
+                    account.address.toLowerCase()) && (
+                  <StyledOpenEditProfileModal
+                    onClick={onPresentProfileEditModal}
+                  >
+                    Edit Profile
+                  </StyledOpenEditProfileModal>
+                )}
               <StyledAssetsWrapper>
                 {profile && profile.issuedAssets.length > 0 && (
                   <>
@@ -412,17 +434,6 @@ const ProfileDetails: React.FC = () => {
                   </>
                 )}
               </StyledAssetsWrapper>
-              {profile &&
-                account &&
-                (canTransfer ||
-                  profile.owner.toLowerCase() ===
-                    account.address.toLowerCase()) && (
-                  <StyledOpenTransferModalButton
-                    onClick={onPresentTransferCardsModal}
-                  >
-                    Transfer Cards
-                  </StyledOpenTransferModalButton>
-                )}
             </>
           )}
         </StyledProfileDetailsContent>

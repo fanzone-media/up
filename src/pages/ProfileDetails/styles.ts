@@ -251,7 +251,19 @@ export const StyledOpenTransferModalButton = styled.button`
   border-radius: 8px;
 
   @media ${({ theme }) => theme.screen.md} {
-    margin: 0 auto;
+    margin: 2em auto 0 auto;
+  }
+`;
+
+export const StyledOpenEditProfileModal = styled.button`
+  background-color: rgba(33, 33, 33, 1);
+  max-width: max-content;
+  margin: 1.25em auto;
+  padding: 5px 0.625em;
+  border-radius: 8px;
+
+  @media ${({ theme }) => theme.screen.md} {
+    margin: 2em auto 0 auto;
   }
 `;
 

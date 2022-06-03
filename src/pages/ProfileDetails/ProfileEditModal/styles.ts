@@ -14,12 +14,9 @@ export const StyledInputRow = styled.div`
   margin: 25px 0 0 0;
 `;
 
-export const StyledInput = styled.input.attrs({
-  placeholder: '0x',
-})`
+export const StyledInput = styled.input`
   color: black;
   min-width: 25rem;
-  text-align: right;
   width: auto;
 `;
 

@@ -127,6 +127,10 @@ export interface ISetProfileData {
   }[];
   name: string;
   description: string;
+  links: {
+    title: 'facebook' | 'twitter' | 'instagram';
+    url: string;
+  }[];
 }
 
 export interface IPermissionSet {
