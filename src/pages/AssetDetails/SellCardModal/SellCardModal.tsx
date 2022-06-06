@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { NetworkName } from '../../../boot/types';
 import { ModalOverlay } from '../../../components/ModalOverlay';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
@@ -27,12 +26,7 @@ interface IProps {
   cardImg: string;
   ownerProfile: IProfile;
   whiteListedTokens?: IWhiteListedTokens[];
-}
-
-interface IParams {
-  add: string;
   network: NetworkName;
-  id: string;
 }
 
 export const SellCardModal = ({
@@ -44,8 +38,8 @@ export const SellCardModal = ({
   ownerProfile,
   whiteListedTokens,
   marketTokenAddress,
+  network,
 }: IProps) => {
-  const params = useParams<IParams>();
   const [sellForm, setSellForm] = useState<{
     amount: BigNumberish;
     tokenAddress: string;
@@ -56,7 +50,7 @@ export const SellCardModal = ({
         ? whiteListedTokens[0].tokenAddress
         : '',
   });
-  const { setForSale } = useSellBuyLsp8Token(address, params.network);
+  const { setForSale } = useSellBuyLsp8Token(address, network);
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -87,58 +81,54 @@ export const SellCardModal = ({
   useEffect(() => {}, []);
 
   return (
-    <ModalOverlay onClose={onClose}>
-      <StyledSellCardModalContent>
-        <StyledModalHeader>SET CARD FOR SALE</StyledModalHeader>
-        <CardPriceInfoForModal
-          address={address}
-          mint={mint}
-          price={
-            price &&
-            displayPrice(price, marketTokenDecimals ? marketTokenDecimals : 0)
-          }
-          cardImg={cardImg}
-        />
-        {whiteListedTokens && (
-          <StyledInputGroup>
-            <InputField
-              name="amount"
-              label="Your Price"
-              type="number"
-              changeHandler={changeHandler}
-            />
-            <StyledTokenSelectorDropDown
-              name="tokenAddress"
-              onChange={changeHandler}
-            >
-              <option>Token</option>
-              {whiteListedTokens?.map((item, i) => (
-                <option key={i} value={item.tokenAddress}>
-                  {item.symbol}
-                </option>
-              ))}
-            </StyledTokenSelectorDropDown>
-          </StyledInputGroup>
-        )}
-        <StyledButtonGroup>
-          <StyledSetPriceButton
-            onClick={() =>
-              setForSale(
-                address,
-                ownerProfile,
-                mint,
-                sellForm.tokenAddress,
-                sellForm.amount,
-                selectedTokenDecimals,
-              )
-            }
-            disabled={!whiteListedTokens || whiteListedTokens?.length === 0}
+    <StyledSellCardModalContent>
+      <CardPriceInfoForModal
+        address={address}
+        mint={mint}
+        price={
+          price &&
+          displayPrice(price, marketTokenDecimals ? marketTokenDecimals : 0)
+        }
+        cardImg={cardImg}
+      />
+      {whiteListedTokens && (
+        <StyledInputGroup>
+          <InputField
+            name="amount"
+            label="Your Price"
+            type="number"
+            changeHandler={changeHandler}
+          />
+          <StyledTokenSelectorDropDown
+            name="tokenAddress"
+            onChange={changeHandler}
           >
-            Set for sale
-          </StyledSetPriceButton>
-          <StyledCancelButton onClick={onClose}>Cancel</StyledCancelButton>
-        </StyledButtonGroup>
-      </StyledSellCardModalContent>
-    </ModalOverlay>
+            <option>Token</option>
+            {whiteListedTokens?.map((item, i) => (
+              <option key={i} value={item.tokenAddress}>
+                {item.symbol}
+              </option>
+            ))}
+          </StyledTokenSelectorDropDown>
+        </StyledInputGroup>
+      )}
+      <StyledButtonGroup>
+        <StyledSetPriceButton
+          onClick={() =>
+            setForSale(
+              address,
+              ownerProfile,
+              mint,
+              sellForm.tokenAddress,
+              sellForm.amount,
+              selectedTokenDecimals,
+            )
+          }
+          disabled={!whiteListedTokens || whiteListedTokens?.length === 0}
+        >
+          Set for sale
+        </StyledSetPriceButton>
+      </StyledButtonGroup>
+    </StyledSellCardModalContent>
   );
 };

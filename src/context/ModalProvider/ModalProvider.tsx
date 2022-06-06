@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useState } from 'react';
+import { CloseIcon } from '../../assets';
 import {
   StyledModalBackdrop,
   StyledModalBoxInner,
@@ -8,6 +9,10 @@ import {
   StyledModalButtonsWrapper,
   StyledModalWrapper,
 } from '../../components/Modal/styles';
+import {
+  StyledCloseButtonIcon,
+  StyledCloseModalButton,
+} from '../../components/ModalOverlay/styles';
 
 export type IOnPresent = (
   content: React.ReactNode,
@@ -79,6 +84,9 @@ export const ModalProvider: React.FC = ({ children }) => {
             onClick={!persist ? handleDismiss : () => null}
           />
           <StyledModalBoxWrapper>
+            <StyledCloseModalButton onClick={handleDismiss}>
+              <StyledCloseButtonIcon src={CloseIcon} alt="" />
+            </StyledCloseModalButton>
             <StyledModalBoxInner>
               {title && <StyledModalBoxTitle>{title}</StyledModalBoxTitle>}
               {React.isValidElement(content) &&

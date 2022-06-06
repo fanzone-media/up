@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
 import { useState } from 'react';
+import { NetworkName } from '../../../boot/types';
 import { InputField } from '../../../components/InputField';
 import { ModalOverlay } from '../../../components/ModalOverlay';
 import { useErc20 } from '../../../hooks/useErc20';
@@ -32,6 +33,7 @@ interface IProps {
   cardImg: string;
   tokenAddress: string;
   whiteListedTokens: IWhiteListedTokens[];
+  network: NetworkName;
 }
 
 export const BuyCardModal = ({
@@ -42,8 +44,8 @@ export const BuyCardModal = ({
   cardImg,
   tokenAddress,
   whiteListedTokens,
+  network,
 }: IProps) => {
-  const { network } = useUrlParams();
   const { approve } = useErc20({ tokenAddress, network });
   const { buyFromMarket } = useSellBuyLsp8Token(address, network);
   const { getItems } = useLocalStorage();
@@ -70,84 +72,78 @@ export const BuyCardModal = ({
   };
 
   return (
-    <ModalOverlay onClose={onClose}>
-      <StyledBuyCardModalContent>
-        <StyledModalHeader>BUY CARD</StyledModalHeader>
-        <CardPriceInfoForModal
-          address={address}
-          mint={mint}
-          price={displayPrice(price, marketToken ? marketToken.decimals : 0)}
-          cardImg={cardImg}
-        />
-        <StyledToggleButtonGroup>
-          <StyledToggleButton
-            $active={!toggleEOABuy}
-            onClick={() => setToggleEOABuy(false)}
-          >
-            With UP
-          </StyledToggleButton>
-          <StyledToggleButton
-            $active={toggleEOABuy}
-            onClick={() => setToggleEOABuy(true)}
-          >
-            With EOA
-          </StyledToggleButton>
-        </StyledToggleButtonGroup>
-        {!toggleEOABuy &&
-          (savedProfilesAddresses ? (
-            <StyledSelectInputContainer>
-              <StyledUpAddressSelectLabel>
-                UP Address
-              </StyledUpAddressSelectLabel>
-              <StyledUpAddressSelectInput>
-                {savedProfilesAddresses.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </StyledUpAddressSelectInput>
-            </StyledSelectInputContainer>
-          ) : (
-            <InputField
-              name="universalProfileAddress"
-              label="UP Address"
-              type="text"
-              changeHandler={changeHandler}
-            />
-          ))}
-        <StyledApproveButton
+    <StyledBuyCardModalContent>
+      <CardPriceInfoForModal
+        address={address}
+        mint={mint}
+        price={displayPrice(price, marketToken ? marketToken.decimals : 0)}
+        cardImg={cardImg}
+      />
+      <StyledToggleButtonGroup>
+        <StyledToggleButton
+          $active={!toggleEOABuy}
+          onClick={() => setToggleEOABuy(false)}
+        >
+          With UP
+        </StyledToggleButton>
+        <StyledToggleButton
+          $active={toggleEOABuy}
+          onClick={() => setToggleEOABuy(true)}
+        >
+          With EOA
+        </StyledToggleButton>
+      </StyledToggleButtonGroup>
+      {!toggleEOABuy &&
+        (savedProfilesAddresses ? (
+          <StyledSelectInputContainer>
+            <StyledUpAddressSelectLabel>UP Address</StyledUpAddressSelectLabel>
+            <StyledUpAddressSelectInput>
+              {savedProfilesAddresses.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </StyledUpAddressSelectInput>
+          </StyledSelectInputContainer>
+        ) : (
+          <InputField
+            name="universalProfileAddress"
+            label="UP Address"
+            type="text"
+            changeHandler={changeHandler}
+          />
+        ))}
+      <StyledApproveButton
+        onClick={async () =>
+          await approve(
+            address,
+            price,
+            network,
+            !toggleEOABuy ? upAddress : undefined,
+          )
+        }
+      >
+        Check balance & Approve
+      </StyledApproveButton>
+      <StyledInfoText>
+        Do you confirm the purchase of this card mint for{' '}
+        {displayPrice(price, marketToken ? marketToken.decimals : 0)}{' '}
+        {marketToken ? marketToken.symbol : ''}?
+      </StyledInfoText>
+      <StyledButtonGroup>
+        <StyledBuyButton
           onClick={async () =>
-            await approve(
+            await buyFromMarket(
               address,
               price,
-              network,
+              mint,
               !toggleEOABuy ? upAddress : undefined,
             )
           }
         >
-          Check balance & Approve
-        </StyledApproveButton>
-        <StyledInfoText>
-          Do you confirm the purchase of this card mint for{' '}
-          {displayPrice(price, marketToken ? marketToken.decimals : 0)}{' '}
-          {marketToken ? marketToken.symbol : ''}?
-        </StyledInfoText>
-        <StyledButtonGroup>
-          <StyledBuyButton
-            onClick={async () =>
-              await buyFromMarket(
-                address,
-                price,
-                mint,
-                !toggleEOABuy ? upAddress : undefined,
-              )
-            }
-          >
-            Buy
-          </StyledBuyButton>
-          <StyledCancelButton onClick={onClose}>Cancel</StyledCancelButton>
-        </StyledButtonGroup>
-      </StyledBuyCardModalContent>
-    </ModalOverlay>
+          Buy
+        </StyledBuyButton>
+      </StyledButtonGroup>
+    </StyledBuyCardModalContent>
   );
 };

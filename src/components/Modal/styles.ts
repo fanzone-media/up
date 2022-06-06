@@ -39,6 +39,7 @@ export const StyledModalBackdrop = styled.div`
 `;
 
 export const StyledModalBoxWrapper = styled.div`
+  position: relative;
   border: 1px solid #aaa;
   border-radius: 0.625em;
   background-color: #313131;

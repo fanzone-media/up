@@ -100,6 +100,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { theme } from '../../boot/styles';
 import { CardMarket } from './CardMarket';
 import { useTransferLsp8Token } from '../../hooks/useTransferLsp8Token';
+import { useModal } from '../../hooks/useModal';
 
 interface IPrams {
   add: string;
@@ -184,8 +185,6 @@ const AssetDetails: React.FC = () => {
   );
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [openBuyModal, setOpenBuyModal] = useState<boolean>(false);
-  const [openSellModal, setOpenSellModal] = useState<boolean>(false);
   const [selectedMarketTokenId, setSelectedMarketTokenId] = useState<
     number | null
   >(null);
@@ -199,6 +198,58 @@ const AssetDetails: React.FC = () => {
     [activeProfile, params.add],
   );
 
+  const marketsForOwnedTokens = useMemo(
+    () =>
+      ownedTokenIds &&
+      asset?.markets.filter((item) => {
+        return ownedTokenIds.some((i) => {
+          return i === Number(item.tokenId);
+        });
+      }),
+    [asset?.markets, ownedTokenIds],
+  );
+
+  const currentMintMarket = useMemo(() => {
+    const market =
+      marketsForOwnedTokens &&
+      ownedTokenIds &&
+      marketsForOwnedTokens.find(
+        (item) => Number(item.tokenId) === ownedTokenIds[currentIndex],
+      );
+    const token =
+      market &&
+      asset &&
+      asset.whiteListedTokens.find(
+        (i) => i.tokenAddress === market.acceptedToken,
+      );
+    return (
+      market && {
+        ...market,
+        decimals: token && token.decimals,
+        symbol: token && token.symbol,
+      }
+    );
+  }, [asset, currentIndex, marketsForOwnedTokens, ownedTokenIds]);
+
+  const selectedMintMarket = useMemo(() => {
+    const market = asset?.markets.find(
+      (item) => Number(item.tokenId) === selectedMarketTokenId,
+    );
+    const token =
+      market &&
+      asset &&
+      asset.whiteListedTokens.find(
+        (i) => i.tokenAddress === market.acceptedToken,
+      );
+    return (
+      market && {
+        ...market,
+        decimals: token && token.decimals,
+        symbol: token && token.symbol,
+      }
+    );
+  }, [asset, selectedMarketTokenId]);
+
   const dispatch = useAppDispatch();
 
   const { transferCard } = useTransferLsp8Token(
@@ -206,6 +257,52 @@ const AssetDetails: React.FC = () => {
     account ? account.address : '',
     ownedTokenIds ? ownedTokenIds[currentIndex] : 0,
     activeProfile ? activeProfile : ({} as IProfile),
+  );
+
+  const {
+    handlePresent: onPresentBuyCardModal,
+    onDismiss: onDismissBuyCardModal,
+  } = useModal(
+    asset && selectedMintMarket && (
+      <BuyCardModal
+        address={params.add}
+        mint={Number(selectedMintMarket.tokenId)}
+        price={selectedMintMarket.minimumAmount}
+        tokenAddress={selectedMintMarket.acceptedToken}
+        whiteListedTokens={asset.whiteListedTokens}
+        cardImg={asset.ls8MetaData[params.id ? params.id : 0]?.image}
+        onClose={() => {
+          setSelectedMarketTokenId(null);
+          onDismissBuyCardModal();
+        }}
+        network={params.network}
+      />
+    ),
+    'Buy Card Modal',
+    'Buy Card',
+  );
+
+  const {
+    handlePresent: onPresentSellCardModal,
+    onDismiss: onDismissSellCardModal,
+  } = useModal(
+    asset && ownedTokenIds && activeProfile && (
+      <SellCardModal
+        ownerProfile={activeProfile}
+        address={params.add}
+        mint={ownedTokenIds[currentIndex]}
+        price={currentMintMarket ? currentMintMarket.minimumAmount : undefined}
+        marketTokenAddress={
+          currentMintMarket ? currentMintMarket.acceptedToken : undefined
+        }
+        cardImg={asset.ls8MetaData[params.id ? params.id : 0]?.image}
+        onClose={() => onDismissSellCardModal()}
+        whiteListedTokens={asset.whiteListedTokens}
+        network={params.network}
+      />
+    ),
+    'Sell Card Modal',
+    'Sell Card',
   );
 
   useMemo(() => {
@@ -417,58 +514,6 @@ const AssetDetails: React.FC = () => {
     [asset, currentIndex, ownedTokenIds],
   );
 
-  const marketsForOwnedTokens = useMemo(
-    () =>
-      ownedTokenIds &&
-      asset?.markets.filter((item) => {
-        return ownedTokenIds.some((i) => {
-          return i === Number(item.tokenId);
-        });
-      }),
-    [asset?.markets, ownedTokenIds],
-  );
-
-  const currentMintMarket = useMemo(() => {
-    const market =
-      marketsForOwnedTokens &&
-      ownedTokenIds &&
-      marketsForOwnedTokens.find(
-        (item) => Number(item.tokenId) === ownedTokenIds[currentIndex],
-      );
-    const token =
-      market &&
-      asset &&
-      asset.whiteListedTokens.find(
-        (i) => i.tokenAddress === market.acceptedToken,
-      );
-    return (
-      market && {
-        ...market,
-        decimals: token && token.decimals,
-        symbol: token && token.symbol,
-      }
-    );
-  }, [asset, currentIndex, marketsForOwnedTokens, ownedTokenIds]);
-
-  const selectedMintMarket = useMemo(() => {
-    const market = asset?.markets.find(
-      (item) => Number(item.tokenId) === selectedMarketTokenId,
-    );
-    const token =
-      market &&
-      asset &&
-      asset.whiteListedTokens.find(
-        (i) => i.tokenAddress === market.acceptedToken,
-      );
-    return (
-      market && {
-        ...market,
-        decimals: token && token.decimals,
-        symbol: token && token.symbol,
-      }
-    );
-  }, [asset, selectedMarketTokenId]);
-
   const cardInfo: {
     label: string;
     value: string;
@@ -630,8 +675,8 @@ const AssetDetails: React.FC = () => {
           <StyledActionsButtonWrapper>
             <StyledBuyButton
               onClick={() => {
-                setOpenBuyModal(!openBuyModal);
                 setSelectedMarketTokenId(Number(currentMintMarket.tokenId));
+                onPresentBuyCardModal();
               }}
             >
               Buy now
@@ -652,9 +697,7 @@ const AssetDetails: React.FC = () => {
             <StyledCardPriceValue>-</StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
-            <StyledSetPriceButton
-              onClick={() => setOpenSellModal(!openSellModal)}
-            >
+            <StyledSetPriceButton onClick={onPresentSellCardModal}>
               Set price
             </StyledSetPriceButton>
             <StyledSetPriceButton onClick={transferCard}>
@@ -683,9 +726,7 @@ const AssetDetails: React.FC = () => {
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
-            <StyledChangePriceButton
-              onClick={() => setOpenSellModal(!openSellModal)}
-            >
+            <StyledChangePriceButton onClick={onPresentSellCardModal}>
               Change price
             </StyledChangePriceButton>
             <StyledWithdrawButton>Withdraw from sale</StyledWithdrawButton>
@@ -701,8 +742,8 @@ const AssetDetails: React.FC = () => {
   }, [
     currentMintMarket,
     currentUsersPermissionsSet,
-    openBuyModal,
-    openSellModal,
+    onPresentBuyCardModal,
+    onPresentSellCardModal,
     ownedTokenIds,
     transferCard,
   ]);
@@ -767,40 +808,6 @@ const AssetDetails: React.FC = () => {
             </>
           ) : (
             <StyledAssetDetailContent>
-              {openBuyModal && asset && selectedMintMarket && (
-                <BuyCardModal
-                  address={params.add}
-                  mint={Number(selectedMintMarket.tokenId)}
-                  price={selectedMintMarket.minimumAmount}
-                  tokenAddress={selectedMintMarket.acceptedToken}
-                  whiteListedTokens={asset.whiteListedTokens}
-                  cardImg={asset.ls8MetaData[params.id ? params.id : 0]?.image}
-                  onClose={() => {
-                    setOpenBuyModal(!openBuyModal);
-                    setSelectedMarketTokenId(null);
-                  }}
-                />
-              )}
-              {openSellModal && asset && ownedTokenIds && activeProfile && (
-                <SellCardModal
-                  ownerProfile={activeProfile}
-                  address={params.add}
-                  mint={ownedTokenIds[currentIndex]}
-                  price={
-                    currentMintMarket
-                      ? currentMintMarket.minimumAmount
-                      : undefined
-                  }
-                  marketTokenAddress={
-                    currentMintMarket
-                      ? currentMintMarket.acceptedToken
-                      : undefined
-                  }
-                  cardImg={asset.ls8MetaData[params.id ? params.id : 0].image}
-                  onClose={() => setOpenSellModal(!openSellModal)}
-                  whiteListedTokens={asset.whiteListedTokens}
-                />
-              )}
               <StyledCardMainDetails>
                 <StyledMediaWrapper>
                   {asset && (
@@ -911,8 +918,8 @@ const AssetDetails: React.FC = () => {
                   cardMarkets={asset?.markets}
                   whiteListedTokens={asset?.whiteListedTokens}
                   onBuyClick={(tokenId: number) => {
+                    onPresentBuyCardModal();
                     setSelectedMarketTokenId(tokenId);
-                    setOpenBuyModal(true);
                   }}
                 />
               </StyledMarketAccordion>
