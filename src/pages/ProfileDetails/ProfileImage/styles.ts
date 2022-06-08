@@ -13,7 +13,7 @@ export const StyledProfileImg = styled.img`
   inset: 0;
   margin: auto;
   position: absolute;
-  width: auto;
+  width: calc(100% - 1em);
 `;
 
 export const StyledBlockieImg = styled.img`

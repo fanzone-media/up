@@ -1,4 +1,3 @@
-import { profileEnd } from 'console';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
 import { Modal } from '../../../components';
@@ -86,6 +85,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
         backgroundImage: await createImageFile(profile.backgroundImage),
       });
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.profileImage, profile.backgroundImage]);
 
   const changeHandler = (
@@ -195,8 +195,6 @@ export const ProfileEditModal: React.FC<IProps> = ({
     ],
   );
 
-  console.log(data);
-
   const setData = async () => {
     setLoading(true);
     if (profile.isOwnerKeyManager) {
@@ -230,6 +228,14 @@ export const ProfileEditModal: React.FC<IProps> = ({
           }));
     }
   };
+
+  const getImageUrl = useCallback(
+    (url: string) =>
+      url.includes('ipfs.infura-ipfs.io')
+        ? url
+        : `https://ipfs.infura.io/${sanitizeLink(url)}`,
+    [],
+  );
 
   return (
     <Modal>
@@ -265,17 +271,35 @@ export const ProfileEditModal: React.FC<IProps> = ({
                   {(editProfileForm[item.name as keyof formInput] as File) && (
                     <PreviewImage
                       alt={profile.name}
-                      src={`https://ipfs.fanzone.io/${sanitizeLink(
+                      src={
                         (editProfileForm[item.name as keyof formInput] as File)
-                          .name as string,
-                      )}`}
+                          ? getImageUrl(
+                              (
+                                editProfileForm[
+                                  item.name as keyof formInput
+                                ] as File
+                              ).name as string,
+                            )
+                          : ''
+                      }
                     />
                   )}
                   <HiddenFileInputWrapper>
                     <FileInput
+                      title={
+                        (editProfileForm[item.name as keyof formInput] as File)
+                          ? getImageUrl(
+                              (
+                                editProfileForm[
+                                  item.name as keyof formInput
+                                ] as File
+                              ).name as string,
+                            )
+                          : ''
+                      }
                       fileName={
                         (editProfileForm[item.name as keyof formInput] as File)
-                          ? sanitizeLink(
+                          ? getImageUrl(
                               (
                                 editProfileForm[
                                   item.name as keyof formInput
@@ -286,6 +310,17 @@ export const ProfileEditModal: React.FC<IProps> = ({
                       }
                     />
                     <HiddenFileInput
+                      title={
+                        (editProfileForm[item.name as keyof formInput] as File)
+                          ? getImageUrl(
+                              (
+                                editProfileForm[
+                                  item.name as keyof formInput
+                                ] as File
+                              ).name as string,
+                            )
+                          : ''
+                      }
                       name={item.name}
                       onChange={imageChangeHandler}
                       accept=".jpg, .png"

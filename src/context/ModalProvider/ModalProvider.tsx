@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { CloseIcon } from '../../assets';
 import {
   StyledModalBackdrop,
@@ -66,6 +66,23 @@ export const ModalProvider: React.FC = ({ children }) => {
     document.body.style.overflow = 'auto';
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setContent, setIsOpen, modalKey]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.onkeydown = function (evt) {
+        evt = evt || window.event;
+        var isEscape = false;
+        if ('key' in evt) {
+          isEscape = evt.key === 'Escape' || evt.key === 'Esc';
+        } else {
+          isEscape = evt.keyCode === 27;
+        }
+        if (isEscape) {
+          handleDismiss();
+        }
+      };
+    }
+  }, [isOpen, handleDismiss]);
 
   return (
     <ModalContext.Provider
