@@ -1,11 +1,22 @@
-import { title } from 'process';
-import React, { useCallback, useMemo, useState } from 'react';
+import { profileEnd } from 'console';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
 import { Modal } from '../../../components';
+import {
+  FileInput,
+  HiddenFileInput,
+  HiddenFileInputWrapper,
+} from '../../../components/InputField/styles';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { IProfile, ISetProfileData } from '../../../services/models';
+import { sanitizeLink } from '../../../utility/content/text';
+import { createImageFile } from '../../../utility/file';
 import { StyledLoader, StyledLoadingHolder } from '../../AssetDetails/styles';
 import {
+  FileEditWrapper,
+  MetaLabel,
+  MetaLabeledInput,
+  PreviewImage,
   StyledEditProfileModalContent,
   StyledErrorLoadingContent,
   StyledErrorText,
@@ -23,8 +34,8 @@ interface IProps {
 }
 
 type formInput = {
-  profile_image: File | null;
-  background_image: File | null;
+  profileImage: File | null;
+  backgroundImage: File | null;
   name: string;
   bio: string;
   facebook: string;
@@ -32,22 +43,50 @@ type formInput = {
   instagram: string;
 };
 
+type SocialLink = 'facebook' | 'twitter' | 'instagram';
+
+const socialLinks = {
+  twitter: 'https://twitter.com/',
+  facebook: 'https://facebook.com/',
+  instagram: 'https://instagram.com/',
+};
+
 export const ProfileEditModal: React.FC<IProps> = ({
   onDismiss,
   profile,
 }: IProps) => {
+  const linkFinder = useCallback(
+    (title: SocialLink) => {
+      const link = profile.links.find(
+        (item) => item.title.toLowerCase() === title,
+      );
+      return link ? link.url : '';
+    },
+    [profile.links],
+  );
+
   const [{ data: signer }] = useSigner();
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [editProfileForm, setEditProfileForm] = useState<formInput>({
-    profile_image: null,
-    background_image: null,
+    profileImage: null,
+    backgroundImage: null,
     name: profile.name,
     bio: profile.description,
-    facebook: '',
-    twitter: '',
-    instagram: '',
+    facebook: linkFinder('facebook'),
+    twitter: linkFinder('twitter'),
+    instagram: linkFinder('instagram'),
   });
+
+  useEffect(() => {
+    (async () => {
+      setEditProfileForm({
+        ...editProfileForm,
+        profileImage: await createImageFile(profile.profileImage),
+        backgroundImage: await createImageFile(profile.backgroundImage),
+      });
+    })();
+  }, [profile.profileImage, profile.backgroundImage]);
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -67,24 +106,29 @@ export const ProfileEditModal: React.FC<IProps> = ({
     }
   };
 
-  const linkFinder = useCallback(
-    (title: 'facebook' | 'twitter' | 'instagram') => {
-      const link = profile.links.find(
-        (item) => item.title.toLowerCase() === title,
-      );
-      return link ? link.url : '';
-    },
-    [profile.links],
-  );
-
   const fields = [
-    { name: 'background_image', label: 'Background Image', type: 'file' },
-    { name: 'profile_image', label: 'Profile Image', type: 'file' },
+    { name: 'backgroundImage', label: 'Background Image', type: 'file' },
+    { name: 'profileImage', label: 'Profile Image', type: 'file' },
     { name: 'name', label: 'Name', type: 'text' },
+    {
+      name: 'twitter',
+      label: 'Twitter',
+      type: 'text',
+      baseUrl: socialLinks.twitter,
+    },
+    {
+      name: 'facebook',
+      label: 'Facebook',
+      type: 'text',
+      baseUrl: socialLinks.facebook,
+    },
+    {
+      name: 'instagram',
+      label: 'Instagram',
+      type: 'text',
+      baseUrl: socialLinks.instagram,
+    },
     { name: 'bio', label: 'Bio', type: 'textarea' },
-    { name: 'twitter', label: 'Twitter', type: 'text' },
-    { name: 'facebook', label: 'Facebook', type: 'text' },
-    { name: 'instagram', label: 'Instagram', type: 'text' },
   ];
 
   const data: ISetProfileData = useMemo(
@@ -97,8 +141,8 @@ export const ProfileEditModal: React.FC<IProps> = ({
           height: '',
           hashFunction: 'keccak256(bytes)',
           url:
-            editProfileForm.background_image !== null
-              ? editProfileForm.background_image
+            editProfileForm.backgroundImage !== null
+              ? editProfileForm.backgroundImage
               : profile.backgroundImage,
         },
       ],
@@ -108,8 +152,8 @@ export const ProfileEditModal: React.FC<IProps> = ({
           height: '',
           hashFunction: 'keccak256(bytes)',
           url:
-            editProfileForm.profile_image !== null
-              ? editProfileForm.profile_image
+            editProfileForm.profileImage !== null
+              ? editProfileForm.profileImage
               : profile.profileImage,
         },
       ],
@@ -118,38 +162,40 @@ export const ProfileEditModal: React.FC<IProps> = ({
           title: 'facebook',
           url:
             editProfileForm.facebook.length > 0
-              ? `https://www.facebook.com/${editProfileForm.facebook}`
+              ? `https://facebook.com/${editProfileForm.facebook}`
               : linkFinder('facebook'),
         },
         {
           title: 'twitter',
           url:
             editProfileForm.twitter.length > 0
-              ? `https://www.twitter.com/${editProfileForm.twitter}`
+              ? `https://twitter.com/${editProfileForm.twitter}`
               : linkFinder('twitter'),
         },
         {
           title: 'instagram',
           url:
-            editProfileForm.facebook.length > 0
-              ? `https://www.instagram.com/${editProfileForm.instagram}`
+            editProfileForm.instagram.length > 0
+              ? `https://instagram.com/${editProfileForm.instagram}`
               : linkFinder('instagram'),
         },
       ],
     }),
     [
-      editProfileForm.background_image,
+      editProfileForm.backgroundImage,
       editProfileForm.bio,
       editProfileForm.facebook,
       editProfileForm.instagram,
       editProfileForm.name,
-      editProfileForm.profile_image,
+      editProfileForm.profileImage,
       editProfileForm.twitter,
       linkFinder,
       profile.backgroundImage,
       profile.profileImage,
     ],
   );
+
+  console.log(data);
 
   const setData = async () => {
     setLoading(true);
@@ -196,20 +242,60 @@ export const ProfileEditModal: React.FC<IProps> = ({
                 <StyledTextAreaInput
                   name={item.name}
                   onChange={changeHandler}
+                  value={
+                    editProfileForm[item.name as keyof formInput] as string
+                  }
                 />
               )}
-              {(item.type === 'text' || item.type === 'file') && (
-                <StyledInput
-                  name={item.name}
-                  type={item.type}
-                  onChange={
-                    item.type === 'file' ? imageChangeHandler : changeHandler
-                  }
-                  accept={item.type === 'file' ? '.jpg, .png' : ''}
-                />
+              {item.type === 'text' && (
+                <MetaLabeledInput>
+                  {item.baseUrl && <MetaLabel>{item.baseUrl}</MetaLabel>}
+                  <StyledInput
+                    name={item.name}
+                    type={item.type}
+                    onChange={changeHandler}
+                    value={sanitizeLink(
+                      editProfileForm[item.name as keyof formInput] as string,
+                    )}
+                  />
+                </MetaLabeledInput>
+              )}
+              {item.type === 'file' && (
+                <FileEditWrapper>
+                  {(editProfileForm[item.name as keyof formInput] as File) && (
+                    <PreviewImage
+                      alt={profile.name}
+                      src={`https://ipfs.fanzone.io/${sanitizeLink(
+                        (editProfileForm[item.name as keyof formInput] as File)
+                          .name as string,
+                      )}`}
+                    />
+                  )}
+                  <HiddenFileInputWrapper>
+                    <FileInput
+                      fileName={
+                        (editProfileForm[item.name as keyof formInput] as File)
+                          ? sanitizeLink(
+                              (
+                                editProfileForm[
+                                  item.name as keyof formInput
+                                ] as File
+                              ).name as string,
+                            )
+                          : ''
+                      }
+                    />
+                    <HiddenFileInput
+                      name={item.name}
+                      onChange={imageChangeHandler}
+                      accept=".jpg, .png"
+                    />
+                  </HiddenFileInputWrapper>
+                </FileEditWrapper>
               )}
             </StyledInputRow>
           ))}
+          <br />
           <StyledSaveButton onClick={setData}>Save Changes</StyledSaveButton>
         </StyledEditProfileModalContent>
       ) : (

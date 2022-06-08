@@ -184,15 +184,14 @@ const ProfileDetails: React.FC = () => {
 
   const renderLinks = useMemo(
     () =>
-      profile?.links?.map((link) => {
+      profile?.links?.map((link, i) => {
         const linkTitle = link.title.toLowerCase();
         return (
-          <StyledProfileLinks>
+          <StyledProfileLinks key={i}>
             <StyledLinkIconWrapper
               href={link.url}
               target="_blank"
               rel="noreferrer"
-              key={link.url}
             >
               <StyledLinkIcon
                 src={
