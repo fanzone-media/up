@@ -64,7 +64,8 @@ button {
   background-image: none;
 }
 
-button:hover:not([disabled]) {
+button:hover:not([disabled]),
+input[type='file'] {
   cursor: pointer;
 }
 
