@@ -243,10 +243,50 @@ const buyFromCardMarketViaKeyManager = async (
   });
 };
 
+const transferBalanceViaKeyManager = async (
+  tokenAddress: string,
+  keyManagerAddress: string,
+  universalProfileAddress: string,
+  amountToTransfer: BigNumberish,
+  toAddress: string,
+  signer: Signer,
+) => {
+  const tokenContract = ERC20__factory.connect(tokenAddress, signer);
+  const keyManagerContract = LSP6KeyManagerProxy__factory.connect(
+    keyManagerAddress,
+    signer,
+  );
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+
+  const encodedTransfer = tokenContract.interface.encodeFunctionData(
+    'transfer',
+    [toAddress, amountToTransfer],
+  );
+
+  const encodedExecuteFunction =
+    universalProfileContract.interface.encodeFunctionData('execute', [
+      '0x0',
+      tokenAddress,
+      0,
+      encodedTransfer,
+    ]);
+
+  const transaction = await keyManagerContract.execute(encodedExecuteFunction);
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
 export const KeyManagerApi = {
   addPermissions,
   setCardMarketViaKeyManager,
   transferCardViaKeyManager,
   approveTokenViaKeyManager,
   buyFromCardMarketViaKeyManager,
+  transferBalanceViaKeyManager,
 };

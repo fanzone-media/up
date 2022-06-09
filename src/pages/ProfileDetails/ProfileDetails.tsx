@@ -40,6 +40,7 @@ import {
   ShareLink,
   StyledShareProfileWrapper,
   StyledOpenEditProfileModal,
+  StyledWitdrawFundsButton,
 } from './styles';
 import { ProfileImage } from './ProfileImage';
 import {
@@ -75,6 +76,7 @@ import { TransferCardsModal } from './TransferCardModal/TransferCardsModal';
 import { useModal } from '../../hooks/useModal';
 import { usePagination } from '../../hooks/usePagination';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { WithdrawFundsModal } from './WithdrawFundsModal';
 
 interface IParams {
   add: string;
@@ -267,6 +269,21 @@ const ProfileDetails: React.FC = () => {
     'Profile Edit',
   );
 
+  const {
+    handlePresent: onPresentWithdrawFundsModal,
+    onDismiss: onDismissWithdrawFundsModal,
+  } = useModal(
+    profile && (
+      <WithdrawFundsModal
+        profile={profile}
+        network={params.network}
+        onDismiss={() => onDismissWithdrawFundsModal()}
+      />
+    ),
+    'Withdraw Funds Modal',
+    'Withdraw Funds',
+  );
+
   return (
     <StyledProfileDetails>
       {profileStatus === 'loading' ? (
@@ -385,6 +402,9 @@ const ProfileDetails: React.FC = () => {
                     Edit Profile
                   </StyledOpenEditProfileModal>
                 )}
+              <StyledWitdrawFundsButton onClick={onPresentWithdrawFundsModal}>
+                Withdraw Funds
+              </StyledWitdrawFundsButton>
               <StyledAssetsWrapper>
                 {profile && profile.issuedAssets.length > 0 && (
                   <>

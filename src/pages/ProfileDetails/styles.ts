@@ -267,6 +267,8 @@ export const StyledOpenEditProfileModal = styled.button`
   }
 `;
 
+export const StyledWitdrawFundsButton = styled(StyledOpenEditProfileModal)``;
+
 export const StyledShareProfileButton = styled.button<{ isShare: boolean }>`
   align-items: center;
   column-gap: 1.25em;

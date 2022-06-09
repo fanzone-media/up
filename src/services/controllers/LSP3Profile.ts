@@ -20,7 +20,7 @@ import {
   isFetchDataForSchemaResultList,
   fetchLSP5Data,
 } from '../../utils/LSPSchema';
-import { BigNumber, ethers, Signer } from 'ethers';
+import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import Web3 from 'web3';
@@ -558,6 +558,37 @@ const buyFromCardMarketViaUniversalProfile = async (
   });
 };
 
+const transferBalanceViaUniversalProfile = async (
+  tokenAddress: string,
+  universalProfileAddress: string,
+  amountToTransfer: BigNumberish,
+  toAddress: string,
+  signer: Signer,
+) => {
+  const tokenContract = ERC20__factory.connect(tokenAddress, signer);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+
+  const encodedTransfer = tokenContract.interface.encodeFunctionData(
+    'transfer',
+    [toAddress, amountToTransfer],
+  );
+
+  const transaction = await universalProfileContract.execute(
+    '0x0',
+    tokenAddress,
+    0,
+    encodedTransfer,
+  );
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
 export const LSP3ProfileApi = {
   fetchProfile,
   fetchAllProfiles,
@@ -572,4 +603,5 @@ export const LSP3ProfileApi = {
   checkKeyManager,
   isUniversalProfile,
   fetchOwnerOfProfile,
+  transferBalanceViaUniversalProfile,
 };
