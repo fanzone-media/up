@@ -15,14 +15,14 @@ export const StyledPriceLabel = styled.p`
   color: rgba(255, 255, 255, 0.6);
 `;
 
-export const StyledPriceInput = styled.input`
+export const StyledPriceInput = styled.input<{ align?: string }>`
   background: transparent;
   color: white;
   cursor: pointer;
   border: 1px solid rgba(153, 153, 153, 1);
   border-radius: 0.3em;
   padding: 0.5em 0.5em;
-  text-align: end;
+  text-align: ${({ align }) => (align ? align : 'end')};
   width: 100%;
 `;
 

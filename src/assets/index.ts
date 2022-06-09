@@ -35,6 +35,7 @@ import FanzoneClubCardsImg from './fanzone-club-cards.png';
 import ForwardsIcon from './forwards-button-icon.svg';
 import BackwardsIcon from './backwards-button-icon.svg';
 import CloseIcon from './close-icon.svg';
+import TransferIcon from './transfer-icon.svg';
 
 export {
   BgMetaCard,
@@ -74,4 +75,5 @@ export {
   ForwardsIcon,
   BackwardsIcon,
   CloseIcon,
+  TransferIcon,
 };

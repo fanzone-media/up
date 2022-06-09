@@ -9,9 +9,20 @@ interface IProps {
   label: string;
   type: string;
   changeHandler?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  align?: string;
+  placeholder?: string;
+  value?: string;
 }
 
-export const InputField = ({ name, label, type, changeHandler }: IProps) => {
+export const InputField = ({
+  name,
+  label,
+  type,
+  changeHandler,
+  align,
+  placeholder,
+  value,
+}: IProps) => {
   return (
     <StyledInputContainer>
       <StyledPriceLabel>{label}</StyledPriceLabel>
@@ -20,6 +31,9 @@ export const InputField = ({ name, label, type, changeHandler }: IProps) => {
         type={type}
         step="any"
         onChange={changeHandler}
+        align={align}
+        placeholder={placeholder}
+        value={value}
       />
     </StyledInputContainer>
   );

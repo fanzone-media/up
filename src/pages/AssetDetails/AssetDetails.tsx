@@ -14,6 +14,7 @@ import {
   TeamPropertyIcon,
   TierPropertyIcon,
   ZonePropertyIcon,
+  TransferIcon,
 } from '../../assets';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
@@ -101,6 +102,7 @@ import { theme } from '../../boot/styles';
 import { CardMarket } from './CardMarket';
 import { useTransferLsp8Token } from '../../hooks/useTransferLsp8Token';
 import { useModal } from '../../hooks/useModal';
+import { TransferCardTokenIdModal } from './TransferCardTokenIdModal';
 
 interface IPrams {
   add: string;
@@ -252,7 +254,7 @@ const AssetDetails: React.FC = () => {
 
   const dispatch = useAppDispatch();
 
-  const { transferCard } = useTransferLsp8Token(
+  const { transferCard, transfering } = useTransferLsp8Token(
     params.add,
     account ? account.address : '',
     ownedTokenIds ? ownedTokenIds[currentIndex] : 0,
@@ -303,6 +305,24 @@ const AssetDetails: React.FC = () => {
     ),
     'Sell Card Modal',
     'Sell Card',
+  );
+
+  const {
+    handlePresent: onPresentTransferCardModal,
+    onDismiss: onDismissTransferCardModal,
+  } = useModal(
+    <>
+      {activeProfile && (
+        <TransferCardTokenIdModal
+          cardAddress={params.add}
+          tokenId={parseInt(params.id)}
+          profile={activeProfile}
+          onDismiss={() => onDismissTransferCardModal()}
+        />
+      )}
+    </>,
+    'Card Transfer Modal',
+    'Transfer Card',
   );
 
   useMemo(() => {
@@ -701,7 +721,9 @@ const AssetDetails: React.FC = () => {
               Set price
             </StyledSetPriceButton>
             <StyledSetPriceButton onClick={transferCard}>
-              Transfer to metamask account
+              {transfering
+                ? 'Transfering to metamask account…'
+                : 'Transfer to metamask account'}
             </StyledSetPriceButton>
           </StyledActionsButtonWrapper>
         </>
@@ -733,7 +755,9 @@ const AssetDetails: React.FC = () => {
           </StyledActionsButtonWrapper>
           <StyledActionsButtonWrapper>
             <StyledSetPriceButton onClick={transferCard}>
-              Transfer to metamask account
+              {transfering
+                ? 'Transfering to metamask account…'
+                : 'Transfer to metamask account'}
             </StyledSetPriceButton>
           </StyledActionsButtonWrapper>
         </>
@@ -746,6 +770,7 @@ const AssetDetails: React.FC = () => {
     onPresentSellCardModal,
     ownedTokenIds,
     transferCard,
+    transfering,
   ]);
 
   const renderCardProperties = useMemo(() => {
@@ -846,14 +871,37 @@ const AssetDetails: React.FC = () => {
                     <StyledCardPriceWrapperHeader>
                       <StyledCardPriceLabel>Current Price</StyledCardPriceLabel>
                       <StyledQuickActions>
+                        {ownedTokenIds &&
+                          currentUsersPermissionsSet.call === '1' && (
+                            <StyledReloadPriceAction>
+                              <StyledActionIcon
+                                src={TransferIcon}
+                                alt="transfer"
+                                title="transfer"
+                                onClick={onPresentTransferCardModal}
+                              />
+                            </StyledReloadPriceAction>
+                          )}
                         <StyledReloadPriceAction>
-                          <StyledActionIcon src={ReloadIcon} />
+                          <StyledActionIcon
+                            src={ReloadIcon}
+                            alt="reload"
+                            title="reload"
+                          />
                         </StyledReloadPriceAction>
                         <StyledReloadPriceAction>
-                          <StyledActionIcon src={ShareIcon} />
+                          <StyledActionIcon
+                            src={ShareIcon}
+                            alt="share"
+                            title="share"
+                          />
                         </StyledReloadPriceAction>
                         <StyledReloadPriceAction>
-                          <StyledActionIcon src={OptionIcon} />
+                          <StyledActionIcon
+                            src={OptionIcon}
+                            alt="options"
+                            title="options"
+                          />
                         </StyledReloadPriceAction>
                       </StyledQuickActions>
                     </StyledCardPriceWrapperHeader>
