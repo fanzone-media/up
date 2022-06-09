@@ -101,6 +101,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { theme } from '../../boot/styles';
 import { CardMarket } from './CardMarket';
 import { useTransferLsp8Token } from '../../hooks/useTransferLsp8Token';
+import { useRemoveMarketForLsp8Token } from '../../hooks/useRemoveMarketForLsp8Token';
 import { useModal } from '../../hooks/useModal';
 import { TransferCardTokenIdModal } from './TransferCardTokenIdModal';
 
@@ -258,6 +259,12 @@ const AssetDetails: React.FC = () => {
     params.add,
     account ? account.address : '',
     ownedTokenIds ? ownedTokenIds[currentIndex] : 0,
+    activeProfile ? activeProfile : ({} as IProfile),
+  );
+
+  const { removeMarket, removingMarket } = useRemoveMarketForLsp8Token(
+    params.add,
+    parseInt(params.id),
     activeProfile ? activeProfile : ({} as IProfile),
   );
 
@@ -751,7 +758,9 @@ const AssetDetails: React.FC = () => {
             <StyledChangePriceButton onClick={onPresentSellCardModal}>
               Change price
             </StyledChangePriceButton>
-            <StyledWithdrawButton>Withdraw from sale</StyledWithdrawButton>
+            <StyledWithdrawButton onClick={removeMarket}>
+              {removingMarket ? 'Withdrawing from sale…' : 'Withdraw from sale'}
+            </StyledWithdrawButton>
           </StyledActionsButtonWrapper>
           <StyledActionsButtonWrapper>
             <StyledSetPriceButton onClick={transferCard}>
@@ -771,6 +780,8 @@ const AssetDetails: React.FC = () => {
     ownedTokenIds,
     transferCard,
     transfering,
+    removeMarket,
+    removingMarket,
   ]);
 
   const renderCardProperties = useMemo(() => {
