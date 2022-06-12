@@ -400,7 +400,7 @@ export const StyledQuickActions = styled.div`
   display: grid;
   width: 110px;
   height: 30px;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(1em, 1fr));
   margin-left: auto;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;

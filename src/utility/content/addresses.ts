@@ -1,3 +1,4 @@
+import { BaseProvider } from '@ethersproject/providers';
 import { NetworkName } from '../../boot/types';
 import { Address } from '../../utils/types';
 

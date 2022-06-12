@@ -69,6 +69,10 @@ input[type='file'] {
   cursor: pointer;
 }
 
+[disabled] {
+  opacity: 0.3;
+}
+
 img {
   border-style: solid;
 }
