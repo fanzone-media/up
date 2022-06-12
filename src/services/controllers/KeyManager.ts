@@ -4,8 +4,9 @@ import {
   encodeKeyValue,
 } from '@erc725/erc725.js/build/main/lib/utils';
 import { Provider } from '@ethersproject/providers';
-import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
+import { BigNumber, BigNumberish, BytesLike, ethers, Signer } from 'ethers';
 import {
+  CardMarket__factory,
   CardTokenProxy__factory,
   ERC20__factory,
   LSP6KeyManagerProxy__factory,
@@ -260,7 +261,6 @@ const transferBalanceViaKeyManager = async (
     universalProfileAddress,
     signer,
   );
-
   const encodedTransfer = tokenContract.interface.encodeFunctionData(
     'transfer',
     [toAddress, amountToTransfer],
@@ -272,6 +272,41 @@ const transferBalanceViaKeyManager = async (
       tokenAddress,
       0,
       encodedTransfer,
+    ]);
+  const transaction = await keyManagerContract.execute(encodedExecuteFunction);
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+const removeMarketViaKeymanager = async (
+  assetAddress: string,
+  universalProfileAddress: string,
+  keyManagerAddress: string,
+  tokenId: BytesLike,
+  signer: Signer,
+) => {
+  const assetContract = CardMarket__factory.connect(assetAddress, signer);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+
+  const keyManagerContract = LSP6KeyManagerProxy__factory.connect(
+    keyManagerAddress,
+    signer,
+  );
+
+  const encodedRemoveMarketForFunction =
+    assetContract.interface.encodeFunctionData('removeMarketFor', [tokenId]);
+
+  const encodedExecuteFunction =
+    universalProfileContract.interface.encodeFunctionData('execute', [
+      '0x0',
+      assetAddress,
+      0,
+      encodedRemoveMarketForFunction,
     ]);
 
   const transaction = await keyManagerContract.execute(encodedExecuteFunction);
@@ -289,4 +324,5 @@ export const KeyManagerApi = {
   approveTokenViaKeyManager,
   buyFromCardMarketViaKeyManager,
   transferBalanceViaKeyManager,
+  removeMarketViaKeymanager,
 };

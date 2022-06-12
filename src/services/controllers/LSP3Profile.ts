@@ -10,6 +10,7 @@ import { NetworkName, AsyncReturnType, UnpackedType } from '../../boot/types';
 import Utils from '../utilities/util';
 import { addData, addFile, getLSP3ProfileData } from '../ipfsClient';
 import {
+  CardMarket__factory,
   CardTokenProxy__factory,
   ERC20__factory,
   ERC725Y__factory,
@@ -20,7 +21,7 @@ import {
   isFetchDataForSchemaResultList,
   fetchLSP5Data,
 } from '../../utils/LSPSchema';
-import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
+import { BigNumber, BigNumberish, BytesLike, ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import Web3 from 'web3';
@@ -570,7 +571,6 @@ const transferBalanceViaUniversalProfile = async (
     universalProfileAddress,
     signer,
   );
-
   const encodedTransfer = tokenContract.interface.encodeFunctionData(
     'transfer',
     [toAddress, amountToTransfer],
@@ -581,6 +581,33 @@ const transferBalanceViaUniversalProfile = async (
     tokenAddress,
     0,
     encodedTransfer,
+  );
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+const removeMarket = async (
+  assetAddress: string,
+  universalProfileAddress: string,
+  tokenId: BytesLike,
+  signer: Signer,
+) => {
+  const assetContract = CardMarket__factory.connect(assetAddress, signer);
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+
+  const encodedRemoveMarketForFunction =
+    assetContract.interface.encodeFunctionData('removeMarketFor', [tokenId]);
+
+  const transaction = await universalProfileContract.execute(
+    '0x0',
+    assetAddress,
+    0,
+    encodedRemoveMarketForFunction,
   );
   await transaction.wait(1).then((result) => {
     if (result.status === 0) {
@@ -604,4 +631,5 @@ export const LSP3ProfileApi = {
   isUniversalProfile,
   fetchOwnerOfProfile,
   transferBalanceViaUniversalProfile,
+  removeMarket,
 };
