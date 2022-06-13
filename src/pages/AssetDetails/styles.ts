@@ -357,6 +357,14 @@ export const StyledMintSkipButtonImg = styled.img`
   margin: auto;
 `;
 
+export const StyledMintSliderInput = styled.input`
+  background: transparent;
+  border: 0.1em solid white;
+  height: 1.5em;
+  margin: auto 0;
+  text-align: right;
+`;
+
 export const StyledMintSliderIndex = styled.p`
   margin: auto 0;
 `;

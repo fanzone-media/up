@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   BackwardsIcon,
@@ -81,6 +81,7 @@ import {
   StyledSetPriceButton,
   StyledTabContent,
   StyledNoProfileLabel,
+  StyledMintSliderInput,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { displayPrice, getChainExplorer, STATUS } from '../../utility';
@@ -187,6 +188,7 @@ const AssetDetails: React.FC = () => {
     (state: RootState) => state.userData[params.network].creatorStatus,
   );
 
+  const mintIdInputRef = useRef<HTMLInputElement>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selectedMarketTokenId, setSelectedMarketTokenId] = useState<
     number | null
@@ -572,6 +574,9 @@ const AssetDetails: React.FC = () => {
   const nextMint = () => {
     const nextIndex = currentIndex + 1;
     if (!ownedTokenIds || nextIndex >= ownedTokenIds.length) return;
+    if (mintIdInputRef.current) {
+      mintIdInputRef.current.value = (nextIndex + 1).toString();
+    }
     history.push(
       `/${params.network}/asset/${params.add}/${ownedTokenIds[nextIndex]}`,
     );
@@ -581,6 +586,9 @@ const AssetDetails: React.FC = () => {
   const previousMint = () => {
     const previousIndex = currentIndex - 1;
     if (!ownedTokenIds || previousIndex < 0) return;
+    if (mintIdInputRef.current) {
+      mintIdInputRef.current.value = (previousIndex + 1).toString();
+    }
     history.push(
       `/${params.network}/asset/${params.add}/${ownedTokenIds[previousIndex]}`,
     );
@@ -869,7 +877,27 @@ const AssetDetails: React.FC = () => {
                         <StyledMintSkipButtonImg src={BackwardsIcon} alt="" />
                       </StyledMintSkipButton>
                       <StyledMintSliderIndex>
-                        {currentIndex + 1}/{ownedTokenIds?.length}
+                        <StyledMintSliderInput
+                          type="number"
+                          min={1}
+                          max={ownedTokenIds.length}
+                          defaultValue={currentIndex + 1}
+                          ref={mintIdInputRef}
+                          onBlur={(
+                            event: React.FocusEvent<HTMLInputElement>,
+                          ) => {
+                            const val = Number(event.target.value);
+                            if (val > 0 && val <= ownedTokenIds.length) {
+                              history.push(
+                                `/${params.network}/asset/${params.add}/${
+                                  ownedTokenIds[val - 1]
+                                }`,
+                              );
+                              setCurrentIndex(val - 1);
+                            }
+                          }}
+                        />
+                        /{ownedTokenIds.length}
                       </StyledMintSliderIndex>
                       <StyledMintSkipButton onClick={nextMint}>
                         <StyledMintSkipButtonImg src={ForwardsIcon} alt="" />
