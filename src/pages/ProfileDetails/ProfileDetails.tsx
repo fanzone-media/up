@@ -109,8 +109,8 @@ const ProfileDetails: React.FC = () => {
 
   const isTablet = useMediaQuery(theme.screen.md);
 
-  const [canTransfer, canSetData] = useMemo(() => {
-    if (!profile || !account) return [false, false];
+  const [canTransfer, canSetData, canTransferValue] = useMemo(() => {
+    if (!profile || !account) return [false, false, false];
     const permissionsSet = getAddressPermissionsOnUniversalProfile(
       profile.permissionSet,
       account.address,
@@ -118,6 +118,7 @@ const ProfileDetails: React.FC = () => {
     return [
       permissionsSet?.permissions.call === StringBoolean.TRUE,
       permissionsSet?.permissions.setData === StringBoolean.TRUE,
+      permissionsSet?.permissions.transferValue === StringBoolean.TRUE,
     ];
   }, [account, profile]);
 
@@ -401,9 +402,11 @@ const ProfileDetails: React.FC = () => {
                     Edit Profile
                   </StyledOpenEditProfileModal>
                 )}
-              <StyledWitdrawFundsButton onClick={onPresentWithdrawFundsModal}>
-                Withdraw Funds
-              </StyledWitdrawFundsButton>
+              {canTransferValue && (
+                <StyledWitdrawFundsButton onClick={onPresentWithdrawFundsModal}>
+                  Withdraw Funds
+                </StyledWitdrawFundsButton>
+              )}
               <StyledAssetsWrapper>
                 {profile && profile.issuedAssets.length > 0 && (
                   <>
