@@ -3,7 +3,7 @@ import { create } from 'ipfs-http-client';
 import { ILSP8MetaData } from './models';
 import { ethers } from 'ethers';
 
-const url: string = 'https://ipfs.infura.io/ipfs/';
+const url: string = 'https://ipfs.fanzone.io/ipfs/';
 const IPFS_HOST = 'ipfs.infura.io';
 const IPFS_PORT = 5001;
 const IPFS_PROTOCOL = 'https';

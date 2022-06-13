@@ -44,8 +44,14 @@ export const StyledModalBoxWrapper = styled.div`
   border-radius: 0.625em;
   background-color: #313131;
   padding: 1.5em 1.25em;
-  min-width: 35em;
+  max-width: 20em;
+  width: 100%;
   z-index: 10;
+
+  @media ${({ theme }) => theme.screen.md} {
+    max-width: auto;
+    min-width: 35em;
+  }
 `;
 
 export const StyledModalBoxInner = styled.div`

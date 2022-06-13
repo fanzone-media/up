@@ -357,6 +357,12 @@ export const StyledMintSkipButtonImg = styled.img`
   margin: auto;
 `;
 
+export const StyledSelectMintModalButton = styled.button`
+  border: 0.1em solid white;
+  padding: 0 0.3em;
+  border-radius: 0.2em;
+`;
+
 export const StyledMintSliderInput = styled.input`
   background: transparent;
   border: 0.1em solid white;

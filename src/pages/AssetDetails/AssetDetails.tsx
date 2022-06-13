@@ -82,6 +82,7 @@ import {
   StyledTabContent,
   StyledNoProfileLabel,
   StyledMintSliderInput,
+  StyledSelectMintModalButton,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { displayPrice, getChainExplorer, STATUS } from '../../utility';
@@ -105,6 +106,7 @@ import { useTransferLsp8Token } from '../../hooks/useTransferLsp8Token';
 import { useRemoveMarketForLsp8Token } from '../../hooks/useRemoveMarketForLsp8Token';
 import { useModal } from '../../hooks/useModal';
 import { TransferCardTokenIdModal } from './TransferCardTokenIdModal';
+import { SelectMintModalContent } from './SelectMintModalContent';
 
 interface IPrams {
   add: string;
@@ -314,6 +316,23 @@ const AssetDetails: React.FC = () => {
     ),
     'Sell Card Modal',
     'Sell Card',
+  );
+
+  const {
+    handlePresent: onPresentSelectMintModal,
+    onDismiss: onDismissSelectMintModal,
+  } = useModal(
+    ownedTokenIds && (
+      <SelectMintModalContent
+        ownedTokenIds={ownedTokenIds}
+        onSelect={(tokenId: number) => {
+          setCurrentIndex(ownedTokenIds.indexOf(Number(tokenId)));
+        }}
+        onSelectCallback={() => onDismissSelectMintModal()}
+      />
+    ),
+    'Select Mint Modal',
+    'Select Mint',
   );
 
   const {
@@ -872,37 +891,44 @@ const AssetDetails: React.FC = () => {
                     <StyledExplorerIcon src={explorer?.icon} alt="" />
                   </a>
                   {wasActiveProfile && ownedTokenIds && (
-                    <StyledMintControls>
-                      <StyledMintSkipButton onClick={previousMint}>
-                        <StyledMintSkipButtonImg src={BackwardsIcon} alt="" />
-                      </StyledMintSkipButton>
-                      <StyledMintSliderIndex>
-                        <StyledMintSliderInput
-                          type="number"
-                          min={1}
-                          max={ownedTokenIds.length}
-                          defaultValue={currentIndex + 1}
-                          ref={mintIdInputRef}
-                          onBlur={(
-                            event: React.FocusEvent<HTMLInputElement>,
-                          ) => {
-                            const val = Number(event.target.value);
-                            if (val > 0 && val <= ownedTokenIds.length) {
-                              history.push(
-                                `/${params.network}/asset/${params.add}/${
-                                  ownedTokenIds[val - 1]
-                                }`,
-                              );
-                              setCurrentIndex(val - 1);
-                            }
-                          }}
-                        />
-                        /{ownedTokenIds.length}
-                      </StyledMintSliderIndex>
-                      <StyledMintSkipButton onClick={nextMint}>
-                        <StyledMintSkipButtonImg src={ForwardsIcon} alt="" />
-                      </StyledMintSkipButton>
-                    </StyledMintControls>
+                    <>
+                      <StyledMintControls>
+                        <StyledMintSkipButton onClick={previousMint}>
+                          <StyledMintSkipButtonImg src={BackwardsIcon} alt="" />
+                        </StyledMintSkipButton>
+                        <StyledMintSliderIndex>
+                          <StyledMintSliderInput
+                            type="number"
+                            min={1}
+                            max={ownedTokenIds.length}
+                            defaultValue={currentIndex + 1}
+                            ref={mintIdInputRef}
+                            onBlur={(
+                              event: React.FocusEvent<HTMLInputElement>,
+                            ) => {
+                              const val = Number(event.target.value);
+                              if (val > 0 && val <= ownedTokenIds.length) {
+                                history.push(
+                                  `/${params.network}/asset/${params.add}/${
+                                    ownedTokenIds[val - 1]
+                                  }`,
+                                );
+                                setCurrentIndex(val - 1);
+                              }
+                            }}
+                          />
+                          /{ownedTokenIds.length}
+                        </StyledMintSliderIndex>
+                        <StyledMintSkipButton onClick={nextMint}>
+                          <StyledMintSkipButtonImg src={ForwardsIcon} alt="" />
+                        </StyledMintSkipButton>
+                        <StyledSelectMintModalButton
+                          onClick={onPresentSelectMintModal}
+                        >
+                          Select Mint
+                        </StyledSelectMintModalButton>
+                      </StyledMintControls>
+                    </>
                   )}
                 </StyledMediaWrapper>
                 <StyledCardInfoWrapper>
