@@ -36,3 +36,7 @@ export const StyledSelectMintListContent = styled.div`
     );
   }
 `;
+
+export const StyledListMint = styled.p``;
+
+export const StyledListPrice = styled.p``;

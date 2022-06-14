@@ -322,9 +322,11 @@ const AssetDetails: React.FC = () => {
     handlePresent: onPresentSelectMintModal,
     onDismiss: onDismissSelectMintModal,
   } = useModal(
-    ownedTokenIds && (
+    ownedTokenIds && asset && (
       <SelectMintModalContent
         ownedTokenIds={ownedTokenIds}
+        markets={asset.markets}
+        whiteListedTokens={asset.whiteListedTokens}
         onSelect={(tokenId: number) => {
           setCurrentIndex(ownedTokenIds.indexOf(Number(tokenId)));
         }}
