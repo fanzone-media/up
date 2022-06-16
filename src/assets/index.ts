@@ -36,6 +36,9 @@ import ForwardsIcon from './forwards-button-icon.svg';
 import BackwardsIcon from './backwards-button-icon.svg';
 import CloseIcon from './close-icon.svg';
 import TransferIcon from './transfer-icon.svg';
+import CloseMenuIcon from './close-menu-icon.svg';
+import UserIcon from './user-icon.svg';
+import WalletIcon from './wallet-icon.svg';
 
 export {
   BgMetaCard,
@@ -76,4 +79,7 @@ export {
   BackwardsIcon,
   CloseIcon,
   TransferIcon,
+  CloseMenuIcon,
+  UserIcon,
+  WalletIcon,
 };

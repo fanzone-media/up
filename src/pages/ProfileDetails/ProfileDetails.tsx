@@ -105,7 +105,7 @@ const ProfileDetails: React.FC = () => {
   const [isShare, setIsShare] = useState<boolean>(false);
 
   const { copied, copyText, canCopy } = useCopyText();
-  const { setItem, getItems } = useLocalStorage();
+  const { setItem } = useLocalStorage();
 
   const isTablet = useMediaQuery(theme.screen.md);
 
@@ -124,8 +124,16 @@ const ProfileDetails: React.FC = () => {
 
   useMemo(() => {
     if (!account || !profile || !canTransfer || !canSetData) return;
-    setItem(params.add, profile.permissionSet);
-  }, [account, canSetData, canTransfer, params.add, profile, setItem]);
+    setItem(params.network, params.add, profile.permissionSet);
+  }, [
+    account,
+    canSetData,
+    canTransfer,
+    params.add,
+    params.network,
+    profile,
+    setItem,
+  ]);
 
   useEffect(() => {
     dispatch(currentProfile(params.add));

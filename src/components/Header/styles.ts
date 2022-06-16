@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-export const StyledHeader = styled.header`
+export const StyledHeader = styled.header<{ $showHamburger: boolean }>`
   background-color: black;
   display: flex;
   height: 54px;
   color: white;
   border-bottom: 1px solid #858585;
+  position: ${({ $showHamburger }) => ($showHamburger ? 'fixed' : 'relative')};
+  width: 100%;
+  z-index: 10;
 
   @media ${({ theme }) => theme.screen.sm} {
     height: 65px;
@@ -24,7 +27,7 @@ export const StyledHeaderContent = styled.div`
     max-width: 1440px;
     margin: 0 auto;
     padding: 0 40px;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 `;
 
@@ -32,7 +35,7 @@ export const StyledHamburgerMenu = styled.div`
   position: fixed;
   display: flex;
   flex-direction: column;
-  top: 0;
+  top: 54px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -45,7 +48,7 @@ export const StyledHamburgerMenuContent = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: auto 0;
+  margin: 2em;
   row-gap: 20px;
 `;
 
@@ -96,12 +99,38 @@ export const StyledButtonConainer = styled.div`
     column-gap: 20px;
     row-gap: none;
     flex-direction: row;
+    justify-content: flex-end;
+  }
+`;
+
+export const StyledButtonIcon = styled.img`
+  padding: 0 0.1em;
+`;
+
+export const StyledButtonText = styled.p``;
+
+export const StyledMyUpLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  width: 180px;
+  border: 1px solid white;
+  margin: 0 auto;
+  box-sizing: border-box;
+  filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.15));
+  border-radius: 3px;
+  text-align: center;
+  line-height: 35px;
+
+  @media ${({ theme }) => theme.screen.md} {
+    margin: auto 0;
   }
 `;
 
 export const StyledSignUpLink = styled.a`
   margin: 0 auto;
-  width: 150px;
+  width: 180px;
   height: 35px;
   text-align: center;
   line-height: 35px;
@@ -111,13 +140,16 @@ export const StyledSignUpLink = styled.a`
   border-radius: 3px;
 
   @media ${({ theme }) => theme.screen.md} {
-    margin: auto 0 auto auto;
+    margin: auto 0;
   }
 `;
 
 export const StyledConnectMetaMask = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 35px;
-  width: 150px;
+  width: 180px;
   border: 1px solid white;
   margin: 0 auto;
   box-sizing: border-box;

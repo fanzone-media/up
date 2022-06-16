@@ -2,11 +2,9 @@ import { BigNumber } from 'ethers';
 import { useState } from 'react';
 import { NetworkName } from '../../../boot/types';
 import { InputField } from '../../../components/InputField';
-import { ModalOverlay } from '../../../components/ModalOverlay';
 import { useErc20 } from '../../../hooks/useErc20';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useSellBuyLsp8Token } from '../../../hooks/useSellBuyLsp8Token';
-import { useUrlParams } from '../../../hooks/useUrlParams';
 import { IWhiteListedTokens } from '../../../services/models';
 import { displayPrice } from '../../../utility';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
@@ -15,9 +13,7 @@ import {
   StyledButtonGroup,
   StyledBuyButton,
   StyledBuyCardModalContent,
-  StyledCancelButton,
   StyledInfoText,
-  StyledModalHeader,
   StyledSelectInputContainer,
   StyledToggleButton,
   StyledToggleButtonGroup,
@@ -49,7 +45,7 @@ export const BuyCardModal = ({
   const { approve } = useErc20({ tokenAddress, network });
   const { buyFromMarket } = useSellBuyLsp8Token(address, network);
   const { getItems } = useLocalStorage();
-  const savedProfiles = getItems();
+  const savedProfiles = getItems(network);
   const savedProfilesAddresses = savedProfiles
     ? Object.keys(savedProfiles)
     : null;
