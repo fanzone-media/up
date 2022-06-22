@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
   const { getItems } = useLocalStorage();
 
   const upAddressLink = () => {
-    const permissions = getItems('mumbai');
+    const permissions = getItems('polygon');
     return permissions
       ? `/polygon/profile/${Object.keys(permissions)[0]}`
       : undefined;
@@ -115,7 +115,7 @@ const HeaderContent = ({
       {myUpLink && (
         <StyledMyUpLink to={myUpLink}>
           <StyledButtonIcon src={UserIcon} alt="" />
-          <StyledButtonText>My Up</StyledButtonText>
+          <StyledButtonText>My UP</StyledButtonText>
         </StyledMyUpLink>
       )}
 
