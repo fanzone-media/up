@@ -6,6 +6,8 @@ import Routes from './routes';
 import { Footer, Header } from './components';
 import { Chain, defaultChains, InjectedConnector, WagmiProvider } from 'wagmi';
 import { ModalProvider } from './context/ModalProvider';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const chains: Chain[] = [
   defaultChains[0],
@@ -76,6 +78,7 @@ const App: React.FC = () => {
             <Header />
             <Routes />
             <Footer />
+            <ToastContainer />
           </div>
         </ModalProvider>
       </WagmiProvider>

@@ -1,5 +1,7 @@
-import React, { useRef, useState } from 'react';
+import detectEthereumProvider from '@metamask/detect-provider';
+import React, { ReactText, useRef, useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAccount, useConnect } from 'wagmi';
 import {
   CloseMenuIcon,
@@ -31,13 +33,14 @@ import {
 
 type HeaderContentType = {
   isConnected: boolean;
+  isConnecting: boolean;
   connectMetamask: () => void;
   myUpLink?: string;
 };
 
 export const Header: React.FC = () => {
   const isTablet = useMediaQuery(theme.screen.md);
-  const [{ data }, connect] = useConnect();
+  const [{ data, loading }, connect] = useConnect();
   const [{}, disconnect] = useAccount();
   const [showAccountDetail, setShowAccountDetail] = useState<boolean>(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState<boolean>(false);
@@ -51,10 +54,46 @@ export const Header: React.FC = () => {
   };
 
   const accountDetailsRef = useRef(null);
+  const connectToastRef = useRef<ReactText>();
+
   useOutsideClick(
     accountDetailsRef,
     () => showAccountDetail && setShowAccountDetail(false),
   );
+
+  const handleConnect = async () => {
+    const connectToast = () =>
+      (connectToastRef.current = toast('Connecting', {
+        type: 'default',
+        position: 'top-center',
+      }));
+
+    if (data.connected) {
+      disconnect();
+    } else {
+      connectToast();
+      const provider = await detectEthereumProvider();
+      if (provider) {
+        connect(data.connectors[0])
+          .then(() => {
+            toast('Connected', {
+              type: 'success',
+              position: 'top-center',
+              autoClose: 2000,
+            });
+          })
+          .finally(() => {
+            toast.dismiss(connectToastRef.current);
+          });
+      } else {
+        toast.dismiss(connectToastRef.current);
+        toast('Please install metamask', {
+          type: 'error',
+          position: 'top-center',
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -65,9 +104,8 @@ export const Header: React.FC = () => {
               <StyledHamburgerMenuContent>
                 <HeaderContent
                   isConnected={data.connected}
-                  connectMetamask={() =>
-                    data.connected ? disconnect() : connect(data.connectors[0])
-                  }
+                  connectMetamask={handleConnect}
+                  isConnecting={loading ? loading : false}
                   myUpLink={upAddressLink()}
                 />
               </StyledHamburgerMenuContent>
@@ -80,9 +118,8 @@ export const Header: React.FC = () => {
             {isTablet && (
               <HeaderContent
                 isConnected={data.connected}
-                connectMetamask={() =>
-                  data.connected ? disconnect() : connect(data.connectors[0])
-                }
+                connectMetamask={handleConnect}
+                isConnecting={loading ? loading : false}
                 myUpLink={upAddressLink()}
               />
             )}
@@ -109,6 +146,7 @@ const HeaderContent = ({
   isConnected,
   connectMetamask,
   myUpLink,
+  isConnecting,
 }: HeaderContentType) => (
   <>
     <StyledButtonConainer>
@@ -119,7 +157,12 @@ const HeaderContent = ({
         </StyledMyUpLink>
       )}
 
-      <StyledConnectMetaMask onClick={connectMetamask}>
+      <StyledConnectMetaMask
+        disabled={isConnecting}
+        onClick={() => {
+          connectMetamask();
+        }}
+      >
         <StyledButtonIcon src={WalletIcon} alt="" />
         <StyledButtonText>
           {isConnected ? 'Disconnect wallet' : 'Connect wallet'}
@@ -130,7 +173,7 @@ const HeaderContent = ({
         target="_blank"
         rel="noreferrer"
       >
-        {myUpLink ? 'Go to Fanzone App' : 'Signup'}
+        {myUpLink ? 'Go to Fanzone App' : 'Sign up'}
       </StyledSignUpLink>
     </StyledButtonConainer>
   </>
