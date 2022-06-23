@@ -1,20 +1,15 @@
-import { BigNumber, BigNumberish } from 'ethers';
+import { BigNumber } from 'ethers';
 import { useState } from 'react';
-import { useAccount, useSigner } from 'wagmi';
+import { useSigner } from 'wagmi';
 import { NetworkName } from '../../boot/types';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
-import { IProfile } from '../../services/models';
-import { convertPrice } from '../../utility';
 
-export const useSellBuyLsp8Token = (
-  assetAddress: string,
-  network: NetworkName,
-) => {
+export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
   const [{ data: signer }] = useSigner();
   const [error, setError] = useState();
-  const [{ data: account }] = useAccount();
+  const [isBuying, setIsBuying] = useState<boolean>(false);
 
   const buyFromMarket = async (
     assetAddress: string,
@@ -22,6 +17,7 @@ export const useSellBuyLsp8Token = (
     tokenId: number,
     universalProfileAddress?: string,
   ) => {
+    setIsBuying(true);
     const universalProfileCheck =
       universalProfileAddress &&
       (await LSP3ProfileApi.isUniversalProfile(
@@ -46,7 +42,13 @@ export const useSellBuyLsp8Token = (
           tokenId,
           amount,
           signer,
-        ));
+        )
+          .catch((error) => {
+            setError(error);
+          })
+          .finally(() => {
+            setIsBuying(false);
+          }));
     }
     if (owner && universalProfileAddress) {
       signer &&
@@ -56,7 +58,13 @@ export const useSellBuyLsp8Token = (
           tokenId,
           amount,
           signer,
-        ));
+        )
+          .catch((error) => {
+            setError(error);
+          })
+          .finally(() => {
+            setIsBuying(false);
+          }));
     } else {
       signer &&
         (await LSP4DigitalAssetApi.buyFromMarketViaEOA(
@@ -64,40 +72,15 @@ export const useSellBuyLsp8Token = (
           tokenId,
           amount,
           signer,
-        ));
+        )
+          .catch((error) => {
+            setError(error);
+          })
+          .finally(() => {
+            setIsBuying(false);
+          }));
     }
   };
 
-  const setForSale = async (
-    assetAddress: string,
-    ownerProfile: IProfile,
-    mint: number,
-    tokenAddress: string,
-    amount: BigNumberish,
-    decimals: number,
-  ) => {
-    if (ownerProfile.isOwnerKeyManager && signer) {
-      await KeyManagerApi.setCardMarketViaKeyManager(
-        assetAddress,
-        ownerProfile.address,
-        ownerProfile.owner,
-        mint,
-        tokenAddress,
-        convertPrice(amount, decimals),
-        signer,
-      );
-    }
-    if (!ownerProfile.isOwnerKeyManager && signer) {
-      await LSP4DigitalAssetApi.setMarketViaUniversalProfile(
-        assetAddress,
-        ownerProfile.address,
-        mint,
-        tokenAddress,
-        convertPrice(amount, decimals),
-        signer,
-      );
-    }
-  };
-
-  return { buyFromMarket, setForSale };
+  return { buyFromMarket, error, isBuying };
 };

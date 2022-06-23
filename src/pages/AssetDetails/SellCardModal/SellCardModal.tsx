@@ -1,12 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { NetworkName } from '../../../boot/types';
-import { ModalOverlay } from '../../../components/ModalOverlay';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
   StyledButtonGroup,
-  StyledCancelButton,
   StyledInputGroup,
-  StyledModalHeader,
   StyledSellCardModalContent,
   StyledSetPriceButton,
   StyledTokenSelectorDropDown,
@@ -15,7 +12,7 @@ import { IProfile, IWhiteListedTokens } from '../../../services/models';
 import { InputField } from '../../../components/InputField';
 import { displayPrice } from '../../../utility';
 import { BigNumber, BigNumberish } from 'ethers';
-import { useSellBuyLsp8Token } from '../../../hooks/useSellBuyLsp8Token';
+import { useSellLsp8Token } from '../../../hooks/useSellLsp8Token';
 
 interface IProps {
   onClose: () => void;
@@ -50,7 +47,7 @@ export const SellCardModal = ({
         ? whiteListedTokens[0].tokenAddress
         : '',
   });
-  const { setForSale } = useSellBuyLsp8Token(address, network);
+  const { setForSale } = useSellLsp8Token();
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,

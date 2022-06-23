@@ -4,7 +4,7 @@ import { NetworkName } from '../../../boot/types';
 import { InputField } from '../../../components/InputField';
 import { useErc20 } from '../../../hooks/useErc20';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
-import { useSellBuyLsp8Token } from '../../../hooks/useSellBuyLsp8Token';
+import { useBuyLsp8Token } from '../../../hooks/useBuyLsp8Token';
 import { IWhiteListedTokens } from '../../../services/models';
 import { displayPrice } from '../../../utility';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
@@ -43,7 +43,7 @@ export const BuyCardModal = ({
   network,
 }: IProps) => {
   const { approve } = useErc20({ tokenAddress, network });
-  const { buyFromMarket } = useSellBuyLsp8Token(address, network);
+  const { buyFromMarket } = useBuyLsp8Token(address, network);
   const { getItems } = useLocalStorage();
   const savedProfiles = getItems(network);
   const savedProfilesAddresses = savedProfiles
