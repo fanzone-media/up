@@ -399,7 +399,15 @@ const uploadProfileData = async (
       if (path) {
         profileData = {
           ...profileData,
-          profileImage: [{ ...profileData.profileImage[0], url: path }],
+          profileImage: [
+            {
+              ...profileData.profileImage[0],
+              url: path,
+              hash: path.replace('ipfs://', ''),
+              width: '1',
+              height: '1',
+            },
+          ],
         };
       }
     });
@@ -409,7 +417,15 @@ const uploadProfileData = async (
       if (path) {
         profileData = {
           ...profileData,
-          backgroundImage: [{ ...profileData.backgroundImage[0], url: path }],
+          backgroundImage: [
+            {
+              ...profileData.backgroundImage[0],
+              url: path,
+              hash: path.replace('ipfs://', ''),
+              width: '1',
+              height: '1',
+            },
+          ],
         };
       }
     });

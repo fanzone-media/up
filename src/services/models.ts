@@ -118,12 +118,14 @@ export interface ISetProfileData {
     height: string;
     hashFunction: 'keccak256(bytes)';
     url: File | string;
+    hash?: string;
   }[];
   profileImage: {
     width: string;
     height: string;
     hashFunction: 'keccak256(bytes)';
     url: File | string;
+    hash?: string;
   }[];
   name: string;
   description: string;
