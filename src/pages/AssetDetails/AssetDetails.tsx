@@ -56,7 +56,6 @@ import {
   StyledCardPriceValue,
   StyledCardPriceValueWrapper,
   StyledActionsButtonWrapper,
-  StyledBuyButton,
   StyledCardInfoContainer,
   StyledCardInfoLabel,
   StyledCardInfoValue,
@@ -86,15 +85,12 @@ import {
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { displayPrice, getChainExplorer, STATUS } from '../../utility';
-import { BuyCardModal } from './BuyCardModal';
 import { SellCardModal } from './SellCardModal';
 import { TabedAccordion } from '../../components/TabedAccordion';
 import { StyledAccordionTitle } from '../../components/Accordion/styles';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import ReactTooltip from 'react-tooltip';
 import { IPermissionSet, IProfile } from '../../services/models';
-// import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
-// import { useSigner } from 'wagmi';
 import { HolderPagination } from './HoldersPagination';
 import { getAddressPermissionsOnUniversalProfile } from '../../utility/permissions';
 import { useAccount } from 'wagmi';
@@ -107,6 +103,7 @@ import { useRemoveMarketForLsp8Token } from '../../hooks/useRemoveMarketForLsp8T
 import { useModal } from '../../hooks/useModal';
 import { TransferCardTokenIdModal } from './TransferCardTokenIdModal';
 import { SelectMintModalContent } from './SelectMintModalContent';
+import { BuyCardButton } from './components/BuyCardButton';
 
 interface IPrams {
   add: string;
@@ -192,9 +189,6 @@ const AssetDetails: React.FC = () => {
 
   const mintIdInputRef = useRef<HTMLInputElement>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [selectedMarketTokenId, setSelectedMarketTokenId] = useState<
-    number | null
-  >(null);
 
   const ownedTokenIds = useMemo(
     () =>
@@ -238,25 +232,6 @@ const AssetDetails: React.FC = () => {
     );
   }, [asset, currentIndex, marketsForOwnedTokens, ownedTokenIds]);
 
-  const selectedMintMarket = useMemo(() => {
-    const market = asset?.markets.find(
-      (item) => Number(item.tokenId) === selectedMarketTokenId,
-    );
-    const token =
-      market &&
-      asset &&
-      asset.whiteListedTokens.find(
-        (i) => i.tokenAddress === market.acceptedToken,
-      );
-    return (
-      market && {
-        ...market,
-        decimals: token && token.decimals,
-        symbol: token && token.symbol,
-      }
-    );
-  }, [asset, selectedMarketTokenId]);
-
   const dispatch = useAppDispatch();
 
   const { transferCard, transfering } = useTransferLsp8Token(
@@ -270,29 +245,6 @@ const AssetDetails: React.FC = () => {
     params.add,
     parseInt(params.id),
     activeProfile ? activeProfile : ({} as IProfile),
-  );
-
-  const {
-    handlePresent: onPresentBuyCardModal,
-    onDismiss: onDismissBuyCardModal,
-  } = useModal(
-    asset && selectedMintMarket && (
-      <BuyCardModal
-        address={params.add}
-        mint={Number(selectedMintMarket.tokenId)}
-        price={selectedMintMarket.minimumAmount}
-        tokenAddress={selectedMintMarket.acceptedToken}
-        whiteListedTokens={asset.whiteListedTokens}
-        cardImg={asset.ls8MetaData[params.id ? params.id : 0]?.image}
-        onClose={() => {
-          setSelectedMarketTokenId(null);
-          onDismissBuyCardModal();
-        }}
-        network={params.network}
-      />
-    ),
-    'Buy Card Modal',
-    'Buy Card',
   );
 
   const {
@@ -729,14 +681,9 @@ const AssetDetails: React.FC = () => {
             </StyledCardPriceValue>
           </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
-            <StyledBuyButton
-              onClick={() => {
-                setSelectedMarketTokenId(Number(currentMintMarket.tokenId));
-                onPresentBuyCardModal();
-              }}
-            >
-              Buy now
-            </StyledBuyButton>
+            {asset && ownedTokenIds && (
+              <BuyCardButton asset={asset} mint={ownedTokenIds[currentIndex]} />
+            )}
           </StyledActionsButtonWrapper>
         </>
       );
@@ -802,11 +749,12 @@ const AssetDetails: React.FC = () => {
       );
     }
   }, [
-    currentMintMarket,
     currentUsersPermissionsSet,
-    onPresentBuyCardModal,
-    onPresentSellCardModal,
+    currentMintMarket,
     ownedTokenIds,
+    asset,
+    currentIndex,
+    onPresentSellCardModal,
     transferCard,
     transfering,
     removeMarket,
@@ -1028,15 +976,13 @@ const AssetDetails: React.FC = () => {
                 header={<StyledAccordionTitle>Market</StyledAccordionTitle>}
                 enableToggle
               >
-                <CardMarket
-                  asset={asset}
-                  cardMarkets={asset?.markets}
-                  whiteListedTokens={asset?.whiteListedTokens}
-                  onBuyClick={(tokenId: number) => {
-                    onPresentBuyCardModal();
-                    setSelectedMarketTokenId(tokenId);
-                  }}
-                />
+                {asset && (
+                  <CardMarket
+                    asset={asset}
+                    cardMarkets={asset?.markets}
+                    whiteListedTokens={asset?.whiteListedTokens}
+                  />
+                )}
               </StyledMarketAccordion>
               <StyledHoldersAccordion
                 header={

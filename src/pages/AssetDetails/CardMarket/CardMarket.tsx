@@ -1,8 +1,8 @@
 import { ICard, IMarket, IWhiteListedTokens } from '../../../services/models';
 import { displayPrice } from '../../../utility';
+import { BuyCardButton } from '../components/BuyCardButton';
 import {
   StyledCardMarket,
-  StyledCardMarketBuy,
   StyledCardMarketContainer,
   StyledCardMarketListHeader,
   StyledCardMarketListHeaderContent,
@@ -12,17 +12,15 @@ import {
 } from './styles';
 
 interface IProps {
-  asset?: ICard;
+  asset: ICard;
   cardMarkets?: IMarket[];
   whiteListedTokens?: IWhiteListedTokens[];
-  onBuyClick: (tokenId: number) => void;
 }
 
 export const CardMarket = ({
   asset,
   cardMarkets,
   whiteListedTokens,
-  onBuyClick,
 }: IProps) => {
   const findDecimals = (tokenAddress: string) => {
     const decimals =
@@ -64,11 +62,12 @@ export const CardMarket = ({
               )}{' '}
               {findSymbol(market.acceptedToken)}
             </StyledCardMarketPrice>
-            <StyledCardMarketBuy
+            {/* <StyledCardMarketBuy
               onClick={() => onBuyClick(Number(market.tokenId))}
             >
               Buy
-            </StyledCardMarketBuy>
+            </StyledCardMarketBuy> */}
+            <BuyCardButton asset={asset} mint={Number(market.tokenId)} />
           </StyledCardMarket>
         ))}
       </StyledCardMarketTable>
