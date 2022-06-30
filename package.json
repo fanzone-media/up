@@ -24,6 +24,7 @@
     "dotenv": "^16.0.0",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.5.3",
+    "form-data": "^4.0.0",
     "gsap": "^3.7.0",
     "image-size": "^1.0.1",
     "ipfs-http-client": "^53.0.1",

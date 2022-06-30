@@ -141,7 +141,8 @@ export const ProfileEditModal: React.FC<IProps> = ({
           height: '',
           hashFunction: 'keccak256(bytes)',
           url:
-            editProfileForm.backgroundImage !== null
+            editProfileForm.backgroundImage &&
+            editProfileForm.backgroundImage.name !== profile.backgroundImage
               ? editProfileForm.backgroundImage
               : profile.backgroundImage,
         },
@@ -152,7 +153,8 @@ export const ProfileEditModal: React.FC<IProps> = ({
           height: '',
           hashFunction: 'keccak256(bytes)',
           url:
-            editProfileForm.profileImage !== null
+            editProfileForm.profileImage &&
+            editProfileForm.profileImage.name !== profile.profileImage
               ? editProfileForm.profileImage
               : profile.profileImage,
         },

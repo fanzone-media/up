@@ -5,5 +5,5 @@ export const createImageFile = async (url: string) => {
     type: 'image/jpeg',
   };
 
-  return new File([data], response.url, metadata);
+  return new File([data], url, metadata);
 };

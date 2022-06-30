@@ -434,7 +434,7 @@ const uploadProfileData = async (
     LSP3Profile: profileData,
   });
 
-  const jsonIpfsPath = await addData(json);
+  const jsonIpfsPath = await addData(profileData);
 
   if (!jsonIpfsPath) throw new Error('Something went wrong');
 
