@@ -368,7 +368,14 @@ export const StyledMintSliderInput = styled.input`
   border: 0.1em solid white;
   height: 1.5em;
   margin: auto 0;
-  text-align: right;
+  text-align: center;
+  -moz-appearance: textfield;
+
+  ::-webkit-outer-spin-button,
+  ::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 `;
 
 export const StyledMintSliderIndex = styled.p`
