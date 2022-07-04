@@ -13,6 +13,7 @@ import { InputField } from '../../../components/InputField';
 import { displayPrice } from '../../../utility';
 import { BigNumber, BigNumberish } from 'ethers';
 import { useSellLsp8Token } from '../../../hooks/useSellLsp8Token';
+import { getWhiteListedTokenAddresses } from '../../../utility/content/addresses';
 
 interface IProps {
   onClose: () => void;
@@ -75,6 +76,8 @@ export const SellCardModal = ({
     whiteListedTokens.find((i) => i.tokenAddress === marketTokenAddress)
       ?.decimals;
 
+  const whiteListedtokensAddresses = getWhiteListedTokenAddresses(network);
+
   useEffect(() => {}, []);
 
   return (
@@ -100,9 +103,15 @@ export const SellCardModal = ({
             name="tokenAddress"
             onChange={changeHandler}
           >
-            <option>Token</option>
             {whiteListedTokens?.map((item, i) => (
-              <option key={i} value={item.tokenAddress}>
+              <option
+                key={i}
+                value={item.tokenAddress}
+                selected={
+                  item.tokenAddress.toLowerCase() ===
+                  whiteListedtokensAddresses[0].toLowerCase()
+                }
+              >
                 {item.symbol}
               </option>
             ))}
