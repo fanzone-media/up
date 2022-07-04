@@ -13,13 +13,20 @@ import {
   StyledButtonGroup,
   StyledBuyButton,
   StyledBuyCardModalContent,
+  StyledBuyStep,
+  StyledBuyStepsContainer,
+  StyledErrorMessage,
   StyledInfoText,
+  StyledPaymentText,
+  StyledProcessingWindow,
+  StyledRadioGroup,
+  StyledRadioInput,
+  StyledRadioLabel,
   StyledSelectInputContainer,
-  StyledToggleButton,
-  StyledToggleButtonGroup,
   StyledUpAddressSelectInput,
   StyledUpAddressSelectLabel,
 } from './styles';
+import { isAddress } from 'ethers/lib/utils';
 
 interface IProps {
   onClose: () => void;
@@ -42,7 +49,10 @@ export const BuyCardModal = ({
   whiteListedTokens,
   network,
 }: IProps) => {
-  const { approve } = useErc20({ tokenAddress, network });
+  const { approve, isApproved, resetApproveState, approveError } = useErc20({
+    tokenAddress,
+    network,
+  });
   const { buyFromMarket } = useBuyLsp8Token(address, network);
   const { getItems } = useLocalStorage();
   const savedProfiles = getItems(network);
@@ -54,7 +64,7 @@ export const BuyCardModal = ({
       ? savedProfilesAddresses[0]
       : '',
   );
-  const [toggleEOABuy, setToggleEOABuy] = useState<boolean>(false);
+  const [paymentOption, setPaymentOption] = useState<string>('');
 
   const marketToken =
     whiteListedTokens &&
@@ -65,6 +75,12 @@ export const BuyCardModal = ({
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setUpAddress(event.currentTarget.value);
+    resetApproveState();
+  };
+
+  const paymentChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPaymentOption(event.target.value);
+    resetApproveState();
   };
 
   return (
@@ -75,65 +91,96 @@ export const BuyCardModal = ({
         price={displayPrice(price, marketToken ? marketToken.decimals : 0)}
         cardImg={cardImg}
       />
-      <StyledToggleButtonGroup>
-        <StyledToggleButton
-          $active={!toggleEOABuy}
-          onClick={() => setToggleEOABuy(false)}
-        >
-          With UP
-        </StyledToggleButton>
-        <StyledToggleButton
-          $active={toggleEOABuy}
-          onClick={() => setToggleEOABuy(true)}
-        >
-          With EOA
-        </StyledToggleButton>
-      </StyledToggleButtonGroup>
-      {!toggleEOABuy &&
-        (savedProfilesAddresses ? (
-          <StyledSelectInputContainer>
-            <StyledUpAddressSelectLabel>UP Address</StyledUpAddressSelectLabel>
-            <StyledUpAddressSelectInput>
-              {savedProfilesAddresses.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </StyledUpAddressSelectInput>
-          </StyledSelectInputContainer>
-        ) : (
-          <InputField
-            name="universalProfileAddress"
-            label="UP Address"
-            type="text"
-            changeHandler={changeHandler}
-          />
-        ))}
-      <StyledApproveButton
-        onClick={async () =>
-          await approve(
-            address,
-            price,
-            network,
-            !toggleEOABuy ? upAddress : undefined,
-          )
-        }
-      >
-        Check balance & Approve
-      </StyledApproveButton>
-      <StyledInfoText>
-        Do you confirm the purchase of this card mint for{' '}
-        {displayPrice(price, marketToken ? marketToken.decimals : 0)}{' '}
-        {marketToken ? marketToken.symbol : ''}?
-      </StyledInfoText>
+      <StyledBuyStepsContainer>
+        <StyledBuyStep>
+          <StyledPaymentText>1. CHOOSE PAYMENT METHOD</StyledPaymentText>
+          <StyledRadioGroup>
+            <StyledRadioLabel htmlFor="up" $checked={paymentOption === 'up'}>
+              <StyledRadioInput
+                name="payment"
+                type="radio"
+                id="up"
+                value="up"
+                onChange={paymentChangeHandler}
+              />{' '}
+              Universal Profile
+            </StyledRadioLabel>
+            <StyledRadioLabel htmlFor="mm" $checked={paymentOption === 'mm'}>
+              <StyledRadioInput
+                name="payment"
+                type="radio"
+                id="mm"
+                value="mm"
+                onChange={paymentChangeHandler}
+              />{' '}
+              Metamask
+            </StyledRadioLabel>
+          </StyledRadioGroup>
+        </StyledBuyStep>
+        <StyledBuyStep>
+          <StyledPaymentText>
+            2. CONFIRM ADDRESS & CHECK BALANCE
+          </StyledPaymentText>
+          {paymentOption === 'up' &&
+            (savedProfilesAddresses ? (
+              <StyledSelectInputContainer>
+                <StyledUpAddressSelectLabel>
+                  UP Address
+                </StyledUpAddressSelectLabel>
+                <StyledUpAddressSelectInput>
+                  {savedProfilesAddresses.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </StyledUpAddressSelectInput>
+              </StyledSelectInputContainer>
+            ) : (
+              <InputField
+                name="universalProfileAddress"
+                label="UP Address"
+                type="text"
+                changeHandler={changeHandler}
+                disabled={paymentOption === 'up' && isApproved}
+              />
+            ))}
+          <StyledApproveButton
+            disabled={
+              ((paymentOption === 'up' || paymentOption === '') &&
+                !isAddress(upAddress)) ||
+              isApproved
+            }
+            onClick={async () =>
+              await approve(
+                address,
+                price,
+                network,
+                paymentOption === 'up' ? upAddress : undefined,
+              )
+            }
+          >
+            Check balance & Approve
+          </StyledApproveButton>
+          <StyledErrorMessage>{approveError}</StyledErrorMessage>
+        </StyledBuyStep>
+        <StyledBuyStep>
+          <StyledPaymentText>3. CONFIRM PURCHASE</StyledPaymentText>
+          <StyledInfoText>
+            Do you confirm the purchase of this card mint for{' '}
+            {displayPrice(price, marketToken ? marketToken.decimals : 0)}{' '}
+            {marketToken ? marketToken.symbol : ''}?
+          </StyledInfoText>
+        </StyledBuyStep>
+      </StyledBuyStepsContainer>
       <StyledButtonGroup>
         <StyledBuyButton
+          disabled={!isApproved}
           onClick={async () =>
             await buyFromMarket(
               address,
               price,
               mint,
-              !toggleEOABuy ? upAddress : undefined,
+              paymentOption === 'up' ? upAddress : undefined,
             )
           }
         >

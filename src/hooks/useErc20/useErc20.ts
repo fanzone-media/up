@@ -16,6 +16,8 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
   const [{ data: signer }] = useSigner();
   const [{ data: account }] = useAccount();
   const [error, setError] = useState();
+  const [approveError, setApproveError] = useState<string>();
+  const [isApproved, setIsApproved] = useState<boolean>(false);
   const provider = useRpcProvider(network);
   const erc20Contract = useMemo(
     () => ERC20__factory.connect(tokenAddress, signer ? signer : provider),
@@ -33,11 +35,18 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
       : account
       ? account.address
       : '';
+
     const balance = await checkBalanceOf(buyer);
 
-    const allowance =
-      balance >= amount && (await checkAllowance(buyer, spenderAddress));
+    if (balance < amount) {
+      setApproveError('Not enough balance');
+      return;
+    }
+
+    const allowance = await checkAllowance(buyer, spenderAddress);
+
     if (allowance && allowance >= amount) {
+      setIsApproved(true);
       return;
     }
 
@@ -66,7 +75,13 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
           tokenAddress,
           amount,
           signer,
-        ));
+        )
+          .then(() => {
+            setIsApproved(true);
+          })
+          .catch((err) => {
+            setError(err);
+          }));
     }
     if (owner && universalProfileAddress) {
       signer &&
@@ -76,9 +91,22 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
           tokenAddress,
           amount,
           signer,
-        ));
+        )
+          .then(() => {
+            setIsApproved(true);
+          })
+          .catch((err) => {
+            setError(err);
+          }));
     } else {
-      await erc20Contract.approve(spenderAddress, amount);
+      await erc20Contract
+        .approve(spenderAddress, amount)
+        .then(() => {
+          setIsApproved(true);
+        })
+        .catch((err) => {
+          setError(err);
+        });
     }
   };
 
@@ -98,9 +126,17 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
     return balance;
   };
 
+  const resetApproveState = () => {
+    setIsApproved(false);
+    setApproveError(undefined);
+  };
+
   return {
     approve,
     checkAllowance,
     checkBalanceOf,
+    isApproved,
+    resetApproveState,
+    approveError,
   };
 };

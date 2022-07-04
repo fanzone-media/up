@@ -12,6 +12,7 @@ interface IProps {
   align?: string;
   placeholder?: string;
   value?: string;
+  disabled?: boolean;
 }
 
 export const InputField = ({
@@ -22,6 +23,7 @@ export const InputField = ({
   align,
   placeholder,
   value,
+  disabled,
 }: IProps) => {
   return (
     <StyledInputContainer>
@@ -34,6 +36,7 @@ export const InputField = ({
         align={align}
         placeholder={placeholder}
         value={value}
+        disabled={disabled}
       />
     </StyledInputContainer>
   );
