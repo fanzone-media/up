@@ -568,6 +568,26 @@ const AssetDetails: React.FC = () => {
     setCurrentIndex(previousIndex);
   };
 
+  const mintChangeHelper = (mint: number) => {
+    if (ownedTokenIds && mint > 0 && mint <= ownedTokenIds.length) {
+      history.push(
+        `/${params.network}/asset/${params.add}/${ownedTokenIds[mint - 1]}`,
+      );
+      setCurrentIndex(mint - 1);
+    }
+  };
+
+  const onEnterHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.currentTarget.blur();
+    }
+  };
+
+  const onBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
+    const val = Number(event.target.value);
+    mintChangeHelper(val);
+  };
+
   const renderIssuer = useMemo(() => {
     const findBalanceOf =
       owner &&
@@ -853,19 +873,8 @@ const AssetDetails: React.FC = () => {
                             max={ownedTokenIds.length}
                             defaultValue={currentIndex + 1}
                             ref={mintIdInputRef}
-                            onBlur={(
-                              event: React.FocusEvent<HTMLInputElement>,
-                            ) => {
-                              const val = Number(event.target.value);
-                              if (val > 0 && val <= ownedTokenIds.length) {
-                                history.push(
-                                  `/${params.network}/asset/${params.add}/${
-                                    ownedTokenIds[val - 1]
-                                  }`,
-                                );
-                                setCurrentIndex(val - 1);
-                              }
-                            }}
+                            onKeyPress={onEnterHandler}
+                            onBlur={onBlurHandler}
                           />
                           /{ownedTokenIds.length}
                         </StyledMintSliderIndex>
