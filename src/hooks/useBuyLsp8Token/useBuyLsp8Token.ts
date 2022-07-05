@@ -5,11 +5,12 @@ import { NetworkName } from '../../boot/types';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
+import { STATUS } from '../../utility';
 
 export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
   const [{ data: signer }] = useSigner();
   const [error, setError] = useState();
-  const [isBuying, setIsBuying] = useState<boolean>(false);
+  const [buyingState, setBuyingState] = useState<STATUS>(STATUS.IDLE);
 
   const buyFromMarket = async (
     assetAddress: string,
@@ -17,7 +18,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
     tokenId: number,
     universalProfileAddress?: string,
   ) => {
-    setIsBuying(true);
+    setBuyingState(STATUS.LOADING);
     const universalProfileCheck =
       universalProfileAddress &&
       (await LSP3ProfileApi.isUniversalProfile(
@@ -43,11 +44,12 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           amount,
           signer,
         )
+          .then(() => {
+            setBuyingState(STATUS.SUCCESSFUL);
+          })
           .catch((error) => {
             setError(error);
-          })
-          .finally(() => {
-            setIsBuying(false);
+            setBuyingState(STATUS.FAILED);
           }));
     }
     if (owner && universalProfileAddress) {
@@ -59,11 +61,12 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           amount,
           signer,
         )
+          .then(() => {
+            setBuyingState(STATUS.SUCCESSFUL);
+          })
           .catch((error) => {
             setError(error);
-          })
-          .finally(() => {
-            setIsBuying(false);
+            setBuyingState(STATUS.FAILED);
           }));
     } else {
       signer &&
@@ -73,14 +76,15 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           amount,
           signer,
         )
+          .then(() => {
+            setBuyingState(STATUS.SUCCESSFUL);
+          })
           .catch((error) => {
             setError(error);
-          })
-          .finally(() => {
-            setIsBuying(false);
+            setBuyingState(STATUS.FAILED);
           }));
     }
   };
 
-  return { buyFromMarket, error, isBuying };
+  return { buyFromMarket, error, buyingState };
 };
