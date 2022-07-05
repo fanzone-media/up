@@ -151,18 +151,14 @@ const fetchProfile = async (
   const profile: IProfile = {
     ...metaData?.LSP3Profile,
     profileImage: metaData.LSP3Profile.profileImage[0]
-      ? typeof metaData.LSP3Profile.profileImage[0].url === 'string'
-        ? metaData.LSP3Profile.profileImage[0].url.startsWith('ipfs://')
-          ? Utils.convertImageURL(metaData.LSP3Profile.profileImage[0].url)
-          : metaData.LSP3Profile.profileImage[0].url
-        : ''
+      ? metaData.LSP3Profile.profileImage[0].url.startsWith('ipfs://')
+        ? Utils.convertImageURL(metaData.LSP3Profile.profileImage[0].url)
+        : metaData.LSP3Profile.profileImage[0].url
       : null,
     backgroundImage: metaData.LSP3Profile.backgroundImage[0]
-      ? typeof metaData.LSP3Profile.backgroundImage[0].url === 'string'
-        ? metaData.LSP3Profile.backgroundImage[0].url.startsWith('ipfs://')
-          ? Utils.convertImageURL(metaData.LSP3Profile.backgroundImage[0].url)
-          : metaData.LSP3Profile.backgroundImage[0].url
-        : ''
+      ? metaData.LSP3Profile.backgroundImage[0].url.startsWith('ipfs://')
+        ? Utils.convertImageURL(metaData.LSP3Profile.backgroundImage[0].url)
+        : metaData.LSP3Profile.backgroundImage[0].url
       : null,
   };
   return {
