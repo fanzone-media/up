@@ -139,9 +139,24 @@ export const StyledProcessingWindow = styled.div`
   display: flex;
   position: absolute;
   width: 100%;
-  height: calc(100% - 13em);
+  height: calc(100% - 11em);
   bottom: 0;
   left: -0.03em;
   border-radius: 0.625em;
   background-color: rgba(0, 0, 0, 0.8);
 `;
+
+export const StyledStateContent = styled.div`
+  text-align: center;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const StyledStateIcon = styled.img`
+  height: 8.5em;
+`;
+
+export const StyledStateHeading = styled.h2``;
+
+export const StyledStateDescription = styled.p``;

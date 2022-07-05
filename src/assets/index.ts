@@ -39,6 +39,9 @@ import TransferIcon from './transfer-icon.svg';
 import CloseMenuIcon from './close-menu-icon.svg';
 import UserIcon from './user-icon.svg';
 import WalletIcon from './wallet-icon.svg';
+import PendingIcon from './pending-icon.svg';
+import SuccessIcon from './success-icon.svg';
+import ErrorIcon from './error-icon.svg';
 
 export {
   BgMetaCard,
@@ -82,4 +85,7 @@ export {
   CloseMenuIcon,
   UserIcon,
   WalletIcon,
+  PendingIcon,
+  ErrorIcon,
+  SuccessIcon,
 };
