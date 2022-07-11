@@ -15,6 +15,7 @@ import {
   TierPropertyIcon,
   ZonePropertyIcon,
   TransferIcon,
+  OpenseaIcon,
 } from '../../assets';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
@@ -82,6 +83,7 @@ import {
   StyledNoProfileLabel,
   StyledMintSliderInput,
   StyledSelectMintModalButton,
+  StyledOpenseaIcon,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { displayPrice, getChainExplorer, STATUS } from '../../utility';
@@ -860,6 +862,15 @@ const AssetDetails: React.FC = () => {
                   >
                     <StyledExplorerIcon src={explorer?.icon} alt="" />
                   </a>
+                  {ownedTokenIds && params.network === 'polygon' && (
+                    <a
+                      href={`https://opensea.io/assets/matic/${params.add}/${ownedTokenIds[currentIndex]}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <StyledOpenseaIcon src={OpenseaIcon} alt="" />
+                    </a>
+                  )}
                   {wasActiveProfile && ownedTokenIds && (
                     <>
                       <StyledMintControls>

@@ -130,7 +130,9 @@ const fetchProfile = async (
       ownedAssets: ownedAssetsWithBalance,
       issuedAssets,
       profileImage: '',
+      profileImageHash: '',
       backgroundImage: '',
+      backgroundImageHash: '',
       permissionSet,
       isOwnerKeyManager,
     } as IProfile;
@@ -157,6 +159,11 @@ const fetchProfile = async (
           : metaData.LSP3Profile.profileImage[0].url
         : ''
       : null,
+    profileImageHash: metaData.LSP3Profile.profileImage[0]
+      ? metaData.LSP3Profile.profileImage[0].hash
+        ? metaData.LSP3Profile.profileImage[0].hash
+        : ''
+      : '',
     backgroundImage: metaData.LSP3Profile.backgroundImage[0]
       ? typeof metaData.LSP3Profile.backgroundImage[0].url === 'string'
         ? metaData.LSP3Profile.backgroundImage[0].url.startsWith('ipfs://')
@@ -164,6 +171,11 @@ const fetchProfile = async (
           : metaData.LSP3Profile.backgroundImage[0].url
         : ''
       : null,
+    backgroundImageHash: metaData.LSP3Profile.backgroundImage[0]
+      ? metaData.LSP3Profile.backgroundImage[0].hash
+        ? metaData.LSP3Profile.backgroundImage[0].hash
+        : ''
+      : '',
   };
   return {
     ...profile,
@@ -398,6 +410,23 @@ export const checkKeyManager = async (
 const uploadProfileData = async (
   profileData: ISetProfileData,
 ): Promise<string> => {
+  profileData = {
+    ...profileData,
+    profileImage: [
+      {
+        ...profileData.profileImage[0],
+        width: '1',
+        height: '1',
+      },
+    ],
+    backgroundImage: [
+      {
+        ...profileData.backgroundImage[0],
+        width: '1',
+        height: '1',
+      },
+    ],
+  };
   if (typeof profileData.profileImage[0].url !== 'string') {
     await addFile(profileData.profileImage[0].url).then((path) => {
       if (path) {
@@ -408,8 +437,6 @@ const uploadProfileData = async (
               ...profileData.profileImage[0],
               url: path,
               hash: path.replace('ipfs://', ''),
-              width: '1',
-              height: '1',
             },
           ],
         };
@@ -426,14 +453,13 @@ const uploadProfileData = async (
               ...profileData.backgroundImage[0],
               url: path,
               hash: path.replace('ipfs://', ''),
-              width: '1',
-              height: '1',
             },
           ],
         };
       }
     });
   }
+
   const json = JSON.stringify({
     LSP3Profile: profileData,
   });

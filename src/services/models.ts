@@ -106,7 +106,9 @@ export interface IProfile {
   description: string;
   links: { title: string; url: string }[];
   profileImage: string;
+  profileImageHash: string;
   backgroundImage: string;
+  backgroundImageHash: string;
   ownedAssets: IOwnedAssets[];
   issuedAssets: string[];
   permissionSet: IPermissionSet[];
@@ -118,14 +120,14 @@ export interface ISetProfileData {
     height: string;
     hashFunction: 'keccak256(bytes)';
     url: File | string;
-    hash?: string;
+    hash: string;
   }[];
   profileImage: {
     width: string;
     height: string;
     hashFunction: 'keccak256(bytes)';
     url: File | string;
-    hash?: string;
+    hash: string;
   }[];
   name: string;
   description: string;

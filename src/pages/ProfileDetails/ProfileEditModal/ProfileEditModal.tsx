@@ -139,6 +139,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
         {
           width: '',
           height: '',
+          hash: profile.backgroundImageHash,
           hashFunction: 'keccak256(bytes)',
           url:
             editProfileForm.backgroundImage &&
@@ -152,6 +153,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
           width: '',
           height: '',
           hashFunction: 'keccak256(bytes)',
+          hash: profile.backgroundImageHash,
           url:
             editProfileForm.profileImage &&
             editProfileForm.profileImage.name !== profile.profileImage

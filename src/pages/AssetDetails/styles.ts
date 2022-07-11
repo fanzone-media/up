@@ -123,6 +123,15 @@ export const StyledExplorerIcon = styled.img`
   animation: ${pulseAnimate} 2s ease-in-out infinite;
 `;
 
+export const StyledOpenseaIcon = styled.img`
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  right: 0;
+  margin: 20px 20px 0 0;
+  animation: ${pulseAnimate} 2s ease-in-out infinite;
+`;
+
 // export const StyledDetailsWrapper = styled.div`
 //   display: flex;
 //   flex-direction: column;

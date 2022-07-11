@@ -42,6 +42,7 @@ import WalletIcon from './wallet-icon.svg';
 import PendingIcon from './pending-icon.svg';
 import SuccessIcon from './success-icon.svg';
 import ErrorIcon from './error-icon.svg';
+import OpenseaIcon from './opensea.svg';
 
 export {
   BgMetaCard,
@@ -88,4 +89,5 @@ export {
   PendingIcon,
   ErrorIcon,
   SuccessIcon,
+  OpenseaIcon,
 };

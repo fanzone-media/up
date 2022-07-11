@@ -197,7 +197,7 @@ const ProfileDetails: React.FC = () => {
     () =>
       profile?.links?.map((link, i) => {
         const linkTitle = link.title.toLowerCase();
-        return (
+        return link.url !== '' ? (
           <StyledProfileLinks key={i}>
             <StyledLinkIconWrapper
               href={link.url}
@@ -217,6 +217,8 @@ const ProfileDetails: React.FC = () => {
               />
             </StyledLinkIconWrapper>
           </StyledProfileLinks>
+        ) : (
+          <></>
         );
       }),
     [profile?.links],
