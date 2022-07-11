@@ -16,6 +16,13 @@ interface ILSP4Metadata {
     hash: string;
     url: string;
   }[][];
+  image_back?: {
+    height: number;
+    width: number;
+    hashFunction: 'keccak256(bytes)';
+    hash: string;
+    url: string;
+  }[][];
   assets: [];
 }
 
