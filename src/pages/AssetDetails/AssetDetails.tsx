@@ -149,7 +149,7 @@ const AssetDetails: React.FC = () => {
   );
 
   const asset = useSelector((state: RootState) =>
-    selectCardById(state, params.add),
+    selectCardById(state.cards[params.network], params.add),
   );
 
   const owner = useSelector((state: RootState) =>
@@ -173,16 +173,20 @@ const AssetDetails: React.FC = () => {
     });
   });
 
-  const cardError = useSelector((state: RootState) => state.cards.error);
+  const cardError = useSelector(
+    (state: RootState) => state.cards[params.network].error,
+  );
 
-  const cardStatus = useSelector((state: RootState) => state.cards.status);
+  const cardStatus = useSelector(
+    (state: RootState) => state.cards[params.network].status,
+  );
 
   const marketsStatus = useSelector(
-    (state: RootState) => state.cards.marketsStatus,
+    (state: RootState) => state.cards[params.network].marketsStatus,
   );
 
   const metaDataStatus = useSelector(
-    (state: RootState) => state.cards.metaDataStatus,
+    (state: RootState) => state.cards[params.network].metaDataStatus,
   );
 
   const creatorsStatus = useSelector(
@@ -406,7 +410,7 @@ const AssetDetails: React.FC = () => {
   }, [asset, allProfiles, dispatch, params.network]);
 
   useEffect(() => {
-    dispatch(clearState());
+    dispatch(clearState(params.network));
   }, [dispatch, params]);
 
   useEffect(() => {

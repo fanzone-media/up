@@ -66,7 +66,9 @@ const Profiles: React.FC = () => {
     (state: RootState) => state.userData[params.network].status,
   );
 
-  const cards = useSelector(selectAllCardItems).filter((item) =>
+  const cards = useSelector((state: RootState) =>
+    selectAllCardItems(state.cards[params.network]),
+  ).filter((item) =>
     assetsAddresses
       .slice(assetsRange[0], assetsRange[1] + 1)
       .some((i) => i === item.address),
@@ -82,7 +84,9 @@ const Profiles: React.FC = () => {
     );
   }, [dispatch, assetsAddresses, params.network, assetsRange]);
 
-  const assetsState = useSelector((state: RootState) => state.cards.status);
+  const assetsState = useSelector(
+    (state: RootState) => state.cards[params.network].status,
+  );
 
   return (
     <StyledMainContent>

@@ -2,6 +2,7 @@ import {
   createAsyncThunk,
   createEntityAdapter,
   createSlice,
+  PayloadAction,
 } from '@reduxjs/toolkit';
 import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
@@ -21,12 +22,7 @@ const cardsAdapter = createEntityAdapter<ICard>({
   selectId: (e) => e.address,
 });
 
-/**
- * **************
- *     STATE
- * **************
- */
-const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
+const cardAdapterInitialState = cardsAdapter.getInitialState<ICardItemsState>({
   ownedStatus: STATUS.IDLE,
   ownedError: null,
   issuedStatus: STATUS.IDLE,
@@ -41,6 +37,18 @@ const initialState: ICardState = cardsAdapter.getInitialState<ICardItemsState>({
 
 /**
  * **************
+ *     STATE
+ * **************
+ */
+const initialState: ICardState = {
+  l14: cardAdapterInitialState,
+  polygon: cardAdapterInitialState,
+  mumbai: cardAdapterInitialState,
+  ethereum: cardAdapterInitialState,
+};
+
+/**
+ * **************
  *     THUNKS
  * **************
  */
@@ -52,7 +60,9 @@ const fetchCardsByAddresses = async (
   api: API,
   state: RootState,
 ) => {
-  const currentEntities = Object.values(state.cards.entities) as Array<ICard>;
+  const currentEntities = Object.values(
+    state.cards[network].entities,
+  ) as Array<ICard>;
 
   const existingAddresses = addresses.filter((address) =>
     currentEntities.find((e) => e.address === address),
@@ -128,9 +138,9 @@ export const fetchMetaDataForTokenId = createAsyncThunk<
     );
     const state: RootState = getState();
     return {
-      ...state.cards.entities[assetAddress],
+      ...state.cards[network].entities[assetAddress],
       ls8MetaData: {
-        ...state.cards.entities[assetAddress]?.ls8MetaData,
+        ...state.cards[network].entities[assetAddress]?.ls8MetaData,
         [`${tokenId}`]: res,
       },
     } as ICard;
@@ -147,7 +157,7 @@ export const fetchAllMarkets = createAsyncThunk<
     const res = await api.cards.fetchAllMarkets(assetAddress, network);
     const state: RootState = getState();
     return {
-      ...state.cards.entities[assetAddress],
+      ...state.cards[network].entities[assetAddress],
       markets: res,
     } as ICard;
   },
@@ -162,19 +172,22 @@ const cardsSlice = createSlice({
   name: 'cards',
   initialState,
   reducers: {
-    clearState: (state) => {
+    clearState: (state, action: PayloadAction<NetworkName>) => {
       return {
         ...state,
-        ownedStatus: STATUS.IDLE,
-        ownedError: null,
-        issuedStatus: STATUS.IDLE,
-        issuedError: null,
-        status: STATUS.IDLE,
-        error: null,
-        metaDataStatus: STATUS.IDLE,
-        metaDataError: null,
-        marketsStatus: STATUS.IDLE,
-        marketsError: null,
+        [action.payload]: {
+          ...state[action.payload],
+          ownedStatus: STATUS.IDLE,
+          ownedError: null,
+          issuedStatus: STATUS.IDLE,
+          issuedError: null,
+          status: STATUS.IDLE,
+          error: null,
+          metaDataStatus: STATUS.IDLE,
+          metaDataError: null,
+          marketsStatus: STATUS.IDLE,
+          marketsError: null,
+        },
       };
     },
     anyEvent: {
@@ -195,79 +208,97 @@ const cardsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllCards.pending, (state, _action) => {
-        state.status = STATUS.LOADING;
+        state[_action.meta.arg.network].status = STATUS.LOADING;
       })
       .addCase(fetchAllCards.fulfilled, (state, action) => {
-        cardsAdapter.upsertMany(state, action.payload as ICard[]);
-        state.status = STATUS.SUCCESSFUL;
+        cardsAdapter.upsertMany(
+          state[action.meta.arg.network],
+          action.payload as ICard[],
+        );
+        state[action.meta.arg.network].status = STATUS.SUCCESSFUL;
       })
       .addCase(fetchAllCards.rejected, (state, action) => {
-        state.error = action.error;
-        state.status = STATUS.FAILED;
+        state[action.meta.arg.network].error = action.error;
+        state[action.meta.arg.network].status = STATUS.FAILED;
       });
     builder
       .addCase(fetchIssuedCards.pending, (state, _action) => {
-        state.issuedStatus = STATUS.LOADING;
+        state[_action.meta.arg.network].issuedStatus = STATUS.LOADING;
       })
       .addCase(fetchIssuedCards.fulfilled, (state, action) => {
-        cardsAdapter.upsertMany(state, action.payload as ICard[]);
-        state.issuedStatus = STATUS.SUCCESSFUL;
+        cardsAdapter.upsertMany(
+          state[action.meta.arg.network],
+          action.payload as ICard[],
+        );
+        state[action.meta.arg.network].issuedStatus = STATUS.SUCCESSFUL;
       })
       .addCase(fetchIssuedCards.rejected, (state, action) => {
-        state.issuedError = action.error;
-        state.issuedStatus = STATUS.FAILED;
+        state[action.meta.arg.network].issuedError = action.error;
+        state[action.meta.arg.network].issuedStatus = STATUS.FAILED;
       });
     builder
       .addCase(fetchCard.pending, (state, _action) => {
-        state.status = STATUS.LOADING;
+        state[_action.meta.arg.network].status = STATUS.LOADING;
       })
       .addCase(fetchCard.fulfilled, (state, action) => {
         if (action.payload)
-          cardsAdapter.upsertOne(state, action.payload as ICard);
-        state.status = STATUS.SUCCESSFUL;
+          cardsAdapter.upsertOne(
+            state[action.meta.arg.network],
+            action.payload as ICard,
+          );
+        state[action.meta.arg.network].status = STATUS.SUCCESSFUL;
       })
       .addCase(fetchCard.rejected, (state, action) => {
-        state.error = action.error;
-        state.status = STATUS.FAILED;
+        state[action.meta.arg.network].error = action.error;
+        state[action.meta.arg.network].status = STATUS.FAILED;
       });
     builder
       .addCase(fetchOwnedCards.pending, (state, _action) => {
-        state.ownedStatus = STATUS.LOADING;
+        state[_action.meta.arg.network].ownedStatus = STATUS.LOADING;
       })
       .addCase(fetchOwnedCards.fulfilled, (state, action) => {
         if (action.payload)
-          cardsAdapter.upsertMany(state, action.payload as ICard[]);
-        state.ownedStatus = STATUS.SUCCESSFUL;
+          cardsAdapter.upsertMany(
+            state[action.meta.arg.network],
+            action.payload as ICard[],
+          );
+        state[action.meta.arg.network].ownedStatus = STATUS.SUCCESSFUL;
       })
       .addCase(fetchOwnedCards.rejected, (state, action) => {
-        state.ownedError = action.error;
-        state.ownedStatus = STATUS.FAILED;
+        state[action.meta.arg.network].ownedError = action.error;
+        state[action.meta.arg.network].ownedStatus = STATUS.FAILED;
       });
     builder
       .addCase(fetchMetaDataForTokenId.pending, (state, _action) => {
-        state.metaDataStatus = STATUS.LOADING;
+        state[_action.meta.arg.network].metaDataStatus = STATUS.LOADING;
       })
       .addCase(fetchMetaDataForTokenId.fulfilled, (state, action) => {
         if (action.payload)
-          cardsAdapter.upsertOne(state, action.payload as ICard);
-        state.metaDataStatus = STATUS.SUCCESSFUL;
+          cardsAdapter.upsertOne(
+            state[action.meta.arg.network],
+            action.payload as ICard,
+          );
+        state[action.meta.arg.network].metaDataStatus = STATUS.SUCCESSFUL;
       })
       .addCase(fetchMetaDataForTokenId.rejected, (state, action) => {
-        state.metaDataError = action.error;
-        state.metaDataStatus = STATUS.FAILED;
+        state[action.meta.arg.network].metaDataError = action.error;
+        state[action.meta.arg.network].metaDataStatus = STATUS.FAILED;
       });
     builder
       .addCase(fetchAllMarkets.pending, (state, _action) => {
-        state.marketsStatus = STATUS.LOADING;
+        state[_action.meta.arg.network].marketsStatus = STATUS.LOADING;
       })
       .addCase(fetchAllMarkets.fulfilled, (state, action) => {
         if (action.payload)
-          cardsAdapter.upsertOne(state, action.payload as ICard);
-        state.marketsStatus = STATUS.SUCCESSFUL;
+          cardsAdapter.upsertOne(
+            state[action.meta.arg.network],
+            action.payload as ICard,
+          );
+        state[action.meta.arg.network].marketsStatus = STATUS.SUCCESSFUL;
       })
       .addCase(fetchAllMarkets.rejected, (state, action) => {
-        state.marketsError = action.error;
-        state.marketsStatus = STATUS.FAILED;
+        state[action.meta.arg.network].marketsError = action.error;
+        state[action.meta.arg.network].marketsStatus = STATUS.FAILED;
       });
   },
 });
@@ -285,7 +316,7 @@ export const {
   selectById: selectCardById,
   selectIds: selectCardIds,
   selectEntities: selectCardEntities,
-} = cardsAdapter.getSelectors<RootState>((state) => state.cards);
+} = cardsAdapter.getSelectors();
 
 /**
  * ************

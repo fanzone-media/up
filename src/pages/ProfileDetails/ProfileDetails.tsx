@@ -148,14 +148,16 @@ const ProfileDetails: React.FC = () => {
   const { range: ownedAssetsRange, setRange: setOwnedAssetsRange } =
     usePagination();
 
-  const issuedCards = useSelector(selectAllCardItems).filter((item) =>
+  const issuedCards = useSelector((state: RootState) =>
+    selectAllCardItems(state.cards[params.network]),
+  ).filter((item) =>
     profile?.issuedAssets
       .slice(issuedAssetsRange[0], issuedAssetsRange[1] + 1)
       .some((i) => i === item.address),
   );
 
   const issuedCardStatus = useSelector(
-    (state: RootState) => state.cards.issuedStatus,
+    (state: RootState) => state.cards[params.network].issuedStatus,
   );
 
   useEffect(() => {
@@ -172,10 +174,12 @@ const ProfileDetails: React.FC = () => {
   }, [dispatch, profile, params.network, issuedAssetsRange]);
 
   const ownedCardStatus = useSelector(
-    (state: RootState) => state.cards.ownedStatus,
+    (state: RootState) => state.cards[params.network].ownedStatus,
   );
 
-  const ownedCards = useSelector(selectAllCardItems).filter((item) =>
+  const ownedCards = useSelector((state: RootState) =>
+    selectAllCardItems(state.cards[params.network]),
+  ).filter((item) =>
     profile?.ownedAssets
       .slice(ownedAssetsRange[0], ownedAssetsRange[1] + 1)
       .some((i) => i.assetAddress === item.address),
