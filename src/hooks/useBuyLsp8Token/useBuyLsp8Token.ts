@@ -10,7 +10,7 @@ import { STATUS } from '../../utility';
 export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
   const [{ data: signer }] = useSigner();
   const [error, setError] = useState();
-  const [buyingState, setBuyingState] = useState<STATUS>(STATUS.IDLE);
+  const [buyState, setBuyState] = useState<STATUS>(STATUS.IDLE);
 
   const buyFromMarket = async (
     assetAddress: string,
@@ -18,7 +18,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
     tokenId: number,
     universalProfileAddress?: string,
   ) => {
-    setBuyingState(STATUS.LOADING);
+    setBuyState(STATUS.LOADING);
     const universalProfileCheck =
       universalProfileAddress &&
       (await LSP3ProfileApi.isUniversalProfile(
@@ -45,11 +45,11 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           signer,
         )
           .then(() => {
-            setBuyingState(STATUS.SUCCESSFUL);
+            setBuyState(STATUS.SUCCESSFUL);
           })
           .catch((error) => {
             setError(error);
-            setBuyingState(STATUS.FAILED);
+            setBuyState(STATUS.FAILED);
           }));
     }
     if (owner && universalProfileAddress) {
@@ -62,11 +62,11 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           signer,
         )
           .then(() => {
-            setBuyingState(STATUS.SUCCESSFUL);
+            setBuyState(STATUS.SUCCESSFUL);
           })
           .catch((error) => {
             setError(error);
-            setBuyingState(STATUS.FAILED);
+            setBuyState(STATUS.FAILED);
           }));
     } else {
       signer &&
@@ -77,14 +77,19 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           signer,
         )
           .then(() => {
-            setBuyingState(STATUS.SUCCESSFUL);
+            setBuyState(STATUS.SUCCESSFUL);
           })
           .catch((error) => {
             setError(error);
-            setBuyingState(STATUS.FAILED);
+            setBuyState(STATUS.FAILED);
           }));
     }
   };
 
-  return { buyFromMarket, error, buyingState };
+  return {
+    buyFromMarket,
+    error,
+    buyState,
+    resetState: () => setBuyState(STATUS.IDLE),
+  };
 };

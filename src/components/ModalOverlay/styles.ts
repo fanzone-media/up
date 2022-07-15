@@ -29,6 +29,7 @@ export const StyledCloseModalButton = styled.button`
   right: 0;
   top: 0;
   margin: 1em 1em 0 0;
+  z-index: 9999;
 `;
 
 export const StyledCloseButtonIcon = styled.img``;

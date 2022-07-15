@@ -40,17 +40,18 @@ export const StyledModalBackdrop = styled.div`
 
 export const StyledModalBoxWrapper = styled.div`
   position: relative;
-  border: 1px solid #aaa;
+  border: 1px solid #aaaaaa;
   border-radius: 0.625em;
   background-color: #313131;
   padding: 1.5em 1.25em;
-  max-width: 20em;
+  max-width: 22em;
   width: 100%;
   z-index: 10;
+  box-sizing: border-box;
 
   @media ${({ theme }) => theme.screen.md} {
     max-width: auto;
-    min-width: 35em;
+    min-width: 30em;
   }
 `;
 
@@ -60,23 +61,23 @@ export const StyledModalBoxInner = styled.div`
 
 export const StyledModalBoxTitle = styled.h2`
   font-size: 0.9375rem;
-  font-weight: ${({ theme }) => theme.font.weight.regular};
+  font-weight: ${({ theme }) => theme.font.weight.bold};
   margin-bottom: 2em;
   text-align: center;
   text-transform: uppercase;
 `;
 
-export const StyledModalButtonsWrapper = styled.div<{ topMargin?: boolean }>`
+export const StyledModalButtonsWrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  margin-top: ${({ topMargin }) => (topMargin ? '2.5em' : '0.75em')};
+  column-gap: 0.5em;
 `;
 
 export const StyledModalButton = styled.button<{ variant?: 'gray' | 'orange' }>`
-  color: #fff;
   background-color: ${({ variant }) =>
     variant === 'gray' ? '#4C4C4C' : '#FF8101'};
-  font-size: 0.9375rem;
-  padding: 0.75em;
+  border-radius: 0.2em;
+  color: white;
   width: 100%;
+  padding: 0.5em 0;
+  margin-top: 0.9em;
 `;

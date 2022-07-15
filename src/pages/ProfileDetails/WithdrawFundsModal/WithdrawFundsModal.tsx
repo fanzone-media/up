@@ -3,16 +3,25 @@ import { useCallback, useMemo, useState } from 'react';
 import { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { NetworkName } from '../../../boot/types';
+import {
+  StyledModalButton,
+  StyledModalButtonsWrapper,
+} from '../../../components/Modal/styles';
+import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
 import { useRpcProvider } from '../../../hooks/useRpcProvider';
 import { useWitdrawFunds } from '../../../hooks/useWithdrawFunds';
 import { LSP4DigitalAssetApi } from '../../../services/controllers/LSP4DigitalAsset';
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
-import { displayPrice } from '../../../utility';
+import { displayPrice, STATUS } from '../../../utility';
 import { getWhiteListedTokenAddresses } from '../../../utility/content/addresses';
 import { Address } from '../../../utils/types';
 import {
-  StyledSelectWithdrawToken,
-  StyledWithdrawFundsButton,
+  StyledBalanceLabel,
+  StyledBalanceValue,
+  StyledBalanceWrapper,
+  StyledRadioInput,
+  StyledRadioLabel,
+  StyledTokenLabel,
   StyledWithdrawModalContent,
 } from './styles';
 
@@ -34,7 +43,8 @@ export const WithdrawFundsModal = ({ profile, network, onDismiss }: IProps) => {
   const whiteListedtokensAddresses = getWhiteListedTokenAddresses(network);
 
   const provider = useRpcProvider(network);
-  const { balanceOf, withdrawFunds } = useWitdrawFunds(network);
+  const { balanceOf, withdrawFunds, withdrawState, resetState } =
+    useWitdrawFunds(network);
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -66,6 +76,19 @@ export const WithdrawFundsModal = ({ profile, network, onDismiss }: IProps) => {
     return [balance, decimals];
   }, [balances, selectedTokenInput, whiteListedTokensInfo]);
 
+  const transactionStatesMessages = {
+    loading: {
+      mainHeading: 'WITHDRAWING FUNDS. . .',
+    },
+    successful: {
+      mainHeading: 'WITHDRAW SUCCESSFULL',
+    },
+    failed: {
+      mainHeading: 'WITHDRAW FAILED',
+      description: 'Please try agian.',
+    },
+  };
+
   useEffect(() => {
     fetchWhiteListedTokenInfo();
     balanceOf(whiteListedtokensAddresses, profile.address).then((res) => {
@@ -75,33 +98,57 @@ export const WithdrawFundsModal = ({ profile, network, onDismiss }: IProps) => {
 
   return (
     <StyledWithdrawModalContent>
-      <p>select token to withdraw: </p>
-      <StyledSelectWithdrawToken onChange={changeHandler}>
-        <option>Select token</option>
-        {whiteListedTokensInfo.map((item) => (
-          <option value={item.tokenAddress}>{item.symbol}</option>
-        ))}
-      </StyledSelectWithdrawToken>
-      <p>
-        Your Balance:{' '}
-        {displayPrice(
-          selectedTokenBalance ? selectedTokenBalance : 0,
-          selectedTokenDecimals ? selectedTokenDecimals : 0,
-        )}
-      </p>
-      <StyledWithdrawFundsButton
-        onClick={async () =>
-          account &&
-          (await withdrawFunds(
-            profile,
-            selectedTokenInput,
-            account.address,
-            selectedTokenBalance ? selectedTokenBalance : 0,
-          ))
-        }
-      >
-        withdraw to metamask
-      </StyledWithdrawFundsButton>
+      {whiteListedTokensInfo.map((item) => (
+        <StyledRadioLabel
+          htmlFor="token"
+          $checked={
+            selectedTokenInput.toLowerCase() === item.tokenAddress.toLowerCase()
+          }
+        >
+          <StyledRadioInput
+            name="payment"
+            type="radio"
+            id="token"
+            value={item.tokenAddress}
+            onChange={changeHandler}
+          />
+          <StyledTokenLabel>{item.symbol}</StyledTokenLabel>
+          <StyledBalanceWrapper>
+            <StyledBalanceLabel>Balance: </StyledBalanceLabel>
+            <StyledBalanceValue>
+              {displayPrice(
+                selectedTokenBalance ? selectedTokenBalance : 0,
+                selectedTokenDecimals ? selectedTokenDecimals : 0,
+              )}
+            </StyledBalanceValue>
+          </StyledBalanceWrapper>
+        </StyledRadioLabel>
+      ))}
+      <StyledModalButtonsWrapper>
+        <StyledModalButton variant="gray" onClick={onDismiss}>
+          Cancel
+        </StyledModalButton>
+        <StyledModalButton
+          disabled={!selectedTokenBalance || Number(selectedTokenBalance) <= 0}
+          onClick={async () =>
+            account &&
+            (await withdrawFunds(
+              profile,
+              selectedTokenInput,
+              account.address,
+              selectedTokenBalance ? selectedTokenBalance : 0,
+            ))
+          }
+        >
+          withdraw to metamask
+        </StyledModalButton>
+      </StyledModalButtonsWrapper>
+      <TransactionStateWindow
+        height="full"
+        state={withdrawState}
+        transactionMessages={transactionStatesMessages}
+        callback={resetState}
+      />
     </StyledWithdrawModalContent>
   );
 };

@@ -240,7 +240,7 @@ const AssetDetails: React.FC = () => {
 
   const dispatch = useAppDispatch();
 
-  const { transferCard, transfering } = useTransferLsp8Token(
+  const { transferCard, transferState } = useTransferLsp8Token(
     params.add,
     account ? account.address : '',
     ownedTokenIds ? ownedTokenIds[currentIndex] : 0,
@@ -267,7 +267,7 @@ const AssetDetails: React.FC = () => {
           currentMintMarket ? currentMintMarket.acceptedToken : undefined
         }
         cardImg={asset.ls8MetaData[params.id ? params.id : 0]?.image}
-        onClose={() => onDismissSellCardModal()}
+        onDismiss={() => onDismissSellCardModal()}
         whiteListedTokens={asset.whiteListedTokens}
         network={params.network}
       />
@@ -730,7 +730,7 @@ const AssetDetails: React.FC = () => {
               Set price
             </StyledSetPriceButton>
             <StyledSetPriceButton onClick={transferCard}>
-              {transfering
+              {transferState === STATUS.LOADING
                 ? 'Transfering to metamask account…'
                 : 'Transfer to metamask account'}
             </StyledSetPriceButton>
@@ -766,7 +766,7 @@ const AssetDetails: React.FC = () => {
           </StyledActionsButtonWrapper>
           <StyledActionsButtonWrapper>
             <StyledSetPriceButton onClick={transferCard}>
-              {transfering
+              {transferState === STATUS.LOADING
                 ? 'Transfering to metamask account…'
                 : 'Transfer to metamask account'}
             </StyledSetPriceButton>
@@ -782,7 +782,7 @@ const AssetDetails: React.FC = () => {
     currentIndex,
     onPresentSellCardModal,
     transferCard,
-    transfering,
+    transferState,
     removeMarket,
     removingMarket,
   ]);

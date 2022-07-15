@@ -6,35 +6,31 @@ import { useErc20 } from '../../../hooks/useErc20';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useBuyLsp8Token } from '../../../hooks/useBuyLsp8Token';
 import { IWhiteListedTokens } from '../../../services/models';
-import { displayPrice, STATUS } from '../../../utility';
+import { displayPrice } from '../../../utility';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
-  StyledApproveButton,
-  StyledButtonGroup,
-  StyledBuyButton,
   StyledBuyCardModalContent,
   StyledBuyStep,
   StyledBuyStepsContainer,
   StyledErrorMessage,
   StyledInfoText,
   StyledPaymentText,
-  StyledProcessingWindow,
   StyledRadioGroup,
   StyledRadioInput,
   StyledRadioLabel,
   StyledSelectInputContainer,
-  StyledStateContent,
-  StyledStateDescription,
-  StyledStateHeading,
-  StyledStateIcon,
   StyledUpAddressSelectInput,
   StyledUpAddressSelectLabel,
 } from './styles';
 import { isAddress } from 'ethers/lib/utils';
-import { ErrorIcon, PendingIcon, SuccessIcon } from '../../../assets';
+import {
+  StyledModalButton,
+  StyledModalButtonsWrapper,
+} from '../../../components/Modal/styles';
+import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
 
 interface IProps {
-  onClose: () => void;
+  onDismiss: () => void;
   address: string;
   mint: number;
   price: BigNumber;
@@ -46,7 +42,7 @@ interface IProps {
 
 export const BuyCardModal = ({
   address,
-  onClose,
+  onDismiss,
   mint,
   price,
   cardImg,
@@ -58,7 +54,10 @@ export const BuyCardModal = ({
     tokenAddress,
     network,
   });
-  const { buyFromMarket, buyingState } = useBuyLsp8Token(address, network);
+  const { buyFromMarket, buyState, resetState } = useBuyLsp8Token(
+    address,
+    network,
+  );
   const { getItems } = useLocalStorage();
   const savedProfiles = getItems(network);
   const savedProfilesAddresses = savedProfiles
@@ -88,21 +87,18 @@ export const BuyCardModal = ({
     resetApproveState();
   };
 
-  const transactionStates = {
+  const transactionStatesMessages = {
     loading: {
-      icon: PendingIcon,
       mainHeading: 'Purchase is being verified',
       description:
         'In a few moments you will know if the purchase was successful.',
     },
     successful: {
-      icon: SuccessIcon,
       mainHeading: 'Purchase successful!',
       description:
         'The card will appear in your Universal Profile in the next ... hours',
     },
     failed: {
-      icon: ErrorIcon,
       mainHeading: 'Purchase failed',
       description: 'Please try again.',
     },
@@ -169,7 +165,7 @@ export const BuyCardModal = ({
                 disabled={paymentOption === 'up' && isApproved}
               />
             ))}
-          <StyledApproveButton
+          <StyledModalButton
             disabled={
               ((paymentOption === 'up' || paymentOption === '') &&
                 !isAddress(upAddress)) ||
@@ -185,7 +181,7 @@ export const BuyCardModal = ({
             }
           >
             Check balance & Approve
-          </StyledApproveButton>
+          </StyledModalButton>
           <StyledErrorMessage>{approveError}</StyledErrorMessage>
         </StyledBuyStep>
         <StyledBuyStep>
@@ -197,8 +193,11 @@ export const BuyCardModal = ({
           </StyledInfoText>
         </StyledBuyStep>
       </StyledBuyStepsContainer>
-      <StyledButtonGroup>
-        <StyledBuyButton
+      <StyledModalButtonsWrapper>
+        <StyledModalButton variant="gray" onClick={onDismiss}>
+          Cancel
+        </StyledModalButton>
+        <StyledModalButton
           disabled={!isApproved}
           onClick={async () =>
             await buyFromMarket(
@@ -210,21 +209,13 @@ export const BuyCardModal = ({
           }
         >
           Buy
-        </StyledBuyButton>
-      </StyledButtonGroup>
-      {buyingState !== STATUS.IDLE && (
-        <StyledProcessingWindow>
-          <StyledStateContent>
-            <StyledStateIcon src={transactionStates[buyingState].icon} alt="" />
-            <StyledStateHeading>
-              {transactionStates[buyingState].mainHeading}
-            </StyledStateHeading>
-            <StyledStateDescription>
-              {transactionStates[buyingState].description}
-            </StyledStateDescription>
-          </StyledStateContent>
-        </StyledProcessingWindow>
-      )}
+        </StyledModalButton>
+      </StyledModalButtonsWrapper>
+      <TransactionStateWindow
+        state={buyState}
+        transactionMessages={transactionStatesMessages}
+        callback={resetState}
+      />
     </StyledBuyCardModalContent>
   );
 };

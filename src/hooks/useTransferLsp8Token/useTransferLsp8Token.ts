@@ -4,6 +4,7 @@ import { useSigner } from 'wagmi';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { IOwnedAssets } from '../../services/models';
+import { STATUS } from '../../utility';
 import { Address } from '../../utils/types';
 
 // @Todo fix type
@@ -19,14 +20,13 @@ export const useTransferLsp8Token = (
   toAddress: Address,
   tokenId: number | null,
   profile: IProfile,
-  callback?: () => any,
 ) => {
-  const [transfering, setTransfering] = useState(false);
+  const [transferState, setTransferState] = useState<STATUS>(STATUS.IDLE);
   const [error, setError] = useState();
   const [{ data: signer }] = useSigner();
 
   const transferCard = async () => {
-    setTransfering(true);
+    setTransferState(STATUS.LOADING);
     if (profile.isOwnerKeyManager) {
       await KeyManagerApi.transferCardViaKeyManager(
         cardAddress,
@@ -37,13 +37,11 @@ export const useTransferLsp8Token = (
         signer as Signer,
       )
         .then(() => {
-          callback && callback();
+          setTransferState(STATUS.SUCCESSFUL);
         })
-        .catch((error: any) => {
+        .catch((error) => {
           setError(error);
-        })
-        .finally(() => {
-          setTransfering(false);
+          setTransferState(STATUS.FAILED);
         });
     } else {
       await LSP3ProfileApi.transferCardViaUniversalProfile(
@@ -54,16 +52,19 @@ export const useTransferLsp8Token = (
         signer as Signer,
       )
         .then(() => {
-          callback && callback();
+          setTransferState(STATUS.SUCCESSFUL);
         })
-        .catch((error: any) => {
+        .catch((error) => {
           setError(error);
-        })
-        .finally(() => {
-          setTransfering(false);
+          setTransferState(STATUS.FAILED);
         });
     }
   };
 
-  return { transferCard, transfering, error };
+  return {
+    transferCard,
+    transferState,
+    error,
+    resetState: () => setTransferState(STATUS.IDLE),
+  };
 };

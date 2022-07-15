@@ -5,8 +5,6 @@ import {
   StyledModalBoxInner,
   StyledModalBoxTitle,
   StyledModalBoxWrapper,
-  StyledModalButton,
-  StyledModalButtonsWrapper,
   StyledModalWrapper,
 } from '../../components/Modal/styles';
 import {
@@ -110,13 +108,13 @@ export const ModalProvider: React.FC = ({ children }) => {
                 React.cloneElement(content, {
                   onDismiss: handleDismiss,
                 })}
-              <StyledModalButtonsWrapper topMargin={false}>
+              {/* <StyledModalButtonsWrapper topMargin={false}>
                 {!persist && (
                   <StyledModalButton variant="gray" onClick={handleDismiss}>
                     Cancel
                   </StyledModalButton>
                 )}
-              </StyledModalButtonsWrapper>
+              </StyledModalButtonsWrapper> */}
             </StyledModalBoxInner>
           </StyledModalBoxWrapper>
         </StyledModalWrapper>

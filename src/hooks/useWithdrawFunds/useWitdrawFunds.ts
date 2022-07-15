@@ -6,13 +6,14 @@ import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { IProfile } from '../../services/models';
 import { ERC20__factory } from '../../submodules/fanzone-smart-contracts/typechain';
+import { STATUS } from '../../utility';
 import { Address } from '../../utils/types';
 import { useRpcProvider } from '../useRpcProvider';
 
 export const useWitdrawFunds = (network: NetworkName) => {
   const [{ data: signer }] = useSigner();
   const [error, setError] = useState();
-  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
+  const [withdrawState, setWithdrawState] = useState<STATUS>(STATUS.IDLE);
   const provider = useRpcProvider(network);
 
   const balanceOf = async (
@@ -38,7 +39,7 @@ export const useWitdrawFunds = (network: NetworkName) => {
     toAddress: Address,
     amount: BigNumberish,
   ) => {
-    setIsWithdrawing(true);
+    setWithdrawState(STATUS.LOADING);
     if (profile.isOwnerKeyManager) {
       signer &&
         (await KeyManagerApi.transferBalanceViaKeyManager(
@@ -49,34 +50,37 @@ export const useWitdrawFunds = (network: NetworkName) => {
           toAddress,
           signer,
         )
+          .then(() => {
+            setWithdrawState(STATUS.SUCCESSFUL);
+          })
           .catch((error) => {
             setError(error);
-          })
-          .finally(() => {
-            setIsWithdrawing(false);
+            setWithdrawState(STATUS.FAILED);
           }));
     } else {
       signer &&
-        LSP3ProfileApi.transferBalanceViaUniversalProfile(
+        (await LSP3ProfileApi.transferBalanceViaUniversalProfile(
           tokenAddress,
           profile.address,
           amount,
           toAddress,
           signer,
         )
+          .then(() => {
+            setWithdrawState(STATUS.SUCCESSFUL);
+          })
           .catch((error) => {
             setError(error);
-          })
-          .finally(() => {
-            setIsWithdrawing(false);
-          });
+            setWithdrawState(STATUS.FAILED);
+          }));
     }
   };
 
   return {
     balanceOf,
     withdrawFunds,
-    isWithdrawing,
+    withdrawState,
     error,
+    resetState: () => setWithdrawState(STATUS.IDLE),
   };
 };

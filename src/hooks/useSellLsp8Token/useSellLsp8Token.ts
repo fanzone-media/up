@@ -1,16 +1,15 @@
 import { BigNumberish } from 'ethers';
 import { useState } from 'react';
-import { useNetwork, useSigner } from 'wagmi';
+import { useSigner } from 'wagmi';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 import { IProfile } from '../../services/models';
-import { convertPrice } from '../../utility';
+import { convertPrice, STATUS } from '../../utility';
 
 export const useSellLsp8Token = () => {
   const [{ data: signer }] = useSigner();
   const [error, setError] = useState();
-  const [isSelling, setIsSelling] = useState<boolean>(false);
-  const [{ data }] = useNetwork();
+  const [sellState, setSellState] = useState<STATUS>(STATUS.IDLE);
 
   const setForSale = async (
     assetAddress: string,
@@ -20,7 +19,7 @@ export const useSellLsp8Token = () => {
     amount: BigNumberish,
     decimals: number,
   ) => {
-    setIsSelling(true);
+    setSellState(STATUS.LOADING);
     if (ownerProfile.isOwnerKeyManager && signer) {
       await KeyManagerApi.setCardMarketViaKeyManager(
         assetAddress,
@@ -31,11 +30,12 @@ export const useSellLsp8Token = () => {
         convertPrice(amount, decimals),
         signer,
       )
+        .then(() => {
+          setSellState(STATUS.SUCCESSFUL);
+        })
         .catch((error) => {
           setError(error);
-        })
-        .finally(() => {
-          setIsSelling(false);
+          setSellState(STATUS.FAILED);
         });
     }
     if (!ownerProfile.isOwnerKeyManager && signer) {
@@ -47,14 +47,20 @@ export const useSellLsp8Token = () => {
         convertPrice(amount, decimals),
         signer,
       )
+        .then(() => {
+          setSellState(STATUS.SUCCESSFUL);
+        })
         .catch((error) => {
           setError(error);
-        })
-        .finally(() => {
-          setIsSelling(false);
+          setSellState(STATUS.FAILED);
         });
     }
   };
 
-  return { isSelling, setForSale, error };
+  return {
+    sellState,
+    setForSale,
+    error,
+    resetState: () => setSellState(STATUS.IDLE),
+  };
 };

@@ -42,7 +42,7 @@ export const BuyCardButton = ({ asset, mint }: IProps) => {
         tokenAddress={selectedMintMarket.acceptedToken}
         whiteListedTokens={asset.whiteListedTokens}
         cardImg={asset.ls8MetaData[tokenId ? tokenId : 0]?.image}
-        onClose={() => {
+        onDismiss={() => {
           onDismissBuyCardModal();
         }}
         network={network}

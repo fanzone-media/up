@@ -100,23 +100,6 @@ export const StyledUpAddressSelectLabel = styled.p`
   color: rgba(255, 255, 255, 0.6);
 `;
 
-export const StyledButtonGroup = styled.div``;
-
-export const StyledBuyButton = styled.button`
-  background-color: rgba(255, 129, 1, 1);
-  border-radius: 0.2em;
-  color: white;
-  width: 100%;
-  padding: 0.5em 0;
-`;
-
-export const StyledCancelButton = styled(StyledBuyButton)`
-  background-color: rgba(76, 76, 76, 1);
-  margin-top: 0.8em;
-`;
-
-export const StyledApproveButton = styled(StyledBuyButton)``;
-
 export const StyledBuyStepsContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -134,29 +117,3 @@ export const StyledBuyStep = styled.div`
 export const StyledErrorMessage = styled.p`
   color: red;
 `;
-
-export const StyledProcessingWindow = styled.div`
-  display: flex;
-  position: absolute;
-  width: 100%;
-  height: calc(100% - 11em);
-  bottom: 0;
-  left: -0.03em;
-  border-radius: 0.625em;
-  background-color: rgba(0, 0, 0, 0.8);
-`;
-
-export const StyledStateContent = styled.div`
-  text-align: center;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-`;
-
-export const StyledStateIcon = styled.img`
-  height: 8.5em;
-`;
-
-export const StyledStateHeading = styled.h2``;
-
-export const StyledStateDescription = styled.p``;

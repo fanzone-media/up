@@ -43,12 +43,11 @@ export const TransferCardModal = ({ profile, asset, onDismiss }: IProps) => {
     tokenId: null,
   });
 
-  const { transferCard, transfering, error } = useTransferLsp8Token(
+  const { transferCard, transferState, error } = useTransferLsp8Token(
     transferCardForm.cardAddress,
     transferCardForm.toAddress,
     transferCardForm.tokenId,
     profile,
-    onDismiss,
   );
 
   const changeHandler = (
@@ -79,65 +78,43 @@ export const TransferCardModal = ({ profile, asset, onDismiss }: IProps) => {
   ];
 
   return (
-    <Modal>
-      {!transfering && !error ? (
-        <StyledTransferCardModalContent>
-          {fields.map((item, i) => (
-            <StyledInputRow key={i}>
-              <StyledLabel htmlFor={item.name}>{item.label}</StyledLabel>
-              {item.type === 'text' && (
-                <StyledInput
-                  id={item.name}
-                  name={item.name}
-                  type={item.type}
-                  onChange={changeHandler}
-                />
-              )}
-              {item.type === 'select' && item.name === 'cardName' && (
-                <p>{asset.name}</p>
-              )}
-              {item.type === 'select' && item.name === 'cardAddress' && (
-                <p>{trimedAddress(asset.address)}</p>
-              )}
-              {item.type === 'select' && item.name === 'tokenId' && (
-                <StyledSelectInput name={item.name} onChange={changeHandler}>
-                  <option>Select token id</option>
-                  {profile.ownedAssets
-                    .find(
-                      (ownedAsset) => ownedAsset.assetAddress === asset.address,
-                    )
-                    ?.tokenIds.map((tokenId, key) => (
-                      <option key={key} value={tokenId} defaultValue={tokenId}>
-                        {tokenId}
-                      </option>
-                    ))}
-                </StyledSelectInput>
-              )}
-            </StyledInputRow>
-          ))}
-          <StyledModalButtonsWrapper topMargin>
-            <StyledModalButton onClick={transferCard}>
-              Transfer Card
-            </StyledModalButton>
-          </StyledModalButtonsWrapper>
-        </StyledTransferCardModalContent>
-      ) : (
-        <StyledErrorLoadingContent>
-          {!error ? (
-            <>
-              <StyledLoadingHolder>
-                <StyledLoader color="#ed7a2d" />
-              </StyledLoadingHolder>
-              <StyledLoadingMessage>
-                confirm the metamask transaction and wait for transaction
-                success....
-              </StyledLoadingMessage>
-            </>
-          ) : (
-            <StyledErrorText>Something went wrong</StyledErrorText>
+    <StyledTransferCardModalContent>
+      {fields.map((item, i) => (
+        <StyledInputRow key={i}>
+          <StyledLabel htmlFor={item.name}>{item.label}</StyledLabel>
+          {item.type === 'text' && (
+            <StyledInput
+              id={item.name}
+              name={item.name}
+              type={item.type}
+              onChange={changeHandler}
+            />
           )}
-        </StyledErrorLoadingContent>
-      )}
-    </Modal>
+          {item.type === 'select' && item.name === 'cardName' && (
+            <p>{asset.name}</p>
+          )}
+          {item.type === 'select' && item.name === 'cardAddress' && (
+            <p>{trimedAddress(asset.address)}</p>
+          )}
+          {item.type === 'select' && item.name === 'tokenId' && (
+            <StyledSelectInput name={item.name} onChange={changeHandler}>
+              <option>Select token id</option>
+              {profile.ownedAssets
+                .find((ownedAsset) => ownedAsset.assetAddress === asset.address)
+                ?.tokenIds.map((tokenId, key) => (
+                  <option key={key} value={tokenId} defaultValue={tokenId}>
+                    {tokenId}
+                  </option>
+                ))}
+            </StyledSelectInput>
+          )}
+        </StyledInputRow>
+      ))}
+      <StyledModalButtonsWrapper>
+        <StyledModalButton onClick={transferCard}>
+          Transfer Card
+        </StyledModalButton>
+      </StyledModalButtonsWrapper>
+    </StyledTransferCardModalContent>
   );
 };

@@ -2,10 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { NetworkName } from '../../../boot/types';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
-  StyledButtonGroup,
   StyledInputGroup,
   StyledSellCardModalContent,
-  StyledSetPriceButton,
   StyledTokenSelectorDropDown,
 } from './styles';
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
@@ -14,9 +12,14 @@ import { displayPrice } from '../../../utility';
 import { BigNumber, BigNumberish } from 'ethers';
 import { useSellLsp8Token } from '../../../hooks/useSellLsp8Token';
 import { getWhiteListedTokenAddresses } from '../../../utility/content/addresses';
+import {
+  StyledModalButton,
+  StyledModalButtonsWrapper,
+} from '../../../components/Modal/styles';
+import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
 
 interface IProps {
-  onClose: () => void;
+  onDismiss: () => void;
   address: string;
   mint: number;
   marketTokenAddress?: string;
@@ -29,7 +32,7 @@ interface IProps {
 
 export const SellCardModal = ({
   address,
-  onClose,
+  onDismiss,
   mint,
   price,
   cardImg,
@@ -48,7 +51,7 @@ export const SellCardModal = ({
         ? whiteListedTokens[0].tokenAddress
         : '',
   });
-  const { setForSale } = useSellLsp8Token();
+  const { setForSale, sellState } = useSellLsp8Token();
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -78,7 +81,17 @@ export const SellCardModal = ({
 
   const whiteListedtokensAddresses = getWhiteListedTokenAddresses(network);
 
-  useEffect(() => {}, []);
+  const transactionStatesMessages = {
+    loading: {
+      mainHeading: 'SETTING FOR SALE...',
+    },
+    successful: {
+      mainHeading: 'SUCCESSFULLY SET FOR SALE',
+    },
+    failed: {
+      mainHeading: 'SOMETHING WENT WRONG',
+    },
+  };
 
   return (
     <StyledSellCardModalContent>
@@ -118,8 +131,11 @@ export const SellCardModal = ({
           </StyledTokenSelectorDropDown>
         </StyledInputGroup>
       )}
-      <StyledButtonGroup>
-        <StyledSetPriceButton
+      <StyledModalButtonsWrapper>
+        <StyledModalButton variant="gray" onClick={onDismiss}>
+          Cancel
+        </StyledModalButton>
+        <StyledModalButton
           onClick={() =>
             setForSale(
               address,
@@ -130,11 +146,19 @@ export const SellCardModal = ({
               selectedTokenDecimals,
             )
           }
-          disabled={!whiteListedTokens || whiteListedTokens?.length === 0}
+          disabled={
+            !whiteListedTokens ||
+            whiteListedTokens?.length === 0 ||
+            sellForm.amount <= 0
+          }
         >
           Set for sale
-        </StyledSetPriceButton>
-      </StyledButtonGroup>
+        </StyledModalButton>
+      </StyledModalButtonsWrapper>
+      <TransactionStateWindow
+        state={sellState}
+        transactionMessages={transactionStatesMessages}
+      />
     </StyledSellCardModalContent>
   );
 };

@@ -24,18 +24,3 @@ export const StyledInputGroup = styled.div`
 export const StyledTokenSelectorDropDown = styled.select`
   background: none;
 `;
-
-export const StyledButtonGroup = styled.div``;
-
-export const StyledSetPriceButton = styled.button`
-  background-color: rgba(255, 129, 1, 1);
-  border-radius: 0.2em;
-  color: white;
-  width: 100%;
-  padding: 0.5em 0;
-`;
-
-export const StyledCancelButton = styled(StyledSetPriceButton)`
-  background-color: rgba(76, 76, 76, 1);
-  margin-top: 0.8em;
-`;
