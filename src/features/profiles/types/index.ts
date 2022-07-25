@@ -20,6 +20,7 @@ export type IUsersState = IBaseState;
 
 export type IUserDataSliceState = {
   me: string | null;
+  l16: IUsersState & EntityState<IProfile>;
   l14: IUsersState & EntityState<IProfile>;
   polygon: IUsersState & EntityState<IProfile>;
   mumbai: IUsersState & EntityState<IProfile>;

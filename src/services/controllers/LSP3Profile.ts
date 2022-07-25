@@ -68,14 +68,15 @@ const fetchProfile = async (
   const provider = useRpcProvider(network);
   const contract = ERC725Y__factory.connect(address, provider);
 
-  await contract
-    .supportsInterface('0x63cb749b')
-    .then((result) => {
-      if (result === false) throw new Error('Not a universal profile');
-    })
-    .catch(() => {
-      throw new Error('Not a universal profile');
-    });
+  network in ['mumbai', 'polygon'] &&
+    (await contract
+      .supportsInterface('0x63cb749b')
+      .then((result) => {
+        if (result === false) throw new Error('Not a universal profile');
+      })
+      .catch(() => {
+        throw new Error('Not a universal profile');
+      }));
   let ownedAssets:
     | UnpackedType<AsyncReturnType<typeof fetchLSP5Data>>
     | undefined;
@@ -88,7 +89,7 @@ const fetchProfile = async (
       console.log(error);
     });
 
-  let ownedAssetsWithBalance;
+  let ownedAssetsWithBalance = [] as IOwnedAssets[];
   if (isFetchDataForSchemaResultList(ownedAssets)) {
     ownedAssetsWithBalance = await Promise.all(
       ownedAssets.listEntries.map(async (ownedAsset) => {

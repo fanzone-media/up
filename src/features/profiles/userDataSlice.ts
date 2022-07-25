@@ -41,6 +41,7 @@ const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
 
 const initialState: IUserDataSliceState = {
   me: null,
+  l16: usersAdapterInitialState,
   l14: usersAdapterInitialState,
   polygon: usersAdapterInitialState,
   mumbai: usersAdapterInitialState,

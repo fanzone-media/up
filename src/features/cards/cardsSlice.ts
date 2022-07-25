@@ -41,6 +41,7 @@ const cardAdapterInitialState = cardsAdapter.getInitialState<ICardItemsState>({
  * **************
  */
 const initialState: ICardState = {
+  l16: cardAdapterInitialState,
   l14: cardAdapterInitialState,
   polygon: cardAdapterInitialState,
   mumbai: cardAdapterInitialState,

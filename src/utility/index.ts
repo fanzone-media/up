@@ -26,6 +26,11 @@ export const getChainExplorer = (network: NetworkName) => {
         exploreUrl: 'https://blockscout.com/lukso/l14/address/',
         icon: BlockScoutIcon,
       };
+    case 'l16':
+      return {
+        exploreUrl: 'https://explorer.execution.l16.lukso.network/address/',
+        icon: BlockScoutIcon,
+      };
     case 'mumbai':
       return {
         exploreUrl: 'https://mumbai.polygonscan.com/address/',

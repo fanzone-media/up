@@ -15,6 +15,7 @@ import {
 
 export const Footer: React.FC = () => {
   const networks = [
+    { name: 'Lukso L16', link: '/l16' },
     { name: 'Lukso L14', link: '/l14' },
     { name: 'Polygon Mumbai', link: '/mumbai' },
     { name: 'Polygon Mainnet', link: '/polygon' },

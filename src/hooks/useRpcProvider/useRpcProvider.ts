@@ -33,6 +33,12 @@ export const useRpcProvider = (network: string): Provider => {
     );
     return LUKSO_L14_PROVIDER;
   }
-
+  if (network === 'l16') {
+    const LUKSO_L16_PROVIDER = new ethers.providers.StaticJsonRpcProvider(
+      'https://rpc.l16.lukso.network',
+      { name: 'lukso', chainId: 2828 },
+    );
+    return LUKSO_L16_PROVIDER;
+  }
   return {} as Provider;
 };

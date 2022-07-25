@@ -1,4 +1,3 @@
-import { BaseProvider } from '@ethersproject/providers';
 import { NetworkName } from '../../boot/types';
 import { Address } from '../../utils/types';
 
@@ -25,6 +24,7 @@ export const getWhiteListedTokenAddresses = (network: NetworkName) => {
     mumbai: ['0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa'],
     ethereum: ['0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'],
     l14: [''],
+    l16: [''],
   };
 
   return whiteListedTokens[network];

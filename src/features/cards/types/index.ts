@@ -17,6 +17,7 @@ interface IBaseState {
 export type ICardItemsState = IBaseState;
 
 export type ICardState = {
+  l16: ICardItemsState & EntityState<ICard>;
   l14: ICardItemsState & EntityState<ICard>;
   polygon: ICardItemsState & EntityState<ICard>;
   mumbai: ICardItemsState & EntityState<ICard>;

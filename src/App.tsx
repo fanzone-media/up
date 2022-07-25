@@ -61,6 +61,23 @@ const chains: Chain[] = [
     ],
     testnet: true,
   },
+  {
+    id: 2828,
+    name: 'L16',
+    nativeCurrency: {
+      name: 'Lukso',
+      symbol: 'LYXt',
+      decimals: 18,
+    },
+    rpcUrls: ['https://rpc.l16.lukso.network'],
+    blockExplorers: [
+      {
+        name: 'Blockscout',
+        url: 'https://explorer.execution.l16.lukso.network/',
+      },
+    ],
+    testnet: true,
+  },
 ];
 
 const connectors = () => {

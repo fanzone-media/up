@@ -12,6 +12,7 @@ import { StyledSelectInput, StyledTransferCardModalContent } from './styles';
 import { Address } from '../../../utils/types';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
 import { IOwnedAssets } from '../../../services/models';
+import { InputField } from '../../../components/InputField';
 
 interface IProps {
   profile: {
@@ -35,7 +36,7 @@ export const TransferCardsModal: React.FC<IProps> = ({
 }: IProps) => {
   const [transferCardForm, setTransferCardForm] = useState<formInput>({
     toAddress: '',
-    cardAddress: '',
+    cardAddress: profile.ownedAssets[0].assetAddress,
     tokenId: null,
   });
 
@@ -67,31 +68,29 @@ export const TransferCardsModal: React.FC<IProps> = ({
   );
 
   const fields = [
-    { name: 'toAddress', label: 'To', type: 'text' },
     { name: 'cardAddress', label: 'Card Name', type: 'select' },
     { name: 'tokenId', label: 'Token Id', type: 'select' },
   ];
 
   return (
     <StyledTransferCardModalContent>
+      <InputField
+        name="receiver's address"
+        label="Receiver's address"
+        type="text"
+        changeHandler={changeHandler}
+        align="start"
+        placeholder="0x123456789…"
+      />
       {fields.map((item, key) => (
         <StyledInputRow key={key}>
           <StyledLabel htmlFor={item.name}>{item.label}</StyledLabel>
-          {item.type === 'text' && (
-            <StyledInput
-              id={item.name}
-              name={item.name}
-              type={item.type}
-              onChange={changeHandler}
-            />
-          )}
           {item.type === 'select' && item.name === 'cardAddress' && (
             <StyledSelectInput
               name={item.name}
               onChange={changeHandler}
               defaultValue={profile.ownedAssets[0].assetAddress}
             >
-              <option>Token address</option>
               {profile.ownedAssets.map((ownedAsset, key) => (
                 <option
                   key={key}
@@ -121,6 +120,9 @@ export const TransferCardsModal: React.FC<IProps> = ({
         </StyledInputRow>
       ))}
       <StyledModalButtonsWrapper>
+        <StyledModalButton variant="gray" onClick={onDismiss}>
+          Cancel
+        </StyledModalButton>
         <StyledModalButton onClick={transferCard}>
           Transfer Card
         </StyledModalButton>

@@ -38,7 +38,7 @@ export const ProfileImage: React.FC<IProps> = ({
       >
         <StyledBlockScoutLogo src={explorer && explorer.icon} />
       </a>
-      {params.network === 'l14' && (
+      {params.network in ['l14', 'l16'] && (
         <a
           href={'https://universalprofile.cloud/' + profileAddress}
           target="_blank"

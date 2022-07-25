@@ -11,7 +11,7 @@ export type RootState = {
   cards: ICardState;
 };
 
-export type NetworkName = 'l14' | 'mumbai' | 'polygon' | 'ethereum';
+export type NetworkName = 'l14' | 'l16' | 'mumbai' | 'polygon' | 'ethereum';
 
 export type AsyncReturnType<T extends (...args: any) => Promise<any>> =
   T extends (...args: any) => Promise<infer R> ? R : any;
