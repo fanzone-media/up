@@ -13,6 +13,7 @@ import { Address } from '../../../utils/types';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
 import { IOwnedAssets } from '../../../services/models';
 import { InputField } from '../../../components/InputField';
+import { NetworkName } from '../../../boot/types';
 
 interface IProps {
   profile: {
@@ -22,6 +23,7 @@ interface IProps {
     ownedAssets: IOwnedAssets[];
   };
   onDismiss: () => void;
+  network: NetworkName;
 }
 
 type formInput = {
@@ -33,6 +35,7 @@ type formInput = {
 export const TransferCardsModal: React.FC<IProps> = ({
   profile,
   onDismiss,
+  network,
 }: IProps) => {
   const [transferCardForm, setTransferCardForm] = useState<formInput>({
     toAddress: '',
@@ -65,6 +68,7 @@ export const TransferCardsModal: React.FC<IProps> = ({
     transferCardForm.toAddress,
     transferCardForm.tokenId,
     profile,
+    network,
   );
 
   const fields = [

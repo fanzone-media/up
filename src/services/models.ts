@@ -51,23 +51,23 @@ export type OpenseaAttribute =
   | DateTrait
   | GenericProperty;
 export interface ILSP8MetaData {
-  tokenId: number;
-  batch: string;
-  batchMax: string;
-  cardType: string;
-  edition: string;
-  editionCategory: string;
-  editionSet: string;
-  leagueLabel: string;
-  metacardIndex: string;
-  scoreMax: string;
-  scoreMin: string;
-  season: string;
-  teamLabel: string;
-  tier: string;
-  tierLabel: string;
-  zoneLabel: string;
-  lsp4MetaData: ILSP4Metadata;
+  // tokenId: number;
+  // batch: string;
+  // batchMax: string;
+  // cardType: string;
+  // edition: string;
+  // editionCategory: string;
+  // editionSet: string;
+  // leagueLabel: string;
+  // metacardIndex: string;
+  // scoreMax: string;
+  // scoreMin: string;
+  // season: string;
+  // teamLabel: string;
+  // tier: string;
+  // tierLabel: string;
+  // zoneLabel: string;
+  LSP4Metadata: ILSP4Metadata;
   // extra OpenSea fields
   image: string;
   external_url: string;
@@ -76,6 +76,7 @@ export interface ILSP8MetaData {
   attributes: OpenseaAttribute[];
 }
 
+export type SupportedInterface = 'lsp8' | 'lsp4' | 'erc721' | 'lsp3';
 export interface ICard {
   address: string;
   network: NetworkName;
@@ -83,9 +84,10 @@ export interface ICard {
   symbol: string;
   owner: string;
   totalSupply: number;
+  supportedInterface?: SupportedInterface[];
   holders: string[];
   creators: string[];
-  ls8MetaData: {
+  lsp8MetaData: {
     [key: string]: ILSP8MetaData;
   };
   markets: IMarket[];

@@ -266,6 +266,7 @@ const ProfileDetails: React.FC = () => {
         ownedAssets: profile?.ownedAssets ? profile.ownedAssets : [],
       }}
       onDismiss={() => onDismissTransferCardsModal()}
+      network={params.network}
     />,
     'Cards Transfer Modal',
     'Transfer Card',

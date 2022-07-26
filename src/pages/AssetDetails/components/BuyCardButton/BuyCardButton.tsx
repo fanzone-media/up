@@ -41,7 +41,7 @@ export const BuyCardButton = ({ asset, mint }: IProps) => {
         price={selectedMintMarket.minimumAmount}
         tokenAddress={selectedMintMarket.acceptedToken}
         whiteListedTokens={asset.whiteListedTokens}
-        cardImg={asset.ls8MetaData[tokenId ? tokenId : 0]?.image}
+        cardImg={asset.lsp8MetaData[tokenId ? tokenId : 0]?.image}
         onDismiss={() => {
           onDismissBuyCardModal();
         }}

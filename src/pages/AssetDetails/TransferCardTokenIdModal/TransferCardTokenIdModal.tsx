@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { useState } from 'react';
+import { NetworkName } from '../../../boot/types';
 import { Modal } from '../../../components';
 import { InputField } from '../../../components/InputField';
 import {
@@ -15,6 +16,7 @@ interface TransferCardTokenIdModalProps {
   tokenId: number;
   profile: IProfile;
   onDismiss: () => any;
+  network: NetworkName;
 }
 
 export const TransferCardTokenIdModal = ({
@@ -22,6 +24,7 @@ export const TransferCardTokenIdModal = ({
   tokenId,
   profile,
   onDismiss,
+  network,
 }: TransferCardTokenIdModalProps) => {
   const [toAddress, setToAddress] = useState<string>('');
 
@@ -30,6 +33,7 @@ export const TransferCardTokenIdModal = ({
     toAddress,
     tokenId,
     profile,
+    network,
   );
 
   const transactionStatesMessages = {

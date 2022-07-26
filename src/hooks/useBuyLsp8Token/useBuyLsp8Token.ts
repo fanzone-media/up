@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers';
 import { useState } from 'react';
-import { useSigner } from 'wagmi';
+import { toast } from 'react-toastify';
+import { useNetwork, useSigner } from 'wagmi';
 import { NetworkName } from '../../boot/types';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
@@ -9,6 +10,7 @@ import { STATUS } from '../../utility';
 
 export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
   const [{ data: signer }] = useSigner();
+  const [{ data: networkData }] = useNetwork();
   const [error, setError] = useState();
   const [buyState, setBuyState] = useState<STATUS>(STATUS.IDLE);
 
@@ -18,6 +20,10 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
     tokenId: number,
     universalProfileAddress?: string,
   ) => {
+    if (networkData.chain?.name !== network) {
+      toast('Wrong Network', { type: 'error', position: 'top-right' });
+      return;
+    }
     setBuyState(STATUS.LOADING);
     const universalProfileCheck =
       universalProfileAddress &&

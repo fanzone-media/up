@@ -14,6 +14,12 @@ export const CONSTANTS = {
   MINT_OWNER_STATUS: 'mintOwnerStatus',
 };
 
+export const interfaceIds: { [key: string]: string } = {
+  lsp8: '0x49399145',
+  lsp4: '0xa4d96624',
+  erc721: '0x80ac58cd',
+};
+
 export const getChainExplorer = (network: NetworkName) => {
   switch (network) {
     case 'polygon':

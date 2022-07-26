@@ -144,6 +144,7 @@ export const SellCardModal = ({
               sellForm.tokenAddress,
               sellForm.amount,
               selectedTokenDecimals,
+              network,
             )
           }
           disabled={

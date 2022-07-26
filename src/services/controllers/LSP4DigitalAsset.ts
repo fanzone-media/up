@@ -1,7 +1,13 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import KeyChain from '../utilities/KeyChain';
 import { NetworkName } from '../../boot/types';
-import { ICard, ILSP8MetaData, IMarket, IWhiteListedTokens } from '../models';
+import {
+  ICard,
+  ILSP8MetaData,
+  IMarket,
+  IWhiteListedTokens,
+  SupportedInterface,
+} from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
 import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
 import {
@@ -15,6 +21,8 @@ import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { erc20ABI } from 'wagmi';
 import { Provider } from '@ethersproject/providers';
+import { interfaceIds } from '../../utility';
+import ABIs from '../utilities/ABIs';
 
 const fetchCard = async (
   address: string,
@@ -23,19 +31,30 @@ const fetchCard = async (
 ): Promise<ICard> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(address, provider);
-  await contract
-    .supportsInterface('0x49399145')
-    .then((result) => {
-      if (result === false) throw new Error('Not an lsp8 asset');
-    })
-    .catch(() => {
-      throw new Error('Not an lsp8 asset');
-    });
+  const contractLSP4 = new ethers.Contract(
+    address,
+    ABIs.LSP4DigitalCertificateABI,
+    provider,
+  );
 
-  tokenId &&
-    (await contract.ownerOf(tokenId).catch(() => {
-      throw new Error('Not a valid token id');
-    }));
+  let supportedInterface: SupportedInterface[] = [];
+  await Promise.allSettled(
+    Object.keys(interfaceIds).map(async (key) => {
+      const res = await contract.supportsInterface(interfaceIds[key]);
+      return { key, res };
+    }),
+  ).then((results) =>
+    results.forEach((result) => {
+      if (result.status === 'fulfilled' && result.value.res) {
+        supportedInterface.push(result.value.key as SupportedInterface);
+      }
+    }),
+  );
+
+  // tokenId &&
+  //   (await contract.ownerOf(tokenId).catch(() => {
+  //     throw new Error('Not a valid token id');
+  //   }));
 
   const [
     name,
@@ -51,33 +70,49 @@ const fetchCard = async (
     contract.totalSupply(),
     contract.owner(),
     contract.allTokenHolders(),
-    contract.tokenURI(0),
+    supportedInterface.includes('erc721')
+      ? contract.tokenURI(0)
+      : supportedInterface.includes('lsp8')
+      ? contract.getData([KeyChain.LSP4Metadata])
+      : contractLSP4.getData(KeyChain.LSP4Metadata),
     fetchAcceptedTokens(address, network),
   ]);
 
   if (!hashedUrl) {
     throw new Error('No card data');
   }
-  const result = await getLSP4Metadata(hashedUrl);
+  const result = await getLSP4Metadata(
+    supportedInterface.includes('erc721')
+      ? hashedUrl
+      : supportedInterface.includes('lsp8')
+      ? hashedUrl[0]
+      : hashedUrl,
+    supportedInterface,
+  );
   let creators: string[] = [];
-  await LSP3ProfileApi.fetchCreatorsAddresses(address, network)
-    .then((result) => {
-      creators = result;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  supportedInterface.includes('lsp8' || 'lsp4') &&
+    (await LSP3ProfileApi.fetchCreatorsAddresses(
+      address,
+      network,
+      supportedInterface.includes('lsp8') ? 'lsp8' : 'lsp4',
+    )
+      .then((result) => {
+        creators = result;
+      })
+      .catch((error) => {
+        console.log(error);
+      }));
   return {
     address,
     name,
     symbol,
     totalSupply: ethers.BigNumber.from(totalSupply).toNumber(),
-    ls8MetaData: {
+    lsp8MetaData: {
       '0': {
         ...result,
-        image: result.image.startsWith('ipfs://')
-          ? Utils.convertImageURL(result.image)
-          : result.image,
+        image: result.LSP4Metadata.images[0][0].url.startsWith('ipfs://')
+          ? Utils.convertImageURL(result.LSP4Metadata.images[0][0].url)
+          : result.LSP4Metadata.images[0][0].url,
       },
     },
     owner,
@@ -146,7 +181,7 @@ const fetchMetaDataForTokenID = async (
       throw new Error('Not an lsp8 asset');
     });
   const tokenUri = await contract.tokenURI(tokenId);
-  const metaData = await getLSP4Metadata(tokenUri);
+  const metaData = await getLSP4Metadata(tokenUri, ['lsp8']);
 
   return {
     ...metaData,
@@ -179,11 +214,30 @@ const fetchProfileIssuedAssetsAddresses = async (
     profileAddress,
     provider,
   );
+  const universalProfileOld = new ethers.Contract(
+    profileAddress,
+    ABIs.LSP3AccountABI,
+    provider,
+  );
 
   let assets: string[] = [];
   // Use the LSP3IssuedAssets_KEY to request the number of elements
   // response ex: 0x0000000000000000000000000000000000000000000000000000000000000002 (2 elements)
-  const numAssetsHex = await contract.getData([KeyChain.LSP3IssuedAssets]);
+  let numAssetsHex = '0x';
+
+  await contract
+    .getData([KeyChain.LSP3IssuedAssets])
+    .then((res) => {
+      numAssetsHex = res[0];
+    })
+    .catch(async () => {
+      await universalProfileOld
+        .getData(KeyChain.LSP3IssuedAssets)
+        .then((res: string) => {
+          numAssetsHex = res as string;
+        })
+        .catch(() => {});
+    });
 
   // Convert the hex to decimal
   //
@@ -192,7 +246,7 @@ const fetchProfileIssuedAssetsAddresses = async (
   //      0x000000000000000000000000000000000000000000000000000000000000000a => 10
   //      0x3a47ab5bd3a594c3a8995f8fa58d087600000000000000000000000000000013 => 19
   // const numAssets = EthereumSerive.web3.utils.hexToNumber(numAssetsHex);
-  const numAssets = parseInt(numAssetsHex[0], 16);
+  const numAssets = parseInt(numAssetsHex, 16);
 
   if (isNaN(numAssets) || numAssets === 0) {
     //return assets;
@@ -225,13 +279,29 @@ const fetchProfileIssuedAssetsAddresses = async (
       const elementKey =
         elementPrefix.padEnd(66 - elementSufix.length, '0') + elementSufix;
 
-      const assetAddr = await contract.getData([elementKey]);
+      let assetAddr: string = '';
 
-      return assetAddr[0];
+      await contract
+        .getData([elementKey])
+        .then((res) => {
+          assetAddr = res[0];
+        })
+        .catch(async () => {
+          await universalProfileOld
+            .getData(elementKey)
+            .then((res: string) => {
+              assetAddr = res as string;
+            })
+            .catch(() => {});
+        });
+
+      // const assetAddr = await contract.getData([elementKey]);
+
+      return assetAddr;
     }),
   ).then((results) =>
     results.forEach((result) => {
-      if (result.status === 'fulfilled') {
+      if (result.status === 'fulfilled' && result.value !== '0x') {
         assets.push(result.value);
       }
     }),

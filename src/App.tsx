@@ -13,7 +13,7 @@ const chains: Chain[] = [
   defaultChains[0],
   {
     id: 137,
-    name: 'Polygon',
+    name: 'polygon',
     nativeCurrency: {
       name: 'Matic',
       symbol: 'MATIC',
@@ -29,7 +29,7 @@ const chains: Chain[] = [
   },
   {
     id: 80001,
-    name: 'Mumbai',
+    name: 'mumbai',
     nativeCurrency: {
       name: 'Matic',
       symbol: 'MATIC',
@@ -46,7 +46,7 @@ const chains: Chain[] = [
   },
   {
     id: 22,
-    name: 'L14',
+    name: 'l14',
     nativeCurrency: {
       name: 'Lukso',
       symbol: 'LYXe',
@@ -63,7 +63,7 @@ const chains: Chain[] = [
   },
   {
     id: 2828,
-    name: 'L16',
+    name: 'l16',
     nativeCurrency: {
       name: 'Lukso',
       symbol: 'LYXt',

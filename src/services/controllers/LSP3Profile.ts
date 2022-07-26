@@ -5,6 +5,7 @@ import {
   IPermissionSet,
   IProfile,
   ISetProfileData,
+  SupportedInterface,
 } from '../models';
 import { NetworkName, AsyncReturnType, UnpackedType } from '../../boot/types';
 import Utils from '../utilities/util';
@@ -27,6 +28,7 @@ import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
+import ABIs from '../utilities/ABIs';
 
 const isUniversalProfile = async (
   address: string,
@@ -68,41 +70,58 @@ const fetchProfile = async (
   const provider = useRpcProvider(network);
   const contract = ERC725Y__factory.connect(address, provider);
 
-  network in ['mumbai', 'polygon'] &&
-    (await contract
-      .supportsInterface('0x63cb749b')
-      .then((result) => {
-        if (result === false) throw new Error('Not a universal profile');
-      })
-      .catch(() => {
-        throw new Error('Not a universal profile');
-      }));
-  let ownedAssets:
-    | UnpackedType<AsyncReturnType<typeof fetchLSP5Data>>
-    | undefined;
-
-  await fetchLSP5Data(contract)
-    .then((result) => {
-      ownedAssets = result.find((x) => x.schemaName === 'LSP5ReceivedAssets[]');
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  // network in ['mumbai', 'polygon'] &&
+  //   (await contract
+  //     .supportsInterface('0x63cb749b')
+  //     .then((result) => {
+  //       if (result === false) throw new Error('Not a universal profile');
+  //     })
+  //     .catch(() => {
+  //       throw new Error('Not a universal profile');
+  //     }));
 
   let ownedAssetsWithBalance = [] as IOwnedAssets[];
-  if (isFetchDataForSchemaResultList(ownedAssets)) {
-    ownedAssetsWithBalance = await Promise.all(
-      ownedAssets.listEntries.map(async (ownedAsset) => {
-        const res = await fetchBalanceOf(network, ownedAsset.value, address);
-        return res;
-      }),
-    );
-  }
+
+  await fetchLSP5Data(contract)
+    .then(async (result) => {
+      const ownedAssets = result.find(
+        (x) => x.schemaName === 'LSP5ReceivedAssets[]',
+      );
+      if (isFetchDataForSchemaResultList(ownedAssets)) {
+        ownedAssetsWithBalance = await Promise.all(
+          ownedAssets.listEntries.map(async (ownedAsset) => {
+            const res = await fetchBalanceOf(
+              network,
+              ownedAsset.value,
+              false,
+              address,
+            );
+            return res;
+          }),
+        );
+      }
+    })
+    .catch(async () => {
+      await fetchOwnedCollectionOld(network, address).then(async (result) => {
+        ownedAssetsWithBalance = await Promise.all(
+          result.map(
+            async (ownedAsset) =>
+              await fetchBalanceOf(network, ownedAsset, true, address),
+          ),
+        );
+      });
+    });
 
   let hashedUrl: string = '';
 
   const universalProfile = UniversalProfileProxy__factory.connect(
     address,
+    provider,
+  );
+
+  const universalProfileOld = new ethers.Contract(
+    address,
+    ABIs.LSP3AccountABI,
     provider,
   );
 
@@ -119,8 +138,15 @@ const fetchProfile = async (
     .then((result) => {
       hashedUrl = result[0];
     })
-    .catch((error) => {
-      throw new Error('No metadata found');
+    .catch(async () => {
+      await universalProfileOld
+        .getData(KeyChain.LSP3PROFILE)
+        .then((result: string) => {
+          hashedUrl = result;
+        })
+        .catch(() => {
+          hashedUrl = '0x';
+        });
     });
 
   if (hashedUrl === '0x')
@@ -190,6 +216,39 @@ const fetchProfile = async (
   };
 };
 
+const fetchOwnedCollectionOld = async (
+  network: string,
+  profileAddress: string,
+): Promise<string[]> => {
+  let ownedAssets: string[] = [];
+  const provider = useRpcProvider(network);
+
+  try {
+    const profileContract = new ethers.Contract(
+      profileAddress,
+      ABIs.LSP3AccountABI,
+      provider,
+    );
+    const lsp1Address = await profileContract.getData(KeyChain.LSP1DELEGATE);
+
+    const universalRecieverContract = new ethers.Contract(
+      lsp1Address,
+      ABIs.UniversalReceiverABI,
+      provider,
+    );
+
+    const assetsAddresses = await universalRecieverContract.getAllRawValues();
+
+    ownedAssets = new Array(assetsAddresses.length)
+      .fill(0)
+      .map((_, index) => `0x${assetsAddresses[index].slice(26)}`);
+  } catch (error: any) {
+    console.error(error.message);
+  }
+
+  return ownedAssets;
+};
+
 const fetchOwnedCollectionCount = async (
   address: string,
   network: NetworkName,
@@ -230,18 +289,31 @@ const fetchAllProfiles = async (
 const fetchCreatorsAddresses = async (
   address: string,
   network: NetworkName,
+  supportedInterface: SupportedInterface,
 ): Promise<string[]> => {
   const provider = useRpcProvider(network);
 
   const contract = CardTokenProxy__factory.connect(address, provider);
 
-  const numCreatorHex = await contract.getData([KeyChain.LSP4Creators]);
+  const contractLSP3 = new ethers.Contract(
+    address,
+    ABIs.LSP3AccountABI,
+    provider,
+  );
+
+  const numCreatorHex =
+    supportedInterface === 'lsp8'
+      ? await contract.getData([KeyChain.LSP4Creators])
+      : await contractLSP3.getData(KeyChain.LSP4Creators);
 
   if (!numCreatorHex) {
     throw new Error('No creator found');
   }
 
-  const numCreators = parseInt(numCreatorHex[0], 16);
+  const numCreators = parseInt(
+    supportedInterface === 'lsp8' ? numCreatorHex[0] : numCreatorHex,
+    16,
+  );
 
   const elementPrefix = KeyChain.LSP4Creators.slice(0, 34);
 
@@ -252,12 +324,18 @@ const fetchCreatorsAddresses = async (
       const elementSufix = index.toString(16);
       const elementKey =
         elementPrefix.padEnd(66 - elementSufix.length, '0') + elementSufix;
-      const creatorAddr = await contract.getData([elementKey]);
+      const creatorAddr =
+        supportedInterface === 'lsp8'
+          ? await contract.getData([elementKey])
+          : await contractLSP3.getData(elementKey);
       return creatorAddr;
     }),
   ).then((results) =>
     results.forEach((result) => {
-      if (result.status === 'fulfilled') creators.push(result.value[0]);
+      if (result.status === 'fulfilled')
+        creators.push(
+          supportedInterface === 'lsp8' ? result.value[0] : result.value,
+        );
     }),
   );
 
@@ -267,6 +345,7 @@ const fetchCreatorsAddresses = async (
 const fetchBalanceOf = async (
   network: NetworkName,
   assetAddress: string,
+  oldStandard: boolean,
   profileAddress?: string,
 ): Promise<IOwnedAssets> => {
   if (!profileAddress) {
@@ -275,13 +354,22 @@ const fetchBalanceOf = async (
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
   const balance = await contract.balanceOf(profileAddress);
-  const tokenIds = await (
-    await contract.tokenIdsOf(profileAddress)
-  ).map((tokenId) => ethers.BigNumber.from(tokenId).toNumber());
+
+  if (!oldStandard) {
+    const tokenIds = await (
+      await contract.tokenIdsOf(profileAddress)
+    ).map((tokenId) => ethers.BigNumber.from(tokenId).toNumber());
+    return {
+      assetAddress,
+      balance: ethers.BigNumber.from(balance).toNumber(),
+      tokenIds,
+    };
+  }
+
   return {
     assetAddress,
     balance: ethers.BigNumber.from(balance).toNumber(),
-    tokenIds,
+    tokenIds: [],
   };
 };
 
@@ -335,9 +423,28 @@ export const getKeyManagerPermissions = async (
 ): Promise<IPermissionSet[]> => {
   const provider = useRpcProvider(network);
   const contract = UniversalProfileProxy__factory.connect(address, provider);
-  const addressPermissions = await contract.getData([
-    KeyChain.LSP6AddressPermissions,
-  ]);
+  const universalProfileOld = new ethers.Contract(
+    address,
+    ABIs.LSP3AccountABI,
+    provider,
+  );
+  let addressPermissions: string = '0x';
+  await contract
+    .getData([KeyChain.LSP6AddressPermissions])
+    .then((result) => {
+      addressPermissions = result[0];
+    })
+    .catch(async () => {
+      await universalProfileOld
+        .getData(KeyChain.LSP3PROFILE)
+        .then((result: string) => {
+          addressPermissions = result;
+        })
+        .catch(() => {
+          addressPermissions = '0x';
+        });
+    });
+
   if (addressPermissions[0] !== '0x') {
     const permissionNames = [
       'sign',
@@ -359,15 +466,39 @@ export const getKeyManagerPermissions = async (
         encodeArrayKey(KeyChain.LSP6AddressPermissions, index),
       );
 
-    const indexValues = await contract.getData(indexKeys);
+    let indexValues: string[] = ['0x'];
+    await contract
+      .getData(indexKeys)
+      .then((result) => {
+        indexValues = result;
+      })
+      .catch(async () => {
+        indexValues = await Promise.all(
+          indexKeys.map(async (key) => await universalProfileOld.getData(key)),
+        );
+      });
+
     const permissionsSet = await Promise.all(
       indexValues.map(async (address) => {
         if (address !== '0x') {
           const key =
             KeyChain.LSP6AddressPermissions_Permissions +
             address.replace(/^0x/, '');
-          const res = await contract.getData([key]);
-          let permissionsBinary = parseInt(res[0].slice(58), 16)
+          let res: string = '';
+          await contract
+            .getData([key])
+            .then((result) => {
+              res = result[0];
+            })
+            .catch(async () => {
+              await universalProfileOld
+                .getData(key)
+                .then((result: string) => {
+                  res = result;
+                })
+                .catch(() => {});
+            });
+          let permissionsBinary = parseInt(res.slice(58), 16)
             .toString(2)
             .padStart(10, '0');
           if (permissionsBinary.length > 10) {

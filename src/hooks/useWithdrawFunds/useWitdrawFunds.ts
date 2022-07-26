@@ -1,6 +1,7 @@
 import { BigNumberish } from 'ethers';
 import { useState } from 'react';
-import { useSigner } from 'wagmi';
+import { toast } from 'react-toastify';
+import { useSigner, useNetwork } from 'wagmi';
 import { NetworkName } from '../../boot/types';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
@@ -12,6 +13,7 @@ import { useRpcProvider } from '../useRpcProvider';
 
 export const useWitdrawFunds = (network: NetworkName) => {
   const [{ data: signer }] = useSigner();
+  const [{ data: networkData }] = useNetwork();
   const [error, setError] = useState();
   const [withdrawState, setWithdrawState] = useState<STATUS>(STATUS.IDLE);
   const provider = useRpcProvider(network);
@@ -39,6 +41,10 @@ export const useWitdrawFunds = (network: NetworkName) => {
     toAddress: Address,
     amount: BigNumberish,
   ) => {
+    if (networkData.chain?.name !== network) {
+      toast('Wrong Network', { type: 'error', position: 'top-right' });
+      return;
+    }
     setWithdrawState(STATUS.LOADING);
     if (profile.isOwnerKeyManager) {
       signer &&

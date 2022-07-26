@@ -195,6 +195,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
       editProfileForm.twitter,
       linkFinder,
       profile.backgroundImage,
+      profile.backgroundImageHash,
       profile.profileImage,
     ],
   );

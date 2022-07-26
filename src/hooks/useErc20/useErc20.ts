@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers';
 import { useMemo, useState } from 'react';
-import { useAccount, useSigner } from 'wagmi';
+import { toast } from 'react-toastify';
+import { useAccount, useNetwork, useSigner } from 'wagmi';
 import { NetworkName } from '../../boot/types';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
@@ -15,6 +16,7 @@ interface IProps {
 export const useErc20 = ({ tokenAddress, network }: IProps) => {
   const [{ data: signer }] = useSigner();
   const [{ data: account }] = useAccount();
+  const [{ data: networkData }] = useNetwork();
   const [error, setError] = useState();
   const [approveError, setApproveError] = useState<string>();
   const [isApproved, setIsApproved] = useState<boolean>(false);
@@ -30,6 +32,11 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
     network: NetworkName,
     universalProfileAddress?: string,
   ) => {
+    if (networkData.chain?.name !== network) {
+      toast('Wrong Network', { type: 'error', position: 'top-right' });
+      return;
+    }
+
     const buyer = universalProfileAddress
       ? universalProfileAddress
       : account

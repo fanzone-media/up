@@ -63,6 +63,7 @@ export const MetaCard: React.FC<IProps> = ({
       }}
       asset={digitalCard}
       onDismiss={() => onDismissTransferCardModal()}
+      network={params.network}
     />,
     'Card Transfer Modal',
     'Transfer Card',
@@ -101,7 +102,7 @@ export const MetaCard: React.FC<IProps> = ({
       </a>
       <Link to={`/${params.network}/asset/` + digitalCard.address}>
         <StyledMediaWrapper>
-          <StyledMetaCardImg src={digitalCard.ls8MetaData[0].image} alt="" />
+          <StyledMetaCardImg src={digitalCard.lsp8MetaData[0].image} alt="" />
         </StyledMediaWrapper>
         <StyledCardDetail>
           <StyledCardName>{digitalCard.name.split('•')[0]}</StyledCardName>

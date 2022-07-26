@@ -18,6 +18,7 @@ import { StyledSelectInput, StyledTransferCardModalContent } from './styles';
 import { Address } from '../../../utils/types';
 import { trimedAddress } from '../../../utility/content/addresses';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
+import { NetworkName } from '../../../boot/types';
 
 interface IProps {
   profile: {
@@ -28,6 +29,7 @@ interface IProps {
   };
   asset: ICard;
   onDismiss: () => any;
+  network: NetworkName;
 }
 
 type formInput = {
@@ -36,7 +38,12 @@ type formInput = {
   tokenId: number | null;
 };
 
-export const TransferCardModal = ({ profile, asset, onDismiss }: IProps) => {
+export const TransferCardModal = ({
+  profile,
+  asset,
+  onDismiss,
+  network,
+}: IProps) => {
   const [transferCardForm, setTransferCardForm] = useState<formInput>({
     toAddress: '',
     cardAddress: asset.address,
@@ -48,6 +55,7 @@ export const TransferCardModal = ({ profile, asset, onDismiss }: IProps) => {
     transferCardForm.toAddress,
     transferCardForm.tokenId,
     profile,
+    network,
   );
 
   const changeHandler = (

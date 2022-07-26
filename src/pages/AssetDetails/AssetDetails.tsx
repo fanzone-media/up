@@ -245,6 +245,7 @@ const AssetDetails: React.FC = () => {
     account ? account.address : '',
     ownedTokenIds ? ownedTokenIds[currentIndex] : 0,
     activeProfile ? activeProfile : ({} as IProfile),
+    params.network,
   );
 
   const { removeMarket, removingMarket } = useRemoveMarketForLsp8Token(
@@ -266,7 +267,7 @@ const AssetDetails: React.FC = () => {
         marketTokenAddress={
           currentMintMarket ? currentMintMarket.acceptedToken : undefined
         }
-        cardImg={asset.ls8MetaData[params.id ? params.id : 0]?.image}
+        cardImg={asset.lsp8MetaData[params.id ? params.id : 0]?.image}
         onDismiss={() => onDismissSellCardModal()}
         whiteListedTokens={asset.whiteListedTokens}
         network={params.network}
@@ -306,6 +307,7 @@ const AssetDetails: React.FC = () => {
           tokenId={parseInt(params.id)}
           profile={activeProfile}
           onDismiss={() => onDismissTransferCardModal()}
+          network={params.network}
         />
       )}
     </>,
@@ -371,7 +373,7 @@ const AssetDetails: React.FC = () => {
       ownedTokenIds &&
       ownedTokenIds.length > 0 &&
       asset &&
-      !(`${ownedTokenIds[currentIndex].toString()}` in asset.ls8MetaData) &&
+      !(`${ownedTokenIds[currentIndex].toString()}` in asset.lsp8MetaData) &&
       metaDataStatus !== STATUS.LOADING
     ) {
       dispatch(
@@ -460,67 +462,67 @@ const AssetDetails: React.FC = () => {
     [],
   );
 
-  const cardProperties = useMemo(
-    () => [
-      {
-        label: 'Tier',
-        value:
-          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-            ?.tier,
-        icon: TierPropertyIcon,
-      },
-      {
-        label: 'Edition',
-        value:
-          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-            ?.edition,
-        icon: EditionPropertyIcon,
-      },
-      {
-        label: 'Category',
-        value:
-          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-            ?.editionCategory,
-        icon: CategoryPropertyIcon,
-      },
-      {
-        label: 'Set',
-        value:
-          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-            ?.editionSet,
-        icon: SetPropertyIcon,
-      },
-      {
-        label: 'Season',
-        value:
-          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-            ?.season,
-        icon: SeasonPropertyIcon,
-      },
-      {
-        label: 'Zone',
-        value:
-          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-            ?.zoneLabel,
-        icon: ZonePropertyIcon,
-      },
-      {
-        label: 'League',
-        value:
-          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-            ?.leagueLabel,
-        icon: SubzonePropertyIcon,
-      },
-      {
-        label: 'Team',
-        value:
-          asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-            ?.teamLabel,
-        icon: TeamPropertyIcon,
-      },
-    ],
-    [asset, currentIndex, ownedTokenIds],
-  );
+  // const cardProperties = useMemo(
+  //   () => [
+  //     {
+  //       label: 'Tier',
+  //       value:
+  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+  //           ?.tier,
+  //       icon: TierPropertyIcon,
+  //     },
+  //     {
+  //       label: 'Edition',
+  //       value:
+  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+  //           ?.edition,
+  //       icon: EditionPropertyIcon,
+  //     },
+  //     {
+  //       label: 'Category',
+  //       value:
+  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+  //           ?.editionCategory,
+  //       icon: CategoryPropertyIcon,
+  //     },
+  //     {
+  //       label: 'Set',
+  //       value:
+  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+  //           ?.editionSet,
+  //       icon: SetPropertyIcon,
+  //     },
+  //     {
+  //       label: 'Season',
+  //       value:
+  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+  //           ?.season,
+  //       icon: SeasonPropertyIcon,
+  //     },
+  //     {
+  //       label: 'Zone',
+  //       value:
+  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+  //           ?.zoneLabel,
+  //       icon: ZonePropertyIcon,
+  //     },
+  //     {
+  //       label: 'League',
+  //       value:
+  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+  //           ?.leagueLabel,
+  //       icon: SubzonePropertyIcon,
+  //     },
+  //     {
+  //       label: 'Team',
+  //       value:
+  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+  //           ?.teamLabel,
+  //       icon: TeamPropertyIcon,
+  //     },
+  //   ],
+  //   [asset, currentIndex, ownedTokenIds],
+  // );
 
   const cardInfo: {
     label: string;
@@ -534,7 +536,10 @@ const AssetDetails: React.FC = () => {
     },
     {
       label: 'Mint',
-      value: ownedTokenIds ? ownedTokenIds[currentIndex].toString() : '',
+      value:
+        ownedTokenIds && ownedTokenIds.length > 0
+          ? ownedTokenIds[currentIndex].toString()
+          : '',
     },
     {
       label: 'Total amount of Tokens',
@@ -790,12 +795,12 @@ const AssetDetails: React.FC = () => {
   const renderCardProperties = useMemo(() => {
     if (
       asset &&
-      asset.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+      asset.lsp8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
         ?.attributes &&
-      asset.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+      asset.lsp8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
         .attributes.length > 0
     ) {
-      return asset?.ls8MetaData[
+      return asset?.lsp8MetaData[
         ownedTokenIds ? ownedTokenIds[currentIndex] : 0
       ].attributes.map((item) => {
         if ('trait_type' in item) {
@@ -818,20 +823,21 @@ const AssetDetails: React.FC = () => {
         }
         return null;
       });
-    } else {
-      return cardProperties.map((item) => (
-        <StyledCardPropertyContainer key={item.label}>
-          <StyledCardPropertyIconWrapper>
-            <StyledCardPropertyIcon src={item.icon} alt="" />
-          </StyledCardPropertyIconWrapper>
-          <StyledCardProperty>
-            <StyledCardPropertyLabel>{item.label}</StyledCardPropertyLabel>
-            <StyledCardPropertyValue>{item.value}</StyledCardPropertyValue>
-          </StyledCardProperty>
-        </StyledCardPropertyContainer>
-      ));
     }
-  }, [asset, cardProperties, currentIndex, ownedTokenIds, propertiesImages]);
+    // } else {
+    //   return cardProperties.map((item) => (
+    //     <StyledCardPropertyContainer key={item.label}>
+    //       <StyledCardPropertyIconWrapper>
+    //         <StyledCardPropertyIcon src={item.icon} alt="" />
+    //       </StyledCardPropertyIconWrapper>
+    //       <StyledCardProperty>
+    //         <StyledCardPropertyLabel>{item.label}</StyledCardPropertyLabel>
+    //         <StyledCardPropertyValue>{item.value}</StyledCardPropertyValue>
+    //       </StyledCardProperty>
+    //     </StyledCardPropertyContainer>
+    //   ));
+    // }
+  }, [asset, currentIndex, ownedTokenIds, propertiesImages]);
 
   return (
     <StyledAssetDetailsContentWrapper>
@@ -852,7 +858,7 @@ const AssetDetails: React.FC = () => {
                   {asset && (
                     <StyledMedia
                       src={
-                        asset.ls8MetaData[
+                        asset.lsp8MetaData[
                           ownedTokenIds ? ownedTokenIds[currentIndex] : 0
                         ]?.image
                       }

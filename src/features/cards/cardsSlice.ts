@@ -140,8 +140,8 @@ export const fetchMetaDataForTokenId = createAsyncThunk<
     const state: RootState = getState();
     return {
       ...state.cards[network].entities[assetAddress],
-      ls8MetaData: {
-        ...state.cards[network].entities[assetAddress]?.ls8MetaData,
+      lsp8MetaData: {
+        ...state.cards[network].entities[assetAddress]?.lsp8MetaData,
         [`${tokenId}`]: res,
       },
     } as ICard;

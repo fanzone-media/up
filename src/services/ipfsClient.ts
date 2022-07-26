@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ILSP8MetaData, ISetProfileData } from './models';
+import { ILSP8MetaData, ISetProfileData, SupportedInterface } from './models';
 import { ethers } from 'ethers';
 import FormData from 'form-data';
 
@@ -27,10 +27,16 @@ export const getLSP3ProfileData = async (hashedUrl: string) => {
 
 export const getLSP4Metadata = async (
   hashedUrl: string,
+  standard: SupportedInterface[],
 ): Promise<ILSP8MetaData> => {
-  //const ipfsPath = getIpfsPath(hashedUrl);
-  const result = await axios.get(url + hashedUrl.replace('ipfs://', ''));
-  return result.data as ILSP8MetaData;
+  if (standard.includes('erc721')) {
+    const result = await axios.get(url + hashedUrl.replace('ipfs://', ''));
+    return result.data as ILSP8MetaData;
+  } else {
+    const ipfsPath = getIpfsPath(hashedUrl);
+    const result = await axios.get(url + ipfsPath);
+    return result.data as ILSP8MetaData;
+  }
 };
 
 export const addFile = async (file: File) => {
