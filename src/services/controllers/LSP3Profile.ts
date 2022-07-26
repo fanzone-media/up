@@ -366,9 +366,11 @@ const fetchBalanceOf = async (
     };
   }
 
+  console.log('here', balance.toString());
+
   return {
     assetAddress,
-    balance: ethers.BigNumber.from(balance).toNumber(),
+    balance: Number(balance.toString()),
     tokenIds: [],
   };
 };

@@ -181,13 +181,13 @@ const fetchMetaDataForTokenID = async (
       throw new Error('Not an lsp8 asset');
     });
   const tokenUri = await contract.tokenURI(tokenId);
-  const metaData = await getLSP4Metadata(tokenUri, ['lsp8']);
+  const metaData = await getLSP4Metadata(tokenUri, ['lsp8', 'erc721']);
 
   return {
     ...metaData,
-    image: metaData.image.startsWith('ipfs://')
-      ? Utils.convertImageURL(metaData.image)
-      : metaData.image,
+    image: metaData.LSP4Metadata.images[0][0].url.startsWith('ipfs://')
+      ? Utils.convertImageURL(metaData.LSP4Metadata.images[0][0].url)
+      : metaData.LSP4Metadata.images[0][0].url,
   };
 };
 

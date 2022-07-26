@@ -374,7 +374,7 @@ const AssetDetails: React.FC = () => {
       ownedTokenIds.length > 0 &&
       asset &&
       !(`${ownedTokenIds[currentIndex].toString()}` in asset.lsp8MetaData) &&
-      metaDataStatus !== STATUS.LOADING
+      metaDataStatus === STATUS.IDLE
     ) {
       dispatch(
         fetchMetaDataForTokenId({
