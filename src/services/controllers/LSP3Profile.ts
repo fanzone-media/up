@@ -445,7 +445,7 @@ export const getKeyManagerPermissions = async (
         });
     });
 
-  if (addressPermissions[0] !== '0x') {
+  if (addressPermissions !== '0x') {
     const permissionNames = [
       'sign',
       'transferValue',
@@ -458,7 +458,7 @@ export const getKeyManagerPermissions = async (
       'changePermissions',
       'changeOwner',
     ];
-    const arrayLength = ethers.BigNumber.from(addressPermissions[0]).toNumber();
+    const arrayLength = ethers.BigNumber.from(addressPermissions).toNumber();
 
     const indexKeys = new Array(arrayLength)
       .fill(null)

@@ -111,10 +111,12 @@ const ProfileDetails: React.FC = () => {
 
   const [canTransfer, canSetData, canTransferValue] = useMemo(() => {
     if (!profile || !account) return [false, false, false];
+
     const permissionsSet = getAddressPermissionsOnUniversalProfile(
       profile.permissionSet,
       account.address,
     );
+    console.log(permissionsSet);
     return [
       permissionsSet?.permissions.call === StringBoolean.TRUE,
       permissionsSet?.permissions.setData === StringBoolean.TRUE,
