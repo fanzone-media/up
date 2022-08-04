@@ -104,7 +104,7 @@ export const StyledButtonConainer = styled.div`
 `;
 
 export const StyledButtonIcon = styled.img`
-  padding: 0 0.1em;
+  padding: 0 8px 0 0;
 `;
 
 export const StyledButtonText = styled.p``;

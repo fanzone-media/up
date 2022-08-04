@@ -35,9 +35,9 @@ export const StyledNetworksText = styled.p`
 `;
 
 export const StyledNetworksWrapper = styled.div`
-  background: #252525;
-  border: 1px solid #fff;
-  border-radius: 5px;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   padding: 20px;

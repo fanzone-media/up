@@ -11,7 +11,7 @@ import {
 } from './styles';
 
 export const Footer: React.FC = () => {
-  const [showDropdown, setShowDropdown] = useState(true);
+  const [showDropdown, setShowDropdown] = useState(false);
   const onClick = () => setShowDropdown(!showDropdown);
   const onClickLink = () => setShowDropdown(false);
 
