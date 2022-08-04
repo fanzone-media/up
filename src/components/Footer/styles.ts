@@ -8,11 +8,12 @@ export const StyledFooter = styled.footer`
 `;
 
 export const StyledFooterContent = styled.div`
+  align-items: center;
   display: flex;
-  flex-direction: column;
   color: white;
   text-align: center;
   margin: 0 auto 0 auto;
+  position: relative;
   row-gap: 10px;
 `;
 
@@ -29,14 +30,27 @@ export const StyledLukso = styled.img`
 
 export const StyledLink = styled.a``;
 
-export const StyledNetworksText = styled.p``;
+export const StyledNetworksText = styled.p`
+  cursor: pointer;
+`;
 
 export const StyledNetworksWrapper = styled.div`
+  background: #252525;
+  border: 1px solid #fff;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
+  padding: 20px;
+  width: 200px;
 
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
   @media ${({ theme }) => theme.screen.md} {
-    flex-direction: row;
+    bottom: 0;
+    left: 170px;
+    transform: unset;
   }
 `;
 
@@ -61,6 +75,16 @@ export const StyledDivider = styled.span`
 `;
 
 export const StyledNetworkLink = styled(Link)`
-  padding: 0 5px 0 5px;
+  padding: 5px;
   margin: auto 0 auto 0;
+`;
+
+export const StyledTrigger = styled.div`
+  border-style: solid;
+  border-width: 8px 8px 0 8px;
+  border-color: #fff transparent transparent transparent;
+  cursor: pointer;
+  height: 0;
+  margin-left: 10px;
+  width: 0;
 `;
