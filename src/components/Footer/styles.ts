@@ -35,6 +35,8 @@ export const StyledNetworksText = styled.p`
 `;
 
 export const StyledNetworksWrapper = styled.div`
+  animation: fade-in 0.5s;
+
   background: #000;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 10px;
@@ -51,6 +53,15 @@ export const StyledNetworksWrapper = styled.div`
     bottom: 0;
     left: 170px;
     transform: unset;
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
   }
 `;
 
