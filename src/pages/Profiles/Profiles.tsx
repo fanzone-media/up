@@ -15,6 +15,7 @@ import {
   StyledWelcomeHeading,
   StyledProfilesHeader,
   StyledProfileHeading,
+  HeroImg,
 } from './styles';
 import { Search } from '../../components';
 import { useAppDispatch } from '../../boot/store';
@@ -23,6 +24,7 @@ import { fetchAllCards, selectAllCardItems } from '../../features/cards';
 import { MetaCard } from '../../features/cards/MetaCard';
 import { useDefaultAddresses } from '../../hooks/useDefaultAddresses';
 import { usePagination } from '../../hooks/usePagination';
+import { BgFanzoneHero, LuksoHeader } from '../../assets';
 
 interface IParams {
   network: NetworkName;
@@ -88,9 +90,14 @@ const Profiles: React.FC = () => {
     (state: RootState) => state.cards[params.network].status,
   );
 
+  const luksoNetwork = params.network === 'l14' || params.network === 'l16';
+  const imgUrl = luksoNetwork ? LuksoHeader : BgFanzoneHero;
+
   return (
     <StyledMainContent>
-      <StyledHeroSection></StyledHeroSection>
+      <StyledHeroSection>
+        <HeroImg src={imgUrl} />
+      </StyledHeroSection>
       <StyledContentwrappar>
         <StyledGreeting>
           <StyledWelcomeHeading>

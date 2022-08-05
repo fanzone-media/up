@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { BgFanzoneHero } from '../../assets';
 
 export const StyledMainContent = styled.div`
   position: relative;
@@ -12,10 +11,11 @@ export const StyledMainContent = styled.div`
 export const StyledHeroSection = styled.div`
   height: 243px;
   width: 100%;
-  background: url(${BgFanzoneHero});
-  background-position: center;
-  background-repeat: repeat;
-  background-size: cover;
+`;
+export const HeroImg = styled.img`
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 `;
 
 export const StyledContentwrappar = styled.div`
