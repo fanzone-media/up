@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
-import { FanzoneHexagon } from '../../assets';
 import {
   StyledFooterContent,
   StyledFooter,
-  StyledFanzoneHexagon,
   StyledNetworkLink,
   StyledNetworksWrapper,
-  StyledDivider,
   StyledNetworksText,
   StyledNetworks,
-  StyledLabel,
+  StyledTrigger,
 } from './styles';
 
 export const Footer: React.FC = () => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const onClick = () => setShowDropdown(!showDropdown);
+  const onClickLink = () => setShowDropdown(false);
+
   const networks = [
     { name: 'Lukso L16', link: '/l16' },
     { name: 'Lukso L14', link: '/l14' },
@@ -24,23 +25,22 @@ export const Footer: React.FC = () => {
   return (
     <StyledFooter>
       <StyledFooterContent>
-        <StyledLabel>Powered by</StyledLabel>
-        <StyledFanzoneHexagon src={FanzoneHexagon} alt="" />
-        {/* <StyledLink href="https://lukso.network">Running on L14 Test Network</StyledLink>
-        <StyledLukso src={Lukso} alt="" /> */}
-        <StyledNetworksText>Choose a network: </StyledNetworksText>
+        <StyledNetworksText onClick={onClick}>
+          Choose a network
+        </StyledNetworksText>
+        <StyledTrigger onClick={onClick} />
         <Router>
-          <StyledNetworksWrapper>
-            <StyledDivider></StyledDivider>
-            {networks.map((item) => (
-              <StyledNetworks key={item.name}>
-                <StyledNetworkLink to={item.link}>
-                  {item.name}
-                </StyledNetworkLink>
-                <StyledDivider></StyledDivider>
-              </StyledNetworks>
-            ))}
-          </StyledNetworksWrapper>
+          {showDropdown && (
+            <StyledNetworksWrapper>
+              {networks.map((item) => (
+                <StyledNetworks key={item.name}>
+                  <StyledNetworkLink to={item.link} onClick={onClickLink}>
+                    {item.name}
+                  </StyledNetworkLink>
+                </StyledNetworks>
+              ))}
+            </StyledNetworksWrapper>
+          )}
         </Router>
       </StyledFooterContent>
     </StyledFooter>
