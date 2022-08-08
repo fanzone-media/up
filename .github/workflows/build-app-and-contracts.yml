@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Work around permission issue
+        run: git config --global --replace-all safe.directory '*'
+        
       - name: Check Out Repo
         uses: actions/checkout@v2
         with:
