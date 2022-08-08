@@ -43,6 +43,7 @@ import PendingIcon from './pending-icon.svg';
 import SuccessIcon from './success-icon.svg';
 import ErrorIcon from './error-icon.svg';
 import OpenseaIcon from './opensea.svg';
+import LuksoHeader from './lukso-header.png';
 
 export {
   BgMetaCard,
@@ -90,4 +91,5 @@ export {
   ErrorIcon,
   SuccessIcon,
   OpenseaIcon,
+  LuksoHeader,
 };
