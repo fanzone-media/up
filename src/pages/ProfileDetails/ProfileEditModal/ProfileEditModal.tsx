@@ -238,7 +238,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
     (url: string) =>
       url.includes('ipfs.infura-ipfs.io')
         ? url
-        : `https://ipfs.infura.io/${sanitizeLink(url)}`,
+        : `https://ipfs.fanzone.io/${sanitizeLink(url)}`,
     [],
   );
 
