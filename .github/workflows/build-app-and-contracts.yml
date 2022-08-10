@@ -12,7 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      #- name: Work around permission issue
+        #run: git config --global --replace-all safe.directory '*'
+        
+      -  uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
@@ -24,8 +27,11 @@ jobs:
       - name: Copy default app env
         run: cp .env.example .env
         
+      - name: Install submodules
+        run: git submodule update --init --recursive
+        
       - name: Copy default contracts env
-        run: cp src/submodules/fanzone-smart-contracts/.env.example src/submodules/fanzone-smart-contracts/.env
+        run: cp ./src/submodules/fanzone-smart-contracts/.env.example ./src/submodules/fanzone-smart-contracts/.env
 
       - name: Build contracts
         run: npm run build-fanzone-contracts
