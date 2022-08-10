@@ -5,7 +5,7 @@ export default class Utils {
   }
 
   static getImageURL(hash: string) {
-    return `https://ipfs.infura.io/ipfs/${hash}`;
+    return `https://ipfs.fanzone.io/ipfs/${hash}`;
   }
 
   static logstream(log: string) {
