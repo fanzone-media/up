@@ -359,6 +359,7 @@ const fetchBalanceOf = async (
     const tokenIds = await (
       await contract.tokenIdsOf(profileAddress)
     ).map((tokenId) => ethers.BigNumber.from(tokenId).toNumber());
+    console.log(tokenIds);
     return {
       assetAddress,
       balance: ethers.BigNumber.from(balance).toNumber(),
@@ -366,11 +367,9 @@ const fetchBalanceOf = async (
     };
   }
 
-  console.log('here', balance.toString());
-
   return {
     assetAddress,
-    balance: Number(balance.toString()),
+    balance: balance.toNumber(),
     tokenIds: [],
   };
 };
@@ -430,6 +429,7 @@ export const getKeyManagerPermissions = async (
     ABIs.LSP3AccountABI,
     provider,
   );
+
   let addressPermissions: string = '0x';
   await contract
     .getData([KeyChain.LSP6AddressPermissions])
@@ -438,7 +438,7 @@ export const getKeyManagerPermissions = async (
     })
     .catch(async () => {
       await universalProfileOld
-        .getData(KeyChain.LSP3PROFILE)
+        .getData(KeyChain.LSP6AddressPermissions)
         .then((result: string) => {
           addressPermissions = result;
         })
