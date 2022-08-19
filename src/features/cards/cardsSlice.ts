@@ -7,7 +7,7 @@ import {
 import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
 import { API } from '../../services/api';
-import { ICard } from '../../services/models';
+import { ICard, SupportedInterface } from '../../services/models';
 import { STATUS } from '../../utility';
 import { Address } from '../../utils/types';
 import { ICardItemsState, ICardState } from './types';
@@ -127,15 +127,24 @@ export const fetchOwnedCards = createAsyncThunk<
 
 export const fetchMetaDataForTokenId = createAsyncThunk<
   ICard,
-  { assetAddress: string; tokenId: BigNumberish; network: NetworkName },
+  {
+    assetAddress: string;
+    tokenId: BigNumberish;
+    network: NetworkName;
+    supportedInterface: SupportedInterface;
+  },
   { state: RootState; extra: ThunkExtra }
 >(
   'cards/fetchMetaDataForTokenId',
-  async ({ assetAddress, tokenId, network }, { extra: { api }, getState }) => {
+  async (
+    { assetAddress, tokenId, network, supportedInterface },
+    { extra: { api }, getState },
+  ) => {
     const res = await api.cards.fetchMetaDataForTokenID(
       assetAddress,
       tokenId,
       network,
+      supportedInterface,
     );
     const state: RootState = getState();
     return {

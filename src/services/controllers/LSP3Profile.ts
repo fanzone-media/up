@@ -359,7 +359,6 @@ const fetchBalanceOf = async (
     const tokenIds = await (
       await contract.tokenIdsOf(profileAddress)
     ).map((tokenId) => ethers.BigNumber.from(tokenId).toNumber());
-    console.log(tokenIds);
     return {
       assetAddress,
       balance: ethers.BigNumber.from(balance).toNumber(),

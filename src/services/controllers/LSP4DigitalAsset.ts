@@ -21,7 +21,6 @@ import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { erc20ABI } from 'wagmi';
 import { Provider } from '@ethersproject/providers';
-import { interfaceIds } from '../../utility';
 import ABIs from '../utilities/ABIs';
 
 const fetchCard = async (
@@ -37,19 +36,7 @@ const fetchCard = async (
     provider,
   );
 
-  let supportedInterface: SupportedInterface[] = [];
-  await Promise.allSettled(
-    Object.keys(interfaceIds).map(async (key) => {
-      const res = await contract.supportsInterface(interfaceIds[key]);
-      return { key, res };
-    }),
-  ).then((results) =>
-    results.forEach((result) => {
-      if (result.status === 'fulfilled' && result.value.res) {
-        supportedInterface.push(result.value.key as SupportedInterface);
-      }
-    }),
-  );
+  let supportedInterface: SupportedInterface | null = null;
 
   // tokenId &&
   //   (await contract.ownerOf(tokenId).catch(() => {
@@ -62,39 +49,51 @@ const fetchCard = async (
     totalSupply,
     owner,
     holders,
-    hashedUrl,
+    lsp8MetaDataUrl,
+    lsp4MetaDataUrl,
+    erc721MetaDataUrl,
     whiteListedTokens,
-  ] = await Promise.all([
+  ] = await Promise.allSettled([
     contract.name(),
     contract.symbol(),
     contract.totalSupply(),
     contract.owner(),
     contract.allTokenHolders(),
-    supportedInterface.includes('erc721')
-      ? contract.tokenURI(0)
-      : supportedInterface.includes('lsp8')
-      ? contract.getData([KeyChain.LSP4Metadata])
-      : contractLSP4.getData(KeyChain.LSP4Metadata),
+    contract.getData([KeyChain.LSP4Metadata]),
+    contractLSP4.getData(KeyChain.LSP4Metadata),
+    contract.tokenURI(0),
     fetchAcceptedTokens(address, network),
   ]);
 
-  if (!hashedUrl) {
-    throw new Error('No card data');
+  let metaDataUrl: string = '';
+
+  if (lsp8MetaDataUrl.status === 'fulfilled') {
+    metaDataUrl = lsp8MetaDataUrl.value[0];
+    supportedInterface = 'lsp8';
   }
-  const result = await getLSP4Metadata(
-    supportedInterface.includes('erc721')
-      ? hashedUrl
-      : supportedInterface.includes('lsp8')
-      ? hashedUrl[0]
-      : hashedUrl,
-    supportedInterface,
-  );
+  if (lsp4MetaDataUrl.status === 'fulfilled') {
+    metaDataUrl = lsp4MetaDataUrl.value;
+    supportedInterface = 'lsp4';
+  }
+  if (
+    lsp4MetaDataUrl.status === 'rejected' &&
+    lsp8MetaDataUrl.status === 'rejected' &&
+    erc721MetaDataUrl.status === 'fulfilled'
+  ) {
+    metaDataUrl = erc721MetaDataUrl.value;
+    supportedInterface = 'erc721';
+  }
+
+  if (!supportedInterface) throw new Error('No Asset Found');
+
+  const result = await getLSP4Metadata(metaDataUrl, supportedInterface);
+
   let creators: string[] = [];
-  supportedInterface.includes('lsp8' || 'lsp4') &&
+  supportedInterface !== 'erc721' &&
     (await LSP3ProfileApi.fetchCreatorsAddresses(
       address,
       network,
-      supportedInterface.includes('lsp8') ? 'lsp8' : 'lsp4',
+      supportedInterface,
     )
       .then((result) => {
         creators = result;
@@ -104,23 +103,33 @@ const fetchCard = async (
       }));
   return {
     address,
-    name,
-    symbol,
-    totalSupply: ethers.BigNumber.from(totalSupply).toNumber(),
+    name: name.status === 'fulfilled' ? name.value : 'unknown',
+    symbol: symbol.status === 'fulfilled' ? symbol.value : '',
+    totalSupply:
+      totalSupply.status === 'fulfilled' ? totalSupply.value.toNumber() : 0,
     lsp8MetaData: {
       '0': {
         ...result,
-        image: result.LSP4Metadata.images[0][0].url.startsWith('ipfs://')
+        image: result?.image
+          ? result.image.startsWith('ipfs://')
+            ? Utils.convertImageURL(result.image)
+            : result.image
+          : result.LSP4Metadata.images[0][0].url.startsWith('ipfs://')
           ? Utils.convertImageURL(result.LSP4Metadata.images[0][0].url)
           : result.LSP4Metadata.images[0][0].url,
       },
     },
-    owner,
-    holders: holders.map((holder: string) => `0x${holder.slice(26)}`),
+    owner: owner.status === 'fulfilled' ? owner.value : '0x',
+    holders:
+      holders.status === 'fulfilled'
+        ? holders.value.map((holder: string) => `0x${holder.slice(26)}`)
+        : [],
     creators,
     network: network,
     markets: [],
-    whiteListedTokens,
+    supportedInterface,
+    whiteListedTokens:
+      whiteListedTokens.status === 'fulfilled' ? whiteListedTokens.value : [],
   };
 };
 
@@ -169,6 +178,7 @@ const fetchMetaDataForTokenID = async (
   assetAddress: string,
   tokenId: BigNumberish,
   network: NetworkName,
+  supportedInterface: SupportedInterface,
 ): Promise<ILSP8MetaData> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
@@ -181,7 +191,7 @@ const fetchMetaDataForTokenID = async (
       throw new Error('Not an lsp8 asset');
     });
   const tokenUri = await contract.tokenURI(tokenId);
-  const metaData = await getLSP4Metadata(tokenUri, ['lsp8', 'erc721']);
+  const metaData = await getLSP4Metadata(tokenUri, supportedInterface);
 
   return {
     ...metaData,

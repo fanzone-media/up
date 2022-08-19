@@ -84,7 +84,7 @@ export interface ICard {
   symbol: string;
   owner: string;
   totalSupply: number;
-  supportedInterface?: SupportedInterface[];
+  supportedInterface: SupportedInterface;
   holders: string[];
   creators: string[];
   lsp8MetaData: {

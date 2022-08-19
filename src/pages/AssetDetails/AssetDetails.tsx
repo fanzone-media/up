@@ -381,6 +381,7 @@ const AssetDetails: React.FC = () => {
           assetAddress: params.add,
           network: params.network,
           tokenId: ownedTokenIds[currentIndex],
+          supportedInterface: asset.supportedInterface,
         }),
       );
     }
@@ -545,7 +546,7 @@ const AssetDetails: React.FC = () => {
       label: 'Total amount of Tokens',
       value: asset ? asset.totalSupply.toString() : '',
     },
-    { label: 'Token Standard', value: 'LSP8' },
+    { label: 'Token Standard', value: asset ? asset.supportedInterface : '' },
     { label: 'Network', value: asset ? asset.network : '' },
     { label: 'Score', value: '' },
     {

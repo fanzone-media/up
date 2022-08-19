@@ -27,10 +27,11 @@ export const getLSP3ProfileData = async (hashedUrl: string) => {
 
 export const getLSP4Metadata = async (
   hashedUrl: string,
-  standard: SupportedInterface[],
+  standard: SupportedInterface,
 ): Promise<ILSP8MetaData> => {
-  if (standard.includes('erc721')) {
+  if (standard === 'erc721') {
     const result = await axios.get(url + hashedUrl.replace('ipfs://', ''));
+    console.log(result);
     return result.data as ILSP8MetaData;
   } else {
     const ipfsPath = getIpfsPath(hashedUrl);
