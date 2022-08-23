@@ -15,7 +15,6 @@ import {
   ContractRegistry__factory,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
-import Utils from '../utilities/util';
 import { LSP3ProfileApi } from './LSP3Profile';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
@@ -110,16 +109,7 @@ const fetchCard = async (
     totalSupply:
       totalSupply.status === 'fulfilled' ? totalSupply.value.toNumber() : 0,
     lsp8MetaData: {
-      '0': {
-        ...result,
-        image: result?.image
-          ? result.image.startsWith('ipfs://')
-            ? Utils.convertImageURL(result.image)
-            : result.image
-          : result.LSP4Metadata.images[0][0].url.startsWith('ipfs://')
-          ? Utils.convertImageURL(result.LSP4Metadata.images[0][0].url)
-          : result.LSP4Metadata.images[0][0].url,
-      },
+      '0': result,
     },
     owner: owner.status === 'fulfilled' ? owner.value : '0x',
     holders:
@@ -183,12 +173,7 @@ const fetchMetaDataForTokenID = async (
   const tokenUri = await contract.tokenURI(tokenId);
   const metaData = await getLSP4Metadata(tokenUri, 'erc721');
 
-  return {
-    ...metaData,
-    image: metaData.LSP4Metadata.images[0][0].url.startsWith('ipfs://')
-      ? Utils.convertImageURL(metaData.LSP4Metadata.images[0][0].url)
-      : metaData.LSP4Metadata.images[0][0].url,
-  };
+  return metaData;
 };
 
 const fetchAllMarkets = async (

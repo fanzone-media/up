@@ -105,6 +105,7 @@ import { SelectMintModalContent } from './SelectMintModalContent';
 import { BuyCardButton } from './components/BuyCardButton';
 import Utils from '../../services/utilities/util';
 import { CardInfoAccordion } from './components/CardInfoAccordion';
+import { id } from '@ethersproject/hash';
 
 interface IPrams {
   add: string;
@@ -369,28 +370,28 @@ const AssetDetails: React.FC = () => {
   useMemo(() => {
     if (
       wasActiveProfile &&
-      ownedTokenIds &&
-      ownedTokenIds.length > 0 &&
+      ((ownedTokenIds && ownedTokenIds.length > 0) ||
+        asset?.supportedInterface === 'erc721') &&
       asset &&
-      !(`${ownedTokenIds[currentIndex].toString()}` in asset.lsp8MetaData) &&
+      !(params.id in asset.lsp8MetaData) &&
       metaDataStatus === STATUS.IDLE
     ) {
       dispatch(
         fetchMetaDataForTokenId({
           assetAddress: params.add,
           network: params.network,
-          tokenId: ownedTokenIds[currentIndex],
+          tokenId: params.id,
           supportedInterface: asset.supportedInterface,
         }),
       );
     }
   }, [
     asset,
-    currentIndex,
     dispatch,
     metaDataStatus,
     ownedTokenIds,
     params.add,
+    params.id,
     params.network,
     wasActiveProfile,
   ]);
@@ -700,16 +701,19 @@ const AssetDetails: React.FC = () => {
   ]);
 
   const renderCardProperties = useMemo(() => {
+    let index: number | string = 0;
+    if (asset?.supportedInterface === 'erc721') {
+      index = params.id ? params.id : 0;
+    } else if (asset?.supportedInterface === 'lsp8') {
+      index = ownedTokenIds ? ownedTokenIds[currentIndex] : 0;
+    }
+
     if (
       asset &&
-      asset.lsp8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-        ?.attributes &&
-      asset.lsp8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-        .attributes.length > 0
+      asset.lsp8MetaData[index]?.attributes &&
+      asset.lsp8MetaData[index].attributes.length > 0
     ) {
-      return asset?.lsp8MetaData[
-        ownedTokenIds ? ownedTokenIds[currentIndex] : 0
-      ].attributes.map((item) => {
+      return asset?.lsp8MetaData[index].attributes.map((item) => {
         if ('trait_type' in item) {
           return (
             <StyledCardPropertyContainer key={item.trait_type}>
@@ -731,7 +735,7 @@ const AssetDetails: React.FC = () => {
         return null;
       });
     }
-  }, [asset, currentIndex, ownedTokenIds, propertiesImages]);
+  }, [asset, currentIndex, ownedTokenIds, params.id, propertiesImages]);
 
   const renderContractDetailHeader = useMemo(
     () => (
@@ -768,6 +772,58 @@ const AssetDetails: React.FC = () => {
     ],
   );
 
+  const getHeroImgSrc = useMemo(() => {
+    if (asset?.supportedInterface === 'erc721') {
+      const img = asset?.lsp8MetaData[params.id ? params.id : 0]?.image;
+      return img && img.startsWith('ipfs://')
+        ? Utils.convertImageURL(img)
+        : img;
+    } else if (asset?.supportedInterface === 'lsp8') {
+      const img =
+        asset?.lsp8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+          ?.LSP4Metadata.images[0][0].url;
+      return img && img.startsWith('ipfs://')
+        ? Utils.convertImageURL(img)
+        : img;
+    } else {
+      const img = asset?.lsp8MetaData[0]?.LSP4Metadata.images[0][0].url;
+      return img && img.startsWith('ipfs://')
+        ? Utils.convertImageURL(img)
+        : img;
+    }
+  }, [asset, currentIndex, ownedTokenIds, params.id]);
+
+  const getOtherImgs = useMemo(() => {
+    if (
+      asset &&
+      asset.supportedInterface === 'lsp4' &&
+      asset.lsp8MetaData[0]?.LSP4Metadata?.images.length > 1
+    ) {
+      return asset.lsp8MetaData[0]?.LSP4Metadata?.images.map((item, i) => {
+        if (i !== 0) {
+          return item[0]?.url.startsWith('ipfs://')
+            ? Utils.convertImageURL(item[0].url)
+            : item[0].url;
+        }
+      });
+    } else if (
+      asset &&
+      asset.supportedInterface === 'lsp8' &&
+      asset.lsp8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
+        ?.LSP4Metadata?.images.length > 1
+    ) {
+      return asset.lsp8MetaData[
+        ownedTokenIds ? ownedTokenIds[currentIndex] : 0
+      ]?.LSP4Metadata?.images.map((item, i) => {
+        if (i !== 0) {
+          return item[0]?.url.startsWith('ipfs://')
+            ? Utils.convertImageURL(item[0].url)
+            : item[0].url;
+        }
+      });
+    }
+  }, [asset, currentIndex, ownedTokenIds]);
+
   return (
     <StyledAssetDetailsContentWrapper>
       {cardStatus === 'loading' ? (
@@ -786,13 +842,7 @@ const AssetDetails: React.FC = () => {
                 {!isDesktop && renderContractDetailHeader}
                 <StyledMediaContainer>
                   <StyledHeroImgContainer>
-                    <StyledHeroImg
-                      src={
-                        asset.lsp8MetaData[
-                          ownedTokenIds ? ownedTokenIds[currentIndex] : 0
-                        ]?.image
-                      }
-                    />
+                    <StyledHeroImg src={getHeroImgSrc} />
                     {asset.supportedInterface === 'lsp8' &&
                       wasActiveProfile &&
                       ownedTokenIds && (
@@ -834,21 +884,14 @@ const AssetDetails: React.FC = () => {
                   {asset.lsp8MetaData[0]?.LSP4Metadata?.images.length > 1 &&
                     ['lsp8', 'lsp4'].includes(asset.supportedInterface) && (
                       <StyledOtherMediaContainer>
-                        {asset.lsp8MetaData[0]?.LSP4Metadata?.images.map(
-                          (item, i) =>
-                            i === 0 ? (
+                        {getOtherImgs &&
+                          getOtherImgs.map((item, i) =>
+                            item === undefined ? (
                               <></>
                             ) : (
-                              <StyledOtherImg
-                                key={i}
-                                src={
-                                  item[0]?.url.startsWith('ipfs://')
-                                    ? Utils.convertImageURL(item[0].url)
-                                    : item[0].url
-                                }
-                              />
+                              <StyledOtherImg key={i} src={item} />
                             ),
-                        )}
+                          )}
                       </StyledOtherMediaContainer>
                     )}
                 </StyledMediaContainer>
@@ -874,6 +917,7 @@ const AssetDetails: React.FC = () => {
                       issuerContent={renderIssuer}
                     />
                   )}
+
                   <StyledCardPropertiesAccordion
                     header={
                       <StyledAccordionTitle>Details</StyledAccordionTitle>

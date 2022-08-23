@@ -25,6 +25,7 @@ import {
 } from '../../profiles/ProfileCard/styles';
 import { useModal } from '../../../hooks/useModal';
 import { TransferCardModal } from '../../../pages/ProfileDetails/TransferCardModal';
+import Utils from '../../../services/utilities/util';
 
 interface IProps {
   digitalCard: ICard;
@@ -69,6 +70,20 @@ export const MetaCard: React.FC<IProps> = ({
     'Transfer Card',
   );
 
+  const getCardImg = () => {
+    if (digitalCard.supportedInterface === 'erc721') {
+      const img = digitalCard.lsp8MetaData[0]?.image;
+      return img && img.startsWith('ipfs://')
+        ? Utils.convertImageURL(img)
+        : img;
+    } else {
+      const img = digitalCard?.lsp8MetaData[0]?.LSP4Metadata.images[0][0].url;
+      return img && img.startsWith('ipfs://')
+        ? Utils.convertImageURL(img)
+        : img;
+    }
+  };
+
   return (
     <StyledCardWrapper>
       {params.network === 'l14' && (
@@ -102,7 +117,7 @@ export const MetaCard: React.FC<IProps> = ({
       </a>
       <Link to={`/${params.network}/asset/` + digitalCard.address}>
         <StyledMediaWrapper>
-          <StyledMetaCardImg src={digitalCard.lsp8MetaData[0].image} alt="" />
+          <StyledMetaCardImg src={getCardImg()} alt="" />
         </StyledMediaWrapper>
         <StyledCardDetail>
           <StyledCardName>{digitalCard.name.split('•')[0]}</StyledCardName>
