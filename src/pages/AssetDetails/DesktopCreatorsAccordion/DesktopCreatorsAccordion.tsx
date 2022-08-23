@@ -1,62 +1,54 @@
 import { ReactNode, useState } from 'react';
-import { AccordionToggleIcon } from '../../../assets';
 import {
-  StyledAccordiomToggleIcon,
   StyledAccordionHeader,
-  StyledAccordionToggleButton,
   StyledCreatorsContainer,
   StyledDesktopCreatorsAccordionWrapper,
   StyledHeader,
   StyledHeaderTitle,
   StyledIssuerContainer,
+  StyledIssuerOwnerWrapper,
+  StyledOwnerContainer,
 } from './styles';
 
 interface IProps {
   creatorsContent: ReactNode;
   issuerContent: ReactNode;
   ownerContent?: ReactNode;
-  enableToggle: boolean;
 }
 
 export const DesktopCreatorsAccordion: React.FC<IProps> = ({
   creatorsContent,
   issuerContent,
   ownerContent,
-  enableToggle,
 }) => {
   const [expand, setExpand] = useState<boolean>(true);
 
   return (
-    <StyledDesktopCreatorsAccordionWrapper $expanded={expand}>
+    <StyledDesktopCreatorsAccordionWrapper>
+      <StyledIssuerOwnerWrapper>
+        <StyledIssuerContainer $expanded={expand}>
+          <StyledHeader $expanded={expand}>
+            <StyledHeaderTitle>Issuer</StyledHeaderTitle>
+          </StyledHeader>
+          {issuerContent}
+        </StyledIssuerContainer>
+        {ownerContent && (
+          <StyledOwnerContainer>
+            <StyledHeader $expanded={expand}>
+              <StyledHeaderTitle>Owner</StyledHeaderTitle>
+            </StyledHeader>
+            {ownerContent}
+          </StyledOwnerContainer>
+        )}
+      </StyledIssuerOwnerWrapper>
+
       <StyledCreatorsContainer $expanded={expand}>
         <StyledHeader $expanded={expand}>
           <StyledHeaderTitle>Creators</StyledHeaderTitle>
         </StyledHeader>
         {creatorsContent}
       </StyledCreatorsContainer>
-      {ownerContent && (
-        <StyledIssuerContainer $expanded={expand}>
-          <StyledHeader $expanded={expand}>
-            <StyledHeaderTitle>Owner</StyledHeaderTitle>
-          </StyledHeader>
-          {ownerContent}
-        </StyledIssuerContainer>
-      )}
-      <StyledIssuerContainer $expanded={expand}>
-        <StyledHeader $expanded={expand}>
-          <StyledHeaderTitle>Issuer</StyledHeaderTitle>
-          {enableToggle && (
-            <StyledAccordionToggleButton onClick={() => setExpand(!expand)}>
-              <StyledAccordiomToggleIcon
-                $expanded={expand}
-                src={AccordionToggleIcon}
-                alt=""
-              />
-            </StyledAccordionToggleButton>
-          )}
-        </StyledHeader>
-        {issuerContent}
-      </StyledIssuerContainer>
+
       <StyledAccordionHeader $expanded={expand}></StyledAccordionHeader>
     </StyledDesktopCreatorsAccordionWrapper>
   );

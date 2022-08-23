@@ -1,11 +1,8 @@
 import styled from 'styled-components';
 
-export const StyledDesktopCreatorsAccordionWrapper = styled.div<{
-  $expanded: boolean;
-}>`
+export const StyledDesktopCreatorsAccordionWrapper = styled.div`
   display: flex;
-  height: ${({ $expanded }) => ($expanded ? '100%' : '62px')};
-  overflow: hidden;
+  flex-direction: column;
 
   @media ${({ theme }) => theme.screen.md} {
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -29,8 +26,14 @@ export const StyledAccordionHeader = styled.div<{ $expanded: boolean }>`
   }
 `;
 
+export const StyledIssuerOwnerWrapper = styled.div`
+  display: flex;
+`;
+
 export const StyledCreatorsContainer = styled.div<{ $expanded: boolean }>`
   width: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 0.5em 1em;
 `;
 
@@ -40,7 +43,10 @@ export const StyledIssuerContainer = styled.div<{ $expanded: boolean }>`
     rgba(255, 255, 255, 0.06) 26.97%,
     rgba(255, 255, 255, -0.06) 100%
   );
-  margin-left: auto;
+  padding: 0.5em 1em;
+`;
+
+export const StyledOwnerContainer = styled.div`
   padding: 0.5em 1em;
 `;
 
@@ -56,12 +62,3 @@ export const StyledHeaderTitle = styled.h3`
 `;
 
 export const StyledCreatorsContent = styled.div``;
-
-export const StyledAccordionToggleButton = styled.button`
-  margin: auto 0 auto auto;
-`;
-
-export const StyledAccordiomToggleIcon = styled.img<{ $expanded: boolean }>`
-  transform: ${({ $expanded }) =>
-    $expanded ? 'rotate(0deg)' : 'rotate(180deg)'};
-`;

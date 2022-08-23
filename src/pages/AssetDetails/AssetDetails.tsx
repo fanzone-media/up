@@ -15,7 +15,6 @@ import {
   TierPropertyIcon,
   ZonePropertyIcon,
   TransferIcon,
-  OpenseaIcon,
 } from '../../assets';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
@@ -43,12 +42,7 @@ import {
   StyledLoader,
   StyledLoadingHolder,
   StyledAssetDetailsContentWrapper,
-  StyledCardInfoWrapper,
   StyledCardPriceWrapper,
-  StyledCardInfo,
-  StyledCardMainDetails,
-  StyledMedia,
-  StyledMediaWrapper,
   StyledCardPriceWrapperHeader,
   StyledCardPriceLabel,
   StyledQuickActions,
@@ -57,10 +51,6 @@ import {
   StyledCardPriceValue,
   StyledCardPriceValueWrapper,
   StyledActionsButtonWrapper,
-  StyledCardInfoContainer,
-  StyledCardInfoLabel,
-  StyledCardInfoValue,
-  StyledCardInfoAccordion,
   StyledCardPropertiesAccordion,
   StyledCardProperties,
   StyledCardPropertyIconWrapper,
@@ -74,7 +64,6 @@ import {
   StyledMintControls,
   StyledMintSkipButton,
   StyledMintSkipButtonImg,
-  StyledExplorerIcon,
   StyledMintSliderIndex,
   StyledChangePriceButton,
   StyledWithdrawButton,
@@ -83,7 +72,15 @@ import {
   StyledNoProfileLabel,
   StyledMintSliderInput,
   StyledSelectMintModalButton,
-  StyledOpenseaIcon,
+  StyledMediaContainer,
+  StyledHeroImg,
+  StyledAssetDetailContainer,
+  StyledContractDetailHeader,
+  StyledContractName,
+  StyledContractDescription,
+  StyledOtherMediaContainer,
+  StyledOtherImg,
+  StyledHeroImgContainer,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
 import { displayPrice, getChainExplorer, STATUS } from '../../utility';
@@ -106,6 +103,8 @@ import { useModal } from '../../hooks/useModal';
 import { TransferCardTokenIdModal } from './TransferCardTokenIdModal';
 import { SelectMintModalContent } from './SelectMintModalContent';
 import { BuyCardButton } from './components/BuyCardButton';
+import Utils from '../../services/utilities/util';
+import { CardInfoAccordion } from './components/CardInfoAccordion';
 
 interface IPrams {
   add: string;
@@ -463,99 +462,6 @@ const AssetDetails: React.FC = () => {
     [],
   );
 
-  // const cardProperties = useMemo(
-  //   () => [
-  //     {
-  //       label: 'Tier',
-  //       value:
-  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-  //           ?.tier,
-  //       icon: TierPropertyIcon,
-  //     },
-  //     {
-  //       label: 'Edition',
-  //       value:
-  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-  //           ?.edition,
-  //       icon: EditionPropertyIcon,
-  //     },
-  //     {
-  //       label: 'Category',
-  //       value:
-  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-  //           ?.editionCategory,
-  //       icon: CategoryPropertyIcon,
-  //     },
-  //     {
-  //       label: 'Set',
-  //       value:
-  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-  //           ?.editionSet,
-  //       icon: SetPropertyIcon,
-  //     },
-  //     {
-  //       label: 'Season',
-  //       value:
-  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-  //           ?.season,
-  //       icon: SeasonPropertyIcon,
-  //     },
-  //     {
-  //       label: 'Zone',
-  //       value:
-  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-  //           ?.zoneLabel,
-  //       icon: ZonePropertyIcon,
-  //     },
-  //     {
-  //       label: 'League',
-  //       value:
-  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-  //           ?.leagueLabel,
-  //       icon: SubzonePropertyIcon,
-  //     },
-  //     {
-  //       label: 'Team',
-  //       value:
-  //         asset?.ls8MetaData[ownedTokenIds ? ownedTokenIds[currentIndex] : 0]
-  //           ?.teamLabel,
-  //       icon: TeamPropertyIcon,
-  //     },
-  //   ],
-  //   [asset, currentIndex, ownedTokenIds],
-  // );
-
-  const cardInfo: {
-    label: string;
-    value: string;
-    valueType?: string;
-  }[] = [
-    {
-      label: 'Contract Address',
-      value: asset ? asset.address : '',
-      valueType: 'address',
-    },
-    {
-      label: 'Mint',
-      value:
-        ownedTokenIds && ownedTokenIds.length > 0
-          ? ownedTokenIds[currentIndex].toString()
-          : '',
-    },
-    {
-      label: 'Total amount of Tokens',
-      value: asset ? asset.totalSupply.toString() : '',
-    },
-    { label: 'Token Standard', value: asset ? asset.supportedInterface : '' },
-    { label: 'Network', value: asset ? asset.network : '' },
-    { label: 'Score', value: '' },
-    {
-      label: 'Current owner',
-      value: wasActiveProfile ? wasActiveProfile : '',
-      valueType: 'address',
-    },
-  ];
-
   const nextMint = () => {
     const nextIndex = currentIndex + 1;
     if (!ownedTokenIds || nextIndex >= ownedTokenIds.length) return;
@@ -825,20 +731,42 @@ const AssetDetails: React.FC = () => {
         return null;
       });
     }
-    // } else {
-    //   return cardProperties.map((item) => (
-    //     <StyledCardPropertyContainer key={item.label}>
-    //       <StyledCardPropertyIconWrapper>
-    //         <StyledCardPropertyIcon src={item.icon} alt="" />
-    //       </StyledCardPropertyIconWrapper>
-    //       <StyledCardProperty>
-    //         <StyledCardPropertyLabel>{item.label}</StyledCardPropertyLabel>
-    //         <StyledCardPropertyValue>{item.value}</StyledCardPropertyValue>
-    //       </StyledCardProperty>
-    //     </StyledCardPropertyContainer>
-    //   ));
-    // }
   }, [asset, currentIndex, ownedTokenIds, propertiesImages]);
+
+  const renderContractDetailHeader = useMemo(
+    () => (
+      <StyledContractDetailHeader>
+        <StyledContractName>{asset?.name}</StyledContractName>
+        <StyledQuickActions>
+          {ownedTokenIds && currentUsersPermissionsSet.call === '1' && (
+            <StyledReloadPriceAction>
+              <StyledActionIcon
+                src={TransferIcon}
+                alt="transfer"
+                title="transfer"
+                onClick={onPresentTransferCardModal}
+              />
+            </StyledReloadPriceAction>
+          )}
+          <StyledReloadPriceAction>
+            <StyledActionIcon src={ReloadIcon} alt="reload" title="reload" />
+          </StyledReloadPriceAction>
+          <StyledReloadPriceAction>
+            <StyledActionIcon src={ShareIcon} alt="share" title="share" />
+          </StyledReloadPriceAction>
+          <StyledReloadPriceAction>
+            <StyledActionIcon src={OptionIcon} alt="options" title="options" />
+          </StyledReloadPriceAction>
+        </StyledQuickActions>
+      </StyledContractDetailHeader>
+    ),
+    [
+      asset?.name,
+      currentUsersPermissionsSet.call,
+      onPresentTransferCardModal,
+      ownedTokenIds,
+    ],
+  );
 
   return (
     <StyledAssetDetailsContentWrapper>
@@ -853,177 +781,150 @@ const AssetDetails: React.FC = () => {
               <StyledCardError>Asset not found</StyledCardError>
             </>
           ) : (
-            <StyledAssetDetailContent>
-              <StyledCardMainDetails>
-                <StyledMediaWrapper>
-                  {asset && (
-                    <StyledMedia
+            asset && (
+              <StyledAssetDetailContent>
+                {!isDesktop && renderContractDetailHeader}
+                <StyledMediaContainer>
+                  <StyledHeroImgContainer>
+                    <StyledHeroImg
                       src={
                         asset.lsp8MetaData[
                           ownedTokenIds ? ownedTokenIds[currentIndex] : 0
                         ]?.image
                       }
-                      alt=""
+                    />
+                    {asset.supportedInterface === 'lsp8' &&
+                      wasActiveProfile &&
+                      ownedTokenIds && (
+                        <>
+                          <StyledMintControls>
+                            <StyledMintSkipButton onClick={previousMint}>
+                              <StyledMintSkipButtonImg
+                                src={BackwardsIcon}
+                                alt=""
+                              />
+                            </StyledMintSkipButton>
+                            <StyledMintSliderIndex>
+                              <StyledMintSliderInput
+                                type="number"
+                                min={1}
+                                max={ownedTokenIds.length}
+                                defaultValue={currentIndex + 1}
+                                ref={mintIdInputRef}
+                                onKeyPress={onEnterHandler}
+                                onBlur={onBlurHandler}
+                              />
+                              /{ownedTokenIds.length}
+                            </StyledMintSliderIndex>
+                            <StyledMintSkipButton onClick={nextMint}>
+                              <StyledMintSkipButtonImg
+                                src={ForwardsIcon}
+                                alt=""
+                              />
+                            </StyledMintSkipButton>
+                            <StyledSelectMintModalButton
+                              onClick={onPresentSelectMintModal}
+                            >
+                              Select Mint
+                            </StyledSelectMintModalButton>
+                          </StyledMintControls>
+                        </>
+                      )}
+                  </StyledHeroImgContainer>
+                  {asset.lsp8MetaData[0]?.LSP4Metadata?.images.length > 1 &&
+                    ['lsp8', 'lsp4'].includes(asset.supportedInterface) && (
+                      <StyledOtherMediaContainer>
+                        {asset.lsp8MetaData[0]?.LSP4Metadata?.images.map(
+                          (item, i) =>
+                            i === 0 ? (
+                              <></>
+                            ) : (
+                              <StyledOtherImg
+                                key={i}
+                                src={
+                                  item[0]?.url.startsWith('ipfs://')
+                                    ? Utils.convertImageURL(item[0].url)
+                                    : item[0].url
+                                }
+                              />
+                            ),
+                        )}
+                      </StyledOtherMediaContainer>
+                    )}
+                </StyledMediaContainer>
+                <StyledAssetDetailContainer>
+                  {isDesktop && renderContractDetailHeader}
+                  <StyledContractDescription>
+                    {asset.lsp8MetaData[0].description ||
+                      asset.lsp8MetaData[0].LSP4Metadata.description}
+                  </StyledContractDescription>
+                  {!isDesktop && <CardInfoAccordion asset={asset} />}
+                  {!isDesktop ? (
+                    <TabedAccordion
+                      tabs={[
+                        { name: 'Creators', content: renderCreators },
+                        { name: 'Owner', content: renderCurrentMintOwner },
+                        { name: 'Issuer', content: renderIssuer },
+                      ]}
+                    />
+                  ) : (
+                    <DesktopCreatorsAccordion
+                      creatorsContent={renderCreators}
+                      ownerContent={activeProfile && renderCurrentMintOwner}
+                      issuerContent={renderIssuer}
                     />
                   )}
-                  <a
-                    href={explorer && explorer.exploreUrl + asset?.address}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <StyledExplorerIcon src={explorer?.icon} alt="" />
-                  </a>
-                  {ownedTokenIds && params.network === 'polygon' && (
-                    <a
-                      href={`https://opensea.io/assets/matic/${params.add}/${ownedTokenIds[currentIndex]}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <StyledOpenseaIcon src={OpenseaIcon} alt="" />
-                    </a>
-                  )}
-                  {wasActiveProfile && ownedTokenIds && (
-                    <>
-                      <StyledMintControls>
-                        <StyledMintSkipButton onClick={previousMint}>
-                          <StyledMintSkipButtonImg src={BackwardsIcon} alt="" />
-                        </StyledMintSkipButton>
-                        <StyledMintSliderIndex>
-                          <StyledMintSliderInput
-                            type="number"
-                            min={1}
-                            max={ownedTokenIds.length}
-                            defaultValue={currentIndex + 1}
-                            ref={mintIdInputRef}
-                            onKeyPress={onEnterHandler}
-                            onBlur={onBlurHandler}
-                          />
-                          /{ownedTokenIds.length}
-                        </StyledMintSliderIndex>
-                        <StyledMintSkipButton onClick={nextMint}>
-                          <StyledMintSkipButtonImg src={ForwardsIcon} alt="" />
-                        </StyledMintSkipButton>
-                        <StyledSelectMintModalButton
-                          onClick={onPresentSelectMintModal}
-                        >
-                          Select Mint
-                        </StyledSelectMintModalButton>
-                      </StyledMintControls>
-                    </>
-                  )}
-                </StyledMediaWrapper>
-                <StyledCardInfoWrapper>
-                  <StyledCardPriceWrapper>
-                    <StyledCardPriceWrapperHeader>
-                      <StyledCardPriceLabel>Current Price</StyledCardPriceLabel>
-                      <StyledQuickActions>
-                        {ownedTokenIds &&
-                          currentUsersPermissionsSet.call === '1' && (
-                            <StyledReloadPriceAction>
-                              <StyledActionIcon
-                                src={TransferIcon}
-                                alt="transfer"
-                                title="transfer"
-                                onClick={onPresentTransferCardModal}
-                              />
-                            </StyledReloadPriceAction>
-                          )}
-                        <StyledReloadPriceAction>
-                          <StyledActionIcon
-                            src={ReloadIcon}
-                            alt="reload"
-                            title="reload"
-                          />
-                        </StyledReloadPriceAction>
-                        <StyledReloadPriceAction>
-                          <StyledActionIcon
-                            src={ShareIcon}
-                            alt="share"
-                            title="share"
-                          />
-                        </StyledReloadPriceAction>
-                        <StyledReloadPriceAction>
-                          <StyledActionIcon
-                            src={OptionIcon}
-                            alt="options"
-                            title="options"
-                          />
-                        </StyledReloadPriceAction>
-                      </StyledQuickActions>
-                    </StyledCardPriceWrapperHeader>
-                    {renderCardPrice}
-                  </StyledCardPriceWrapper>
-                  <StyledCardInfoAccordion
+                  <StyledCardPropertiesAccordion
                     header={
-                      <StyledAccordionTitle>Card Info</StyledAccordionTitle>
+                      <StyledAccordionTitle>Details</StyledAccordionTitle>
                     }
                     enableToggle
                   >
-                    <StyledCardInfo>
-                      {cardInfo.map((item) => (
-                        <StyledCardInfoContainer key={item.label}>
-                          <StyledCardInfoLabel>
-                            {item.label}
-                          </StyledCardInfoLabel>
-                          <StyledCardInfoValue>
-                            {item.valueType === 'address'
-                              ? `${item.value.slice(0, 8)}...${item.value.slice(
-                                  item.value.length - 4,
-                                  item.value.length,
-                                )}`
-                              : item.value}
-                          </StyledCardInfoValue>
-                        </StyledCardInfoContainer>
-                      ))}
-                    </StyledCardInfo>
-                  </StyledCardInfoAccordion>
-                </StyledCardInfoWrapper>
-              </StyledCardMainDetails>
-              {!isDesktop ? (
-                <TabedAccordion
-                  tabs={[
-                    { name: 'Creators', content: renderCreators },
-                    { name: 'Owner', content: renderCurrentMintOwner },
-                    { name: 'Issuer', content: renderIssuer },
-                  ]}
-                />
-              ) : (
-                <DesktopCreatorsAccordion
-                  creatorsContent={renderCreators}
-                  ownerContent={activeProfile && renderCurrentMintOwner}
-                  issuerContent={renderIssuer}
-                  enableToggle
-                />
-              )}
-              <StyledCardPropertiesAccordion
-                header={<StyledAccordionTitle>Details</StyledAccordionTitle>}
-                enableToggle
-              >
-                <StyledCardProperties>
-                  {renderCardProperties}
-                </StyledCardProperties>
-              </StyledCardPropertiesAccordion>
-              <StyledMarketAccordion
-                header={<StyledAccordionTitle>Market</StyledAccordionTitle>}
-                enableToggle
-              >
-                {asset && (
-                  <CardMarket
-                    asset={asset}
-                    cardMarkets={asset?.markets}
-                    whiteListedTokens={asset?.whiteListedTokens}
-                  />
-                )}
-              </StyledMarketAccordion>
-              <StyledHoldersAccordion
-                header={
-                  <StyledAccordionTitle>Other Holders</StyledAccordionTitle>
-                }
-                enableToggle
-              >
-                {renderHolderPagination}
-              </StyledHoldersAccordion>
-            </StyledAssetDetailContent>
+                    <StyledCardProperties>
+                      {renderCardProperties}
+                    </StyledCardProperties>
+                  </StyledCardPropertiesAccordion>
+                  {asset.supportedInterface === 'lsp8' && (
+                    <StyledCardPriceWrapper>
+                      <StyledCardPriceWrapperHeader>
+                        <StyledCardPriceLabel>Item Price</StyledCardPriceLabel>
+                      </StyledCardPriceWrapperHeader>
+
+                      {renderCardPrice}
+                    </StyledCardPriceWrapper>
+                  )}
+                  {isDesktop && <CardInfoAccordion asset={asset} />}
+                  {asset.supportedInterface === 'lsp8' && (
+                    <StyledMarketAccordion
+                      header={
+                        <StyledAccordionTitle>Market</StyledAccordionTitle>
+                      }
+                      enableToggle
+                    >
+                      {asset && (
+                        <CardMarket
+                          asset={asset}
+                          cardMarkets={asset?.markets}
+                          whiteListedTokens={asset?.whiteListedTokens}
+                        />
+                      )}
+                    </StyledMarketAccordion>
+                  )}
+                  {['lsp4', 'lsp8'].includes(asset.supportedInterface) && (
+                    <StyledHoldersAccordion
+                      header={
+                        <StyledAccordionTitle>
+                          Other Holders
+                        </StyledAccordionTitle>
+                      }
+                      enableToggle
+                    >
+                      {renderHolderPagination}
+                    </StyledHoldersAccordion>
+                  )}
+                </StyledAssetDetailContainer>
+              </StyledAssetDetailContent>
+            )
           )}
         </>
       )}

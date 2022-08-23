@@ -1,5 +1,5 @@
 import { BigNumber, BigNumberish } from 'ethers';
-import { BlockScoutIcon, polygonExplorerIcon } from '../assets';
+import { BlockScoutIcon, EtherScanLogo, polygonExplorerIcon } from '../assets';
 import { NetworkName } from '../boot/types';
 
 export enum STATUS {
@@ -41,6 +41,11 @@ export const getChainExplorer = (network: NetworkName) => {
       return {
         exploreUrl: 'https://mumbai.polygonscan.com/address/',
         icon: polygonExplorerIcon,
+      };
+    case 'ethereum':
+      return {
+        exploreUrl: 'https://etherscan.io/address/',
+        icon: EtherScanLogo,
       };
   }
 };

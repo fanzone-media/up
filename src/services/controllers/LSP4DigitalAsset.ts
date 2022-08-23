@@ -88,6 +88,8 @@ const fetchCard = async (
 
   const result = await getLSP4Metadata(metaDataUrl, supportedInterface);
 
+  console.log(result);
+
   let creators: string[] = [];
   supportedInterface !== 'erc721' &&
     (await LSP3ProfileApi.fetchCreatorsAddresses(
@@ -161,14 +163,7 @@ const fetchOwnerOfTokenId = async (
 ): Promise<string> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
-  await contract
-    .supportsInterface('0x49399145')
-    .then((result) => {
-      if (result === false) throw new Error('Not an lsp8 asset');
-    })
-    .catch(() => {
-      throw new Error('Not an lsp8 asset');
-    });
+
   const ownerOf = await contract.ownerOf(tokenId);
 
   return ownerOf;
@@ -182,16 +177,11 @@ const fetchMetaDataForTokenID = async (
 ): Promise<ILSP8MetaData> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
-  await contract
-    .supportsInterface('0x49399145')
-    .then((result) => {
-      if (result === false) throw new Error('Not an lsp8 asset');
-    })
-    .catch(() => {
-      throw new Error('Not an lsp8 asset');
-    });
+
+  if (supportedInterface === 'lsp4') throw new Error('token ids not supported');
+
   const tokenUri = await contract.tokenURI(tokenId);
-  const metaData = await getLSP4Metadata(tokenUri, supportedInterface);
+  const metaData = await getLSP4Metadata(tokenUri, 'erc721');
 
   return {
     ...metaData,

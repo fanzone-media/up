@@ -4,10 +4,11 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-image: url(./assets/fanzone-bg.png);
+  /* background-image: url(./assets/fanzone-bg.png);
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
+  background-attachment: fixed; */
+  background-color: black;
   position: relative;
 }
 

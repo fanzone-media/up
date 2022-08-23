@@ -29,6 +29,7 @@ export const StyledAssetDetailContent = styled.div`
   display: flex;
   flex-direction: column;
   row-gap: 5px;
+  padding-top: 1em;
 
   @media ${({ theme }) => theme.screen.md} {
     max-width: 1440px;
@@ -38,80 +39,12 @@ export const StyledAssetDetailContent = styled.div`
     row-gap: 30px;
   }
 
-  @media ${({ theme }) => theme.screen.xl} {
+  @media ${({ theme }) => theme.screen.lg} {
     padding: 48px 40px 0 40px;
+    flex-direction: row;
+    column-gap: 2em;
   }
 `;
-
-// export const StyledGrid = styled.div`
-//   display: grid;
-//   grid-template-columns: 1fr;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     margin: 0 48px 0 48px;
-//   }
-
-//   @media ${({theme}) => theme.screen.lg} {
-//     grid-template-columns: repeat(2, 392px);
-//     margin: 0 auto 0 auto;
-//     column-gap: 20px;
-//   }
-
-//   @media ${({theme}) => theme.screen.xl} {
-//     grid-template-columns: 2fr 1fr;
-//     column-gap: 10px;
-//     margin: 0;
-//   }
-// `;
-
-// export const StyledAssetDetailGrid = styled.div`
-//   display: grid;
-//   grid-template-columns: 1fr;
-//   column-gap: 10px;
-//   row-gap: 20px;
-
-//   @media ${({theme}) => theme.screen.xl} {
-//     grid-template-columns: repeat(2, 1fr);
-//   }
-// `;
-
-// export const StyledMediaWrapper = styled.div`
-//   position: relative;
-//   background: url(${BgMetaCard});
-//   background-position: center;
-//   background-repeat: no-repeat;
-//   background-size: cover;
-//   display: flex;
-//   height: 473px;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     border-radius: 10px;
-//     border: 1px solid rgba(255, 255, 255, 0.15);
-//     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
-//   }
-// `;
-
-// export const StyledMetaCardImg = styled.img`
-//   width: 221px;
-//   margin: auto;
-// `;
-
-// export const StyledStatsName = styled.h1`
-//   position: absolute;
-//   left: 5%;
-//   margin-top: 10px;
-//   font-size: 24px;
-//   font-weight: ${({theme}) => theme.font.weight.bold};
-// `;
-
-// export const StyledUniversalProfileIcon = styled.img`
-//   position: absolute;
-//   width: 44px;
-//   height: 44px;
-//   bottom: 5%;
-//   left: 10%;
-//   animation: ${pulseAnimate} 2s ease-in-out infinite;
-// `;
 
 export const StyledExplorerIcon = styled.img`
   position: absolute;
@@ -132,217 +65,11 @@ export const StyledOpenseaIcon = styled.img`
   animation: ${pulseAnimate} 2s ease-in-out infinite;
 `;
 
-// export const StyledDetailsWrapper = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   padding: 10px 0px 0px 0px;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     background: linear-gradient(
-//         180deg,
-//         rgba(255, 255, 255, 0) 0%,
-//         rgba(255, 255, 255, 0.08) 100%
-//       ),
-//       #212121;
-//     border-radius: 10px;
-//     border: 1px solid rgba(255, 255, 255, 0.15);
-//     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
-//     min-height: 473px;
-//   }
-// `;
-
-// export const StyledCardInfoLabel = styled.h2`
-//   font-size: 18px;
-//   font-weight: ${({theme}) => theme.font.weight.bold};
-//   margin: 0 8px 10px 8px;
-//   border-width: 0 0 1px 0;
-//   border-style: solid;
-//   border-color: white;
-//   padding-bottom: 5px;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     margin: 0 20px 5px 20px;
-//   }
-// `;
-
-// export const StyledInfoGrid = styled.div`
-//   display: grid;
-//   grid-template-columns: 35% 1fr;
-//   padding: 0 8px 5px 8px;
-//   row-gap: 10px;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     padding: 0 20px 0 20px;
-//   }
-// `;
-
 export const StyledLabel = styled.p`
   font-size: 15px;
 `;
 
-// export const StyledValue = styled.p`
-//   font-size: 15px;
-//   font-weight: ${({theme}) => theme.font.weight.bold};
-//   text-transform: capitalize;
-// `;
-
-// export const StyledFullName = styled.p`
-//   font-size: 15px;
-//   font-weight: ${({theme}) => theme.font.weight.bold};
-//   margin: 0 10px 0 10px;
-//   padding: 15px 0 15px 0;
-//   border-width: 2px 0 2px 0;
-//   border-style: solid;
-//   border-color: rgba(255, 255, 255, 0.25);
-//   line-height: 17px;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     margin: 0;
-//     padding: 15px 20px 15px 20px;
-//     border-width: 2px 0 0 0;
-//     margin-top: auto;
-//   }
-// `;
-
-// export const StyledExtraInfo = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   height: max-content;
-//   padding: 0 8px 0 8px;
-//   margin-top: 20px;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     padding: 0;
-//   }
-
-//   @media ${({theme}) => theme.screen.lg} {
-//     margin: 0;
-//     background: linear-gradient(
-//         180deg,
-//         rgba(255, 255, 255, 0) 0%,
-//         rgba(255, 255, 255, 0.08) 100%
-//       ),
-//       #212121;
-//     border-radius: 10px;
-//     border: 1px solid rgba(255, 255, 255, 0.15);
-//     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
-//     padding: 15px 10px 15px 10px;
-//   }
-// `;
-
-// export const StyledIssuerLabel = styled.h3`
-//   font-size: 18px;
-//   font-weight: ${({theme}) => theme.font.weight.bold};
-//   margin-bottom: 10px;
-
-//   @media ${({theme}) => theme.screen.lg} {
-//     width: 116px;
-//     border-width: 0 0 1px 0;
-//     border-style: solid;
-//     border-color: rgba(223, 223, 223, 1);
-//   }
-// `;
-
-// export const StyledCreatorLabel = styled(StyledIssuerLabel)`
-//   margin-top: 10px;
-// `;
-
-// export const StyledHolderLabel = styled(StyledIssuerLabel)`
-//   margin-top: 10px;
-//   margin-left: 8px;
-//   border: none;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     margin-left: 48px;
-//   }
-
-//   @media ${({theme}) => theme.screen.xl} {
-//     margin: 0;
-//   }
-// `;
-
-// export const StyledIssuerWrapper = styled.div`
-//   display: grid;
-//   grid-template-columns: repeat(3, 1fr);
-//   justify-items: center;
-//   column-gap: 5px;
-//   row-gap: 10px;
-//   /*
-//     @media ${({theme}) => theme.screen.sm} {
-//         grid-template-columns: repeat(3, 1fr);
-//     } */
-
-//   @media ${({theme}) => theme.screen.md} {
-//     grid-template-columns: repeat(4, 1fr);
-//   }
-
-//   @media ${({theme}) => theme.screen.lg} {
-//     grid-template-columns: repeat(3, 1fr);
-//   }
-// `;
-
-// export const StyledCreatorWrapper = styled(StyledIssuerWrapper)``;
-
-// export const StyledHolderWrapper = styled(StyledIssuerWrapper)`
-//   display: grid;
-//   grid-template-columns: repeat(3, 1fr);
-//   margin: 0 8px 0 8px;
-//   justify-items: center;
-
-//   @media ${({theme}) => theme.screen.sm} {
-//     margin: 0 48px 0 48px;
-//   }
-
-//   @media ${({theme}) => theme.screen.md} {
-//     grid-template-columns: repeat(4, 1fr);
-//   }
-
-//   @media ${({theme}) => theme.screen.lg} {
-//     grid-template-columns: repeat(5, 1fr);
-//   }
-
-//   @media ${({theme}) => theme.screen.xl} {
-//     margin: 0;
-//     grid-template-columns: repeat(6, 1fr);
-//   }
-// `;
-
 // Re designed styled components
-
-export const StyledCardMainDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  @media ${({ theme }) => theme.screen.md} {
-    flex-direction: row;
-    column-gap: 20px;
-    height: 590px;
-  }
-`;
-
-export const StyledMediaWrapper = styled.div`
-  position: relative;
-  display: flex;
-  background: url(${BgMetaCard});
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  width: 100%;
-  height: 445px;
-
-  @media ${({ theme }) => theme.screen.md} {
-    width: 50%;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    height: 100%;
-  }
-`;
-
-export const StyledMedia = styled.img`
-  width: 230px;
-  margin: auto;
-`;
 
 export const StyledMintControls = styled.div`
   position: absolute;
@@ -391,17 +118,6 @@ export const StyledMintSliderIndex = styled.p`
   margin: auto 0;
 `;
 
-export const StyledCardInfoWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  @media ${({ theme }) => theme.screen.md} {
-    width: 50%;
-    row-gap: 20px;
-  }
-`;
-
 export const StyledCardPriceWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -428,9 +144,9 @@ export const StyledCardPriceLabel = styled.p``;
 
 export const StyledQuickActions = styled.div`
   display: grid;
-  width: 110px;
+  width: max-content;
   height: 30px;
-  grid-template-columns: repeat(auto-fit, minmax(1em, 1fr));
+  grid-template-columns: repeat(3, minmax(2em, 1fr));
   margin-left: auto;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;
@@ -487,28 +203,9 @@ export const StyledChangePriceButton = styled(StyledSetPriceButton)``;
 
 export const StyledWithdrawButton = styled(StyledSetPriceButton)``;
 
-export const StyledCardInfoAccordion = styled(Accordion)``;
-
-export const StyledCardInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-`;
-
-export const StyledCardInfoContainer = styled.div`
-  display: flex;
+export const StyledDividerSpan = styled.span`
+  border: 0.01em solid rgba(223, 223, 223, 0.2);
   width: 100%;
-  margin: auto 0;
-`;
-
-export const StyledCardInfoLabel = styled.p`
-  color: white;
-  opacity: 0.5;
-  width: 50%;
-`;
-
-export const StyledCardInfoValue = styled.p`
-  width: 50%;
 `;
 
 export const StyledTabContent = styled.div`
@@ -540,11 +237,11 @@ export const StyledCardProperties = styled.div`
   }
 
   @media ${({ theme }) => theme.screen.md} {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   @media ${({ theme }) => theme.screen.lg} {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
@@ -580,3 +277,73 @@ export const StyledCardPropertyValue = styled.p``;
 export const StyledMarketAccordion = styled(Accordion)``;
 
 export const StyledHoldersAccordion = styled(Accordion)``;
+
+// hackathon changes
+
+export const StyledMediaContainer = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  row-gap: 1.5em;
+
+  @media ${({ theme }) => theme.screen.lg} {
+    width: 50%;
+    row-gap: 2em;
+  }
+`;
+
+export const StyledHeroImgContainer = styled.div`
+  position: relative;
+`;
+
+export const StyledHeroImg = styled.img`
+  width: 100%;
+
+  @media ${({ theme }) => theme.screen.md} {
+    border-radius: 0.5em;
+  }
+`;
+
+export const StyledOtherMediaContainer = styled.div`
+  display: flex;
+  column-gap: 2em;
+  row-gap: 2em;
+  overflow-x: scroll;
+  height: 15em;
+
+  @media ${({ theme }) => theme.screen.lg} {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    height: auto;
+  }
+`;
+
+export const StyledOtherImg = styled.img`
+  @media ${({ theme }) => theme.screen.md} {
+    border-radius: 0.5em;
+  }
+`;
+
+export const StyledAssetDetailContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  row-gap: 2em;
+
+  @media ${({ theme }) => theme.screen.lg} {
+    width: 50%;
+  }
+`;
+
+export const StyledContractDetailHeader = styled.div`
+  display: flex;
+`;
+
+export const StyledContractName = styled.h2`
+  margin: 0 auto;
+`;
+
+export const StyledContractDescription = styled.p`
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+`;

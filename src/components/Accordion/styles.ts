@@ -4,8 +4,7 @@ export const StyledAccordionWrapper = styled.div<{ $expanded: boolean }>`
   display: flex;
   flex-direction: column;
   padding: 10px;
-  height: ${({ $expanded }) => ($expanded ? '100%' : '62px')};
-  overflow: hidden;
+  height: ${({ $expanded }) => ($expanded ? 'max-content' : '62px')};
 
   @media ${({ theme }) => theme.screen.md} {
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -25,8 +24,7 @@ export const StyledAccordionHeader = styled.div<{ $expanded: boolean }>`
   height: 40px;
 
   @media ${({ theme }) => theme.screen.md} {
-    border-bottom: ${({ $expanded }) =>
-      $expanded ? '1px solid rgba(223, 223, 223, 0.2)' : 'none'};
+    border-bottom: none;
   }
 `;
 

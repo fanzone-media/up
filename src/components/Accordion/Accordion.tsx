@@ -1,5 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { AccordionToggleIcon } from '../../assets';
+import { theme } from '../../boot/styles';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import {
   StyledAccordiomToggleIcon,
   StyledAccordionHeader,
@@ -18,13 +20,14 @@ export const Accordion: React.FC<IProps> = ({
   children,
   enableToggle,
 }) => {
+  const isDesktop = useMediaQuery(theme.screen.md);
   const [expand, setExpand] = useState<boolean>(true);
 
   return (
     <StyledAccordionWrapper $expanded={expand}>
       <StyledAccordionHeader $expanded={expand}>
         {header}
-        {enableToggle && (
+        {enableToggle && !isDesktop && (
           <StyledAccordionToggleButton onClick={() => setExpand(!expand)}>
             <StyledAccordiomToggleIcon
               $expanded={expand}
