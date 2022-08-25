@@ -324,6 +324,12 @@ export const StyledOtherImg = styled.img`
   }
 `;
 
+export const StyledVideo = styled.video`
+  @media ${({ theme }) => theme.screen.md} {
+    border-radius: 0.5em;
+  }
+`;
+
 export const StyledAssetDetailContainer = styled.div`
   display: flex;
   flex-direction: column;
