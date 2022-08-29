@@ -45,6 +45,16 @@ import ErrorIcon from './error-icon.svg';
 import OpenseaIcon from './opensea.svg';
 import LuksoHeader from './lukso-header.png';
 import EtherScanLogo from './etherscan-logo.png';
+import HeaderAd from './header-ad.png';
+import HeaderBackground from './header-background.png';
+import LuksoBadge from './lukso-badge.png';
+import NftShowcaseIcon from './nft-showcase-icon.svg';
+import NftBuyAndSellIcon from './nft-buy-and-sell-icon.svg';
+import NftGrantPermissionIcon from './nft-grant-permission-icon.svg';
+import NftTransferIcon from './nft-transfer-icon.svg';
+import NftPersonaliseIcon from './nft-personalise-icon.svg';
+import NftExchangeIcon from './nft-exchange-icon.svg';
+import BodyBackground from './body-background.png';
 
 export {
   BgMetaCard,
@@ -94,4 +104,14 @@ export {
   OpenseaIcon,
   LuksoHeader,
   EtherScanLogo,
+  HeaderAd,
+  HeaderBackground,
+  LuksoBadge,
+  NftShowcaseIcon,
+  NftBuyAndSellIcon,
+  NftGrantPermissionIcon,
+  NftTransferIcon,
+  NftPersonaliseIcon,
+  NftExchangeIcon,
+  BodyBackground,
 };
