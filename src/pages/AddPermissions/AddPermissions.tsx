@@ -13,8 +13,11 @@ import {
   StyledNetworkLabel,
 } from './styles';
 
+interface IProps {
+  upAddress: string;
+}
+
 type formInput = {
-  universalProfileAddress: string;
   addressTo: string;
   permissions: {
     CHANGEOWNER: boolean;
@@ -30,11 +33,9 @@ type formInput = {
   };
 };
 
-export const AddPermissions: React.FC = () => {
+export const AddPermissions = ({ upAddress }: IProps) => {
   const [{ data }] = useSigner();
-  const [{ data: networkData }] = useNetwork();
   const [permissionsForm, setpermissionsForm] = useState<formInput>({
-    universalProfileAddress: '',
     addressTo: '',
     permissions: {
       CHANGEOWNER: false,
@@ -77,12 +78,12 @@ export const AddPermissions: React.FC = () => {
 
   const setPermissions = async () => {
     if (
-      ethers.utils.isAddress(permissionsForm.universalProfileAddress) &&
+      ethers.utils.isAddress(upAddress) &&
       ethers.utils.isAddress(permissionsForm.addressTo)
     ) {
       data &&
         (await KeyManagerApi.addPermissions(
-          permissionsForm.universalProfileAddress,
+          upAddress,
           permissionsForm.addressTo,
           permissionsForm.permissions,
           data,
@@ -92,16 +93,6 @@ export const AddPermissions: React.FC = () => {
 
   return (
     <StyledAddPermissions>
-      <StyledNetworkLabel>
-        You are connected to {networkData.chain?.name} network
-      </StyledNetworkLabel>
-      <StyledInputWrapper>
-        <StyledLabel>Universal Profile Address: </StyledLabel>
-        <StyledInput
-          name="universalProfileAddress"
-          onChange={changeHandler}
-        ></StyledInput>
-      </StyledInputWrapper>
       <StyledInputWrapper>
         <StyledLabel>Grant permission to Address: </StyledLabel>
         <StyledInput name="addressTo" onChange={changeHandler}></StyledInput>

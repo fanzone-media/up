@@ -45,6 +45,7 @@ import ErrorIcon from './error-icon.svg';
 import OpenseaIcon from './opensea.svg';
 import LuksoHeader from './lukso-header.png';
 import EtherScanLogo from './etherscan-logo.png';
+import SettingIcon from './setting-icon.svg';
 
 export {
   BgMetaCard,
@@ -94,4 +95,5 @@ export {
   OpenseaIcon,
   LuksoHeader,
   EtherScanLogo,
+  SettingIcon,
 };

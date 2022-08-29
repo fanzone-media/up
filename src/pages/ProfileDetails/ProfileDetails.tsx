@@ -41,6 +41,8 @@ import {
   StyledShareProfileWrapper,
   StyledOpenEditProfileModal,
   StyledWitdrawFundsButton,
+  StyledProfileSettingButton,
+  StyledSettingIcon,
 } from './styles';
 import { ProfileImage } from './ProfileImage';
 import {
@@ -49,6 +51,7 @@ import {
   Globe,
   Instagram,
   Link,
+  SettingIcon,
   ShareIcon,
   Twitter,
 } from '../../assets';
@@ -77,6 +80,7 @@ import { useModal } from '../../hooks/useModal';
 import { usePagination } from '../../hooks/usePagination';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { WithdrawFundsModal } from './WithdrawFundsModal';
+import { ProfileSettingModal } from './ProfileSettingModal';
 
 interface IParams {
   add: string;
@@ -109,20 +113,22 @@ const ProfileDetails: React.FC = () => {
 
   const isTablet = useMediaQuery(theme.screen.md);
 
-  const [canTransfer, canSetData, canTransferValue] = useMemo(() => {
-    if (!profile || !account) return [false, false, false];
+  const [canTransfer, canSetData, canTransferValue, canAddPermissions] =
+    useMemo(() => {
+      if (!profile || !account) return [false, false, false];
 
-    const permissionsSet = getAddressPermissionsOnUniversalProfile(
-      profile.permissionSet,
-      account.address,
-    );
-    console.log(permissionsSet);
-    return [
-      permissionsSet?.permissions.call === StringBoolean.TRUE,
-      permissionsSet?.permissions.setData === StringBoolean.TRUE,
-      permissionsSet?.permissions.transferValue === StringBoolean.TRUE,
-    ];
-  }, [account, profile]);
+      const permissionsSet = getAddressPermissionsOnUniversalProfile(
+        profile.permissionSet,
+        account.address,
+      );
+      console.log(permissionsSet);
+      return [
+        permissionsSet?.permissions.call === StringBoolean.TRUE,
+        permissionsSet?.permissions.setData === StringBoolean.TRUE,
+        permissionsSet?.permissions.transferValue === StringBoolean.TRUE,
+        permissionsSet?.permissions.addPermissions === StringBoolean.TRUE,
+      ];
+    }, [account, profile]);
 
   useMemo(() => {
     if (!account || !profile || !canTransfer || !canSetData) return;
@@ -255,6 +261,15 @@ const ProfileDetails: React.FC = () => {
   }, [params.add, profile]);
 
   const {
+    handlePresent: onPresentSettingModal,
+    onDismiss: onDismissSettingModal,
+  } = useModal(
+    profile && <ProfileSettingModal profile={profile} />,
+    'Profile Settings Modal',
+    'Profile Settings',
+  );
+
+  const {
     handlePresent: onPresentTransferCardsModal,
     onDismiss: onDismissTransferCardsModal,
   } = useModal(
@@ -385,6 +400,13 @@ const ProfileDetails: React.FC = () => {
                           )}
                         </StyledShareProfileWrapper>
                       </StyledShareProfileHolder>
+                      {(canAddPermissions || canSetData) && canTransfer && (
+                        <StyledProfileSettingButton
+                          onClick={onPresentSettingModal}
+                        >
+                          <StyledSettingIcon src={SettingIcon} />
+                        </StyledProfileSettingButton>
+                      )}
                     </StyledProfileNameBioWrapper>
                   </StyledProfileInfo1Content>
                 </StyledProfileInfo1>

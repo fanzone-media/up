@@ -107,6 +107,7 @@ export const StyledProfileNameBioWrapper = styled.div`
 
   @media ${({ theme }) => theme.screen.lg} {
     flex-direction: row;
+    column-gap: 0.25em;
     align-items: center;
   }
 `;
@@ -176,6 +177,19 @@ export const StyledShareProfileHolder = styled.div`
     margin-left: auto;
     margin-top: 0;
   }
+`;
+
+export const StyledProfileSettingButton = styled.button`
+  background-color: rgba(59, 59, 59, 1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  height: 2em;
+  padding: 0 0.5em;
+  width: max-content;
+`;
+
+export const StyledSettingIcon = styled.img`
+  height: 1.5em;
 `;
 
 export const StyledShareProfileWrapper = styled.div`
@@ -287,6 +301,8 @@ export const StyledShareProfileButton = styled.button<{ isShare: boolean }>`
     border-bottom-color: rgba(255, 255, 255, 0.15);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+    height: 2em;
+    padding: 0 0.5em;
   }
 
   ${({ isShare }) =>
