@@ -23,7 +23,12 @@ interface ILSP4Metadata {
     hash: string;
     url: string;
   }[][];
-  assets: [];
+  assets: {
+    fileType: string;
+    hash: string;
+    hashFunction: 'keccak256(bytes)';
+    url: string;
+  }[];
 }
 
 export interface StringTrait {
@@ -71,6 +76,7 @@ export interface ILSP8MetaData {
   // extra OpenSea fields
   image: string;
   external_url: string;
+  animation_url: string;
   description: string;
   name: string;
   attributes: OpenseaAttribute[];

@@ -5,10 +5,6 @@ export const StyledAddPermissions = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 8px;
-
-  @media ${({ theme }) => theme.screen.md} {
-    padding: 0 40px;
-  }
 `;
 
 export const StyledNetworkLabel = styled.p`
