@@ -785,18 +785,24 @@ const AssetDetails: React.FC = () => {
 
   const getHeroImgSrc = useMemo(() => {
     if (asset?.supportedInterface === 'erc721') {
-      const img = asset?.lsp8MetaData[currentTokenId]?.image;
+      const img =
+        asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images &&
+        asset?.lsp8MetaData[currentTokenId]?.image;
       return img && img.startsWith('ipfs://')
         ? Utils.convertImageURL(img)
         : img;
     } else if (asset?.supportedInterface === 'lsp8') {
+      console.log(asset?.lsp8MetaData[currentTokenId], currentTokenId);
       const img =
-        asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata.images[0][0].url;
+        asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images &&
+        asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images[0][0]?.url;
       return img && img.startsWith('ipfs://')
         ? Utils.convertImageURL(img)
         : img;
     } else {
-      const img = asset?.lsp8MetaData[0]?.LSP4Metadata.images[0][0].url;
+      const img =
+        asset?.lsp8MetaData[0]?.LSP4Metadata?.images &&
+        asset?.lsp8MetaData[0]?.LSP4Metadata?.images[0][0]?.url;
       return img && img.startsWith('ipfs://')
         ? Utils.convertImageURL(img)
         : img;
@@ -807,6 +813,7 @@ const AssetDetails: React.FC = () => {
     if (
       asset &&
       asset.supportedInterface === 'lsp4' &&
+      asset.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images &&
       asset.lsp8MetaData[0]?.LSP4Metadata?.images.length > 1
     ) {
       return asset.lsp8MetaData[0]?.LSP4Metadata?.images.map((item, i) => {
@@ -819,6 +826,7 @@ const AssetDetails: React.FC = () => {
     } else if (
       asset &&
       asset.supportedInterface === 'lsp8' &&
+      asset.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images &&
       asset.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images.length > 1
     ) {
       return asset.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images.map(
@@ -890,8 +898,9 @@ const AssetDetails: React.FC = () => {
                         </>
                       )}
                   </StyledHeroImgContainer>
-                  {asset.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images
-                    .length > 1 &&
+                  {asset.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images &&
+                    asset.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images
+                      .length > 1 &&
                     ['lsp8', 'lsp4'].includes(asset.supportedInterface) && (
                       <StyledOtherMediaContainer>
                         {getOtherImgs &&

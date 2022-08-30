@@ -87,8 +87,6 @@ const fetchCard = async (
 
   const result = await getLSP4Metadata(metaDataUrl, supportedInterface);
 
-  console.log(result);
-
   let creators: string[] = [];
   supportedInterface !== 'erc721' &&
     (await LSP3ProfileApi.fetchCreatorsAddresses(

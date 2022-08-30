@@ -25,6 +25,7 @@ import {
 import { BigNumber, BigNumberish, BytesLike, ethers, Signer } from 'ethers';
 import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
+import { ERC725 } from '@erc725/erc725.js';
 import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
@@ -179,30 +180,36 @@ const fetchProfile = async (
 
   const profile: IProfile = {
     ...metaData?.LSP3Profile,
-    profileImage: metaData.LSP3Profile.profileImage[0]
-      ? typeof metaData.LSP3Profile.profileImage[0].url === 'string'
-        ? metaData.LSP3Profile.profileImage[0].url.startsWith('ipfs://')
-          ? Utils.convertImageURL(metaData.LSP3Profile.profileImage[0].url)
-          : metaData.LSP3Profile.profileImage[0].url
-        : ''
-      : null,
-    profileImageHash: metaData.LSP3Profile.profileImage[0]
-      ? metaData.LSP3Profile.profileImage[0].hash
+    profileImage:
+      metaData.LSP3Profile?.profileImage && metaData.LSP3Profile.profileImage[0]
+        ? typeof metaData.LSP3Profile.profileImage[0].url === 'string'
+          ? metaData.LSP3Profile.profileImage[0].url.startsWith('ipfs://')
+            ? Utils.convertImageURL(metaData.LSP3Profile.profileImage[0].url)
+            : metaData.LSP3Profile.profileImage[0].url
+          : ''
+        : null,
+    profileImageHash:
+      metaData.LSP3Profile?.profileImage && metaData.LSP3Profile.profileImage[0]
         ? metaData.LSP3Profile.profileImage[0].hash
-        : ''
-      : '',
-    backgroundImage: metaData.LSP3Profile.backgroundImage[0]
-      ? typeof metaData.LSP3Profile.backgroundImage[0].url === 'string'
-        ? metaData.LSP3Profile.backgroundImage[0].url.startsWith('ipfs://')
-          ? Utils.convertImageURL(metaData.LSP3Profile.backgroundImage[0].url)
-          : metaData.LSP3Profile.backgroundImage[0].url
-        : ''
-      : null,
-    backgroundImageHash: metaData.LSP3Profile.backgroundImage[0]
-      ? metaData.LSP3Profile.backgroundImage[0].hash
+          ? metaData.LSP3Profile.profileImage[0].hash
+          : ''
+        : '',
+    backgroundImage:
+      metaData.LSP3Profile?.backgroundImage &&
+      metaData.LSP3Profile.backgroundImage[0]
+        ? typeof metaData.LSP3Profile.backgroundImage[0].url === 'string'
+          ? metaData.LSP3Profile.backgroundImage[0].url.startsWith('ipfs://')
+            ? Utils.convertImageURL(metaData.LSP3Profile.backgroundImage[0].url)
+            : metaData.LSP3Profile.backgroundImage[0].url
+          : ''
+        : null,
+    backgroundImageHash:
+      metaData.LSP3Profile?.backgroundImage &&
+      metaData.LSP3Profile.backgroundImage[0]
         ? metaData.LSP3Profile.backgroundImage[0].hash
-        : ''
-      : '',
+          ? metaData.LSP3Profile.backgroundImage[0].hash
+          : ''
+        : '',
   };
   return {
     ...profile,
@@ -447,18 +454,18 @@ export const getKeyManagerPermissions = async (
     });
 
   if (addressPermissions !== '0x') {
-    const permissionNames = [
-      'sign',
-      'transferValue',
-      'deploy',
-      'delegateCall',
-      'staticCall',
-      'call',
-      'setData',
-      'addPermissions',
-      'changePermissions',
-      'changeOwner',
-    ];
+    // const permissionNames = [
+    //   'sign',
+    //   'transferValue',
+    //   'deploy',
+    //   'delegateCall',
+    //   'staticCall',
+    //   'call',
+    //   'setData',
+    //   'addPermissions',
+    //   'changePermissions',
+    //   'changeOwner',
+    // ];
     const arrayLength = ethers.BigNumber.from(addressPermissions).toNumber();
 
     const indexKeys = new Array(arrayLength)
@@ -485,6 +492,7 @@ export const getKeyManagerPermissions = async (
           const key =
             KeyChain.LSP6AddressPermissions_Permissions +
             address.replace(/^0x/, '');
+
           let res: string = '';
           await contract
             .getData([key])
@@ -499,17 +507,31 @@ export const getKeyManagerPermissions = async (
                 })
                 .catch(() => {});
             });
-          let permissionsBinary = parseInt(res.slice(58), 16)
-            .toString(2)
-            .padStart(10, '0');
-          if (permissionsBinary.length > 10) {
-            permissionsBinary = permissionsBinary.slice(
-              permissionsBinary.length - 10,
-            );
-          }
-          const permissionsBinaryArray = permissionsBinary.split('');
+
+          const permissionsBinary = ERC725.decodePermissions(res);
+
+          // let permissionsBinary = parseInt(res.slice(58), 16)
+          //   .toString(2)
+          //   .padStart(10, '0');
+          // if (permissionsBinary.length > 10) {
+          //   permissionsBinary = permissionsBinary.slice(
+          //     permissionsBinary.length - 10,
+          //   );
+          // }
+          // const permissionsBinaryArray = permissionsBinary.split('');
+          // const permissions = Object.fromEntries(
+          //   permissionNames.map((item, i) => [item, permissionsBinaryArray[i]]),
+          // );
+
+          const keys = Object.keys(permissionsBinary) as Array<
+            keyof typeof permissionsBinary
+          >;
+
           const permissions = Object.fromEntries(
-            permissionNames.map((item, i) => [item, permissionsBinaryArray[i]]),
+            keys.map((item, i) => [
+              item.toLowerCase(),
+              permissionsBinary[item] ? '1' : '0',
+            ]),
           );
           return { address, permissions };
         }
