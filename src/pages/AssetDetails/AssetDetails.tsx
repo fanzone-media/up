@@ -118,15 +118,15 @@ const AssetDetails: React.FC = () => {
     IPermissionSet['permissions']
   >({
     sign: '0',
-    transferValue: '0',
+    transfervalue: '0',
     deploy: '0',
-    delegateCall: '0',
-    staticCall: '0',
+    delegatecall: '0',
+    staticcall: '0',
     call: '0',
-    setData: '0',
-    addPermissions: '0',
-    changePermissions: '0',
-    changeOwner: '0',
+    setdata: '0',
+    addpermissions: '0',
+    changepermissions: '0',
+    changeowner: '0',
   });
   const params = useParams<IPrams>();
 

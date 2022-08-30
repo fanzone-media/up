@@ -5,12 +5,14 @@ import { Tabs } from '../../../components/Tabs';
 import { IProfile } from '../../../services/models';
 import { getAddressPermissionsOnUniversalProfile } from '../../../utility/permissions';
 import { AddPermissions } from '../../AddPermissions';
+import { ProfileEditModal } from '../ProfileEditModal';
 
 interface IProps {
   profile: IProfile;
+  onDismiss: () => void;
 }
 
-export const ProfileSettingModal = ({ profile }: IProps) => {
+export const ProfileSettingModal = ({ profile, onDismiss }: IProps) => {
   const [{ data: account }] = useAccount();
 
   const [canTransfer, canSetData, canAddPermissions] = useMemo(() => {
@@ -23,13 +25,17 @@ export const ProfileSettingModal = ({ profile }: IProps) => {
 
     return [
       permissionsSet?.permissions.call === StringBoolean.TRUE,
-      permissionsSet?.permissions.setData === StringBoolean.TRUE,
-      permissionsSet?.permissions.addPermissions === StringBoolean.TRUE,
+      permissionsSet?.permissions.setdata === StringBoolean.TRUE,
+      permissionsSet?.permissions.addpermissions === StringBoolean.TRUE,
     ];
   }, [account, profile]);
 
   const tabs = [
-    { name: 'Update info', content: <></>, visible: canTransfer && canSetData },
+    {
+      name: 'Update info',
+      content: <ProfileEditModal profile={profile} onDismiss={onDismiss} />,
+      visible: canTransfer && canSetData,
+    },
     {
       name: 'Permissions',
       content: <AddPermissions upAddress={profile.address} />,

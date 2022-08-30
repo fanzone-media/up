@@ -124,9 +124,9 @@ const ProfileDetails: React.FC = () => {
       console.log(permissionsSet);
       return [
         permissionsSet?.permissions.call === StringBoolean.TRUE,
-        permissionsSet?.permissions.setData === StringBoolean.TRUE,
-        permissionsSet?.permissions.transferValue === StringBoolean.TRUE,
-        permissionsSet?.permissions.addPermissions === StringBoolean.TRUE,
+        permissionsSet?.permissions.setdata === StringBoolean.TRUE,
+        permissionsSet?.permissions.transfervalue === StringBoolean.TRUE,
+        permissionsSet?.permissions.addpermissions === StringBoolean.TRUE,
       ];
     }, [account, profile]);
 
@@ -264,7 +264,12 @@ const ProfileDetails: React.FC = () => {
     handlePresent: onPresentSettingModal,
     onDismiss: onDismissSettingModal,
   } = useModal(
-    profile && <ProfileSettingModal profile={profile} />,
+    profile && (
+      <ProfileSettingModal
+        profile={profile}
+        onDismiss={() => onDismissSettingModal()}
+      />
+    ),
     'Profile Settings Modal',
     'Profile Settings',
   );
