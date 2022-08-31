@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
-import { Modal } from '../../../components';
 import {
   FileInput,
   HiddenFileInput,
@@ -242,118 +241,112 @@ export const ProfileEditModal: React.FC<IProps> = ({
     [],
   );
 
-  return (
-    <Modal>
-      {!loading && !error ? (
-        <StyledEditProfileModalContent>
-          {fields.map((item, i) => (
-            <StyledInputRow key={i}>
-              <StyledLabel>{item.label}</StyledLabel>
-              {item.type === 'textarea' && (
-                <StyledTextAreaInput
-                  name={item.name}
-                  onChange={changeHandler}
-                  value={
-                    editProfileForm[item.name as keyof formInput] as string
+  return !loading && !error ? (
+    <StyledEditProfileModalContent>
+      {fields.map((item, i) => (
+        <StyledInputRow key={i}>
+          <StyledLabel>{item.label}</StyledLabel>
+          {item.type === 'textarea' && (
+            <StyledTextAreaInput
+              name={item.name}
+              onChange={changeHandler}
+              value={editProfileForm[item.name as keyof formInput] as string}
+            />
+          )}
+          {item.type === 'text' && (
+            <MetaLabeledInput>
+              {item.baseUrl && <MetaLabel>{item.baseUrl}</MetaLabel>}
+              <StyledInput
+                name={item.name}
+                type={item.type}
+                onChange={changeHandler}
+                value={sanitizeLink(
+                  editProfileForm[item.name as keyof formInput] as string,
+                )}
+              />
+            </MetaLabeledInput>
+          )}
+          {item.type === 'file' && (
+            <FileEditWrapper>
+              {(editProfileForm[item.name as keyof formInput] as File) && (
+                <PreviewImage
+                  alt={profile.name}
+                  src={
+                    (editProfileForm[item.name as keyof formInput] as File)
+                      ? getImageUrl(
+                          (
+                            editProfileForm[
+                              item.name as keyof formInput
+                            ] as File
+                          ).name as string,
+                        )
+                      : ''
                   }
                 />
               )}
-              {item.type === 'text' && (
-                <MetaLabeledInput>
-                  {item.baseUrl && <MetaLabel>{item.baseUrl}</MetaLabel>}
-                  <StyledInput
-                    name={item.name}
-                    type={item.type}
-                    onChange={changeHandler}
-                    value={sanitizeLink(
-                      editProfileForm[item.name as keyof formInput] as string,
-                    )}
-                  />
-                </MetaLabeledInput>
-              )}
-              {item.type === 'file' && (
-                <FileEditWrapper>
-                  {(editProfileForm[item.name as keyof formInput] as File) && (
-                    <PreviewImage
-                      alt={profile.name}
-                      src={
-                        (editProfileForm[item.name as keyof formInput] as File)
-                          ? getImageUrl(
-                              (
-                                editProfileForm[
-                                  item.name as keyof formInput
-                                ] as File
-                              ).name as string,
-                            )
-                          : ''
-                      }
-                    />
-                  )}
-                  <HiddenFileInputWrapper>
-                    <FileInput
-                      title={
-                        (editProfileForm[item.name as keyof formInput] as File)
-                          ? getImageUrl(
-                              (
-                                editProfileForm[
-                                  item.name as keyof formInput
-                                ] as File
-                              ).name as string,
-                            )
-                          : ''
-                      }
-                      fileName={
-                        (editProfileForm[item.name as keyof formInput] as File)
-                          ? getImageUrl(
-                              (
-                                editProfileForm[
-                                  item.name as keyof formInput
-                                ] as File
-                              ).name as string,
-                            )
-                          : ''
-                      }
-                    />
-                    <HiddenFileInput
-                      title={
-                        (editProfileForm[item.name as keyof formInput] as File)
-                          ? getImageUrl(
-                              (
-                                editProfileForm[
-                                  item.name as keyof formInput
-                                ] as File
-                              ).name as string,
-                            )
-                          : ''
-                      }
-                      name={item.name}
-                      onChange={imageChangeHandler}
-                      accept=".jpg, .png"
-                    />
-                  </HiddenFileInputWrapper>
-                </FileEditWrapper>
-              )}
-            </StyledInputRow>
-          ))}
-          <br />
-          <StyledSaveButton onClick={setData}>Save Changes</StyledSaveButton>
-        </StyledEditProfileModalContent>
-      ) : (
-        <StyledErrorLoadingContent>
-          {!error ? (
-            <>
-              <StyledLoadingHolder>
-                <StyledLoader color="#ed7a2d" />
-              </StyledLoadingHolder>
-              <StyledLoadingMessage>
-                confirm the metamask transaction and wait ....
-              </StyledLoadingMessage>
-            </>
-          ) : (
-            <StyledErrorText>Something went wrong</StyledErrorText>
+              <HiddenFileInputWrapper>
+                <FileInput
+                  title={
+                    (editProfileForm[item.name as keyof formInput] as File)
+                      ? getImageUrl(
+                          (
+                            editProfileForm[
+                              item.name as keyof formInput
+                            ] as File
+                          ).name as string,
+                        )
+                      : ''
+                  }
+                  fileName={
+                    (editProfileForm[item.name as keyof formInput] as File)
+                      ? getImageUrl(
+                          (
+                            editProfileForm[
+                              item.name as keyof formInput
+                            ] as File
+                          ).name as string,
+                        )
+                      : ''
+                  }
+                />
+                <HiddenFileInput
+                  title={
+                    (editProfileForm[item.name as keyof formInput] as File)
+                      ? getImageUrl(
+                          (
+                            editProfileForm[
+                              item.name as keyof formInput
+                            ] as File
+                          ).name as string,
+                        )
+                      : ''
+                  }
+                  name={item.name}
+                  onChange={imageChangeHandler}
+                  accept=".jpg, .png"
+                />
+              </HiddenFileInputWrapper>
+            </FileEditWrapper>
           )}
-        </StyledErrorLoadingContent>
+        </StyledInputRow>
+      ))}
+      <br />
+      <StyledSaveButton onClick={setData}>Save Changes</StyledSaveButton>
+    </StyledEditProfileModalContent>
+  ) : (
+    <StyledErrorLoadingContent>
+      {!error ? (
+        <>
+          <StyledLoadingHolder>
+            <StyledLoader color="#ed7a2d" />
+          </StyledLoadingHolder>
+          <StyledLoadingMessage>
+            confirm the metamask transaction and wait ....
+          </StyledLoadingMessage>
+        </>
+      ) : (
+        <StyledErrorText>Something went wrong</StyledErrorText>
       )}
-    </Modal>
+    </StyledErrorLoadingContent>
   );
 };

@@ -7,7 +7,7 @@ export const StyledEditProfileModalContent = styled.div`
 `;
 
 export const StyledInputRow = styled.div`
-  column-gap: 5em;
+  column-gap: 1.5em;
   width: 100%;
   display: flex;
   justify-content: space-between;

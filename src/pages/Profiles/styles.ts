@@ -119,7 +119,7 @@ export const StyledDivider = styled.span`
 `;
 
 export const StyledProfilesHeader = styled.div`
-  padding-top: 20px;
+  padding-top: 30px;
   display: flex;
 `;
 

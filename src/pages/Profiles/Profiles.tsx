@@ -189,13 +189,11 @@ const Profiles: React.FC = () => {
               Your Universal Profile can act as your digital identity and
               digital reputation in Web3 and Metaverse.
             </StyledDescription>
-
             <StyledDescription>
               We believe this is the most advanced and decentral identity
               standard (ERC725), created by Fabian Vogelsteller and brought
               forward through LUKSO and its vision.{' '}
             </StyledDescription>
-
             <StyledDescription>
               Instead of plain old wallets, a Universal Profile can be
               customized like a social media profile - but is in your complete
