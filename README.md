@@ -3,6 +3,7 @@
 Check out the live page at https://fanzone.cloud
 
 Since day one we believe in Universal Profiles, created by Fabian Vogelsteller and brought forward by LUKSO and their vision.
+Here a short video about it: https://youtu.be/S4A2cAYwdhA
 
 
 URL structure: fanzone-media.github.io/up/#/:network
