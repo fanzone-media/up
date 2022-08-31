@@ -171,8 +171,10 @@ export const StyledDescription = styled.p`
   color: #ffffff;
   text-align: center;
   opacity: 0.4;
+  margin: 1.5em 0;
 
   @media ${({ theme }) => theme.screen.md} {
+    margin: 1.5em 0;
     font-size: 20px;
     text-align: left;
   }
@@ -196,7 +198,7 @@ export const StyledLuksoLogo = styled.div`
   margin-bottom: 15px;
 
   @media ${({ theme }) => theme.screen.md} {
-    margin-right: 30px;
+    margin: auto 0;
   }
 `;
 

@@ -124,27 +124,27 @@ const Profiles: React.FC = () => {
   const nftIconParams = [
     {
       url: NftShowcaseIcon,
-      text: 'Showcase and share your NFTs',
+      text: 'Collect, interact and showcase your digital assets, most important share your passion.',
     },
     {
       url: NftBuyAndSellIcon,
-      text: 'Buy and sell NFTs (based on LSP8) decentrally from and to your Universal Profile',
+      text: 'Be safe and secure by giving different levels of permissions to decentral Apps, wallets and vaults.',
     },
     {
       url: NftGrantPermissionIcon,
-      text: 'Grant permission over each single NFTs & vaults to wallets and decentral Apps',
+      text: 'Personalize your own Universal Profile with profile and header picture, social media links and more.',
     },
     {
       url: NftTransferIcon,
-      text: 'Transfer token & NFTs to yours and other wallets, look-up on blockscout',
+      text: 'Buy, sell and auction your NFTs decentrally right from Universal Profiles, where they already are.',
     },
     {
       url: NftPersonaliseIcon,
-      text: 'Personalise your own Universal Profile with pictures, social media links',
+      text: 'Have true digital ownership of your profile, tokens (LSP7, LSP8, …) and over any other dApps.',
     },
     {
       url: NftExchangeIcon,
-      text: 'Exchange LYX (of L16) to Wrapped LYX (on L16)',
+      text: 'Universal Profiles sync seamlessly with mobile and regular web applications, like FANZONE.io',
     },
   ];
 
@@ -186,12 +186,21 @@ const Profiles: React.FC = () => {
           <StyledInfoContent>
             <StyledInfoHeading>What can you do with your UP?</StyledInfoHeading>
             <StyledDescription>
-              Universal Profiles are based on the maybe most advanced and
-              decentral identity standard (ERC725), created by Fabian
-              Vogelsteller and LUKSO. Instead of plain old wallets, a universal
-              profile can be customised like a social media profile - but is in
-              your complete control. You can collect any token and NFTs on it.
-              And you can give any decentral
+              Your Universal Profile can act as your digital identity and
+              digital reputation in Web3 and Metaverse.
+            </StyledDescription>
+
+            <StyledDescription>
+              We believe this is the most advanced and decentral identity
+              standard (ERC725), created by Fabian Vogelsteller and brought
+              forward through LUKSO and its vision.{' '}
+            </StyledDescription>
+
+            <StyledDescription>
+              Instead of plain old wallets, a Universal Profile can be
+              customized like a social media profile - but is in your complete
+              control. It’s easy to use and fun, so it’s ready for mass
+              adoption.
             </StyledDescription>
           </StyledInfoContent>
         </StyledInfoSection>
