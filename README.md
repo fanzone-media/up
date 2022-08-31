@@ -1,18 +1,17 @@
-Checkout the site: https://fanzone-media.github.io/up/#/mumbai
+# Universal Profiles by FANZONE.io
+
+Check out the live page at https://fanzone.cloud
+
+Since day one we believe in Universal Profiles, created by Fabian Vogelsteller and brought forward by LUKSO and their vision.
+
 
 URL structure: fanzone-media.github.io/up/#/:network
 
-Available networks for `:network` param are:
-
-1. polygon
-2. mumbai
-3. l14
-4. ethereum
 
 ## Add permissions
 
-- connect Metamask with address: `0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b`
-- choose the network in metamask where the universal profile is deployed
+- connect with LUKSO extention or Metamask with address: `0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b`
+- choose the network in wallet where the universal profile is deployed
 - visit: https://fanzone-media.github.io/up/#/addpermissions
 
 For development:
