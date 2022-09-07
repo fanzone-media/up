@@ -241,6 +241,10 @@ const ProfileDetails: React.FC = () => {
 
   const shareButtonHandler = useCallback(async () => {
     try {
+      if (navigator.userAgent.includes('Safari')) {
+        throw new Error('Safari share list disabled');
+      }
+
       await navigator.share({
         title: `Fanzone.io Universal Profile – ${profile && profile.address}`,
         text: `This is Fanzone.io's Universal Profile page for ${
