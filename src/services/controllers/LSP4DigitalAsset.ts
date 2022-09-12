@@ -21,6 +21,8 @@ import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { erc20ABI } from 'wagmi';
 import { Provider } from '@ethersproject/providers';
 import ABIs from '../utilities/ABIs';
+import { Address } from '../../utils/types';
+import { auctionContracts } from './Auction';
 
 const fetchCard = async (
   address: string,
@@ -455,6 +457,21 @@ const getTokenSale = async (
   return market;
 };
 
+const encodeAuthorizeOperator = async (
+  assetAddress: Address,
+  signer: Signer,
+  tokenId: number,
+  network: NetworkName,
+) => {
+  const contract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
+  const encodedAuthorizeOperator = contract.interface.encodeFunctionData(
+    'authorizeOperator',
+    [auctionContracts[network], tokenIdAsBytes],
+  );
+  return encodedAuthorizeOperator;
+};
+
 export const LSP4DigitalAssetApi = {
   fetchCard,
   fetchProfileIssuedAssetsAddresses,
@@ -468,4 +485,5 @@ export const LSP4DigitalAssetApi = {
   fetchErc20TokenInfo,
   buyFromMarketViaEOA,
   buyFromCardMarketViaUniversalProfile,
+  encodeAuthorizeOperator,
 };

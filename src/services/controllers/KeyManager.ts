@@ -3,7 +3,6 @@ import {
   encodeArrayKey,
   encodeKeyValue,
 } from '@erc725/erc725.js/build/main/lib/utils';
-import { Provider } from '@ethersproject/providers';
 import { BigNumber, BigNumberish, BytesLike, ethers, Signer } from 'ethers';
 import {
   CardMarket__factory,
@@ -14,7 +13,7 @@ import {
 } from '../../submodules/fanzone-smart-contracts/typechain';
 import { executeCallToUniversalProfileViaKeyManager } from '../../submodules/fanzone-smart-contracts/utils/universalProfile';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
-import { getGasPrice } from '../../utils/network';
+import { Address } from '../../utils/types';
 import KeyChain from '../utilities/KeyChain';
 
 const LSP6KeyManagerSchemaList: ERC725JSONSchema = {
@@ -310,6 +309,23 @@ const removeMarketViaKeymanager = async (
     ]);
 
   const transaction = await keyManagerContract.execute(encodedExecuteFunction);
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
+const executeTransactionViaKeyManager = async (
+  keyManagerAddress: Address,
+  encodedData: string,
+  signer: Signer,
+) => {
+  const contract = LSP6KeyManagerProxy__factory.connect(
+    keyManagerAddress,
+    signer,
+  );
+  const transaction = await contract.execute(encodedData);
   await transaction.wait(1).then((result) => {
     if (result.status === 0) {
       throw new Error('Transaction reverted');

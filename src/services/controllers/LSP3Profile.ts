@@ -30,6 +30,7 @@ import Web3 from 'web3';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import ABIs from '../utilities/ABIs';
+import { Address } from '../../utils/types';
 
 const isUniversalProfile = async (
   address: string,
@@ -810,6 +811,49 @@ const removeMarket = async (
     0,
     encodedRemoveMarketForFunction,
   );
+  await transaction.wait(1).then((result) => {
+    if (result.status === 0) {
+      throw new Error('Transaction reverted');
+    }
+  });
+};
+
+const encodeExecute = (
+  universalProfileAddress: Address,
+  callToAddress: Address,
+  encodedData: string,
+  signer: Signer,
+) => {
+  const contract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+  const encodedExecute = contract.interface.encodeFunctionData('execute', [
+    '0x0',
+    callToAddress,
+    0,
+    encodedData,
+  ]);
+  return encodedExecute;
+};
+
+const executeTransactionViaUniversalProfile = async (
+  universalProfileAddress: Address,
+  callToAddress: Address,
+  encodedData: string,
+  signer: Signer,
+) => {
+  const contract = UniversalProfileProxy__factory.connect(
+    universalProfileAddress,
+    signer,
+  );
+  const transaction = await contract.execute(
+    '0x0',
+    callToAddress,
+    0,
+    encodedData,
+  );
+
   await transaction.wait(1).then((result) => {
     if (result.status === 0) {
       throw new Error('Transaction reverted');
