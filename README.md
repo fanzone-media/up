@@ -1,19 +1,36 @@
-Checkout the site: https://fanzone-media.github.io/up/#/mumbai
+# Universal Profiles by FANZONE.io
+
+Check out the live page at https://fanzone.cloud
+
+Since day one we believe in Universal Profiles, created by Fabian Vogelsteller and brought forward by LUKSO and their vision.
+Here a short video about it: https://youtu.be/S4A2cAYwdhA
+
 
 URL structure: fanzone-media.github.io/up/#/:network
 
-Available networks for `:network` param are:
 
-1. polygon
-2. mumbai
-3. l14
-4. ethereum
+## WHAT CAN YOU DO WITH YOUR UP?
+Your Universal Profile can act as your digital identity and digital reputation in Web3 and Metaverse.
 
-## Add permissions
+We believe this is the most advanced and decentral identity standard (ERC725), created by Fabian Vogelsteller and brought forward through LUKSO and its vision.
 
-- connect Metamask with address: `0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b`
-- choose the network in metamask where the universal profile is deployed
-- visit: https://fanzone-media.github.io/up/#/addpermissions
+Instead of plain old wallets, a Universal Profile can be customized like a social media profile - but is in your complete control. It’s easy to use and fun, so it’s ready for mass adoption.
+
+- Collect, interact and showcase your digital assets, most important share your passion.
+- Be safe and secure by giving different levels of permissions to decentral Apps, wallets and vaults.
+- Personalize your own Universal Profile with profile and header picture, social media links and more.
+- Buy, sell and auction your NFTs decentrally right from Universal Profiles, where they already are.
+- Have true digital ownership of your profile, tokens (LSP7, LSP8, …) and over any other dApps.
+- Universal Profiles sync seamlessly with mobile and regular web applications, like FANZONE.io
+
+
+
+
+## Permission Management 
+
+- connect with LUKSO extention or Metamask with address: `0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b`
+- choose the network in wallet where the universal profile is deployed
+- visit: https://fanzone.cloud/#/addpermissions
 
 For development:
 
