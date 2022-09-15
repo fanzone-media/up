@@ -257,6 +257,50 @@ const AssetDetails: React.FC = () => {
 
   const dispatch = useAppDispatch();
 
+  const nextMint = () => {
+    const nextIndex = currentIndex + 1;
+    if (!ownedTokenIds || nextIndex >= ownedTokenIds.length) return;
+    if (mintIdInputRef.current) {
+      mintIdInputRef.current.value = (nextIndex + 1).toString();
+    }
+    history.push(
+      `/${params.network}/asset/${params.add}/${ownedTokenIds[nextIndex]}`,
+    );
+    setCurrentIndex(nextIndex);
+  };
+
+  const previousMint = () => {
+    const previousIndex = currentIndex - 1;
+    if (!ownedTokenIds || previousIndex < 0) return;
+    if (mintIdInputRef.current) {
+      mintIdInputRef.current.value = (previousIndex + 1).toString();
+    }
+    history.push(
+      `/${params.network}/asset/${params.add}/${ownedTokenIds[previousIndex]}`,
+    );
+    setCurrentIndex(previousIndex);
+  };
+
+  const mintChangeHelper = (mint: number) => {
+    if (ownedTokenIds && mint > 0 && mint <= ownedTokenIds.length) {
+      history.push(
+        `/${params.network}/asset/${params.add}/${ownedTokenIds[mint - 1]}`,
+      );
+      setCurrentIndex(mint - 1);
+    }
+  };
+
+  const onEnterHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.currentTarget.blur();
+    }
+  };
+
+  const onBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
+    const val = Number(event.target.value);
+    mintChangeHelper(val);
+  };
+
   const { transferCard, transferState } = useTransferLsp8Token(
     params.add,
     account ? account.address : '',
@@ -303,9 +347,7 @@ const AssetDetails: React.FC = () => {
         ownedTokenIds={ownedTokenIds}
         markets={asset.markets}
         whiteListedTokens={asset.whiteListedTokens}
-        onSelect={(tokenId: number) => {
-          setCurrentIndex(ownedTokenIds.indexOf(Number(tokenId)));
-        }}
+        onSelect={mintChangeHelper}
         onSelectCallback={() => onDismissSelectMintModal()}
       />
     ),
@@ -480,50 +522,6 @@ const AssetDetails: React.FC = () => {
     }),
     [],
   );
-
-  const nextMint = () => {
-    const nextIndex = currentIndex + 1;
-    if (!ownedTokenIds || nextIndex >= ownedTokenIds.length) return;
-    if (mintIdInputRef.current) {
-      mintIdInputRef.current.value = (nextIndex + 1).toString();
-    }
-    history.push(
-      `/${params.network}/asset/${params.add}/${ownedTokenIds[nextIndex]}`,
-    );
-    setCurrentIndex(nextIndex);
-  };
-
-  const previousMint = () => {
-    const previousIndex = currentIndex - 1;
-    if (!ownedTokenIds || previousIndex < 0) return;
-    if (mintIdInputRef.current) {
-      mintIdInputRef.current.value = (previousIndex + 1).toString();
-    }
-    history.push(
-      `/${params.network}/asset/${params.add}/${ownedTokenIds[previousIndex]}`,
-    );
-    setCurrentIndex(previousIndex);
-  };
-
-  const mintChangeHelper = (mint: number) => {
-    if (ownedTokenIds && mint > 0 && mint <= ownedTokenIds.length) {
-      history.push(
-        `/${params.network}/asset/${params.add}/${ownedTokenIds[mint - 1]}`,
-      );
-      setCurrentIndex(mint - 1);
-    }
-  };
-
-  const onEnterHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.currentTarget.blur();
-    }
-  };
-
-  const onBlurHandler = (event: React.FocusEvent<HTMLInputElement>) => {
-    const val = Number(event.target.value);
-    mintChangeHelper(val);
-  };
 
   const renderIssuer = useMemo(() => {
     const findBalanceOf =
@@ -792,7 +790,6 @@ const AssetDetails: React.FC = () => {
         ? Utils.convertImageURL(img)
         : img;
     } else if (asset?.supportedInterface === 'lsp8') {
-      console.log(asset?.lsp8MetaData[currentTokenId], currentTokenId);
       const img =
         asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images &&
         asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images[0][0]?.url;

@@ -38,7 +38,7 @@ export const SelectMintModalContent = ({
         return (
           <StyledSelectMintListContent
             onClick={() => {
-              onSelect(id);
+              onSelect(ownedTokenIds.indexOf(id) + 1);
               onSelectCallback();
             }}
           >
