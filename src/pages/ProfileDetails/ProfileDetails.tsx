@@ -276,18 +276,13 @@ const ProfileDetails: React.FC = () => {
     handlePresent: onPresentTransferCardsModal,
     onDismiss: onDismissTransferCardsModal,
   } = useModal(
-    <TransferCardsModal
-      profile={{
-        address: profile?.address ? profile.address : '',
-        owner: profile?.owner ? profile.owner : '',
-        isOwnerKeyManager: profile?.isOwnerKeyManager
-          ? profile.isOwnerKeyManager
-          : false,
-        ownedAssets: profile?.ownedAssets ? profile.ownedAssets : [],
-      }}
-      onDismiss={() => onDismissTransferCardsModal()}
-      network={params.network}
-    />,
+    profile && (
+      <TransferCardsModal
+        profile={profile}
+        onDismiss={() => onDismissTransferCardsModal()}
+        network={params.network}
+      />
+    ),
     'Cards Transfer Modal',
     'Transfer Card',
   );
@@ -400,6 +395,7 @@ const ProfileDetails: React.FC = () => {
               </StyledProfileInfoWrapper>
               {profile &&
                 account &&
+                profile.ownedAssets.length > 0 &&
                 (canTransfer ||
                   profile.owner.toLowerCase() ===
                     account.address.toLowerCase()) && (
