@@ -5,6 +5,7 @@ import { NetworkName } from '../../boot/types';
 import { useCopyText } from '../../hooks/useCopyText';
 import {
   LOCAL_STORAGE_KEYS,
+  ProfilePermissionsLocal,
   useLocalStorage,
 } from '../../hooks/useLocalStorage';
 import {
@@ -36,8 +37,10 @@ export const ShareReferModal = ({ network, pathName, onDismiss }: IProps) => {
   const { getItems } = useLocalStorage();
   const selectInputRef = useRef<HTMLSelectElement>(null);
   const { copied, copyText } = useCopyText();
-  const savedProfiles = getItems(LOCAL_STORAGE_KEYS.UP);
-  const savedProfilesAddresses = savedProfiles
+  const savedProfiles = getItems(
+    LOCAL_STORAGE_KEYS.UP,
+  ) as ProfilePermissionsLocal;
+  const savedProfilesAddresses = savedProfiles[network]
     ? Object.keys(savedProfiles[network])
     : null;
   const [referrerAddress, setReferrerAddress] = useState<string>(
