@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
-import { Modal } from '../../../components';
 import {
   StyledModalButton,
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
 import { ICard, IOwnedAssets } from '../../../services/models';
-import { StyledLoader, StyledLoadingHolder } from '../../AssetDetails/styles';
 import {
-  StyledErrorLoadingContent,
-  StyledErrorText,
   StyledInput,
   StyledInputRow,
   StyledLabel,
-  StyledLoadingMessage,
 } from '../ProfileEditModal/styles';
 import { StyledSelectInput, StyledTransferCardModalContent } from './styles';
 import { Address } from '../../../utils/types';

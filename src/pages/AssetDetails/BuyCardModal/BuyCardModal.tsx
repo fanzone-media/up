@@ -3,7 +3,10 @@ import { useState } from 'react';
 import { NetworkName } from '../../../boot/types';
 import { InputField } from '../../../components/InputField';
 import { useErc20 } from '../../../hooks/useErc20';
-import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import {
+  LOCAL_STORAGE_KEYS,
+  useLocalStorage,
+} from '../../../hooks/useLocalStorage';
 import { useBuyLsp8Token } from '../../../hooks/useBuyLsp8Token';
 import { IWhiteListedTokens } from '../../../services/models';
 import { displayPrice } from '../../../utility';
@@ -59,9 +62,9 @@ export const BuyCardModal = ({
     network,
   );
   const { getItems } = useLocalStorage();
-  const savedProfiles = getItems(network);
+  const savedProfiles = getItems(LOCAL_STORAGE_KEYS.UP);
   const savedProfilesAddresses = savedProfiles
-    ? Object.keys(savedProfiles)
+    ? Object.keys(savedProfiles[network])
     : null;
   const [upAddress, setUpAddress] = useState<string>(
     savedProfilesAddresses && savedProfilesAddresses.length > 0

@@ -206,6 +206,7 @@ const buyFromCardMarketViaKeyManager = async (
   tokenId: number,
   minimumAmount: BigNumber,
   signer: Signer,
+  referrerAddress: Address,
 ) => {
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
   const tokenIdBytes = tokenIdAsBytes32(tokenId);
@@ -220,11 +221,7 @@ const buyFromCardMarketViaKeyManager = async (
 
   const encodedBuyFromMarket = assetContract.interface.encodeFunctionData(
     'buyFromMarket',
-    [
-      tokenIdBytes,
-      minimumAmount.toString(),
-      '0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b',
-    ],
+    [tokenIdBytes, minimumAmount.toString(), referrerAddress],
   );
 
   const encodedExecuteFunction =

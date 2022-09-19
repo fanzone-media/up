@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { NetworkName } from '../../boot/types';
 import { Address } from '../../utils/types';
 
@@ -28,4 +29,12 @@ export const getWhiteListedTokenAddresses = (network: NetworkName) => {
   };
 
   return whiteListedTokens[network];
+};
+
+export const defaultReferrerAddress = {
+  polygon: ethers.constants.AddressZero,
+  mumbai: ethers.constants.AddressZero,
+  ethereum: ethers.constants.AddressZero,
+  l14: ethers.constants.AddressZero,
+  l16: ethers.constants.AddressZero,
 };

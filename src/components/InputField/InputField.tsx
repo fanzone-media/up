@@ -13,6 +13,7 @@ interface IProps {
   placeholder?: string;
   value?: string;
   disabled?: boolean;
+  onBlurHandler?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 export const InputField = ({
@@ -24,6 +25,7 @@ export const InputField = ({
   placeholder,
   value,
   disabled,
+  onBlurHandler,
 }: IProps) => {
   return (
     <StyledInputContainer>
@@ -37,6 +39,7 @@ export const InputField = ({
         placeholder={placeholder}
         value={value}
         disabled={disabled}
+        onBlur={onBlurHandler}
       />
     </StyledInputContainer>
   );

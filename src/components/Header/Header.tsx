@@ -11,7 +11,11 @@ import {
   WalletIcon,
 } from '../../assets';
 import { theme } from '../../boot/styles';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
+import {
+  LOCAL_STORAGE_KEYS,
+  ProfilePermissionsLocal,
+  useLocalStorage,
+} from '../../hooks/useLocalStorage';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
 import {
@@ -47,9 +51,11 @@ export const Header: React.FC = () => {
   const { getItems } = useLocalStorage();
 
   const upAddressLink = () => {
-    const permissions = getItems('polygon');
-    return permissions
-      ? `/polygon/profile/${Object.keys(permissions)[0]}`
+    const permissions = getItems(
+      LOCAL_STORAGE_KEYS.UP,
+    ) as ProfilePermissionsLocal;
+    return permissions && permissions['polygon']
+      ? `/polygon/profile/${Object.keys(permissions['polygon'])[0]}`
       : undefined;
   };
 

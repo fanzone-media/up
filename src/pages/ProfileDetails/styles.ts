@@ -283,7 +283,7 @@ export const StyledOpenEditProfileModal = styled.button`
 
 export const StyledWitdrawFundsButton = styled(StyledOpenEditProfileModal)``;
 
-export const StyledShareProfileButton = styled.button<{ isShare: boolean }>`
+export const StyledShareProfileButton = styled.button`
   align-items: center;
   column-gap: 1.25em;
   background-color: rgba(59, 59, 59, 1);
@@ -304,14 +304,6 @@ export const StyledShareProfileButton = styled.button<{ isShare: boolean }>`
     height: 2em;
     padding: 0 0.5em;
   }
-
-  ${({ isShare }) =>
-    isShare &&
-    `
-    border-bottom-color: transparent;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  `}
 `;
 
 export const StyledShareDropDown = styled.div`

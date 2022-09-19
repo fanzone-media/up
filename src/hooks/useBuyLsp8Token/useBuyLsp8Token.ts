@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import { isAddress } from 'ethers/lib/utils';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNetwork, useSigner } from 'wagmi';
@@ -7,10 +8,24 @@ import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 import { STATUS } from '../../utility';
+import { defaultReferrerAddress } from '../../utility/content/addresses';
+import {
+  LOCAL_STORAGE_KEYS,
+  ReferrerAddressLocal,
+  useLocalStorage,
+} from '../useLocalStorage';
 
 export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
   const [{ data: signer }] = useSigner();
   const [{ data: networkData }] = useNetwork();
+  const { getItems } = useLocalStorage();
+  const localReferrerAddress = getItems(
+    LOCAL_STORAGE_KEYS.REFERRER,
+  ) as ReferrerAddressLocal;
+  const referrerAddress =
+    localReferrerAddress[network] && isAddress(localReferrerAddress[network])
+      ? localReferrerAddress[network]
+      : defaultReferrerAddress[network];
   const [error, setError] = useState();
   const [buyState, setBuyState] = useState<STATUS>(STATUS.IDLE);
 
@@ -49,6 +64,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           tokenId,
           amount,
           signer,
+          referrerAddress,
         )
           .then(() => {
             setBuyState(STATUS.SUCCESSFUL);
@@ -66,6 +82,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           tokenId,
           amount,
           signer,
+          referrerAddress,
         )
           .then(() => {
             setBuyState(STATUS.SUCCESSFUL);
@@ -81,6 +98,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           tokenId,
           amount,
           signer,
+          referrerAddress,
         )
           .then(() => {
             setBuyState(STATUS.SUCCESSFUL);

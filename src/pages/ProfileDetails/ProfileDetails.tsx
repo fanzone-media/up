@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState, StringBoolean } from '../../boot/types';
@@ -36,8 +30,6 @@ import {
   StyledShareIcon,
   StyledShareProfileHolder,
   StyledShareProfileButton,
-  StyledShareDropDown,
-  ShareLink,
   StyledShareProfileWrapper,
   StyledOpenEditProfileModal,
   StyledWitdrawFundsButton,
@@ -50,7 +42,6 @@ import {
   Facebook,
   Globe,
   Instagram,
-  Link,
   SettingIcon,
   ShareIcon,
   Twitter,
@@ -64,8 +55,6 @@ import {
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
 import { useAccount, useSigner } from 'wagmi';
 import { ProfileEditModal } from './ProfileEditModal';
-import { useCopyText } from '../../hooks/useCopyText';
-import { useOutsideClick } from '../../hooks/useOutsideClick';
 import { getAddressPermissionsOnUniversalProfile } from '../../utility/permissions';
 import {
   fetchIssuedCards,
@@ -81,6 +70,9 @@ import { usePagination } from '../../hooks/usePagination';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { WithdrawFundsModal } from './WithdrawFundsModal';
 import { ProfileSettingModal } from './ProfileSettingModal';
+import { useQueryParams } from '../../hooks/useQueryParams';
+import { isAddress } from 'ethers/lib/utils';
+import { ShareReferModal } from '../../components/ShareReferModal';
 
 interface IParams {
   add: string;
@@ -91,6 +83,8 @@ const ProfileDetails: React.FC = () => {
   const params = useParams<IParams>();
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
+  let query = useQueryParams();
+  const { setItem, setReferrer } = useLocalStorage();
   const [{ data: account }] = useAccount();
   const [{ data: signer }] = useSigner();
 
@@ -105,11 +99,6 @@ const ProfileDetails: React.FC = () => {
   const profileStatus = useSelector(
     (state: RootState) => state.userData[params.network].status,
   );
-
-  const [isShare, setIsShare] = useState<boolean>(false);
-
-  const { copied, copyText, canCopy } = useCopyText();
-  const { setItem } = useLocalStorage();
 
   const isTablet = useMediaQuery(theme.screen.md);
 
@@ -129,6 +118,14 @@ const ProfileDetails: React.FC = () => {
         permissionsSet?.permissions.addpermissions === StringBoolean.TRUE,
       ];
     }, [account, profile]);
+
+  useEffect(() => {
+    const referrerAddress = query.get('referrer');
+    referrerAddress &&
+      isAddress(referrerAddress) &&
+      setReferrer(params.network, referrerAddress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   useMemo(() => {
     if (!account || !profile || !canTransfer || !canSetData) return;
@@ -236,28 +233,25 @@ const ProfileDetails: React.FC = () => {
     [profile?.links],
   );
 
-  const shareButtonRef = useRef(null);
-  useOutsideClick(shareButtonRef, () => isShare && setIsShare(false));
+  // const shareButtonHandler = useCallback(async () => {
+  //   try {
+  //     if (navigator.userAgent.includes('Safari')) {
+  //       throw new Error('Safari share list disabled');
+  //     }
 
-  const shareButtonHandler = useCallback(async () => {
-    try {
-      if (navigator.userAgent.includes('Safari')) {
-        throw new Error('Safari share list disabled');
-      }
-
-      await navigator.share({
-        title: `Fanzone.io Universal Profile – ${profile && profile.address}`,
-        text: `This is Fanzone.io's Universal Profile page for ${
-          profile && profile.address
-        }`,
-        url: `${window.location.origin}/#${pathname}`,
-      });
-      console.log('shared successfully');
-    } catch (err) {
-      setIsShare((isShare) => !isShare);
-      console.error('Error: ' + err);
-    }
-  }, [pathname, profile]);
+  //     await navigator.share({
+  //       title: `Fanzone.io Universal Profile – ${profile && profile.address}`,
+  //       text: `This is Fanzone.io's Universal Profile page for ${
+  //         profile && profile.address
+  //       }`,
+  //       url: `${window.location.origin}/#${pathname}`,
+  //     });
+  //     console.log('shared successfully');
+  //   } catch (err) {
+  //     onPresentShareModal();
+  //     console.error('Error: ' + err);
+  //   }
+  // }, [pathname, profile]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -325,6 +319,17 @@ const ProfileDetails: React.FC = () => {
     'Withdraw Funds',
   );
 
+  const { handlePresent: onPresentShareModal, onDismiss: onDismissShareModal } =
+    useModal(
+      <ShareReferModal
+        network={params.network}
+        pathName={pathname}
+        onDismiss={() => onDismissShareModal()}
+      />,
+      'Profile Share Modal',
+      'Share Profile',
+    );
+
   return (
     <StyledProfileDetails>
       {profileStatus === 'loading' ? (
@@ -361,10 +366,9 @@ const ProfileDetails: React.FC = () => {
                       <StyledProfileName>@{profile?.name}</StyledProfileName>
                       <StyledShareProfileHolder>
                         {renderLinks}
-                        <StyledShareProfileWrapper ref={shareButtonRef}>
+                        <StyledShareProfileWrapper>
                           <StyledShareProfileButton
-                            onClick={shareButtonHandler}
-                            isShare={isShare}
+                            onClick={onPresentShareModal}
                           >
                             <StyledShareIcon src={ShareIcon} />
                             <HideOnScreen size="lg">
@@ -374,39 +378,6 @@ const ProfileDetails: React.FC = () => {
                               )}
                             </HideOnScreen>
                           </StyledShareProfileButton>
-                          {isShare && (
-                            <StyledShareDropDown>
-                              <ShareLink
-                                href={`https://twitter.com/intent/tweet?url=${window.location.origin}/#${pathname}`}
-                              >
-                                <img src={Twitter} alt="Twitter" />
-                                Twitter
-                              </ShareLink>
-                              {/* <ShareLink>
-                                <img src={Instagram} alt="Instagram" />
-                                Instagram
-                              </ShareLink> */}
-                              <ShareLink
-                                href={`https://www.facebook.com/sharer.php?u=${window.location.origin}/#${pathname}`}
-                              >
-                                <img src={Facebook} alt="Facebook" />
-                                Facebook
-                              </ShareLink>
-                              {canCopy && (
-                                <ShareLink
-                                  as="button"
-                                  onClick={() =>
-                                    copyText(
-                                      `${window.location.origin}/#${pathname}`,
-                                    )
-                                  }
-                                >
-                                  <img src={Link} alt="Copy Link" />
-                                  {copied ? 'Copied!' : 'Copy Link'}
-                                </ShareLink>
-                              )}
-                            </StyledShareDropDown>
-                          )}
                         </StyledShareProfileWrapper>
                       </StyledShareProfileHolder>
                       {(canAddPermissions || canSetData) && canTransfer && (

@@ -12,7 +12,7 @@ import { useRpcProvider } from '../../../hooks/useRpcProvider';
 import { useWitdrawFunds } from '../../../hooks/useWithdrawFunds';
 import { LSP4DigitalAssetApi } from '../../../services/controllers/LSP4DigitalAsset';
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
-import { displayPrice, STATUS } from '../../../utility';
+import { displayPrice } from '../../../utility';
 import { getWhiteListedTokenAddresses } from '../../../utility/content/addresses';
 import { Address } from '../../../utils/types';
 import {

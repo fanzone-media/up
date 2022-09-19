@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import {
   BackwardsIcon,
   CategoryPropertyIcon,
@@ -84,7 +84,7 @@ import {
   StyledVideo,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
-import { displayPrice, getChainExplorer, STATUS } from '../../utility';
+import { displayPrice, STATUS } from '../../utility';
 import { SellCardModal } from './SellCardModal';
 import { TabedAccordion } from '../../components/TabedAccordion';
 import { StyledAccordionTitle } from '../../components/Accordion/styles';
@@ -106,6 +106,10 @@ import { SelectMintModalContent } from './SelectMintModalContent';
 import { BuyCardButton } from './components/BuyCardButton';
 import Utils from '../../services/utilities/util';
 import { CardInfoAccordion } from './components/CardInfoAccordion';
+import { ShareReferModal } from '../../components/ShareReferModal';
+import { useQueryParams } from '../../hooks/useQueryParams';
+import { isAddress } from 'ethers/lib/utils';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 interface IPrams {
   add: string;
@@ -129,11 +133,10 @@ const AssetDetails: React.FC = () => {
     changeowner: '0',
   });
   const params = useParams<IPrams>();
-
   const history = useHistory();
-
-  const explorer = getChainExplorer(params.network);
-
+  const { pathname } = useLocation();
+  let query = useQueryParams();
+  const { setReferrer } = useLocalStorage();
   const isDesktop = useMediaQuery(theme.screen.md);
 
   const wasActiveProfile = useSelector((state: RootState) => state.userData.me);
@@ -374,6 +377,17 @@ const AssetDetails: React.FC = () => {
     'Transfer Card',
   );
 
+  const { handlePresent: onPresentShareModal, onDismiss: onDismissShareModal } =
+    useModal(
+      <ShareReferModal
+        network={params.network}
+        pathName={pathname}
+        onDismiss={() => onDismissShareModal()}
+      />,
+      'Card Share Modal',
+      'Share Card',
+    );
+
   useMemo(() => {
     if (!asset || owner || ownerStatus !== STATUS.IDLE) return;
 
@@ -475,6 +489,14 @@ const AssetDetails: React.FC = () => {
   useEffect(() => {
     dispatch(clearState(params.network));
   }, [dispatch, params]);
+
+  useEffect(() => {
+    const referrerAddress = query.get('referrer');
+    referrerAddress &&
+      isAddress(referrerAddress) &&
+      setReferrer(params.network, referrerAddress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -764,7 +786,7 @@ const AssetDetails: React.FC = () => {
           <StyledReloadPriceAction>
             <StyledActionIcon src={ReloadIcon} alt="reload" title="reload" />
           </StyledReloadPriceAction>
-          <StyledReloadPriceAction>
+          <StyledReloadPriceAction onClick={onPresentShareModal}>
             <StyledActionIcon src={ShareIcon} alt="share" title="share" />
           </StyledReloadPriceAction>
           <StyledReloadPriceAction>
@@ -776,6 +798,7 @@ const AssetDetails: React.FC = () => {
     [
       asset?.name,
       currentUsersPermissionsSet.call,
+      onPresentShareModal,
       onPresentTransferCardModal,
       ownedTokenIds,
     ],

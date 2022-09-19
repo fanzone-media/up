@@ -353,6 +353,7 @@ const buyFromCardMarketViaUniversalProfile = async (
   tokenId: number,
   minimumAmount: BigNumber,
   signer: Signer,
+  referrerAddress: Address,
 ) => {
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
   const tokenIdBytes = tokenIdAsBytes32(tokenId);
@@ -363,7 +364,7 @@ const buyFromCardMarketViaUniversalProfile = async (
 
   const encodedBuyFromMarket = assetContract.interface.encodeFunctionData(
     'buyFromMarket',
-    [tokenIdBytes, minimumAmount, '0x87847d301E8Da1D7E95263c3478d7F6e229E3F4b'],
+    [tokenIdBytes, minimumAmount, referrerAddress],
   );
 
   const transaction = await universalProfileContract.execute(
@@ -385,13 +386,14 @@ const buyFromMarketViaEOA = async (
   tokenId: number,
   minimumAmount: BigNumber,
   signer: Signer,
+  referrerAddress: Address,
 ) => {
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
   const transaction = await assetContract.buyFromMarket(
     tokenIdAsBytes,
     minimumAmount,
-    ethers.constants.AddressZero,
+    referrerAddress,
   );
   await transaction.wait(1).then((result) => {
     if (result.status === 0) {
