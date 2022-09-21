@@ -234,10 +234,10 @@ export const ProfileEditModal: React.FC<IProps> = ({
         )
           .catch((error) => {
             setError(true);
-            // onDismiss();
           })
           .finally(() => {
             setLoading(false);
+            onDismiss();
           }));
     } else {
       signer &&
@@ -248,10 +248,10 @@ export const ProfileEditModal: React.FC<IProps> = ({
         )
           .catch((error) => {
             setError(true);
-            // onDismiss();
           })
           .finally(() => {
             setLoading(false);
+            onDismiss();
           }));
     }
   };
