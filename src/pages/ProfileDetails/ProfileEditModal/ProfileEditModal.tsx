@@ -6,6 +6,7 @@ import {
   HiddenFileInputWrapper,
 } from '../../../components/InputField/styles';
 import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
+import { addFile } from '../../../services/ipfsClient';
 import { IProfile, ISetProfileData } from '../../../services/models';
 import { sanitizeLink } from '../../../utility/content/text';
 import { createImageFile } from '../../../utility/file';
@@ -76,6 +77,11 @@ export const ProfileEditModal: React.FC<IProps> = ({
     instagram: linkFinder('instagram'),
   });
 
+  const [currentProfileImages, setCurrentProfileImages] = useState({
+    profileImage: null,
+    backgroundImage: null,
+  });
+
   useEffect(() => {
     (async () => {
       setEditProfileForm({
@@ -98,10 +104,27 @@ export const ProfileEditModal: React.FC<IProps> = ({
 
   const imageChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.currentTarget.files) {
-      setEditProfileForm({
-        ...editProfileForm,
-        [event.currentTarget.name]: event.currentTarget.files[0],
-      });
+      const currentTarget = event.currentTarget;
+      addFile(event.currentTarget.files[0])
+        .then(async (path) => {
+          if (!path) {
+            return;
+          }
+          const imageUrl = `ipfs/${path.replace('ipfs://', '')}`;
+
+          setCurrentProfileImages({
+            ...currentProfileImages,
+            [currentTarget.name]: imageUrl,
+          });
+
+          setEditProfileForm({
+            ...editProfileForm,
+            [currentTarget.name]: currentTarget.files![0],
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
 
@@ -211,10 +234,10 @@ export const ProfileEditModal: React.FC<IProps> = ({
         )
           .catch((error) => {
             setError(true);
-            // onDismiss();
           })
           .finally(() => {
             setLoading(false);
+            onDismiss();
           }));
     } else {
       signer &&
@@ -225,21 +248,19 @@ export const ProfileEditModal: React.FC<IProps> = ({
         )
           .catch((error) => {
             setError(true);
-            // onDismiss();
           })
           .finally(() => {
             setLoading(false);
+            onDismiss();
           }));
     }
   };
 
-  const getImageUrl = useCallback(
-    (url: string) =>
-      url.includes('ipfs.infura-ipfs.io')
-        ? url
-        : `https://ipfs.fanzone.io/${sanitizeLink(url)}`,
-    [],
-  );
+  const getImageUrl = useCallback((url: string) => {
+    return url.includes('ipfs.infura-ipfs.io')
+      ? url
+      : `https://ipfs.fanzone.io/${sanitizeLink(url)}`;
+  }, []);
 
   return !loading && !error ? (
     <StyledEditProfileModalContent>
@@ -274,11 +295,17 @@ export const ProfileEditModal: React.FC<IProps> = ({
                   src={
                     (editProfileForm[item.name as keyof formInput] as File)
                       ? getImageUrl(
-                          (
-                            editProfileForm[
-                              item.name as keyof formInput
-                            ] as File
-                          ).name as string,
+                          currentProfileImages[
+                            item.name as keyof {
+                              profileImage: any;
+                              backgroundImage: any;
+                            }
+                          ] ||
+                            ((
+                              editProfileForm[
+                                item.name as keyof formInput
+                              ] as File
+                            ).name as string),
                         )
                       : ''
                   }
