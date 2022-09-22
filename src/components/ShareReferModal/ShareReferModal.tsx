@@ -127,9 +127,8 @@ export const ShareReferModal = ({ network, pathName, onDismiss }: IProps) => {
           {customReferrerAddress ? 'cancel input' : 'use other address'}
         </StyledModalButton>
       )}
-
+      <StyledShareViaLabel>Share Via: </StyledShareViaLabel>
       <StyledShareOptionsContainer>
-        <StyledShareViaLabel>Share Via: </StyledShareViaLabel>
         <StyledShareLink
           href={`https://twitter.com/intent/tweet?url=${
             window.location.origin
@@ -147,11 +146,25 @@ export const ShareReferModal = ({ network, pathName, onDismiss }: IProps) => {
         <StyledShareLink
           as="button"
           onClick={() =>
-            copyText(`${window.location.origin}/#${pathName}${getReferrer()}`)
+            copyText(
+              'link',
+              `${window.location.origin}/#${pathName}${getReferrer()}`,
+            )
           }
         >
           <img src={Link} alt="Copy Link" title="copy link" />
-          {copied ? 'Copied!' : 'Copy Link'}
+          {copied && copied['link'] ? 'Copied!' : 'Copy Link'}
+        </StyledShareLink>
+        <StyledShareLink
+          as="button"
+          onClick={() =>
+            copyText(
+              'embed',
+              `<iframe src="${window.location.origin}/#${pathName}" title="Fanzone"></iframe>`,
+            )
+          }
+        >
+          {`</>`} {copied && copied['embed'] ? 'Copied!' : 'Copy Embed'}
         </StyledShareLink>
       </StyledShareOptionsContainer>
       <StyledModalButton variant="gray" onClick={onDismiss}>
