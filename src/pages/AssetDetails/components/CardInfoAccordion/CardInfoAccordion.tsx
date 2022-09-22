@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { theme } from '../../../../boot/styles';
 import { StyledAccordionTitle } from '../../../../components/Accordion/styles';
 import { useMediaQuery } from '../../../../hooks/useMediaQuery';
@@ -14,9 +15,10 @@ import {
 
 interface IProps {
   asset: ICard;
+  assetId?: string;
 }
 
-export const CardInfoAccordion = ({ asset }: IProps) => {
+export const CardInfoAccordion = ({ asset, assetId }: IProps) => {
   const isDesktop = useMediaQuery(theme.screen.md);
 
   const cardInfo: {
@@ -36,8 +38,9 @@ export const CardInfoAccordion = ({ asset }: IProps) => {
       //       : '',
       value:
         asset.supportedInterface === 'lsp8'
-          ? ` of ${asset.totalSupply.toString()}`
+          ? ` ${assetId} of ${asset.tokenSupplyCap.toString()}`
           : asset.totalSupply.toString(),
+      valueType: 'supply',
     },
     {
       label: 'Address',
@@ -56,19 +59,24 @@ export const CardInfoAccordion = ({ asset }: IProps) => {
       enableToggle
     >
       <StyledCardInfo>
-        {cardInfo.map((item) => (
-          <StyledCardInfoContainer key={item.label}>
-            <StyledCardInfoLabel>{item.label}</StyledCardInfoLabel>
-            <StyledCardInfoValue>
-              {item.valueType === 'address'
-                ? `${item.value.slice(0, 8)}...${item.value.slice(
-                    item.value.length - 4,
-                    item.value.length,
-                  )}`
-                : item.value}
-            </StyledCardInfoValue>
-          </StyledCardInfoContainer>
-        ))}
+        {cardInfo.map((item) => {
+          if (item.valueType === 'supply' && !assetId) {
+            return '';
+          }
+          return (
+            <StyledCardInfoContainer key={item.label}>
+              <StyledCardInfoLabel>{item.label}</StyledCardInfoLabel>
+              <StyledCardInfoValue>
+                {item.valueType === 'address'
+                  ? `${item.value.slice(0, 8)}...${item.value.slice(
+                      item.value.length - 4,
+                      item.value.length,
+                    )}`
+                  : item.value}
+              </StyledCardInfoValue>
+            </StyledCardInfoContainer>
+          );
+        })}
         <StyledDividerSpan />
         <StyledCardStandardLabel>
           {asset?.supportedInterface.toUpperCase()} on {asset?.network}

@@ -54,6 +54,7 @@ const fetchCard = async (
     lsp4MetaDataUrl,
     erc721MetaDataUrl,
     whiteListedTokens,
+    tokenSupplyCap,
   ] = await Promise.allSettled([
     contract.name(),
     contract.symbol(),
@@ -64,6 +65,7 @@ const fetchCard = async (
     contractLSP4.getData(KeyChain.LSP4Metadata),
     contract.tokenURI(0),
     fetchAcceptedTokens(address, network),
+    contract.tokenSupplyCap(),
   ]);
 
   let metaDataUrl: string = '';
@@ -122,6 +124,10 @@ const fetchCard = async (
     supportedInterface,
     whiteListedTokens:
       whiteListedTokens.status === 'fulfilled' ? whiteListedTokens.value : [],
+    tokenSupplyCap:
+      tokenSupplyCap.status === 'fulfilled'
+        ? tokenSupplyCap.value.toNumber()
+        : 0,
   };
 };
 
