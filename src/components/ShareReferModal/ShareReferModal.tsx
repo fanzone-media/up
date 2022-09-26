@@ -40,9 +40,10 @@ export const ShareReferModal = ({ network, pathName, onDismiss }: IProps) => {
   const savedProfiles = getItems(
     LOCAL_STORAGE_KEYS.UP,
   ) as ProfilePermissionsLocal;
-  const savedProfilesAddresses = savedProfiles[network]
-    ? Object.keys(savedProfiles[network])
-    : null;
+  const savedProfilesAddresses =
+    savedProfiles && savedProfiles[network]
+      ? Object.keys(savedProfiles[network])
+      : null;
   const [referrerAddress, setReferrerAddress] = useState<string>(
     savedProfilesAddresses && savedProfilesAddresses.length > 0
       ? savedProfilesAddresses[0]
