@@ -965,7 +965,9 @@ const AssetDetails: React.FC = () => {
                     {asset.lsp8MetaData[0].description ||
                       asset.lsp8MetaData[0].LSP4Metadata.description}
                   </StyledContractDescription>
-                  {!isDesktop && <CardInfoAccordion asset={asset} />}
+                  {!isDesktop && (
+                    <CardInfoAccordion asset={asset} assetId={params.id} />
+                  )}
                   {!isDesktop ? (
                     <TabedAccordion
                       tabs={[
@@ -1001,7 +1003,9 @@ const AssetDetails: React.FC = () => {
                       {renderCardPrice}
                     </StyledCardPriceWrapper>
                   )}
-                  {isDesktop && <CardInfoAccordion asset={asset} />}
+                  {isDesktop && (
+                    <CardInfoAccordion asset={asset} assetId={params.id} />
+                  )}
                   {asset.supportedInterface === 'lsp8' && (
                     <StyledMarketAccordion
                       header={

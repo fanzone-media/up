@@ -90,6 +90,7 @@ export interface ICard {
   symbol: string;
   owner: string;
   totalSupply: number;
+  tokenSupplyCap: number;
   supportedInterface: SupportedInterface;
   holders: string[];
   creators: string[];
