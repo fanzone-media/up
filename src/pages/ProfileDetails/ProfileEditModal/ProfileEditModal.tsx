@@ -1,4 +1,6 @@
+import { ethers } from 'ethers';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useSigner } from 'wagmi';
 import {
   FileInput,
@@ -30,6 +32,7 @@ import {
 interface IProps {
   onDismiss: () => void;
   profile: IProfile;
+  setTabName?: (name: string) => void;
 }
 
 type formInput = {
@@ -53,6 +56,7 @@ const socialLinks = {
 export const ProfileEditModal: React.FC<IProps> = ({
   onDismiss,
   profile,
+  setTabName,
 }: IProps) => {
   const linkFinder = useCallback(
     (title: SocialLink) => {
@@ -81,6 +85,8 @@ export const ProfileEditModal: React.FC<IProps> = ({
     profileImage: null,
     backgroundImage: null,
   });
+
+  const history = useHistory();
 
   useEffect(() => {
     (async () => {
@@ -224,36 +230,41 @@ export const ProfileEditModal: React.FC<IProps> = ({
 
   const setData = async () => {
     setLoading(true);
-    if (profile.isOwnerKeyManager) {
-      signer &&
-        (await LSP3ProfileApi.setUniversalProfileDataViaKeyManager(
-          profile.owner,
-          profile.address,
-          data,
-          signer,
-        )
-          .catch((error) => {
-            setError(true);
-          })
-          .finally(() => {
-            setLoading(false);
-            onDismiss();
-          }));
-    } else {
-      signer &&
-        (await LSP3ProfileApi.setUniversalProfileData(
-          profile.address,
-          data,
-          signer,
-        )
-          .catch((error) => {
-            setError(true);
-          })
-          .finally(() => {
-            setLoading(false);
-            onDismiss();
-          }));
+
+    if (!signer) {
+      return;
     }
+
+    try {
+      const transaction = await (profile.isOwnerKeyManager
+        ? LSP3ProfileApi.setUniversalProfileDataViaKeyManager(
+            profile.owner,
+            profile.address,
+            data,
+            signer,
+          )
+        : LSP3ProfileApi.setUniversalProfileData(
+            profile.address,
+            data,
+            signer,
+          ));
+
+      await transaction.wait(1);
+
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+
+      if (setTabName) {
+        setTabName('Oops...');
+      }
+
+      setError(true);
+      return;
+    }
+
+    setLoading(false);
+    onDismiss();
   };
 
   const getImageUrl = useCallback((url: string) => {

@@ -50,7 +50,9 @@ export const StyledSaveButton = styled.button`
 
 export const StyledLoadingMessage = styled.p``;
 
-export const StyledErrorText = styled.p``;
+export const StyledErrorText = styled.p`
+  color: red;
+`;
 
 export const StyledErrorLoadingContent = styled.div`
   display: flex;
