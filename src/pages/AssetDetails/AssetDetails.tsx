@@ -796,9 +796,6 @@ const AssetDetails: React.FC = () => {
           <StyledReloadPriceAction onClick={onPresentShareModal}>
             <StyledActionIcon src={ShareIcon} alt="share" title="share" />
           </StyledReloadPriceAction>
-          <StyledReloadPriceAction>
-            <StyledActionIcon src={OptionIcon} alt="options" title="options" />
-          </StyledReloadPriceAction>
         </StyledQuickActions>
       </StyledContractDetailHeader>
     ),

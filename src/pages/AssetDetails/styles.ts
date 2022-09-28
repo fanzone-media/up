@@ -143,10 +143,9 @@ export const StyledCardPriceWrapperHeader = styled.div`
 export const StyledCardPriceLabel = styled.p``;
 
 export const StyledQuickActions = styled.div`
-  display: grid;
+  display: flex;
   width: max-content;
   height: 30px;
-  grid-template-columns: repeat(3, minmax(2em, 1fr));
   margin-left: auto;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;
@@ -154,6 +153,7 @@ export const StyledQuickActions = styled.div`
 
 export const StyledReloadPriceAction = styled.button`
   display: flex;
+  width: 2em;
   border-right: 1px solid rgba(255, 255, 255, 0.15);
 `;
 
