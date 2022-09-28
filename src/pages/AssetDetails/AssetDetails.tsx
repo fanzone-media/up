@@ -744,27 +744,34 @@ const AssetDetails: React.FC = () => {
       asset.lsp8MetaData[currentTokenId]?.attributes &&
       asset.lsp8MetaData[currentTokenId].attributes.length > 0
     ) {
-      return asset?.lsp8MetaData[currentTokenId].attributes.map((item) => {
-        if ('trait_type' in item) {
-          return (
-            <StyledCardPropertyContainer key={item.trait_type}>
-              <StyledCardPropertyIconWrapper>
-                <StyledCardPropertyIcon
-                  src={propertiesImages[item.trait_type]}
-                  alt=""
-                />
-              </StyledCardPropertyIconWrapper>
-              <StyledCardProperty>
-                <StyledCardPropertyLabel>
-                  {item.trait_type}
-                </StyledCardPropertyLabel>
-                <StyledCardPropertyValue>{item.value}</StyledCardPropertyValue>
-              </StyledCardProperty>
-            </StyledCardPropertyContainer>
-          );
-        }
-        return null;
-      });
+      return asset?.lsp8MetaData[currentTokenId].attributes
+        .slice(0)
+        .reverse()
+        .map((item) => {
+          if ('trait_type' in item) {
+            return (
+              <StyledCardPropertyContainer key={item.trait_type}>
+                <StyledCardPropertyIconWrapper>
+                  <StyledCardPropertyIcon
+                    src={propertiesImages[item.trait_type]}
+                    alt=""
+                  />
+                </StyledCardPropertyIconWrapper>
+                <StyledCardProperty>
+                  <StyledCardPropertyLabel>
+                    {item.trait_type}
+                  </StyledCardPropertyLabel>
+                  <StyledCardPropertyValue>
+                    {item.trait_type.toLowerCase() === 'score'
+                      ? Number(item.value) / 100
+                      : item.value}
+                  </StyledCardPropertyValue>
+                </StyledCardProperty>
+              </StyledCardPropertyContainer>
+            );
+          }
+          return null;
+        });
     }
   }, [asset, currentTokenId, propertiesImages]);
 
