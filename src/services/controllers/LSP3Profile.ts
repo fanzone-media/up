@@ -224,6 +224,36 @@ const fetchProfile = async (
   };
 };
 
+const getProfile = async (
+  address: string,
+  network: NetworkName,
+): Promise<IProfile | void> => {
+  if (address.length < 42) {
+    const missingCaractersCount = 42 - address.length;
+
+    throw new Error(
+      `Invalid address, missing ${missingCaractersCount} character${
+        missingCaractersCount === 1 ? '' : 's'
+      }`,
+    );
+  }
+
+  if (!ethers.utils.isAddress(address)) {
+    throw new Error('Address is invalid or does not exists');
+  }
+
+  const isValidProfile = await LSP3ProfileApi.isUniversalProfile(
+    address,
+    network,
+  );
+
+  if (!isValidProfile) {
+    throw new Error('Address is invalid or does not exists');
+  }
+
+  return LSP3ProfileApi.fetchProfile(address, network);
+};
+
 const fetchOwnedCollectionOld = async (
   network: string,
   profileAddress: string,
@@ -870,6 +900,7 @@ const executeTransactionViaUniversalProfile = async (
 
 export const LSP3ProfileApi = {
   fetchProfile,
+  getProfile,
   fetchAllProfiles,
   fetchCreatorsAddresses,
   fetchOwnedCollectionCount,

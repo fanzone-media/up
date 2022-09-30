@@ -1,26 +1,21 @@
 import React, { useState } from 'react';
-import { ethers } from 'ethers';
+import { ProfilePreview } from '../../AssetDetails/ProfilePreview';
 import {
   StyledModalButton,
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
-import { ICard, IOwnedAssets, IProfile } from '../../../services/models';
+import { ICard, IOwnedAssets } from '../../../services/models';
 import {
   StyledInput,
   StyledInputRow,
   StyledLabel,
-  PreviewImage,
-  ProfileInfo,
-  ProfileName,
-  ProfileError,
-  ImageWrapper,
 } from '../ProfileEditModal/styles';
 import { StyledSelectInput, StyledTransferCardModalContent } from './styles';
 import { Address } from '../../../utils/types';
 import { trimedAddress } from '../../../utility/content/addresses';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
 import { NetworkName } from '../../../boot/types';
-import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
+import { useProfile } from '../../../hooks/useProfile';
 
 interface IProps {
   profile: {
@@ -60,42 +55,12 @@ export const TransferCardModal = ({
     network,
   );
 
-  const [destinationProfile, setDestinationProfile] = useState<IProfile | null>(
-    null,
-  );
-  const [profileAddressError, setProfileAddressError] = useState<string | null>(
-    null,
-  );
-
-  const getProfile = async (
-    address: string,
-    network: NetworkName,
-  ): Promise<IProfile | void> => {
-    if (address.length !== 42) {
-      const missingCaractersCount = 42 - address.length;
-
-      throw new Error(
-        `Invalid address, missing ${missingCaractersCount} character${
-          missingCaractersCount === 1 ? '' : 's'
-        }`,
-      );
-    }
-
-    if (!ethers.utils.isAddress(address)) {
-      throw new Error('Address is invalid or does not exists');
-    }
-
-    const isValidProfile = await LSP3ProfileApi.isUniversalProfile(
-      address,
-      network,
-    );
-
-    if (!isValidProfile) {
-      throw new Error('Address is invalid or does not exists');
-    }
-
-    return LSP3ProfileApi.fetchProfile(address, network);
-  };
+  const [
+    destinationProfile,
+    profileAddressError,
+    getProfile,
+    isProfileLoading,
+  ] = useProfile();
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -111,17 +76,7 @@ export const TransferCardModal = ({
       });
     } else {
       if (event.currentTarget.name === 'toAddress') {
-        getProfile(event.currentTarget.value, network)
-          .then((profile) => {
-            if (profile) {
-              setDestinationProfile(profile);
-              setProfileAddressError(null);
-            }
-          })
-          .catch((error) => {
-            setDestinationProfile(null);
-            setProfileAddressError(error.message);
-          });
+        getProfile(event.currentTarget.value, network);
       }
 
       setTransferCardForm({
@@ -140,17 +95,11 @@ export const TransferCardModal = ({
 
   return (
     <StyledTransferCardModalContent>
-      <ProfileInfo>
-        {profileAddressError && (
-          <ProfileError>{profileAddressError}</ProfileError>
-        )}
-        {destinationProfile && (
-          <ImageWrapper>
-            <PreviewImage src={destinationProfile.profileImage} />
-            <ProfileName>{destinationProfile.name}</ProfileName>
-          </ImageWrapper>
-        )}
-      </ProfileInfo>
+      <ProfilePreview
+        profile={destinationProfile}
+        profileError={profileAddressError}
+        isProfileLoading={isProfileLoading}
+      />
       {fields.map((item, i) => (
         <StyledInputRow key={i}>
           <StyledLabel htmlFor={item.name}>{item.label}</StyledLabel>

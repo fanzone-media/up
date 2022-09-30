@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Puff } from 'react-loader-spinner';
+import { ProfilePreview } from '../../AssetDetails/ProfilePreview';
 import {
   StyledModalButton,
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
-import {
-  StyledInput,
-  StyledInputRow,
-  StyledLabel,
-} from '../ProfileEditModal/styles';
+import { StyledInputRow, StyledLabel } from '../ProfileEditModal/styles';
 import { StyledSelectInput, StyledTransferCardModalContent } from './styles';
 import { Address } from '../../../utils/types';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
 import { IOwnedAssets } from '../../../services/models';
 import { InputField } from '../../../components/InputField';
 import { NetworkName } from '../../../boot/types';
+import { useCard } from '../../../hooks/useCard';
+import { useProfile } from '../../../hooks/useProfile';
 
 interface IProps {
   profile: {
@@ -43,6 +43,18 @@ export const TransferCardsModal: React.FC<IProps> = ({
     tokenId: null,
   });
 
+  const [card, getCardName, isCardLoading] = useCard();
+  const [
+    destinationProfile,
+    profileAddressError,
+    getProfile,
+    isProfileLoading,
+  ] = useProfile();
+
+  useEffect(() => {
+    getCardName(transferCardForm.cardAddress, network);
+  }, [transferCardForm.cardAddress]);
+
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -56,6 +68,10 @@ export const TransferCardsModal: React.FC<IProps> = ({
         tokenId: null,
       });
     } else {
+      if (event.currentTarget.name === "receiver's address") {
+        getProfile(event.currentTarget.value, network);
+      }
+
       setTransferCardForm({
         ...transferCardForm,
         [event.currentTarget.name]: event.currentTarget.value,
@@ -72,12 +88,18 @@ export const TransferCardsModal: React.FC<IProps> = ({
   );
 
   const fields = [
-    { name: 'cardAddress', label: 'Card Name', type: 'select' },
+    { name: 'cardName', label: 'Card Name', type: 'text' },
+    { name: 'cardAddress', label: 'Card Address', type: 'select' },
     { name: 'tokenId', label: 'Token Id', type: 'select' },
   ];
 
   return (
     <StyledTransferCardModalContent>
+      <ProfilePreview
+        profile={destinationProfile}
+        profileError={profileAddressError}
+        isProfileLoading={isProfileLoading}
+      />
       <InputField
         name="receiver's address"
         label="Receiver's address"
@@ -106,6 +128,13 @@ export const TransferCardsModal: React.FC<IProps> = ({
               ))}
             </StyledSelectInput>
           )}
+          {item.type === 'text' &&
+            item.name === 'cardName' &&
+            (isCardLoading ? (
+              <Puff color="#ed7a2db3" width={25} height={25} />
+            ) : (
+              <p>{card?.name}</p>
+            ))}
           {item.type === 'select' && item.name === 'tokenId' && (
             <StyledSelectInput name={item.name} onChange={changeHandler}>
               <option>Select token id</option>

@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSigner } from 'wagmi';
@@ -7,12 +6,12 @@ import {
   HiddenFileInput,
   HiddenFileInputWrapper,
 } from '../../../components/InputField/styles';
-import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import { addFile } from '../../../services/ipfsClient';
 import { IProfile, ISetProfileData } from '../../../services/models';
 import { sanitizeLink } from '../../../utility/content/text';
 import { createImageFile } from '../../../utility/file';
 import { StyledLoader, StyledLoadingHolder } from '../../AssetDetails/styles';
+import { LSP3ProfileApi } from '../../../services/controllers/LSP3Profile';
 import {
   FileEditWrapper,
   MetaLabel,
@@ -27,7 +26,9 @@ import {
   StyledLoadingMessage,
   StyledSaveButton,
   StyledTextAreaInput,
+  StyledErrorIcon,
 } from './styles';
+import { ExclamationIcon } from '../../../assets';
 
 interface IProps {
   onDismiss: () => void;
@@ -252,6 +253,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
       await transaction.wait(1);
 
       window.location.reload();
+      throw 1;
     } catch (error) {
       console.log(error);
 
@@ -376,14 +378,17 @@ export const ProfileEditModal: React.FC<IProps> = ({
       {!error ? (
         <>
           <StyledLoadingHolder>
-            <StyledLoader color="#ed7a2d" />
+            <StyledLoader color="#ed7a2d" width={40} />
           </StyledLoadingHolder>
           <StyledLoadingMessage>
             confirm the metamask transaction and wait ....
           </StyledLoadingMessage>
         </>
       ) : (
-        <StyledErrorText>Something went wrong</StyledErrorText>
+        <StyledErrorText>
+          <StyledErrorIcon src={ExclamationIcon} />
+          Something went wrong, please try again
+        </StyledErrorText>
       )}
     </StyledErrorLoadingContent>
   );

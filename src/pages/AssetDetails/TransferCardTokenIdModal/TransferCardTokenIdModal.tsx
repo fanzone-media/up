@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { useState } from 'react';
+import { ProfilePreview } from '../ProfilePreview';
 import { NetworkName } from '../../../boot/types';
-import { Modal } from '../../../components';
 import { InputField } from '../../../components/InputField';
 import {
   StyledModalButtonsWrapper,
@@ -10,6 +10,7 @@ import {
 import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
 import { IProfile } from '../../../services/models';
+import { useProfile } from '../../../hooks/useProfile';
 
 interface TransferCardTokenIdModalProps {
   cardAddress: string;
@@ -27,6 +28,13 @@ export const TransferCardTokenIdModal = ({
   network,
 }: TransferCardTokenIdModalProps) => {
   const [toAddress, setToAddress] = useState<string>('');
+
+  const [
+    destinationProfile,
+    profileAddressError,
+    getProfile,
+    isProfileLoading,
+  ] = useProfile();
 
   const { transferCard, transferState, resetState } = useTransferLsp8Token(
     cardAddress,
@@ -50,13 +58,23 @@ export const TransferCardTokenIdModal = ({
     },
   };
 
+  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    getProfile(event.target.value, network);
+    setToAddress(event.target.value);
+  };
+
   return (
     <>
+      <ProfilePreview
+        profile={destinationProfile}
+        profileError={profileAddressError}
+        isProfileLoading={isProfileLoading}
+      />
       <InputField
         name="receiver's address"
         label="Receiver's address"
         type="text"
-        changeHandler={(e) => setToAddress(e.target.value)}
+        changeHandler={changeHandler}
         align="start"
         placeholder="0x123456789…"
         value={toAddress}

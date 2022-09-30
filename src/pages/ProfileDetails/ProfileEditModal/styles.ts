@@ -52,6 +52,7 @@ export const StyledLoadingMessage = styled.p``;
 
 export const StyledErrorText = styled.p`
   color: red;
+  text-align: center;
 `;
 
 export const StyledErrorLoadingContent = styled.div`
@@ -90,6 +91,7 @@ export const ProfileInfo = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  margin-bottom: 5px;
 `;
 
 export const ProfileName = styled.p`
@@ -100,4 +102,11 @@ export const ProfileName = styled.p`
 
 export const ProfileError = styled.p`
   color: #cc0000;
+`;
+
+export const StyledErrorIcon = styled.img`
+  height: 50px;
+  width: 50px;
+  color: red;
+  margin: 0 auto 10px;
 `;
