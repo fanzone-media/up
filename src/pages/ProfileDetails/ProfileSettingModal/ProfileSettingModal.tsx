@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { StringBoolean } from '../../../boot/types';
 import { Tabs } from '../../../components/Tabs';
@@ -14,6 +14,8 @@ interface IProps {
 
 export const ProfileSettingModal = ({ profile, onDismiss }: IProps) => {
   const [{ data: account }] = useAccount();
+
+  const [tabName, setTabName] = useState('');
 
   const [canTransfer, canSetData, canAddPermissions] = useMemo(() => {
     if (!account) return [false, false, false];
@@ -32,8 +34,14 @@ export const ProfileSettingModal = ({ profile, onDismiss }: IProps) => {
 
   const tabs = [
     {
-      name: 'Update info',
-      content: <ProfileEditModal profile={profile} onDismiss={onDismiss} />,
+      name: tabName || 'Update Info',
+      content: (
+        <ProfileEditModal
+          profile={profile}
+          onDismiss={onDismiss}
+          setTabName={(name: string) => setTabName(name)}
+        />
+      ),
       visible: canTransfer && canSetData,
     },
     {

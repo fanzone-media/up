@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Puff } from 'react-loader-spinner';
 
 export const StyledTransferCardModalContent = styled.div`
   width: 100%;
