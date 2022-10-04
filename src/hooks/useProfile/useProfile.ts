@@ -23,6 +23,7 @@ export const useProfile = (): Result => {
 
   const getProfile = useCallback(
     (profileAddress, network) => {
+      setProfileAddressError('');
       const cahcedProfile = profileCache[profileAddress];
       if (cahcedProfile) {
         setProfile(cahcedProfile);

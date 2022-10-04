@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { useSigner } from 'wagmi';
 import {
   FileInput,
@@ -72,6 +71,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
   const [{ data: signer }] = useSigner();
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [txVerification, setTxVerification] = useState<boolean>(false);
   const [editProfileForm, setEditProfileForm] = useState<formInput>({
     profileImage: null,
     backgroundImage: null,
@@ -86,8 +86,6 @@ export const ProfileEditModal: React.FC<IProps> = ({
     profileImage: null,
     backgroundImage: null,
   });
-
-  const history = useHistory();
 
   useEffect(() => {
     (async () => {
@@ -250,10 +248,11 @@ export const ProfileEditModal: React.FC<IProps> = ({
             signer,
           ));
 
+      setTxVerification(true);
+
       await transaction.wait(1);
 
       window.location.reload();
-      throw 1;
     } catch (error) {
       console.log(error);
 
@@ -266,6 +265,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
     }
 
     setLoading(false);
+    setTxVerification(false);
     onDismiss();
   };
 
@@ -381,7 +381,9 @@ export const ProfileEditModal: React.FC<IProps> = ({
             <StyledLoader color="#ed7a2d" width={40} />
           </StyledLoadingHolder>
           <StyledLoadingMessage>
-            confirm the metamask transaction and wait ....
+            {txVerification
+              ? 'Please wait, transaction is being verified ...'
+              : ' Confirm the metamask transaction and wait ...'}
           </StyledLoadingMessage>
         </>
       ) : (
