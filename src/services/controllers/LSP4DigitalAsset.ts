@@ -9,8 +9,9 @@ import {
   SupportedInterface,
 } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
-import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
+import { BigNumber, BigNumberish, BytesLike, ethers, Signer } from 'ethers';
 import {
+  CardMarket__factory,
   CardTokenProxy__factory,
   ContractRegistry__factory,
   UniversalProfileProxy__factory,
@@ -465,12 +466,79 @@ const getTokenSale = async (
   return market;
 };
 
-const encodeAuthorizeOperator = async (
+const encodeTransferFrom = (
+  assetAddress: string,
+  universalProfileAddress: string,
+  tokenId: number,
+  toAddress: string,
+  signer: Signer,
+) => {
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+
+  const encodedTransfer = assetContract.interface.encodeFunctionData(
+    'transferFrom',
+    [universalProfileAddress, toAddress, tokenId],
+  );
+
+  return encodedTransfer;
+};
+
+const encodeBuyFromCardMarket = (
+  assetAddress: string,
+  tokenId: number,
+  minimumAmount: BigNumber,
+  signer: Signer,
+  referrerAddress: Address,
+) => {
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const tokenIdBytes = tokenIdAsBytes32(tokenId);
+  const frag = 'buyFromMarket';
+  const encodedBuyFromMarket = assetContract.interface.encodeFunctionData(
+    frag,
+    [tokenIdBytes, minimumAmount, referrerAddress],
+  );
+
+  return encodedBuyFromMarket;
+};
+
+const encodeSetMarketFor = (
+  assetAddress: string,
+  tokenId: number,
+  acceptedToken: string,
+  minimumAmount: BigNumberish,
+  signer: Signer,
+): string => {
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
+  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const encodedSetMarketFor = assetContract.interface.encodeFunctionData(
+    'setMarketFor',
+    [tokenIdAsBytes, acceptedToken, minimumAmount.toString()],
+  );
+  return encodedSetMarketFor;
+};
+
+const encodeRemoveMarketFor = (
+  assetAddress: string,
+  universalProfileAddress: string,
+  tokenId: BytesLike,
+  signer: Signer,
+) => {
+  const assetContract = CardMarket__factory.connect(assetAddress, signer);
+
+  const encodedRemoveMarketFor = assetContract.interface.encodeFunctionData(
+    'removeMarketFor',
+    [tokenId],
+  );
+
+  return encodedRemoveMarketFor;
+};
+
+const encodeAuthorizeOperator = (
   assetAddress: Address,
   signer: Signer,
   tokenId: number,
   network: NetworkName,
-) => {
+): string => {
   const contract = CardTokenProxy__factory.connect(assetAddress, signer);
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
   const encodedAuthorizeOperator = contract.interface.encodeFunctionData(
@@ -493,5 +561,4 @@ export const LSP4DigitalAssetApi = {
   fetchErc20TokenInfo,
   buyFromMarketViaEOA,
   buyFromCardMarketViaUniversalProfile,
-  encodeAuthorizeOperator,
 };

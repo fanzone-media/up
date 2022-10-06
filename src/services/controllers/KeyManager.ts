@@ -11,7 +11,6 @@ import {
   LSP6KeyManagerProxy__factory,
   UniversalProfileProxy__factory,
 } from '../../submodules/fanzone-smart-contracts/typechain';
-import { executeCallToUniversalProfileViaKeyManager } from '../../submodules/fanzone-smart-contracts/utils/universalProfile';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { Address } from '../../utils/types';
 import KeyChain from '../utilities/KeyChain';

@@ -425,7 +425,7 @@ const setUniversalProfileDataViaKeyManager = async (
   });
 };
 
-export const getKeyManagerPermissions = async (
+const getKeyManagerPermissions = async (
   address: string,
   network: NetworkName,
 ): Promise<IPermissionSet[]> => {
@@ -544,10 +544,7 @@ export const getKeyManagerPermissions = async (
   return [] as IPermissionSet[];
 };
 
-export const checkKeyManager = async (
-  address: string,
-  network: NetworkName,
-) => {
+const checkKeyManager = async (address: string, network: NetworkName) => {
   const provider = useRpcProvider(network);
   const contract = LSP6KeyManagerProxy__factory.connect(address, provider);
   let isKeyManager = false;
@@ -790,6 +787,7 @@ const transferBalanceViaUniversalProfile = async (
     }
   });
 };
+
 const removeMarket = async (
   assetAddress: string,
   universalProfileAddress: string,
@@ -816,6 +814,24 @@ const removeMarket = async (
       throw new Error('Transaction reverted');
     }
   });
+};
+
+const encodeSetData = (
+  profileAddress: string,
+  jsonUrl: string,
+  signer: Signer,
+) => {
+  const universalProfileContract = UniversalProfileProxy__factory.connect(
+    profileAddress,
+    signer,
+  );
+
+  const encodedSetData = universalProfileContract.interface.encodeFunctionData(
+    'setData',
+    [[KeyChain.LSP3PROFILE], [jsonUrl]],
+  );
+
+  return encodedSetData;
 };
 
 const encodeExecute = (
