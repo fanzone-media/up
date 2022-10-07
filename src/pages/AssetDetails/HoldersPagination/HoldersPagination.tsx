@@ -25,7 +25,7 @@ export const HolderPagination = ({ holdersAddresses }: IProps) => {
   const dispatch = useAppDispatch();
   const params = useParams<IParams>();
   const holderStatus = useSelector(
-    (state: RootState) => state.userData[params.network].holderStatus,
+    (state: RootState) => state.userData[params.network].status.fetchHolders,
   );
 
   const { range: profilesRange, setRange: setProfilesRange } = usePagination();

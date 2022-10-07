@@ -9,11 +9,6 @@ export enum STATUS {
   FAILED = 'failed',
 }
 
-export const CONSTANTS = {
-  MINT_OWNER_ERROR: 'mintOwnerError',
-  MINT_OWNER_STATUS: 'mintOwnerStatus',
-};
-
 export const interfaceIds: { [key: string]: string } = {
   lsp8: '0x49399145',
   lsp4: '0xa4d96624',

@@ -5,7 +5,6 @@ import {
   CategoryPropertyIcon,
   EditionPropertyIcon,
   ForwardsIcon,
-  OptionIcon,
   ReloadIcon,
   SeasonPropertyIcon,
   SetPropertyIcon,
@@ -19,7 +18,7 @@ import {
 import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import {
-  clearState,
+  resetCardsSliceInitialState,
   fetchAllMarkets,
   fetchCard,
   fetchMetaDataForTokenId,
@@ -31,6 +30,7 @@ import {
   fetchOwnerAddressOfTokenId,
   fetchOwnerOfTokenId,
   fetchProfileByAddress,
+  resetUserDataSliceInitialState,
   selectAllUsersItems,
   selectUserById,
   selectUserIds,
@@ -165,7 +165,8 @@ const AssetDetails: React.FC = () => {
   const [{ data: account }] = useAccount();
 
   const ownerStatus = useSelector(
-    (state: RootState) => state.userData[params.network].status,
+    (state: RootState) =>
+      state.userData[params.network].status.fetchAllProfiles,
   );
 
   const creators = useSelector((state: RootState) =>
@@ -177,23 +178,23 @@ const AssetDetails: React.FC = () => {
   });
 
   const cardError = useSelector(
-    (state: RootState) => state.cards[params.network].error,
+    (state: RootState) => state.cards[params.network].error.fetchCard,
   );
 
   const cardStatus = useSelector(
-    (state: RootState) => state.cards[params.network].status,
+    (state: RootState) => state.cards[params.network].status.fetchCard,
   );
 
   const marketsStatus = useSelector(
-    (state: RootState) => state.cards[params.network].marketsStatus,
+    (state: RootState) => state.cards[params.network].status.fetchMarket,
   );
 
   const metaDataStatus = useSelector(
-    (state: RootState) => state.cards[params.network].metaDataStatus,
+    (state: RootState) => state.cards[params.network].status.fetchMetaData,
   );
 
   const creatorsStatus = useSelector(
-    (state: RootState) => state.userData[params.network].creatorStatus,
+    (state: RootState) => state.userData[params.network].status.fetchCreators,
   );
 
   const mintIdInputRef = useRef<HTMLInputElement>(null);
@@ -487,7 +488,8 @@ const AssetDetails: React.FC = () => {
   }, [asset, allProfiles, dispatch, params.network]);
 
   useEffect(() => {
-    dispatch(clearState(params.network));
+    dispatch(resetUserDataSliceInitialState(params.network));
+    dispatch(resetCardsSliceInitialState(params.network));
   }, [dispatch, params]);
 
   useEffect(() => {

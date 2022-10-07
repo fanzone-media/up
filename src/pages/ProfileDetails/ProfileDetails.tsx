@@ -50,6 +50,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import {
   currentProfile,
   fetchProfileByAddress,
+  resetUserDataSliceInitialState,
   selectUserById,
 } from '../../features/profiles';
 import { StyledLoader, StyledLoadingHolder } from '../AssetDetails/styles';
@@ -59,6 +60,7 @@ import { getAddressPermissionsOnUniversalProfile } from '../../utility/permissio
 import {
   fetchIssuedCards,
   fetchOwnedCards,
+  resetCardsSliceInitialState,
   selectAllCardItems,
 } from '../../features/cards';
 import { ICard, IProfile } from '../../services/models';
@@ -93,11 +95,11 @@ const ProfileDetails: React.FC = () => {
   );
 
   const profileError = useSelector(
-    (state: RootState) => state.userData[params.network].error,
+    (state: RootState) => state.userData[params.network].error.fetchProfile,
   );
 
   const profileStatus = useSelector(
-    (state: RootState) => state.userData[params.network].status,
+    (state: RootState) => state.userData[params.network].status.fetchProfile,
   );
 
   const isTablet = useMediaQuery(theme.screen.md);
@@ -141,6 +143,11 @@ const ProfileDetails: React.FC = () => {
   ]);
 
   useEffect(() => {
+    dispatch(resetUserDataSliceInitialState(params.network));
+    dispatch(resetCardsSliceInitialState(params.network));
+  }, [dispatch, params]);
+
+  useEffect(() => {
     dispatch(currentProfile(params.add));
     if (!profile)
       dispatch(
@@ -162,7 +169,7 @@ const ProfileDetails: React.FC = () => {
   );
 
   const issuedCardStatus = useSelector(
-    (state: RootState) => state.cards[params.network].issuedStatus,
+    (state: RootState) => state.cards[params.network].status.fetchIssuedCards,
   );
 
   useEffect(() => {
@@ -179,7 +186,7 @@ const ProfileDetails: React.FC = () => {
   }, [dispatch, profile, params.network, issuedAssetsRange]);
 
   const ownedCardStatus = useSelector(
-    (state: RootState) => state.cards[params.network].ownedStatus,
+    (state: RootState) => state.cards[params.network].status.fetchOwnedCards,
   );
 
   const ownedCards = useSelector((state: RootState) =>

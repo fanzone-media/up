@@ -23,16 +23,22 @@ const cardsAdapter = createEntityAdapter<ICard>({
 });
 
 const cardAdapterInitialState = cardsAdapter.getInitialState<ICardItemsState>({
-  ownedStatus: STATUS.IDLE,
-  ownedError: null,
-  issuedStatus: STATUS.IDLE,
-  issuedError: null,
-  status: STATUS.IDLE,
-  error: null,
-  metaDataStatus: STATUS.IDLE,
-  metaDataError: null,
-  marketsStatus: STATUS.IDLE,
-  marketsError: null,
+  status: {
+    fetchCard: STATUS.IDLE,
+    fetchAllCards: STATUS.IDLE,
+    fetchIssuedCards: STATUS.IDLE,
+    fetchOwnedCards: STATUS.IDLE,
+    fetchMetaData: STATUS.IDLE,
+    fetchMarket: STATUS.IDLE,
+  },
+  error: {
+    fetchCard: null,
+    fetchAllCards: null,
+    fetchIssuedCards: null,
+    fetchOwnedCards: null,
+    fetchMetaData: null,
+    fetchMarket: null,
+  },
 });
 
 /**
@@ -182,21 +188,30 @@ const cardsSlice = createSlice({
   name: 'cards',
   initialState,
   reducers: {
-    clearState: (state, action: PayloadAction<NetworkName>) => {
+    resetCardsSliceInitialState: (
+      state,
+      action: PayloadAction<NetworkName>,
+    ) => {
       return {
         ...state,
         [action.payload]: {
           ...state[action.payload],
-          ownedStatus: STATUS.IDLE,
-          ownedError: null,
-          issuedStatus: STATUS.IDLE,
-          issuedError: null,
-          status: STATUS.IDLE,
-          error: null,
-          metaDataStatus: STATUS.IDLE,
-          metaDataError: null,
-          marketsStatus: STATUS.IDLE,
-          marketsError: null,
+          status: {
+            fetchCard: STATUS.IDLE,
+            fetchAllCards: STATUS.IDLE,
+            fetchIssuedCards: STATUS.IDLE,
+            fetchOwnedCards: STATUS.IDLE,
+            fetchMetaData: STATUS.IDLE,
+            fetchMarket: STATUS.IDLE,
+          },
+          error: {
+            fetchCard: null,
+            fetchAllCards: null,
+            fetchIssuedCards: null,
+            fetchOwnedCards: null,
+            fetchMetaData: null,
+            fetchMarket: null,
+          },
         },
       };
     },
@@ -218,37 +233,39 @@ const cardsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllCards.pending, (state, _action) => {
-        state[_action.meta.arg.network].status = STATUS.LOADING;
+        state[_action.meta.arg.network].status.fetchAllCards = STATUS.LOADING;
       })
       .addCase(fetchAllCards.fulfilled, (state, action) => {
         cardsAdapter.upsertMany(
           state[action.meta.arg.network],
           action.payload as ICard[],
         );
-        state[action.meta.arg.network].status = STATUS.SUCCESSFUL;
+        state[action.meta.arg.network].status.fetchAllCards = STATUS.SUCCESSFUL;
       })
       .addCase(fetchAllCards.rejected, (state, action) => {
-        state[action.meta.arg.network].error = action.error;
-        state[action.meta.arg.network].status = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchAllCards = action.error;
+        state[action.meta.arg.network].status.fetchAllCards = STATUS.FAILED;
       });
     builder
       .addCase(fetchIssuedCards.pending, (state, _action) => {
-        state[_action.meta.arg.network].issuedStatus = STATUS.LOADING;
+        state[_action.meta.arg.network].status.fetchIssuedCards =
+          STATUS.LOADING;
       })
       .addCase(fetchIssuedCards.fulfilled, (state, action) => {
         cardsAdapter.upsertMany(
           state[action.meta.arg.network],
           action.payload as ICard[],
         );
-        state[action.meta.arg.network].issuedStatus = STATUS.SUCCESSFUL;
+        state[action.meta.arg.network].status.fetchIssuedCards =
+          STATUS.SUCCESSFUL;
       })
       .addCase(fetchIssuedCards.rejected, (state, action) => {
-        state[action.meta.arg.network].issuedError = action.error;
-        state[action.meta.arg.network].issuedStatus = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchIssuedCards = action.error;
+        state[action.meta.arg.network].status.fetchIssuedCards = STATUS.FAILED;
       });
     builder
       .addCase(fetchCard.pending, (state, _action) => {
-        state[_action.meta.arg.network].status = STATUS.LOADING;
+        state[_action.meta.arg.network].status.fetchCard = STATUS.LOADING;
       })
       .addCase(fetchCard.fulfilled, (state, action) => {
         if (action.payload)
@@ -256,15 +273,15 @@ const cardsSlice = createSlice({
             state[action.meta.arg.network],
             action.payload as ICard,
           );
-        state[action.meta.arg.network].status = STATUS.SUCCESSFUL;
+        state[action.meta.arg.network].status.fetchCard = STATUS.SUCCESSFUL;
       })
       .addCase(fetchCard.rejected, (state, action) => {
-        state[action.meta.arg.network].error = action.error;
-        state[action.meta.arg.network].status = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchCard = action.error;
+        state[action.meta.arg.network].status.fetchCard = STATUS.FAILED;
       });
     builder
       .addCase(fetchOwnedCards.pending, (state, _action) => {
-        state[_action.meta.arg.network].ownedStatus = STATUS.LOADING;
+        state[_action.meta.arg.network].status.fetchOwnedCards = STATUS.LOADING;
       })
       .addCase(fetchOwnedCards.fulfilled, (state, action) => {
         if (action.payload)
@@ -272,15 +289,16 @@ const cardsSlice = createSlice({
             state[action.meta.arg.network],
             action.payload as ICard[],
           );
-        state[action.meta.arg.network].ownedStatus = STATUS.SUCCESSFUL;
+        state[action.meta.arg.network].status.fetchOwnedCards =
+          STATUS.SUCCESSFUL;
       })
       .addCase(fetchOwnedCards.rejected, (state, action) => {
-        state[action.meta.arg.network].ownedError = action.error;
-        state[action.meta.arg.network].ownedStatus = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchOwnedCards = action.error;
+        state[action.meta.arg.network].status.fetchOwnedCards = STATUS.FAILED;
       });
     builder
       .addCase(fetchMetaDataForTokenId.pending, (state, _action) => {
-        state[_action.meta.arg.network].metaDataStatus = STATUS.LOADING;
+        state[_action.meta.arg.network].status.fetchMetaData = STATUS.LOADING;
       })
       .addCase(fetchMetaDataForTokenId.fulfilled, (state, action) => {
         if (action.payload)
@@ -288,15 +306,15 @@ const cardsSlice = createSlice({
             state[action.meta.arg.network],
             action.payload as ICard,
           );
-        state[action.meta.arg.network].metaDataStatus = STATUS.SUCCESSFUL;
+        state[action.meta.arg.network].status.fetchMetaData = STATUS.SUCCESSFUL;
       })
       .addCase(fetchMetaDataForTokenId.rejected, (state, action) => {
-        state[action.meta.arg.network].metaDataError = action.error;
-        state[action.meta.arg.network].metaDataStatus = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchMetaData = action.error;
+        state[action.meta.arg.network].status.fetchMetaData = STATUS.FAILED;
       });
     builder
       .addCase(fetchAllMarkets.pending, (state, _action) => {
-        state[_action.meta.arg.network].marketsStatus = STATUS.LOADING;
+        state[_action.meta.arg.network].status.fetchMarket = STATUS.LOADING;
       })
       .addCase(fetchAllMarkets.fulfilled, (state, action) => {
         if (action.payload)
@@ -304,11 +322,11 @@ const cardsSlice = createSlice({
             state[action.meta.arg.network],
             action.payload as ICard,
           );
-        state[action.meta.arg.network].marketsStatus = STATUS.SUCCESSFUL;
+        state[action.meta.arg.network].status.fetchMarket = STATUS.SUCCESSFUL;
       })
       .addCase(fetchAllMarkets.rejected, (state, action) => {
-        state[action.meta.arg.network].marketsError = action.error;
-        state[action.meta.arg.network].marketsStatus = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchMarket = action.error;
+        state[action.meta.arg.network].status.fetchMarket = STATUS.FAILED;
       });
   },
 });
@@ -334,4 +352,4 @@ export const {
  * ************
  */
 
-export const { anyEvent, clearState } = cardsSlice.actions;
+export const { anyEvent, resetCardsSliceInitialState } = cardsSlice.actions;
