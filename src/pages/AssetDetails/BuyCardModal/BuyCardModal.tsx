@@ -63,9 +63,10 @@ export const BuyCardModal = ({
   );
   const { getItems } = useLocalStorage();
   const savedProfiles = getItems(LOCAL_STORAGE_KEYS.UP);
-  const savedProfilesAddresses = savedProfiles
-    ? Object.keys(savedProfiles[network])
-    : null;
+  const savedProfilesAddresses =
+    savedProfiles && savedProfiles[network]
+      ? Object.keys(savedProfiles[network])
+      : null;
   const [upAddress, setUpAddress] = useState<string>(
     savedProfilesAddresses && savedProfilesAddresses.length > 0
       ? savedProfilesAddresses[0]

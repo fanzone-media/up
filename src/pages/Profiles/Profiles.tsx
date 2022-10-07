@@ -2,7 +2,11 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import { NetworkName, RootState } from '../../boot/types';
-import { fetchAllProfiles, selectAllUsersItems } from '../../features/profiles';
+import {
+  fetchAllProfiles,
+  resetUserDataSliceInitialState,
+  selectAllUsersItems,
+} from '../../features/profiles';
 import { ICard, IProfile } from '../../services/models';
 import { Pagination } from '../../components';
 import {
@@ -33,7 +37,11 @@ import { Search } from '../../components';
 import { theme } from '../../boot/styles';
 import { useAppDispatch } from '../../boot/store';
 import { useParams } from 'react-router-dom';
-import { fetchAllCards, selectAllCardItems } from '../../features/cards';
+import {
+  fetchAllCards,
+  resetCardsSliceInitialState,
+  selectAllCardItems,
+} from '../../features/cards';
 import { MetaCard } from '../../features/cards/MetaCard';
 import { useDefaultAddresses } from '../../hooks/useDefaultAddresses';
 import { usePagination } from '../../hooks/usePagination';
@@ -71,6 +79,11 @@ const Profiles: React.FC = () => {
   const { range: assetsRange, setRange: setAssetsRange } = usePagination();
 
   useEffect(() => {
+    dispatch(resetUserDataSliceInitialState(params.network));
+    dispatch(resetCardsSliceInitialState(params.network));
+  }, [dispatch, params]);
+
+  useEffect(() => {
     if (profileAddresses.length === 0) return;
     dispatch(
       fetchAllProfiles({
@@ -93,7 +106,8 @@ const Profiles: React.FC = () => {
   );
 
   const userProfilesState = useSelector(
-    (state: RootState) => state.userData[params.network].status,
+    (state: RootState) =>
+      state.userData[params.network].status.fetchAllProfiles,
   );
 
   const cards = useSelector((state: RootState) =>
@@ -115,7 +129,7 @@ const Profiles: React.FC = () => {
   }, [dispatch, assetsAddresses, params.network, assetsRange]);
 
   const assetsState = useSelector(
-    (state: RootState) => state.cards[params.network].status,
+    (state: RootState) => state.cards[params.network].status.fetchAllCards,
   );
 
   const luksoNetwork = params.network === 'l14' || params.network === 'l16';

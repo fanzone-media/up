@@ -8,7 +8,7 @@ import { BigNumberish } from 'ethers';
 import { NetworkName, RootState, ThunkExtra } from '../../boot/types';
 import { API } from '../../services/api';
 import { IProfile } from '../../services/models';
-import { CONSTANTS, STATUS } from '../../utility';
+import { STATUS } from '../../utility';
 import { Address } from '../../utils/types';
 import { IUserDataSliceState, IUsersState } from './types';
 
@@ -23,14 +23,20 @@ const usersAdapter = createEntityAdapter<IProfile>({
 });
 
 const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
-  status: STATUS.IDLE,
-  holderStatus: STATUS.IDLE,
-  creatorStatus: STATUS.IDLE,
-  error: null,
-  holderError: null,
-  creatorError: null,
-  newError: {},
-  newStatus: {},
+  error: {
+    fetchProfile: null,
+    fetchAllProfiles: null,
+    fetchOwnerOfProfile: null,
+    fetchHolders: null,
+    fetchCreators: null,
+  },
+  status: {
+    fetchProfile: STATUS.IDLE,
+    fetchAllProfiles: STATUS.IDLE,
+    fetchOwnerOfProfile: STATUS.IDLE,
+    fetchHolders: STATUS.IDLE,
+    fetchCreators: STATUS.IDLE,
+  },
 });
 
 /**
@@ -171,90 +177,111 @@ const userDataSlice = createSlice({
         me: action.payload,
       };
     },
+    resetUserDataSliceInitialState: (
+      state,
+      action: PayloadAction<NetworkName>,
+    ) => {
+      return {
+        ...state,
+        [action.payload]: {
+          ...state[action.payload],
+          error: {
+            fetchProfile: null,
+            fetchAllProfiles: null,
+            fetchOwnerOfProfile: null,
+            fetchHolders: null,
+            fetchCreators: null,
+          },
+          status: {
+            fetchProfile: STATUS.IDLE,
+            fetchAllProfiles: STATUS.IDLE,
+            fetchOwnerOfProfile: STATUS.IDLE,
+            fetchHolders: STATUS.IDLE,
+            fetchCreators: STATUS.IDLE,
+          },
+        },
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProfileByAddress.pending, (state, action) => {
-        state[action.meta.arg.network].status = STATUS.LOADING;
+        state[action.meta.arg.network].status.fetchProfile = STATUS.LOADING;
       })
       .addCase(fetchProfileByAddress.fulfilled, (state, action) => {
         usersAdapter.upsertOne(
           state[action.meta.arg.network],
           action.payload as IProfile,
         );
-        state[action.meta.arg.network].status = STATUS.IDLE;
+        state[action.meta.arg.network].status.fetchProfile = STATUS.SUCCESSFUL;
       })
       .addCase(fetchProfileByAddress.rejected, (state, action) => {
-        state[action.meta.arg.network].error = action.error;
-        state[action.meta.arg.network].status = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchProfile = action.error;
+        state[action.meta.arg.network].status.fetchProfile = STATUS.FAILED;
       });
     builder
       .addCase(fetchOwnerOfTokenId.pending, (state, action) => {
-        state[action.meta.arg.network].newStatus = {
-          [`${CONSTANTS.MINT_OWNER_STATUS}`]: STATUS.LOADING,
-        };
+        state[action.meta.arg.network].status.fetchOwnerOfProfile =
+          STATUS.LOADING;
       })
       .addCase(fetchOwnerOfTokenId.fulfilled, (state, action) => {
         usersAdapter.upsertOne(
           state[action.meta.arg.network],
           action.payload as IProfile,
         );
-        state[action.meta.arg.network].newStatus = {
-          [`${CONSTANTS.MINT_OWNER_STATUS}`]: STATUS.IDLE,
-        };
+        state[action.meta.arg.network].status.fetchOwnerOfProfile =
+          STATUS.SUCCESSFUL;
       })
       .addCase(fetchOwnerOfTokenId.rejected, (state, action) => {
-        state[action.meta.arg.network].error = {
-          [`${CONSTANTS.MINT_OWNER_ERROR}`]: action.error,
-        };
-        state[action.meta.arg.network].newStatus = {
-          [`${CONSTANTS.MINT_OWNER_STATUS}`]: STATUS.FAILED,
-        };
+        state[action.meta.arg.network].error.fetchOwnerOfProfile = action.error;
+        state[action.meta.arg.network].status.fetchOwnerOfProfile =
+          STATUS.FAILED;
       });
     builder
       .addCase(fetchAssetHolders.pending, (state, action) => {
-        state[action.meta.arg.network].holderStatus = STATUS.LOADING;
+        state[action.meta.arg.network].status.fetchHolders = STATUS.LOADING;
       })
       .addCase(fetchAssetHolders.fulfilled, (state, action) => {
         usersAdapter.upsertMany(
           state[action.meta.arg.network],
           action.payload as IProfile[],
         );
-        state[action.meta.arg.network].holderStatus = STATUS.IDLE;
+        state[action.meta.arg.network].status.fetchHolders = STATUS.SUCCESSFUL;
       })
       .addCase(fetchAssetHolders.rejected, (state, action) => {
-        state[action.meta.arg.network].holderError = action.error;
-        state[action.meta.arg.network].holderStatus = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchHolders = action.error;
+        state[action.meta.arg.network].status.fetchHolders = STATUS.FAILED;
       });
     builder
       .addCase(fetchAssetCreator.pending, (state, action) => {
-        state[action.meta.arg.network].creatorStatus = STATUS.LOADING;
+        state[action.meta.arg.network].status.fetchCreators = STATUS.LOADING;
       })
       .addCase(fetchAssetCreator.fulfilled, (state, action) => {
         usersAdapter.upsertMany(
           state[action.meta.arg.network],
           action.payload as IProfile[],
         );
-        state[action.meta.arg.network].creatorStatus = STATUS.IDLE;
+        state[action.meta.arg.network].status.fetchCreators = STATUS.SUCCESSFUL;
       })
       .addCase(fetchAssetCreator.rejected, (state, action) => {
-        state[action.meta.arg.network].creatorError = action.error;
-        state[action.meta.arg.network].creatorStatus = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchCreators = action.error;
+        state[action.meta.arg.network].status.fetchCreators = STATUS.FAILED;
       });
     builder
       .addCase(fetchAllProfiles.pending, (state, action) => {
-        state[action.meta.arg.network].status = STATUS.LOADING;
+        state[action.meta.arg.network].status.fetchAllProfiles = STATUS.LOADING;
       })
       .addCase(fetchAllProfiles.fulfilled, (state, action) => {
         usersAdapter.upsertMany(
           state[action.meta.arg.network],
           action.payload as IProfile[],
         );
-        state[action.meta.arg.network].status = STATUS.IDLE;
+        state[action.meta.arg.network].status.fetchAllProfiles =
+          STATUS.SUCCESSFUL;
       })
       .addCase(fetchAllProfiles.rejected, (state, action) => {
-        state[action.meta.arg.network].error = action.error;
-        state[action.meta.arg.network].status = STATUS.FAILED;
+        state[action.meta.arg.network].error.fetchAllProfiles = action.error;
+        state[action.meta.arg.network].status.fetchAllProfiles = STATUS.FAILED;
       });
     builder.addCase(fetchOwnerAddressOfTokenId.fulfilled, (state, action) => {
       state.me = action.payload;
@@ -282,4 +309,5 @@ export const {
  * ************
  */
 
-export const { currentProfile } = userDataSlice.actions;
+export const { currentProfile, resetUserDataSliceInitialState } =
+  userDataSlice.actions;

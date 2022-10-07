@@ -23,7 +23,9 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
     LOCAL_STORAGE_KEYS.REFERRER,
   ) as ReferrerAddressLocal;
   const referrerAddress =
-    localReferrerAddress[network] && isAddress(localReferrerAddress[network])
+    localReferrerAddress &&
+    localReferrerAddress[network] &&
+    isAddress(localReferrerAddress[network])
       ? localReferrerAddress[network]
       : defaultReferrerAddress[network];
   const [error, setError] = useState();

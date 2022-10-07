@@ -3,17 +3,19 @@ import { IProfile } from '../../../services/models';
 import { STATUS } from '../../../utility';
 
 interface IBaseState {
-  status: STATUS;
-  holderStatus: STATUS;
-  creatorStatus: STATUS;
-  holderError: Error | SerializedError | null;
-  creatorError: Error | SerializedError | null;
-  error: Error | SerializedError | null;
-  newError: {
-    [key: string]: Error | SerializedError | null;
+  error: {
+    fetchProfile: Error | SerializedError | null;
+    fetchAllProfiles: Error | SerializedError | null;
+    fetchOwnerOfProfile: Error | SerializedError | null;
+    fetchHolders: Error | SerializedError | null;
+    fetchCreators: Error | SerializedError | null;
   };
-  newStatus: {
-    [key: string]: STATUS;
+  status: {
+    fetchProfile: STATUS;
+    fetchAllProfiles: STATUS;
+    fetchOwnerOfProfile: STATUS;
+    fetchHolders: STATUS;
+    fetchCreators: STATUS;
   };
 }
 export type IUsersState = IBaseState;

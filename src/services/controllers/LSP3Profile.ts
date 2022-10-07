@@ -224,6 +224,36 @@ const fetchProfile = async (
   };
 };
 
+const getProfile = async (
+  address: string,
+  network: NetworkName,
+): Promise<IProfile | void> => {
+  if (address.length < 42) {
+    const missingCaractersCount = 42 - address.length;
+
+    throw new Error(
+      `Invalid address, missing ${missingCaractersCount} character${
+        missingCaractersCount === 1 ? '' : 's'
+      }`,
+    );
+  }
+
+  if (!ethers.utils.isAddress(address)) {
+    throw new Error('Address is invalid or does not exists');
+  }
+
+  const isValidProfile = await LSP3ProfileApi.isUniversalProfile(
+    address,
+    network,
+  );
+
+  if (!isValidProfile) {
+    throw new Error('Address is invalid or does not exists');
+  }
+
+  return LSP3ProfileApi.fetchProfile(address, network);
+};
+
 const fetchOwnedCollectionOld = async (
   network: string,
   profileAddress: string,
@@ -385,20 +415,23 @@ const setUniversalProfileData = async (
   profileAddress: string,
   profileData: ISetProfileData,
   signer: Signer,
-): Promise<boolean> => {
+): Promise<ethers.ContractTransaction> => {
   const contract = UniversalProfileProxy__factory.connect(
     profileAddress,
     signer,
   );
-  await uploadProfileData(profileData)
-    .then(async (JSONURL) => {
-      await contract.setData([KeyChain.LSP3PROFILE], [JSONURL]);
-    })
-    .catch((error) => {
-      throw new Error(error.message);
-    });
 
-  return true;
+  let transaction: ethers.ContractTransaction;
+
+  try {
+    const JSONURL = await uploadProfileData(profileData);
+
+    transaction = await contract.setData([KeyChain.LSP3PROFILE], [JSONURL]);
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+
+  return transaction;
 };
 
 const setUniversalProfileDataViaKeyManager = async (
@@ -416,13 +449,17 @@ const setUniversalProfileDataViaKeyManager = async (
     signer,
   );
 
-  await uploadProfileData(profileData).then(async (JSONURL) => {
-    const enodedData = universalProfileContract.interface.encodeFunctionData(
-      'setData',
-      [[KeyChain.LSP3PROFILE], [JSONURL]],
-    );
-    await keyManagerContract.execute(enodedData);
-  });
+  let transaction: ethers.ContractTransaction;
+
+  const JSONURL = await uploadProfileData(profileData);
+  const enodedData = universalProfileContract.interface.encodeFunctionData(
+    'setData',
+    [[KeyChain.LSP3PROFILE], [JSONURL]],
+  );
+
+  transaction = await keyManagerContract.execute(enodedData);
+
+  return transaction;
 };
 
 const getKeyManagerPermissions = async (
@@ -879,6 +916,7 @@ const executeTransactionViaUniversalProfile = async (
 
 export const LSP3ProfileApi = {
   fetchProfile,
+  getProfile,
   fetchAllProfiles,
   fetchCreatorsAddresses,
   fetchOwnedCollectionCount,
