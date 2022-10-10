@@ -903,6 +903,7 @@ const AssetDetails: React.FC = () => {
                                 min={1}
                                 max={ownedTokenIds.length}
                                 defaultValue={currentIndex + 1}
+                                value={currentIndex + 1}
                                 ref={mintIdInputRef}
                                 onKeyPress={onEnterHandler}
                                 onBlur={onBlurHandler}

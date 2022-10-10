@@ -286,6 +286,7 @@ const ProfileDetails: React.FC = () => {
     profile && (
       <TransferCardsModal
         profile={profile}
+        ownedCards={ownedCards}
         onDismiss={() => onDismissTransferCardsModal()}
         network={params.network}
       />

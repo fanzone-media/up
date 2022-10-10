@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Puff } from 'react-loader-spinner';
 import { ProfilePreview } from '../../AssetDetails/ProfilePreview';
 import {
   StyledModalButton,
@@ -9,10 +8,9 @@ import { StyledInputRow, StyledLabel } from '../ProfileEditModal/styles';
 import { StyledSelectInput, StyledTransferCardModalContent } from './styles';
 import { Address } from '../../../utils/types';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
-import { IOwnedAssets } from '../../../services/models';
+import { ICard, IOwnedAssets } from '../../../services/models';
 import { InputField } from '../../../components/InputField';
 import { NetworkName } from '../../../boot/types';
-import { useCard } from '../../../hooks/useCard';
 import { useProfile } from '../../../hooks/useProfile';
 
 interface IProps {
@@ -22,6 +20,7 @@ interface IProps {
     isOwnerKeyManager: boolean;
     ownedAssets: IOwnedAssets[];
   };
+  ownedCards: ICard[];
   onDismiss: () => void;
   network: NetworkName;
 }
@@ -36,6 +35,7 @@ export const TransferCardsModal: React.FC<IProps> = ({
   profile,
   onDismiss,
   network,
+  ownedCards,
 }: IProps) => {
   const [transferCardForm, setTransferCardForm] = useState<formInput>({
     toAddress: '',
@@ -43,7 +43,8 @@ export const TransferCardsModal: React.FC<IProps> = ({
     tokenId: null,
   });
 
-  const [card, getCardName, isCardLoading] = useCard();
+  const [selectedCard, setSelectedCard] = useState<ICard | null>(null);
+
   const [
     destinationProfile,
     profileAddressError,
@@ -52,29 +53,34 @@ export const TransferCardsModal: React.FC<IProps> = ({
   ] = useProfile();
 
   useEffect(() => {
-    getCardName(transferCardForm.cardAddress, network);
-  }, [transferCardForm.cardAddress]);
+    setSelectedCard(ownedCards[0]);
+  }, [ownedCards]);
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    if (
-      event.currentTarget.name === 'cardAddress' &&
-      event.currentTarget.value !== transferCardForm.cardAddress
-    ) {
+    const { name, value } = event.currentTarget;
+
+    if (name === 'cardAddress' || name === 'cardName') {
+      const card = ownedCards.find(({ name, address }) => {
+        return address === value || name === value;
+      });
+
+      setSelectedCard(card || null);
+
       setTransferCardForm({
         ...transferCardForm,
-        [event.currentTarget.name]: event.currentTarget.value,
+        cardAddress: card?.address!,
         tokenId: null,
       });
     } else {
-      if (event.currentTarget.name === "receiver's address") {
-        getProfile(event.currentTarget.value, network);
+      if (name === "receiver's address") {
+        getProfile(value, network);
       }
 
       setTransferCardForm({
         ...transferCardForm,
-        [event.currentTarget.name]: event.currentTarget.value,
+        [name]: value,
       });
     }
   };
@@ -88,7 +94,7 @@ export const TransferCardsModal: React.FC<IProps> = ({
   );
 
   const fields = [
-    { name: 'cardName', label: 'Card Name', type: 'text' },
+    { name: 'cardName', label: 'Card Name', type: 'select' },
     { name: 'cardAddress', label: 'Card Address', type: 'select' },
     { name: 'tokenId', label: 'Token Id', type: 'select' },
   ];
@@ -115,33 +121,43 @@ export const TransferCardsModal: React.FC<IProps> = ({
             <StyledSelectInput
               name={item.name}
               onChange={changeHandler}
-              defaultValue={profile.ownedAssets[0].assetAddress}
+              value={selectedCard?.address || ''}
             >
-              {profile.ownedAssets.map((ownedAsset, key) => (
+              {ownedCards.map((card, key) => (
                 <option
                   key={key}
-                  value={ownedAsset.assetAddress}
-                  defaultValue={ownedAsset.assetAddress}
+                  value={card.address}
+                  defaultValue={card.address}
                 >
-                  {ownedAsset.assetAddress}
+                  {card.address}
                 </option>
               ))}
             </StyledSelectInput>
           )}
-          {item.type === 'text' &&
-            item.name === 'cardName' &&
-            (isCardLoading ? (
-              <Puff color="#ed7a2db3" width={25} height={25} />
-            ) : (
-              <p>{card?.name}</p>
-            ))}
+          {item.type === 'select' && item.name === 'cardName' && (
+            <StyledSelectInput
+              name={item.name}
+              onChange={changeHandler}
+              value={selectedCard?.name || ''}
+            >
+              {ownedCards.map((card, key) => (
+                <option key={key} value={card.name} defaultValue={card.name}>
+                  {card.name}
+                </option>
+              ))}
+            </StyledSelectInput>
+          )}
           {item.type === 'select' && item.name === 'tokenId' && (
-            <StyledSelectInput name={item.name} onChange={changeHandler}>
+            <StyledSelectInput
+              name={item.name}
+              onChange={changeHandler}
+              value={transferCardForm.tokenId || 'Select token id'}
+            >
               <option>Select token id</option>
               {profile.ownedAssets
                 .find(
                   (ownedAsset) =>
-                    ownedAsset.assetAddress === transferCardForm.cardAddress,
+                    ownedAsset.assetAddress === selectedCard?.address,
                 )
                 ?.tokenIds.map((tokenId, key) => (
                   <option key={key} value={tokenId}>

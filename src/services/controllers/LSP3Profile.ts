@@ -239,7 +239,7 @@ const getProfile = async (
   }
 
   if (!ethers.utils.isAddress(address)) {
-    throw new Error('Address is invalid or does not exists');
+    throw new Error('Address is invalid or does not exist');
   }
 
   const isValidProfile = await LSP3ProfileApi.isUniversalProfile(
@@ -248,7 +248,7 @@ const getProfile = async (
   );
 
   if (!isValidProfile) {
-    throw new Error('Address is invalid or does not exists');
+    throw new Error('Address is invalid or does not exist');
   }
 
   return LSP3ProfileApi.fetchProfile(address, network);
