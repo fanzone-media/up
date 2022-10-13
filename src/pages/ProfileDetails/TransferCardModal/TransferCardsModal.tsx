@@ -61,10 +61,8 @@ export const TransferCardsModal: React.FC<IProps> = ({
   ) => {
     const { name, value } = event.currentTarget;
 
-    if (name === 'cardAddress' || name === 'cardName') {
-      const card = ownedCards.find(({ name, address }) => {
-        return address === value || name === value;
-      });
+    if (name === 'cardName') {
+      const card = ownedCards.find(({ name }) => name === value);
 
       setSelectedCard(card || null);
 
@@ -95,7 +93,7 @@ export const TransferCardsModal: React.FC<IProps> = ({
 
   const fields = [
     { name: 'cardName', label: 'Card Name', type: 'select' },
-    { name: 'cardAddress', label: 'Card Address', type: 'select' },
+    { name: 'cardAddress', label: 'Card Address', type: 'text' },
     { name: 'tokenId', label: 'Token Id', type: 'select' },
   ];
 
@@ -117,22 +115,8 @@ export const TransferCardsModal: React.FC<IProps> = ({
       {fields.map((item, key) => (
         <StyledInputRow key={key}>
           <StyledLabel htmlFor={item.name}>{item.label}</StyledLabel>
-          {item.type === 'select' && item.name === 'cardAddress' && (
-            <StyledSelectInput
-              name={item.name}
-              onChange={changeHandler}
-              value={selectedCard?.address || ''}
-            >
-              {ownedCards.map((card, key) => (
-                <option
-                  key={key}
-                  value={card.address}
-                  defaultValue={card.address}
-                >
-                  {card.address}
-                </option>
-              ))}
-            </StyledSelectInput>
+          {item.type === 'text' && item.name === 'cardAddress' && (
+            <p>{selectedCard?.address}</p>
           )}
           {item.type === 'select' && item.name === 'cardName' && (
             <StyledSelectInput
