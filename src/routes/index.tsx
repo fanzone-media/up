@@ -12,6 +12,8 @@ import {
   StyledLoader,
   StyledLoadingHolder,
 } from '../pages/AssetDetails/styles';
+import { Footer, Header } from '../components';
+import { EmbedMarket } from '../pages/Embed/EmbedMarket';
 
 const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
 const LazyProfileDetails = React.lazy(
@@ -36,31 +38,50 @@ const Routes: React.FC = () => {
       >
         <Switch>
           <Route exact path="/">
-            <Redirect to="/polygon" />
+            <Redirect to="/up/polygon" />
           </Route>
-          <Route exact path="/fanzoneSportsClub">
-            <FanzoneClub />
+          <Route path="/up">
+            <Header />
+            <Switch>
+              <Route exact path="/up/fanzoneSportsClub">
+                <FanzoneClub />
+              </Route>
+              <Route exact path="/up/test/fanzoneSportsClub">
+                <FanzoneClub />
+              </Route>
+              <Route exact path="/up/:network">
+                <LazyProfiles />
+              </Route>
+              <Route exact path="/up/:network/profile/:add">
+                <LazyProfileDetails />
+              </Route>
+              <Route exact path="/up/:network/asset/:add">
+                <LazyAssetDetails />
+              </Route>
+              <Route exact path="/up/:network/asset/:add/:id">
+                <LazyAssetDetails />
+              </Route>
+              <Route exact path="/up/:network/create-name">
+                <CreateName />
+              </Route>
+              <Route path="/*">
+                <NoMatch />
+              </Route>
+            </Switch>
+            <Footer />
           </Route>
-          <Route exact path="/test/fanzoneSportsClub">
-            <FanzoneClub />
-          </Route>
-          <Route exact path="/:network">
-            <LazyProfiles />
-          </Route>
-          <Route exact path="/:network/profile/:add">
-            <LazyProfileDetails />
-          </Route>
-          <Route exact path="/:network/asset/:add">
-            <LazyAssetDetails />
-          </Route>
-          <Route exact path="/:network/asset/:add/:id">
-            <LazyAssetDetails />
-          </Route>
-          <Route exact path="/:network/create-name">
-            <CreateName />
-          </Route>
-          <Route path="*">
-            <NoMatch />
+          <Route path="/embed">
+            <Switch>
+              <Route exact path="/embed/:network/assetmarket/:add">
+                <EmbedMarket />
+              </Route>
+              <Route exact path="/embed/:network/assetItem/:add/:id">
+                <EmbedMarket />
+              </Route>
+              <Route path="/*">
+                <NoMatch />
+              </Route>
+            </Switch>
           </Route>
         </Switch>
       </Suspense>

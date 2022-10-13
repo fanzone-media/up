@@ -115,7 +115,7 @@ export const MetaCard: React.FC<IProps> = ({
       >
         <StyledBlockScoutIcon src={explorer?.icon} alt="" />
       </a>
-      <Link to={`/${params.network}/asset/` + digitalCard.address}>
+      <Link to={`/up/${params.network}/asset/` + digitalCard.address}>
         <StyledMediaWrapper>
           <StyledMetaCardImg src={getCardImg()} alt="" />
         </StyledMediaWrapper>

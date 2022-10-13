@@ -16,11 +16,11 @@ export const Footer: React.FC = () => {
   const onClickLink = () => setShowDropdown(false);
 
   const networks = [
-    { name: 'Lukso L16', link: '/l16' },
-    { name: 'Lukso L14', link: '/l14' },
-    { name: 'Polygon Mumbai', link: '/mumbai' },
-    { name: 'Polygon Mainnet', link: '/polygon' },
-    { name: 'Ethereum Mainnet', link: '/ethereum' },
+    { name: 'Lukso L16', link: '/up/l16' },
+    { name: 'Lukso L14', link: '/up//l14' },
+    { name: 'Polygon Mumbai', link: '/up//mumbai' },
+    { name: 'Polygon Mainnet', link: '/up//polygon' },
+    { name: 'Ethereum Mainnet', link: '/up//ethereum' },
   ];
   return (
     <StyledFooter>

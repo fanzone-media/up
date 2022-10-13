@@ -268,7 +268,7 @@ const AssetDetails: React.FC = () => {
       mintIdInputRef.current.value = (nextIndex + 1).toString();
     }
     history.push(
-      `/${params.network}/asset/${params.add}/${ownedTokenIds[nextIndex]}`,
+      `/up/${params.network}/asset/${params.add}/${ownedTokenIds[nextIndex]}`,
     );
     setCurrentIndex(nextIndex);
   };
@@ -280,7 +280,7 @@ const AssetDetails: React.FC = () => {
       mintIdInputRef.current.value = (previousIndex + 1).toString();
     }
     history.push(
-      `/${params.network}/asset/${params.add}/${ownedTokenIds[previousIndex]}`,
+      `/up/${params.network}/asset/${params.add}/${ownedTokenIds[previousIndex]}`,
     );
     setCurrentIndex(previousIndex);
   };
@@ -288,7 +288,7 @@ const AssetDetails: React.FC = () => {
   const mintChangeHelper = (mint: number) => {
     if (ownedTokenIds && mint > 0 && mint <= ownedTokenIds.length) {
       history.push(
-        `/${params.network}/asset/${params.add}/${ownedTokenIds[mint - 1]}`,
+        `/up/${params.network}/asset/${params.add}/${ownedTokenIds[mint - 1]}`,
       );
       setCurrentIndex(mint - 1);
     }
@@ -429,7 +429,7 @@ const AssetDetails: React.FC = () => {
   useMemo(() => {
     if (!params.id && ownedTokenIds && asset?.supportedInterface === 'lsp8') {
       history.push(
-        `/${params.network}/asset/${params.add}/${ownedTokenIds[currentIndex]}`,
+        `/up/${params.network}/asset/${params.add}/${ownedTokenIds[currentIndex]}`,
       );
     }
   }, [
