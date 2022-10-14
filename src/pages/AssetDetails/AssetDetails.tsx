@@ -1006,7 +1006,6 @@ const AssetDetails: React.FC = () => {
                       <StyledCardPriceWrapperHeader>
                         <StyledCardPriceLabel>Item Price</StyledCardPriceLabel>
                       </StyledCardPriceWrapperHeader>
-
                       {renderCardPrice}
                     </StyledCardPriceWrapper>
                   )}

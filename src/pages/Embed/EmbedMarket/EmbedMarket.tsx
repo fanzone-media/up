@@ -12,10 +12,9 @@ import { STATUS } from '../../../utility';
 import { CardMarket } from '../../AssetDetails/CardMarket';
 import { ConnectToMetaMaskButton } from '../components/ConnectToMetaMaskButton';
 import {
-  StyledCardNotFoundLabel,
   StyledEmbedMarketContent,
   StyledEmbedMarketWrapper,
-  StyledLoadingLabel,
+  StyledMessageLabel,
 } from './styles';
 
 interface IPrams {
@@ -38,7 +37,6 @@ export const EmbedMarket = () => {
   );
 
   useEffect(() => {
-    window.scrollTo(0, 0);
     if (asset || cardStatus !== STATUS.IDLE) return;
     dispatch(
       fetchCard({
@@ -63,7 +61,7 @@ export const EmbedMarket = () => {
       <StyledEmbedMarketWrapper>
         {(cardStatus === STATUS.LOADING ||
           marketsStatus === STATUS.LOADING) && (
-          <StyledLoadingLabel>loading . . .</StyledLoadingLabel>
+          <StyledMessageLabel>loading . . .</StyledMessageLabel>
         )}
         {asset &&
           cardStatus === STATUS.SUCCESSFUL &&
@@ -75,7 +73,7 @@ export const EmbedMarket = () => {
             />
           )}
         {cardStatus === STATUS.FAILED && (
-          <StyledCardNotFoundLabel>Card not found</StyledCardNotFoundLabel>
+          <StyledMessageLabel>Card not found</StyledMessageLabel>
         )}
       </StyledEmbedMarketWrapper>
     </StyledEmbedMarketContent>

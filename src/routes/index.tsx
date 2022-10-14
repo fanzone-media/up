@@ -14,6 +14,7 @@ import {
 } from '../pages/AssetDetails/styles';
 import { Footer, Header } from '../components';
 import { EmbedMarket } from '../pages/Embed/EmbedMarket';
+import { EmbedSetPrice } from '../pages/Embed/EmbedSetPrice';
 
 const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
 const LazyProfileDetails = React.lazy(
@@ -76,7 +77,7 @@ const Routes: React.FC = () => {
                 <EmbedMarket />
               </Route>
               <Route exact path="/embed/:network/assetItem/:add/:id">
-                <EmbedMarket />
+                <EmbedSetPrice />
               </Route>
               <Route path="/*">
                 <NoMatch />
