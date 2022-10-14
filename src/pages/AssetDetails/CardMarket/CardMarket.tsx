@@ -9,6 +9,7 @@ import {
   StyledCardMarketMint,
   StyledCardMarketPrice,
   StyledCardMarketTable,
+  StyledNoMarketLabel,
 } from './styles';
 
 interface IProps {
@@ -73,6 +74,6 @@ export const CardMarket = ({
       </StyledCardMarketTable>
     </StyledCardMarketContainer>
   ) : (
-    <p>No markets available</p>
+    <StyledNoMarketLabel>No markets available</StyledNoMarketLabel>
   );
 };

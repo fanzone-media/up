@@ -51,7 +51,7 @@ export const ProfileCard: React.FC<Iprops> = ({
   return (
     <StyledProfileCard
       to={
-        `/${params.network}/profile/` +
+        `/up/${params.network}/profile/` +
         Web3.utils.toChecksumAddress(userProfile.address)
       }
       demo={type === 'demo' ? true : false}

@@ -92,9 +92,7 @@ const App: React.FC = () => {
       <WagmiProvider autoConnect connectors={connectors}>
         <ModalProvider>
           <div className="App">
-            <Header />
             <Routes />
-            <Footer />
             <ToastContainer />
           </div>
         </ModalProvider>

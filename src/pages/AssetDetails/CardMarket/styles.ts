@@ -48,3 +48,7 @@ export const StyledCardMarketBuy = styled.button`
   border-radius: 0.3em;
   padding: 0.3em 0;
 `;
+
+export const StyledNoMarketLabel = styled.h3`
+  margin: auto;
+`;
