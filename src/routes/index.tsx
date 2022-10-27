@@ -15,6 +15,7 @@ import {
 import { Footer, Header } from '../components';
 import { EmbedMarket } from '../pages/Embed/EmbedMarket';
 import { EmbedSetPrice } from '../pages/Embed/EmbedSetPrice';
+import { Transfer } from '../pages/Transfer';
 
 const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
 const LazyProfileDetails = React.lazy(
