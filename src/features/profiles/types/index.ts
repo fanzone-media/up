@@ -9,6 +9,7 @@ interface IBaseState {
     fetchOwnerOfProfile: Error | SerializedError | null;
     fetchHolders: Error | SerializedError | null;
     fetchCreators: Error | SerializedError | null;
+    fetchOwnerOfTokenId: Error | SerializedError | null;
   };
   status: {
     fetchProfile: STATUS;
@@ -16,6 +17,7 @@ interface IBaseState {
     fetchOwnerOfProfile: STATUS;
     fetchHolders: STATUS;
     fetchCreators: STATUS;
+    fetchOwnerOfTokenId: STATUS;
   };
 }
 export type IUsersState = IBaseState;
