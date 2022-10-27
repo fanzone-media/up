@@ -29,6 +29,7 @@ const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
     fetchOwnerOfProfile: null,
     fetchHolders: null,
     fetchCreators: null,
+    fetchOwnerOfTokenId: null,
   },
   status: {
     fetchProfile: STATUS.IDLE,
@@ -36,6 +37,7 @@ const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
     fetchOwnerOfProfile: STATUS.IDLE,
     fetchHolders: STATUS.IDLE,
     fetchCreators: STATUS.IDLE,
+    fetchOwnerOfTokenId: STATUS.IDLE,
   },
 });
 
@@ -283,9 +285,23 @@ const userDataSlice = createSlice({
         state[action.meta.arg.network].error.fetchAllProfiles = action.error;
         state[action.meta.arg.network].status.fetchAllProfiles = STATUS.FAILED;
       });
-    builder.addCase(fetchOwnerAddressOfTokenId.fulfilled, (state, action) => {
-      state.me = action.payload;
-    });
+    builder
+      .addCase(fetchOwnerAddressOfTokenId.pending, (state, action) => {
+        state.me = null;
+        state[action.meta.arg.network].status.fetchOwnerOfTokenId =
+          STATUS.LOADING;
+      })
+      .addCase(fetchOwnerAddressOfTokenId.fulfilled, (state, action) => {
+        state.me = action.payload;
+        state[action.meta.arg.network].status.fetchOwnerOfTokenId =
+          STATUS.SUCCESSFUL;
+      })
+      .addCase(fetchOwnerAddressOfTokenId.rejected, (state, action) => {
+        state.me = null;
+        state[action.meta.arg.network].error.fetchOwnerOfTokenId = action.error;
+        state[action.meta.arg.network].status.fetchOwnerOfTokenId =
+          STATUS.FAILED;
+      });
   },
 });
 

@@ -83,6 +83,10 @@ export const EmbedSetPrice = () => {
   const marketsStatus = useSelector(
     (state: RootState) => state.cards[params.network].status.fetchMarket,
   );
+  const tokenIdOwnerStatus = useSelector(
+    (state: RootState) =>
+      state.userData[params.network].status.fetchOwnerOfTokenId,
+  );
 
   const isTokenId = useMemo(
     () =>
@@ -147,7 +151,13 @@ export const EmbedSetPrice = () => {
   );
 
   useEffect(() => {
-    if (!params.id || !params.add || !account) return;
+    if (
+      !params.id ||
+      !params.add ||
+      !account ||
+      tokenIdOwnerStatus !== STATUS.IDLE
+    )
+      return;
     dispatch(
       fetchOwnerAddressOfTokenId({
         assetAddress: params.add,
@@ -155,7 +165,8 @@ export const EmbedSetPrice = () => {
         network: params.network,
       }),
     );
-  }, [account, dispatch, params.add, params.id, params.network]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, params.add, params.id, params.network]);
 
   useEffect(() => {
     if (!activeProfile || !account) {

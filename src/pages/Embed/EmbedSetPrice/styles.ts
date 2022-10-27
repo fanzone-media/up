@@ -8,7 +8,7 @@ export const StyledEmbedSetPriceContent = styled.div`
 `;
 
 export const StyledEmbedSetPriceWrapper = styled.div`
-  height: 650px;
+  height: 250px;
   display: flex;
   flex-direction: column;
 `;
