@@ -66,6 +66,9 @@ const Routes: React.FC = () => {
               <Route exact path="/up/:network/create-name">
                 <CreateName />
               </Route>
+              <Route exact path="/up/:network/transfer">
+                <Transfer />
+              </Route>
               <Route path="/*">
                 <NoMatch />
               </Route>
