@@ -321,7 +321,9 @@ const executeTransactionViaKeyManager = async (
     keyManagerAddress,
     signer,
   );
-  const transaction = await contract.execute(encodedData);
+  const transaction = await contract.execute(encodedData, {
+    gasLimit: 7000000,
+  });
   await transaction.wait(1).then((result) => {
     if (result.status === 0) {
       throw new Error('Transaction reverted');
@@ -337,4 +339,5 @@ export const KeyManagerApi = {
   buyFromCardMarketViaKeyManager,
   transferBalanceViaKeyManager,
   removeMarketViaKeymanager,
+  executeTransactionViaKeyManager,
 };

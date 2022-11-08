@@ -11,4 +11,5 @@ export const StyledEmbedSetPriceWrapper = styled.div`
   height: 250px;
   display: flex;
   flex-direction: column;
+  row-gap: 1em;
 `;

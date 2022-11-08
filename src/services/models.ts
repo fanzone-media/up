@@ -113,6 +113,21 @@ export interface IMarket {
   acceptedToken: string;
 }
 
+export interface IAuctionOptions {
+  minAuctionDuration: number;
+  maxAuctionDuration: number;
+  bidExtensionDuration: number;
+}
+
+export interface IAuctionState {
+  seller: string;
+  acceptedToken: string;
+  minimumBid: BigNumber;
+  endTime: BigNumber;
+  activeBidder: string;
+  activeBidAmount: BigNumber;
+}
+
 export interface IProfile {
   address: string;
   owner: string;

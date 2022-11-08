@@ -45,7 +45,7 @@ type HeaderContentType = {
 export const Header: React.FC = () => {
   const isTablet = useMediaQuery(theme.screen.md);
   const [{ data, loading }, connect] = useConnect();
-  const [{}, disconnect] = useAccount();
+  const [, disconnect] = useAccount();
   const [showAccountDetail, setShowAccountDetail] = useState<boolean>(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState<boolean>(false);
   const { getItems } = useLocalStorage();

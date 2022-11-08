@@ -931,4 +931,6 @@ export const LSP3ProfileApi = {
   fetchOwnerOfProfile,
   transferBalanceViaUniversalProfile,
   removeMarket,
+  encodeExecute,
+  executeTransactionViaUniversalProfile,
 };

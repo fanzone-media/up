@@ -7,7 +7,6 @@ import {
 } from 'react-router-dom';
 import NoMatch from '../pages/NoMatch/NoMatch';
 import { CreateName } from '../pages/CreateName';
-import { AddPermissions } from '../pages/AddPermissions';
 import {
   StyledLoader,
   StyledLoadingHolder,
