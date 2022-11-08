@@ -167,41 +167,7 @@ export const StyledActionIcon = styled.img`
   margin: auto;
 `;
 
-export const StyledCardPriceValueWrapper = styled.div`
-  display: flex;
-`;
-
 export const StyledTokenIcon = styled.img``;
-
-export const StyledCardPriceValue = styled.p`
-  margin: auto 0;
-`;
-
-export const StyledActionsButtonWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  row-gap: 10px;
-
-  @media ${({ theme }) => theme.screen.md} {
-    flex-direction: row;
-    column-gap: 10px;
-  }
-`;
-
-export const StyledBuyButton = styled.button`
-  width: 100%;
-  background: rgba(255, 129, 1, 1);
-  border-radius: 5px;
-  padding: 7px 0;
-`;
-
-export const StyledSetPriceButton = styled(StyledBuyButton)`
-  background: rgba(255, 255, 255, 0.2);
-`;
-
-export const StyledChangePriceButton = styled(StyledSetPriceButton)``;
-
-export const StyledWithdrawButton = styled(StyledSetPriceButton)``;
 
 export const StyledDividerSpan = styled.span`
   border: 0.01em solid rgba(223, 223, 223, 0.2);

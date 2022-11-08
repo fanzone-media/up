@@ -1,24 +1,26 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { BigNumber, BytesLike, Signer } from 'ethers';
+import { Signer } from 'ethers';
 import { NetworkName } from '../../boot/types';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { CardAuction__factory } from '../../submodules/fanzone-smart-contracts/typechain';
+import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { Address } from '../../utils/types';
+import { IAuctionOptions, IAuctionState } from '../models';
 
 export const auctionContracts = {
   l14: '',
-  l16: '',
+  l16: '0xEA1062CC65A0601C2adAA5e27B40e886726F3FE2',
   ethereum: '',
-  polygon: '',
+  polygon: '0x1B29547c6bD8F9312331B5f059F6572526D0Da59',
   mumbai: '',
 };
 
 const encodeOpenAuctionFor = (
   assetAddress: Address,
-  tokenId: BytesLike,
+  tokenId: number,
   acceptedToken: Address,
-  minimumBid: BigNumber,
-  duration: BigNumber,
+  minimumBid: number,
+  duration: number,
   signer: Signer,
   network: NetworkName,
 ) => {
@@ -29,11 +31,65 @@ const encodeOpenAuctionFor = (
 
   const encodedOpenAuctionFor = contract.interface.encodeFunctionData(
     'openAuctionFor',
-    [assetAddress, tokenId, acceptedToken, minimumBid, duration],
+    [
+      assetAddress,
+      tokenIdAsBytes32(tokenId),
+      acceptedToken,
+      minimumBid,
+      duration,
+    ],
   );
   return encodedOpenAuctionFor;
 };
 
+const fetchAuctionSettings = async (
+  network: NetworkName,
+): Promise<IAuctionOptions | null> => {
+  try {
+    const provider = useRpcProvider(network);
+    const contract = CardAuction__factory.connect(
+      auctionContracts[network],
+      provider,
+    );
+
+    const { minAuctionDuration, maxAuctionDuration, bidExtensionDuration } =
+      await contract.auctionSettings();
+
+    return {
+      minAuctionDuration,
+      maxAuctionDuration,
+      bidExtensionDuration,
+    };
+  } catch (error) {
+    return null;
+  }
+};
+
+const fetchAuctionFor = async (
+  network: NetworkName,
+  tokenAddress: Address,
+  tokenId: number,
+): Promise<IAuctionState | null> => {
+  try {
+    const provider = useRpcProvider(network);
+    const contract = CardAuction__factory.connect(
+      auctionContracts[network],
+      provider,
+    );
+
+    const auctions = await contract.auctionFor(
+      tokenAddress,
+      tokenIdAsBytes32(tokenId),
+    );
+
+    return auctions;
+  } catch (error) {
+    return null;
+  }
+};
+
 export const AuctionApi = {
   encodeOpenAuctionFor,
+  fetchAuctionSettings,
+  fetchAuctionFor,
 };

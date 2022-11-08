@@ -3,8 +3,8 @@ import { NetworkName } from '../../boot/types';
 
 interface IParams {
   network: NetworkName;
-  address: string;
-  tokenId: string;
+  add: string;
+  id: string;
 }
 
 export const useUrlParams = () => {
@@ -12,7 +12,7 @@ export const useUrlParams = () => {
 
   return {
     network: params.network,
-    address: params.address,
-    tokenId: params.tokenId,
+    address: params.add.toLowerCase(),
+    tokenId: params.id,
   };
 };

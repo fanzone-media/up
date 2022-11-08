@@ -30,6 +30,7 @@
     "ipfs-http-client": "^53.0.1",
     "it-all": "^1.0.5",
     "keccak256": "^1.0.6",
+    "luxon": "^3.1.0",
     "merkletreejs": "^0.2.31",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -80,6 +81,7 @@
     ]
   },
   "devDependencies": {
+    "@types/luxon": "^3.1.0",
     "@types/react-router-dom": "^5.1.7",
     "@types/styled-components": "^5.1.15",
     "autoprefixer": "^9.8.8",

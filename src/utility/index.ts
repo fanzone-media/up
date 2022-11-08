@@ -1,6 +1,8 @@
 import { BigNumber, BigNumberish } from 'ethers';
 import { BlockScoutIcon, EtherScanLogo, polygonExplorerIcon } from '../assets';
 import { NetworkName } from '../boot/types';
+import { IWhiteListedTokens } from '../services/models';
+import { Address } from '../utils/types';
 
 export enum STATUS {
   IDLE = 'idle',
@@ -64,4 +66,11 @@ export const displayPrice = (price: BigNumberish, decimals: number) => {
 
 export const convertPrice = (price: BigNumberish, decimals: number) => {
   return BigNumber.isBigNumber(price) ? price : Number(price) * 10 ** decimals;
+};
+
+export const getAcceptedTokenDetails = (
+  whiteListedTokens: Array<IWhiteListedTokens>,
+  acceptedToken: Address,
+) => {
+  return whiteListedTokens.find((i) => i.tokenAddress === acceptedToken);
 };

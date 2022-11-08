@@ -1,6 +1,5 @@
 import { ErrorIcon, PendingIcon, SuccessIcon } from '../../assets';
 import { STATUS } from '../../utility';
-import { StyledModalButton } from '../Modal/styles';
 import {
   StyledProcessingWindow,
   StyledStateContent,

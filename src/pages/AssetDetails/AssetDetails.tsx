@@ -19,16 +19,13 @@ import { useSelector } from 'react-redux';
 import { NetworkName, RootState } from '../../boot/types';
 import {
   resetCardsSliceInitialState,
-  fetchAllMarkets,
   fetchCard,
-  fetchMetaDataForTokenId,
   selectCardById,
 } from '../../features/cards';
 import { useEffect } from 'react';
 import {
   fetchAssetCreator,
   fetchOwnerAddressOfTokenId,
-  fetchOwnerOfTokenId,
   fetchProfileByAddress,
   resetUserDataSliceInitialState,
   selectAllUsersItems,
@@ -48,9 +45,6 @@ import {
   StyledQuickActions,
   StyledReloadPriceAction,
   StyledActionIcon,
-  StyledCardPriceValue,
-  StyledCardPriceValueWrapper,
-  StyledActionsButtonWrapper,
   StyledCardPropertiesAccordion,
   StyledCardProperties,
   StyledCardPropertyIconWrapper,
@@ -65,9 +59,6 @@ import {
   StyledMintSkipButton,
   StyledMintSkipButtonImg,
   StyledMintSliderIndex,
-  StyledChangePriceButton,
-  StyledWithdrawButton,
-  StyledSetPriceButton,
   StyledTabContent,
   StyledNoProfileLabel,
   StyledMintSliderInput,
@@ -84,32 +75,33 @@ import {
   StyledVideo,
 } from './styles';
 import { useAppDispatch } from '../../boot/store';
-import { displayPrice, STATUS } from '../../utility';
-import { SellCardModal } from './SellCardModal';
+import { STATUS } from '../../utility';
 import { TabedAccordion } from '../../components/TabedAccordion';
 import { StyledAccordionTitle } from '../../components/Accordion/styles';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
 import ReactTooltip from 'react-tooltip';
-import { IPermissionSet, IProfile } from '../../services/models';
+import { IProfile } from '../../services/models';
 import { HolderPagination } from './HoldersPagination';
-import { getAddressPermissionsOnUniversalProfile } from '../../utility/permissions';
-import { useAccount } from 'wagmi';
 import { DesktopCreatorsAccordion } from './DesktopCreatorsAccordion';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { theme } from '../../boot/styles';
 import { CardMarket } from './CardMarket';
-import { useTransferLsp8Token } from '../../hooks/useTransferLsp8Token';
-import { useRemoveMarketForLsp8Token } from '../../hooks/useRemoveMarketForLsp8Token';
 import { useModal } from '../../hooks/useModal';
 import { TransferCardTokenIdModal } from './TransferCardTokenIdModal';
 import { SelectMintModalContent } from './SelectMintModalContent';
-import { BuyCardButton } from './components/BuyCardButton';
 import Utils from '../../services/utilities/util';
 import { CardInfoAccordion } from './components/CardInfoAccordion';
 import { ShareReferModal } from '../../components/ShareReferModal';
 import { useQueryParams } from '../../hooks/useQueryParams';
 import { isAddress } from 'ethers/lib/utils';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useFetchMarkets } from '../../hooks/useFetchMarkets';
+import { useOwnedMints } from '../../hooks/useOwnedMints';
+import { useActiveProfile } from '../../hooks/useActiveProfile';
+import { useMintNavigation } from '../../hooks/useMintNavigation';
+import { useMintMarket } from '../../hooks/useMintMarket';
+import { AssetActions } from './AssetActions';
+import { useCurrentUserPermissions } from '../../hooks/useCurrentUserPermissions';
 
 interface IPrams {
   add: string;
@@ -118,34 +110,21 @@ interface IPrams {
 }
 
 const AssetDetails: React.FC = () => {
-  const [currentUsersPermissionsSet, setCurrentUsersPermissionsSet] = useState<
-    IPermissionSet['permissions']
-  >({
-    sign: '0',
-    transfervalue: '0',
-    deploy: '0',
-    delegatecall: '0',
-    staticcall: '0',
-    call: '0',
-    setdata: '0',
-    addpermissions: '0',
-    changepermissions: '0',
-    changeowner: '0',
-  });
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+
+  const mintIdInputRef = useRef<HTMLInputElement>(null);
+
   const params = useParams<IPrams>();
   const history = useHistory();
   const { pathname } = useLocation();
   let query = useQueryParams();
+
   const { setReferrer } = useLocalStorage();
   const isDesktop = useMediaQuery(theme.screen.md);
 
-  const wasActiveProfile = useSelector((state: RootState) => state.userData.me);
+  const dispatch = useAppDispatch();
 
-  const activeProfile = useSelector(
-    (state: RootState) =>
-      wasActiveProfile &&
-      selectUserById(state.userData[params.network], wasActiveProfile),
-  );
+  const wasActiveProfile = useSelector((state: RootState) => state.userData.me);
 
   const allProfiles = useSelector((state: RootState) =>
     selectUserIds(state.userData[params.network]),
@@ -162,7 +141,43 @@ const AssetDetails: React.FC = () => {
     ),
   );
 
-  const [{ data: account }] = useAccount();
+  const cardError = useSelector(
+    (state: RootState) => state.cards[params.network].error.fetchCard,
+  );
+
+  const cardStatus = useSelector(
+    (state: RootState) => state.cards[params.network].status.fetchCard,
+  );
+
+  const metaDataStatus = useSelector(
+    (state: RootState) => state.cards[params.network].status.fetchMetaData,
+  );
+
+  const creatorsStatus = useSelector(
+    (state: RootState) => state.userData[params.network].status.fetchCreators,
+  );
+
+  const { activeProfile } = useActiveProfile();
+
+  const currentUsersPermissions = useCurrentUserPermissions(wasActiveProfile);
+
+  useFetchMarkets(asset);
+
+  const { ownedTokenIds, currentTokenId } = useOwnedMints(
+    wasActiveProfile ? wasActiveProfile : '',
+    params.add,
+    currentIndex,
+  );
+
+  const currentMintMarket = useMintMarket(params.add, params.id);
+
+  const { nextMint, previousMint, mintChangeHelper } = useMintNavigation(
+    currentIndex,
+    setCurrentIndex,
+    ownedTokenIds,
+    mintIdInputRef,
+    asset ? asset : null,
+  );
 
   const ownerStatus = useSelector(
     (state: RootState) =>
@@ -177,123 +192,6 @@ const AssetDetails: React.FC = () => {
     });
   });
 
-  const cardError = useSelector(
-    (state: RootState) => state.cards[params.network].error.fetchCard,
-  );
-
-  const cardStatus = useSelector(
-    (state: RootState) => state.cards[params.network].status.fetchCard,
-  );
-
-  const marketsStatus = useSelector(
-    (state: RootState) => state.cards[params.network].status.fetchMarket,
-  );
-
-  const metaDataStatus = useSelector(
-    (state: RootState) => state.cards[params.network].status.fetchMetaData,
-  );
-
-  const creatorsStatus = useSelector(
-    (state: RootState) => state.userData[params.network].status.fetchCreators,
-  );
-
-  const mintIdInputRef = useRef<HTMLInputElement>(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-
-  const ownedTokenIds = useMemo(
-    () =>
-      activeProfile &&
-      activeProfile.ownedAssets.find(
-        (item) => item.assetAddress.toLowerCase() === params.add.toLowerCase(),
-      )?.tokenIds,
-    [activeProfile, params.add],
-  );
-
-  const currentTokenId = useMemo(() => {
-    let index: string = '0';
-    if (
-      asset?.supportedInterface === 'erc721' &&
-      metaDataStatus !== STATUS.FAILED
-    ) {
-      index = params.id ? params.id : '0';
-    } else if (asset?.supportedInterface === 'lsp8') {
-      index = ownedTokenIds ? ownedTokenIds[currentIndex].toString() : '0';
-    }
-    return index;
-  }, [
-    asset?.supportedInterface,
-    currentIndex,
-    metaDataStatus,
-    ownedTokenIds,
-    params.id,
-  ]);
-
-  const marketsForOwnedTokens = useMemo(
-    () =>
-      ownedTokenIds &&
-      asset?.markets.filter((item) => {
-        return ownedTokenIds.some((i) => {
-          return i === Number(item.tokenId);
-        });
-      }),
-    [asset?.markets, ownedTokenIds],
-  );
-
-  const currentMintMarket = useMemo(() => {
-    const market =
-      marketsForOwnedTokens &&
-      ownedTokenIds &&
-      marketsForOwnedTokens.find((item) => item.tokenId === currentTokenId);
-    const token =
-      market &&
-      asset &&
-      asset.whiteListedTokens.find(
-        (i) => i.tokenAddress === market.acceptedToken,
-      );
-    return (
-      market && {
-        ...market,
-        decimals: token && token.decimals,
-        symbol: token && token.symbol,
-      }
-    );
-  }, [asset, currentTokenId, marketsForOwnedTokens, ownedTokenIds]);
-
-  const dispatch = useAppDispatch();
-
-  const nextMint = () => {
-    const nextIndex = currentIndex + 1;
-    if (!ownedTokenIds || nextIndex >= ownedTokenIds.length) return;
-    if (mintIdInputRef.current) {
-      mintIdInputRef.current.value = (nextIndex + 1).toString();
-    }
-    history.push(
-      `/up/${params.network}/asset/${params.add}/${ownedTokenIds[nextIndex]}`,
-    );
-    setCurrentIndex(nextIndex);
-  };
-
-  const previousMint = () => {
-    const previousIndex = currentIndex - 1;
-    if (!ownedTokenIds || previousIndex < 0) return;
-    if (mintIdInputRef.current) {
-      mintIdInputRef.current.value = (previousIndex + 1).toString();
-    }
-    history.push(
-      `/up/${params.network}/asset/${params.add}/${ownedTokenIds[previousIndex]}`,
-    );
-    setCurrentIndex(previousIndex);
-  };
-
-  const mintChangeHelper = (mint: number) => {
-    if (ownedTokenIds && mint > 0 && mint <= ownedTokenIds.length) {
-      history.push(
-        `/up/${params.network}/asset/${params.add}/${ownedTokenIds[mint - 1]}`,
-      );
-      setCurrentIndex(mint - 1);
-    }
-  };
-
   const onEnterHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.currentTarget.blur();
@@ -304,43 +202,6 @@ const AssetDetails: React.FC = () => {
     const val = Number(event.target.value);
     mintChangeHelper(val);
   };
-
-  const { transferCard, transferState } = useTransferLsp8Token(
-    params.add,
-    account ? account.address : '',
-    Number(currentTokenId),
-    activeProfile ? activeProfile : ({} as IProfile),
-    params.network,
-  );
-
-  const { removeMarket, removingMarket } = useRemoveMarketForLsp8Token(
-    params.add,
-    parseInt(params.id),
-    activeProfile ? activeProfile : ({} as IProfile),
-  );
-
-  const {
-    handlePresent: onPresentSellCardModal,
-    onDismiss: onDismissSellCardModal,
-  } = useModal(
-    asset && ownedTokenIds && activeProfile && (
-      <SellCardModal
-        ownerProfile={activeProfile}
-        address={params.add}
-        mint={Number(currentTokenId)}
-        price={currentMintMarket ? currentMintMarket.minimumAmount : undefined}
-        marketTokenAddress={
-          currentMintMarket ? currentMintMarket.acceptedToken : undefined
-        }
-        cardImg={asset.lsp8MetaData[params.id ? params.id : 0]?.image}
-        onDismiss={() => onDismissSellCardModal()}
-        whiteListedTokens={asset.whiteListedTokens}
-        network={params.network}
-      />
-    ),
-    'Sell Card Modal',
-    'Sell Card',
-  );
 
   const {
     handlePresent: onPresentSelectMintModal,
@@ -401,27 +262,6 @@ const AssetDetails: React.FC = () => {
   }, [asset, dispatch, owner, ownerStatus, params.network]);
 
   useMemo(() => {
-    if (activeProfile) return;
-
-    wasActiveProfile &&
-      dispatch(
-        fetchOwnerOfTokenId({
-          address: wasActiveProfile,
-          network: params.network,
-        }),
-      );
-  }, [activeProfile, dispatch, params.network, wasActiveProfile]);
-
-  //getAllMarkets
-  useMemo(() => {
-    if (!asset || marketsStatus !== STATUS.IDLE) return;
-
-    dispatch(
-      fetchAllMarkets({ assetAddress: params.add, network: params.network }),
-    );
-  }, [asset, dispatch, marketsStatus, params.add, params.network]);
-
-  useMemo(() => {
     if (!params.id || !ownedTokenIds) return;
     setCurrentIndex(ownedTokenIds.indexOf(Number(params.id)));
   }, [ownedTokenIds, params.id]);
@@ -440,35 +280,6 @@ const AssetDetails: React.FC = () => {
     params.add,
     params.id,
     params.network,
-  ]);
-
-  useMemo(() => {
-    if (
-      wasActiveProfile &&
-      ((ownedTokenIds && ownedTokenIds.length > 0) ||
-        asset?.supportedInterface === 'erc721') &&
-      asset &&
-      !(params.id in asset.lsp8MetaData) &&
-      metaDataStatus === STATUS.IDLE
-    ) {
-      dispatch(
-        fetchMetaDataForTokenId({
-          assetAddress: params.add,
-          network: params.network,
-          tokenId: params.id,
-          supportedInterface: asset.supportedInterface,
-        }),
-      );
-    }
-  }, [
-    asset,
-    dispatch,
-    metaDataStatus,
-    ownedTokenIds,
-    params.add,
-    params.id,
-    params.network,
-    wasActiveProfile,
   ]);
 
   useMemo(() => {
@@ -522,16 +333,6 @@ const AssetDetails: React.FC = () => {
       }),
     );
   }, [dispatch, params.add, params.id, params.network]);
-
-  useEffect(() => {
-    if (!activeProfile || !account) return;
-    const _currentUsersPermissionsSet = getAddressPermissionsOnUniversalProfile(
-      activeProfile.permissionSet,
-      account.address,
-    );
-    if (_currentUsersPermissionsSet !== undefined)
-      setCurrentUsersPermissionsSet(_currentUsersPermissionsSet.permissions);
-  }, [owner, account, activeProfile]);
 
   const propertiesImages: { [key: string]: string } = useMemo(
     () => ({
@@ -640,105 +441,17 @@ const AssetDetails: React.FC = () => {
     return <HolderPagination holdersAddresses={asset.holders} />;
   }, [asset]);
 
-  const renderCardPrice = useMemo(() => {
-    if (
-      (!currentUsersPermissionsSet ||
-        currentUsersPermissionsSet.call === '0') &&
-      currentMintMarket
-    ) {
-      return (
-        <>
-          <StyledCardPriceValueWrapper>
-            <StyledCardPriceValue>
-              {currentMintMarket.minimumAmount &&
-                currentMintMarket.decimals &&
-                displayPrice(
-                  currentMintMarket.minimumAmount,
-                  currentMintMarket.decimals,
-                ).toString()}{' '}
-              {currentMintMarket.symbol}
-            </StyledCardPriceValue>
-          </StyledCardPriceValueWrapper>
-          <StyledActionsButtonWrapper>
-            {asset && ownedTokenIds && (
-              <BuyCardButton asset={asset} mint={Number(currentTokenId)} />
-            )}
-          </StyledActionsButtonWrapper>
-        </>
-      );
-    }
-
-    if (
-      !currentMintMarket &&
-      ownedTokenIds &&
-      currentUsersPermissionsSet.call === '1'
-    ) {
-      return (
-        <>
-          <StyledCardPriceValueWrapper>
-            <StyledCardPriceValue>-</StyledCardPriceValue>
-          </StyledCardPriceValueWrapper>
-          <StyledActionsButtonWrapper>
-            <StyledSetPriceButton onClick={onPresentSellCardModal}>
-              Set price
-            </StyledSetPriceButton>
-            <StyledSetPriceButton onClick={transferCard}>
-              {transferState === STATUS.LOADING
-                ? 'Transfering to metamask account…'
-                : 'Transfer to metamask account'}
-            </StyledSetPriceButton>
-          </StyledActionsButtonWrapper>
-        </>
-      );
-    }
-    if (
-      currentMintMarket &&
-      ownedTokenIds &&
-      currentUsersPermissionsSet.call === '1'
-    ) {
-      return (
-        <>
-          <StyledCardPriceValueWrapper>
-            <StyledCardPriceValue>
-              {currentMintMarket.minimumAmount &&
-                currentMintMarket.decimals &&
-                displayPrice(
-                  currentMintMarket.minimumAmount,
-                  currentMintMarket.decimals,
-                ).toString()}{' '}
-              {currentMintMarket.symbol}
-            </StyledCardPriceValue>
-          </StyledCardPriceValueWrapper>
-          <StyledActionsButtonWrapper>
-            <StyledChangePriceButton onClick={onPresentSellCardModal}>
-              Change price
-            </StyledChangePriceButton>
-            <StyledWithdrawButton onClick={removeMarket}>
-              {removingMarket ? 'Withdrawing from sale…' : 'Withdraw from sale'}
-            </StyledWithdrawButton>
-          </StyledActionsButtonWrapper>
-          <StyledActionsButtonWrapper>
-            <StyledSetPriceButton onClick={transferCard}>
-              {transferState === STATUS.LOADING
-                ? 'Transfering to metamask account…'
-                : 'Transfer to metamask account'}
-            </StyledSetPriceButton>
-          </StyledActionsButtonWrapper>
-        </>
-      );
-    }
-  }, [
-    currentUsersPermissionsSet,
-    currentMintMarket,
-    ownedTokenIds,
-    asset,
-    currentTokenId,
-    onPresentSellCardModal,
-    transferCard,
-    transferState,
-    removeMarket,
-    removingMarket,
-  ]);
+  const renderCardPrice = useMemo(
+    () => (
+      <AssetActions
+        asset={asset ? asset : null}
+        activeProfile={activeProfile}
+        currentUsersPermissions={currentUsersPermissions}
+        marketForTokenId={currentMintMarket}
+      />
+    ),
+    [activeProfile, asset, currentMintMarket, currentUsersPermissions],
+  );
 
   const renderCardProperties = useMemo(() => {
     if (
@@ -782,7 +495,7 @@ const AssetDetails: React.FC = () => {
       <StyledContractDetailHeader>
         <StyledContractName>{asset?.name}</StyledContractName>
         <StyledQuickActions>
-          {ownedTokenIds && currentUsersPermissionsSet.call === '1' && (
+          {ownedTokenIds && currentUsersPermissions.call === '1' && (
             <StyledReloadPriceAction>
               <StyledActionIcon
                 src={TransferIcon}
@@ -803,7 +516,7 @@ const AssetDetails: React.FC = () => {
     ),
     [
       asset?.name,
-      currentUsersPermissionsSet.call,
+      currentUsersPermissions.call,
       onPresentShareModal,
       onPresentTransferCardModal,
       ownedTokenIds,
