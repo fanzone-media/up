@@ -14,7 +14,7 @@ import { STATUS } from '../../../utility';
 import { AssetActions } from '../../AssetDetails/AssetActions';
 
 import { ConnectToMetaMaskButton } from '../components/ConnectToMetaMaskButton';
-import { StyledMessageLabel } from '../EmbedMarket/styles';
+import { StyledColorSpan, StyledMessageLabel } from '../EmbedMarket/styles';
 import {
   StyledEmbedSetPriceContent,
   StyledEmbedSetPriceWrapper,
@@ -127,7 +127,11 @@ export const EmbedSetPrice = () => {
             </StyledMessageLabel>
           )}
         {!account && (
-          <StyledMessageLabel>metmask not connected</StyledMessageLabel>
+          <StyledMessageLabel>
+            Metamask account not connected yet,{' '}
+            <StyledColorSpan>click on the button above</StyledColorSpan> to
+            procede.
+          </StyledMessageLabel>
         )}
         {renderCardPrice}
       </StyledEmbedSetPriceWrapper>

@@ -12,6 +12,7 @@ import { STATUS } from '../../../utility';
 import { CardMarket } from '../../AssetDetails/CardMarket';
 import { ConnectToMetaMaskButton } from '../components/ConnectToMetaMaskButton';
 import {
+  StyledColorSpan,
   StyledEmbedMarketContent,
   StyledEmbedMarketWrapper,
   StyledMessageLabel,
@@ -61,7 +62,10 @@ export const EmbedMarket = () => {
       <StyledEmbedMarketWrapper>
         {(cardStatus === STATUS.LOADING ||
           marketsStatus === STATUS.LOADING) && (
-          <StyledMessageLabel>loading . . .</StyledMessageLabel>
+          <StyledMessageLabel>
+            The market is currently{' '}
+            <StyledColorSpan>being loaded . . .</StyledColorSpan>
+          </StyledMessageLabel>
         )}
         {asset &&
           cardStatus === STATUS.SUCCESSFUL &&

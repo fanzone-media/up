@@ -15,5 +15,11 @@ export const StyledEmbedMarketWrapper = styled.div`
 `;
 
 export const StyledMessageLabel = styled.h3`
+  text-align: justify;
   margin: auto;
+  padding: 0 3em;
+`;
+
+export const StyledColorSpan = styled.span`
+  color: #ff8101;
 `;
