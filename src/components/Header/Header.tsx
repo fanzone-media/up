@@ -55,7 +55,7 @@ export const Header: React.FC = () => {
       LOCAL_STORAGE_KEYS.UP,
     ) as ProfilePermissionsLocal;
     return permissions && permissions['polygon']
-      ? `/polygon/profile/${Object.keys(permissions['polygon'])[0]}`
+      ? `/up/polygon/profile/${Object.keys(permissions['polygon'])[0]}`
       : undefined;
   };
 
