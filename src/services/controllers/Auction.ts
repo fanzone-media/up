@@ -42,6 +42,24 @@ const encodeOpenAuctionFor = (
   return encodedOpenAuctionFor;
 };
 
+const encodeCancelAuctionFor = (
+  assetAddress: Address,
+  tokenId: number,
+  signer: Signer,
+  network: NetworkName,
+) => {
+  const contract = CardAuction__factory.connect(
+    auctionContracts[network],
+    signer,
+  );
+
+  const encodedCancelAuctionFor = contract.interface.encodeFunctionData(
+    'cancelAuctionFor',
+    [assetAddress, tokenIdAsBytes32(tokenId)],
+  );
+  return encodedCancelAuctionFor;
+};
+
 const fetchAuctionSettings = async (
   network: NetworkName,
 ): Promise<IAuctionOptions | null> => {
@@ -90,6 +108,7 @@ const fetchAuctionFor = async (
 
 export const AuctionApi = {
   encodeOpenAuctionFor,
+  encodeCancelAuctionFor,
   fetchAuctionSettings,
   fetchAuctionFor,
 };
