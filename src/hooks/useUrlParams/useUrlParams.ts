@@ -12,7 +12,7 @@ export const useUrlParams = () => {
 
   return {
     network: params.network,
-    address: params.add.toLowerCase(),
+    address: params.add ? params.id.toLowerCase() : '',
     tokenId: params.id,
   };
 };
