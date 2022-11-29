@@ -116,7 +116,6 @@ export const ShareReferModal = ({ network, pathName, onDismiss }: IProps) => {
           variant="gray"
           onClick={() => {
             if (customReferrerAddress) {
-              console.log('here');
               selectInputRef.current &&
                 setReferrerAddress(selectInputRef.current.value);
             } else {

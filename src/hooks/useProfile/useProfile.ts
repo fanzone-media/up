@@ -48,7 +48,6 @@ export const useProfile = (): Result => {
           setProfile(profile!);
         })
         .catch((error) => {
-          console.log(error);
           setProfile(null);
           setProfileAddressError(error.message);
         })

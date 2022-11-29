@@ -112,7 +112,6 @@ const ProfileDetails: React.FC = () => {
         profile.permissionSet,
         account.address,
       );
-      console.log(permissionsSet);
       return [
         permissionsSet?.permissions.call === StringBoolean.TRUE,
         permissionsSet?.permissions.setdata === StringBoolean.TRUE,

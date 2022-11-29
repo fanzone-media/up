@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../boot/types';
@@ -16,7 +17,7 @@ export const useMintMarket = (assetAddress: Address, tokenId: string) => {
     const market =
       asset &&
       asset.markets &&
-      asset.markets.find((item) => item.tokenId === tokenId);
+      asset.markets.find((item) => Number(item.tokenId) === Number(tokenId));
     const token =
       asset &&
       market &&
