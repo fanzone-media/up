@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import React, { useState } from 'react';
-import { useNetwork, useSigner } from 'wagmi';
+import { useSigner } from 'wagmi';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import {
   StyledAddPermissions,
@@ -14,10 +14,11 @@ import {
 } from './styles';
 
 interface IProps {
-  upAddress: string;
+  upAddress?: string;
 }
 
 type formInput = {
+  upAddress: string;
   addressTo: string;
   permissions: {
     CHANGEOWNER: boolean;
@@ -36,6 +37,7 @@ type formInput = {
 export const AddPermissions = ({ upAddress }: IProps) => {
   const [{ data }] = useSigner();
   const [permissionsForm, setpermissionsForm] = useState<formInput>({
+    upAddress: upAddress ? upAddress : '',
     addressTo: '',
     permissions: {
       CHANGEOWNER: false,
@@ -78,12 +80,12 @@ export const AddPermissions = ({ upAddress }: IProps) => {
 
   const setPermissions = async () => {
     if (
-      ethers.utils.isAddress(upAddress) &&
+      ethers.utils.isAddress(permissionsForm.upAddress) &&
       ethers.utils.isAddress(permissionsForm.addressTo)
     ) {
       data &&
         (await KeyManagerApi.addPermissions(
-          upAddress,
+          permissionsForm.upAddress,
           permissionsForm.addressTo,
           permissionsForm.permissions,
           data,
@@ -93,6 +95,10 @@ export const AddPermissions = ({ upAddress }: IProps) => {
 
   return (
     <StyledAddPermissions>
+      <StyledInputWrapper>
+        <StyledLabel>Up Address: </StyledLabel>
+        <StyledInput name="upAddress" onChange={changeHandler}></StyledInput>
+      </StyledInputWrapper>
       <StyledInputWrapper>
         <StyledLabel>Grant permission to Address: </StyledLabel>
         <StyledInput name="addressTo" onChange={changeHandler}></StyledInput>

@@ -20,6 +20,7 @@ export const StyledLabel = styled.label`
 
 export const StyledInputWrapper = styled(StyledInputRow)`
   display: flex;
+  justify-content: start;
 `;
 
 export const StyledInput = styled.input`
