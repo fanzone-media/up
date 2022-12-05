@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   BackwardsIcon,
   CategoryPropertyIcon,
@@ -16,7 +16,7 @@ import {
   TransferIcon,
 } from '../../assets';
 import { useSelector } from 'react-redux';
-import { NetworkName, RootState } from '../../boot/types';
+import { RootState } from '../../boot/types';
 import {
   resetCardsSliceInitialState,
   fetchCard,
@@ -79,7 +79,6 @@ import { STATUS } from '../../utility';
 import { TabedAccordion } from '../../components/TabedAccordion';
 import { StyledAccordionTitle } from '../../components/Accordion/styles';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
-import ReactTooltip from 'react-tooltip';
 import { IProfile } from '../../services/models';
 import { HolderPagination } from './HoldersPagination';
 import { DesktopCreatorsAccordion } from './DesktopCreatorsAccordion';
@@ -102,20 +101,14 @@ import { useMintNavigation } from '../../hooks/useMintNavigation';
 import { useMintMarket } from '../../hooks/useMintMarket';
 import { AssetActions } from './AssetActions';
 import { useCurrentUserPermissions } from '../../hooks/useCurrentUserPermissions';
-
-interface IPrams {
-  add: string;
-  network: NetworkName;
-  id: string;
-}
+import { useUrlParams } from '../../hooks/useUrlParams';
 
 const AssetDetails: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   const mintIdInputRef = useRef<HTMLInputElement>(null);
 
-  const params = useParams<IPrams>();
-  const history = useHistory();
+  const { network, address, tokenId } = useUrlParams();
   const { pathname } = useLocation();
   let query = useQueryParams();
 
@@ -124,37 +117,32 @@ const AssetDetails: React.FC = () => {
 
   const dispatch = useAppDispatch();
 
-  const wasActiveProfile = useSelector((state: RootState) => state.userData.me);
+  const wasActiveProfile = useSelector(
+    (state: RootState) => tokenId && state.userData.me,
+  );
 
   const allProfiles = useSelector((state: RootState) =>
-    selectUserIds(state.userData[params.network]),
+    selectUserIds(state.userData[network]),
   );
 
   const asset = useSelector((state: RootState) =>
-    selectCardById(state.cards[params.network], params.add),
+    selectCardById(state.cards[network], address),
   );
 
   const owner = useSelector((state: RootState) =>
-    selectUserById(
-      state.userData[params.network],
-      asset?.owner ? asset.owner : '',
-    ),
+    selectUserById(state.userData[network], asset?.owner ? asset.owner : ''),
   );
 
   const cardError = useSelector(
-    (state: RootState) => state.cards[params.network].error.fetchCard,
+    (state: RootState) => state.cards[network].error.fetchCard,
   );
 
-  const cardStatus = useSelector(
-    (state: RootState) => state.cards[params.network].status.fetchCard,
+  const cardsStatus = useSelector(
+    (state: RootState) => state.cards[network].status,
   );
 
-  const metaDataStatus = useSelector(
-    (state: RootState) => state.cards[params.network].status.fetchMetaData,
-  );
-
-  const creatorsStatus = useSelector(
-    (state: RootState) => state.userData[params.network].status.fetchCreators,
+  const userDataStatus = useSelector(
+    (state: RootState) => state.userData[network].status,
   );
 
   const { activeProfile } = useActiveProfile();
@@ -165,11 +153,11 @@ const AssetDetails: React.FC = () => {
 
   const { ownedTokenIds, currentTokenId } = useOwnedMints(
     wasActiveProfile ? wasActiveProfile : '',
-    params.add,
+    address,
     currentIndex,
   );
 
-  const currentMintMarket = useMintMarket(params.add, params.id);
+  const currentMintMarket = useMintMarket(address, tokenId);
 
   const { nextMint, previousMint, mintChangeHelper } = useMintNavigation(
     currentIndex,
@@ -180,15 +168,14 @@ const AssetDetails: React.FC = () => {
   );
 
   const ownerStatus = useSelector(
-    (state: RootState) =>
-      state.userData[params.network].status.fetchAllProfiles,
+    (state: RootState) => state.userData[network].status.fetchAllProfiles,
   );
 
   const creators = useSelector((state: RootState) =>
-    selectAllUsersItems(state.userData[params.network]),
+    selectAllUsersItems(state.userData[network]),
   )?.filter((item) => {
     return asset?.creators.some((i) => {
-      return i === item.address && item.network === params.network;
+      return i === item.address && item.network === network;
     });
   });
 
@@ -227,11 +214,11 @@ const AssetDetails: React.FC = () => {
     <>
       {activeProfile && (
         <TransferCardTokenIdModal
-          cardAddress={params.add}
-          tokenId={parseInt(params.id)}
+          cardAddress={address}
+          tokenId={parseInt(tokenId)}
           profile={activeProfile}
           onDismiss={() => onDismissTransferCardModal()}
-          network={params.network}
+          network={network}
         />
       )}
     </>,
@@ -242,7 +229,7 @@ const AssetDetails: React.FC = () => {
   const { handlePresent: onPresentShareModal, onDismiss: onDismissShareModal } =
     useModal(
       <ShareReferModal
-        network={params.network}
+        network={network}
         pathName={pathname}
         onDismiss={() => onDismissShareModal()}
       />,
@@ -256,34 +243,23 @@ const AssetDetails: React.FC = () => {
     dispatch(
       fetchProfileByAddress({
         address: asset.owner,
-        network: params.network,
+        network: network,
       }),
     );
-  }, [asset, dispatch, owner, ownerStatus, params.network]);
+  }, [asset, dispatch, owner, ownerStatus, network]);
 
   useMemo(() => {
-    if (!params.id || !ownedTokenIds) return;
-    setCurrentIndex(ownedTokenIds.indexOf(Number(params.id)));
-  }, [ownedTokenIds, params.id]);
+    if (
+      !tokenId ||
+      !ownedTokenIds ||
+      userDataStatus.fetchOwnerOfTokenId !== STATUS.IDLE
+    )
+      return;
+    setCurrentIndex(ownedTokenIds.indexOf(Number(tokenId)));
+  }, [ownedTokenIds, tokenId, userDataStatus.fetchOwnerOfTokenId]);
 
   useMemo(() => {
-    if (!params.id && ownedTokenIds && asset?.supportedInterface === 'lsp8') {
-      history.push(
-        `/up/${params.network}/asset/${params.add}/${ownedTokenIds[currentIndex]}`,
-      );
-    }
-  }, [
-    asset?.supportedInterface,
-    currentIndex,
-    history,
-    ownedTokenIds,
-    params.add,
-    params.id,
-    params.network,
-  ]);
-
-  useMemo(() => {
-    if (!asset || creatorsStatus === STATUS.LOADING) return;
+    if (!asset || userDataStatus.fetchCreators !== STATUS.IDLE) return;
     let addresses: string[] = [];
     asset.creators.forEach((item) => {
       if (!allProfiles?.includes(item)) {
@@ -291,48 +267,46 @@ const AssetDetails: React.FC = () => {
       }
     });
     if (addresses.length > 0) {
-      dispatch(
-        fetchAssetCreator({ address: addresses, network: params.network }),
-      );
+      dispatch(fetchAssetCreator({ address: addresses, network }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [asset, allProfiles, dispatch, params.network]);
+  }, [asset, allProfiles, dispatch, network]);
 
   useEffect(() => {
-    dispatch(resetUserDataSliceInitialState(params.network));
-    dispatch(resetCardsSliceInitialState(params.network));
-  }, [dispatch, params]);
+    dispatch(resetUserDataSliceInitialState(network));
+    dispatch(resetCardsSliceInitialState(network));
+  }, [dispatch, address, network, tokenId]);
 
   useEffect(() => {
     const referrerAddress = query.get('referrer');
     referrerAddress &&
       isAddress(referrerAddress) &&
-      setReferrer(params.network, referrerAddress);
+      setReferrer(network, referrerAddress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [network, address, tokenId]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (asset || cardStatus !== STATUS.IDLE) return;
+    if (asset || cardsStatus.fetchCard !== STATUS.IDLE) return;
     dispatch(
       fetchCard({
-        address: params.add,
-        network: params.network,
-        tokenId: params.id,
+        address,
+        network,
+        tokenId,
       }),
     );
-  }, [asset, cardStatus, dispatch, params.add, params.id, params.network]);
+  }, [asset, cardsStatus.fetchCard, dispatch, address, tokenId, network]);
 
   useEffect(() => {
-    if (!params.id || !params.add) return;
+    if (!tokenId || !address) return;
     dispatch(
       fetchOwnerAddressOfTokenId({
-        assetAddress: params.add,
-        tokenId: params.id,
-        network: params.network,
+        assetAddress: address,
+        tokenId,
+        network,
       }),
     );
-  }, [dispatch, params.add, params.id, params.network]);
+  }, [dispatch, address, tokenId, network]);
 
   const propertiesImages: { [key: string]: string } = useMemo(
     () => ({
@@ -349,91 +323,47 @@ const AssetDetails: React.FC = () => {
   );
 
   const renderIssuer = useMemo(() => {
-    const findBalanceOf =
-      owner &&
-      owner.ownedAssets.find(
-        (item) => item.assetAddress === params.add.toLowerCase(),
-      );
     return (
       <StyledTabContent>
-        {asset?.address === params.add && owner?.address === asset.owner && (
-          <>
-            <ProfileCard
-              userProfile={owner}
-              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-              type="owner"
-              tooltipId="ownerTooltip"
-            />
-            <ReactTooltip
-              id="ownerTooltip"
-              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-            ></ReactTooltip>
-          </>
+        {asset?.address === address && owner?.address === asset.owner && (
+          <ProfileCard userProfile={owner} type="owner" />
         )}
         {!owner && (
           <StyledNoProfileLabel>Issuer not found</StyledNoProfileLabel>
         )}
       </StyledTabContent>
     );
-  }, [asset?.address, asset?.owner, params.add, owner]);
+  }, [asset?.address, asset?.owner, address, owner]);
 
   const renderCurrentMintOwner = useMemo(() => {
-    const findBalanceOf =
-      activeProfile &&
-      activeProfile.ownedAssets.find(
-        (item) => item.assetAddress === params.add.toLowerCase(),
-      );
     return (
       <StyledTabContent>
         {activeProfile && (
-          <>
-            <ProfileCard
-              userProfile={activeProfile}
-              balance={findBalanceOf ? findBalanceOf.balance : 0}
-              type="owner"
-              tooltipId="ownerTooltip"
-            />
-            <ReactTooltip
-              id="ownerTooltip"
-              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-            ></ReactTooltip>
-          </>
+          <ProfileCard userProfile={activeProfile} type="owner" />
         )}
         {!activeProfile && (
           <StyledNoProfileLabel>Owner not found</StyledNoProfileLabel>
         )}
       </StyledTabContent>
     );
-  }, [activeProfile, params.add]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProfile, address, tokenId, network]);
 
   const renderCreators = useMemo(
     () => (
       <StyledTabContent>
-        {creators?.map((creator: IProfile) => {
-          const findBalanceOf = creator.ownedAssets.find(
-            (item) => item.assetAddress === params.add.toLowerCase(),
-          );
-          return (
-            <React.Fragment key={creator.address}>
-              <ProfileCard
-                userProfile={creator}
-                balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-                type="creator"
-                tooltipId="designerTooltip"
-              />
-              <ReactTooltip
-                id="designerTooltip"
-                getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-              ></ReactTooltip>
-            </React.Fragment>
-          );
-        })}
+        {creators?.map((creator: IProfile) => (
+          <React.Fragment key={creator.address}>
+            <ProfileCard userProfile={creator} type="creator" />
+          </React.Fragment>
+        ))}
         {creators.length === 0 && (
           <StyledNoProfileLabel>Creators not found</StyledNoProfileLabel>
         )}
       </StyledTabContent>
     ),
-    [creators, params.add],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [creators, address, network],
   );
 
   const renderHolderPagination = useMemo(() => {
@@ -505,7 +435,7 @@ const AssetDetails: React.FC = () => {
               />
             </StyledReloadPriceAction>
           )}
-          <StyledReloadPriceAction>
+          <StyledReloadPriceAction onClick={() => window.location.reload()}>
             <StyledActionIcon src={ReloadIcon} alt="reload" title="reload" />
           </StyledReloadPriceAction>
           <StyledReloadPriceAction onClick={onPresentShareModal}>
@@ -582,13 +512,13 @@ const AssetDetails: React.FC = () => {
 
   return (
     <StyledAssetDetailsContentWrapper>
-      {cardStatus === 'loading' ? (
+      {cardsStatus.fetchCard === STATUS.LOADING ? (
         <StyledLoadingHolder>
           <StyledLoader color="#ed7a2d" />
         </StyledLoadingHolder>
       ) : (
         <>
-          {cardError && cardStatus === 'failed' ? (
+          {cardError && cardsStatus.fetchCard === STATUS.FAILED ? (
             <>
               <StyledCardError>Asset not found</StyledCardError>
             </>
@@ -686,7 +616,7 @@ const AssetDetails: React.FC = () => {
                       asset.lsp8MetaData[0].LSP4Metadata.description}
                   </StyledContractDescription>
                   {!isDesktop && (
-                    <CardInfoAccordion asset={asset} assetId={params.id} />
+                    <CardInfoAccordion asset={asset} assetId={tokenId} />
                   )}
                   {!isDesktop ? (
                     <TabedAccordion
@@ -723,7 +653,7 @@ const AssetDetails: React.FC = () => {
                     </StyledCardPriceWrapper>
                   )}
                   {isDesktop && (
-                    <CardInfoAccordion asset={asset} assetId={params.id} />
+                    <CardInfoAccordion asset={asset} assetId={tokenId} />
                   )}
                   {asset.supportedInterface === 'lsp8' && (
                     <StyledMarketAccordion

@@ -1,9 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import ReactTooltip from 'react-tooltip';
 import { useAppDispatch } from '../../../boot/store';
-import { NetworkName, RootState } from '../../../boot/types';
+import { RootState } from '../../../boot/types';
 import { Pagination } from '../../../components';
 import {
   fetchAssetHolders,
@@ -11,27 +9,23 @@ import {
 } from '../../../features/profiles';
 import { ProfileCard } from '../../../features/profiles/ProfileCard';
 import { usePagination } from '../../../hooks/usePagination';
+import { useUrlParams } from '../../../hooks/useUrlParams';
 import { STATUS } from '../../../utility';
-
-type IParams = {
-  network: NetworkName;
-  add: string;
-};
 interface IProps {
   holdersAddresses: string[];
 }
 
 export const HolderPagination = ({ holdersAddresses }: IProps) => {
   const dispatch = useAppDispatch();
-  const params = useParams<IParams>();
+  const { address, network } = useUrlParams();
   const holderStatus = useSelector(
-    (state: RootState) => state.userData[params.network].status.fetchHolders,
+    (state: RootState) => state.userData[network].status.fetchHolders,
   );
 
   const { range: profilesRange, setRange: setProfilesRange } = usePagination();
 
   const holders = useSelector((state: RootState) => {
-    return selectAllUsersItems(state.userData[params.network]);
+    return selectAllUsersItems(state.userData[network]);
   }).filter((item) => {
     return holdersAddresses
       .slice(profilesRange[0], profilesRange[1] + 1)
@@ -46,35 +40,19 @@ export const HolderPagination = ({ holdersAddresses }: IProps) => {
     dispatch(
       fetchAssetHolders({
         address: holdersAddresses.slice(profilesRange[0], profilesRange[1] + 1),
-        network: params.network,
+        network,
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, holdersAddresses, params.network, profilesRange]);
+  }, [dispatch, holdersAddresses, network, profilesRange]);
 
   const renderHolders = useMemo(
     () =>
-      holders.map((holder) => {
-        const findBalanceOf = holder.ownedAssets.find(
-          (item) => item.assetAddress === params.add.toLowerCase(),
-        );
-        return (
-          <>
-            <ProfileCard
-              key={holder.address}
-              balance={findBalanceOf?.balance ? findBalanceOf.balance : 0}
-              userProfile={holder}
-              type="holder"
-              tooltipId="holderTooltip"
-            />
-            <ReactTooltip
-              id="holderTooltip"
-              getContent={(dataTip) => <span>Token Ids: {dataTip}</span>}
-            ></ReactTooltip>
-          </>
-        );
-      }),
-    [holders, params.add],
+      holders.map((holder) => (
+        <ProfileCard key={holder.address} userProfile={holder} type="holder" />
+      )),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [holders, address, network],
   );
 
   return (

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { NetworkName, RootState, StringBoolean } from '../../boot/types';
+import { RootState, StringBoolean } from '../../boot/types';
 import { theme } from '../../boot/styles';
 import { useAppDispatch } from '../../boot/store';
 import { HideOnScreen, Pagination } from '../../components';
@@ -49,6 +49,8 @@ import {
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import {
   currentProfile,
+  fetchIssuedAssetsAddresses,
+  fetchOwnedAssetsAddresses,
   fetchProfileByAddress,
   resetUserDataSliceInitialState,
   selectUserById,
@@ -65,7 +67,11 @@ import {
 } from '../../features/cards';
 import { ICard, IProfile } from '../../services/models';
 import { MetaCard } from '../../features/cards/MetaCard';
-import { StyledProfileHeading, StyledProfilesHeader } from '../Profiles/styles';
+import {
+  StyledAssetsCheckText,
+  StyledProfileHeaderText,
+  StyledProfilesHeader,
+} from '../Profiles/styles';
 import { TransferCardsModal } from './TransferCardModal/TransferCardsModal';
 import { useModal } from '../../hooks/useModal';
 import { usePagination } from '../../hooks/usePagination';
@@ -75,14 +81,11 @@ import { ProfileSettingModal } from './ProfileSettingModal';
 import { useQueryParams } from '../../hooks/useQueryParams';
 import { isAddress } from 'ethers/lib/utils';
 import { ShareReferModal } from '../../components/ShareReferModal';
-
-interface IParams {
-  add: string;
-  network: NetworkName;
-}
+import { STATUS } from '../../utility';
+import { useUrlParams } from '../../hooks/useUrlParams';
 
 const ProfileDetails: React.FC = () => {
-  const params = useParams<IParams>();
+  const { address, network } = useUrlParams();
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
   let query = useQueryParams();
@@ -90,16 +93,41 @@ const ProfileDetails: React.FC = () => {
   const [{ data: account }] = useAccount();
   const [{ data: signer }] = useSigner();
 
+  const { range: issuedAssetsRange, setRange: setIssuedAssetsRange } =
+    usePagination();
+  const { range: ownedAssetsRange, setRange: setOwnedAssetsRange } =
+    usePagination();
+
+  const activeProfileAddress = useSelector(
+    (state: RootState) => state.userData.me,
+  );
+
   const profile = useSelector((state: RootState) =>
-    selectUserById(state.userData[params.network], params.add),
+    selectUserById(state.userData[network], address),
   );
 
-  const profileError = useSelector(
-    (state: RootState) => state.userData[params.network].error.fetchProfile,
+  const cardsStatus = useSelector(
+    (state: RootState) => state.cards[network].status,
   );
 
-  const profileStatus = useSelector(
-    (state: RootState) => state.userData[params.network].status.fetchProfile,
+  const userDataStatus = useSelector(
+    (state: RootState) => state.userData[network].status,
+  );
+
+  const issuedCards = useSelector((state: RootState) =>
+    selectAllCardItems(state.cards[network]),
+  ).filter((item) =>
+    profile?.issuedAssets
+      .slice(issuedAssetsRange[0], issuedAssetsRange[1] + 1)
+      .some((i) => i === item.address),
+  );
+
+  const ownedCards = useSelector((state: RootState) =>
+    selectAllCardItems(state.cards[network]),
+  ).filter((item) =>
+    profile?.ownedAssets
+      .slice(ownedAssetsRange[0], ownedAssetsRange[1] + 1)
+      .some((i) => i.assetAddress === item.address),
   );
 
   const isTablet = useMediaQuery(theme.screen.md);
@@ -120,56 +148,62 @@ const ProfileDetails: React.FC = () => {
       ];
     }, [account, profile]);
 
+  useMemo(() => {
+    if (!account || !profile || !canTransfer || !canSetData) return;
+    setItem(network, address, profile.permissionSet);
+  }, [account, canSetData, canTransfer, address, network, profile, setItem]);
+
   useEffect(() => {
     const referrerAddress = query.get('referrer');
     referrerAddress &&
       isAddress(referrerAddress) &&
-      setReferrer(params.network, referrerAddress);
+      setReferrer(network, referrerAddress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
-
-  useMemo(() => {
-    if (!account || !profile || !canTransfer || !canSetData) return;
-    setItem(params.network, params.add, profile.permissionSet);
-  }, [
-    account,
-    canSetData,
-    canTransfer,
-    params.add,
-    params.network,
-    profile,
-    setItem,
-  ]);
+  }, [network]);
 
   useEffect(() => {
-    dispatch(resetUserDataSliceInitialState(params.network));
-    dispatch(resetCardsSliceInitialState(params.network));
-  }, [dispatch, params]);
+    dispatch(resetUserDataSliceInitialState(network));
+    dispatch(resetCardsSliceInitialState(network));
+  }, [dispatch, network, address]);
 
   useEffect(() => {
-    dispatch(currentProfile(params.add));
-    if (!profile)
-      dispatch(
-        fetchProfileByAddress({ address: params.add, network: params.network }),
-      );
-  }, [dispatch, params.add, params.network, profile]);
+    if (address === activeProfileAddress) return;
+    dispatch(currentProfile(address));
+  }, [activeProfileAddress, address, dispatch]);
 
-  const { range: issuedAssetsRange, setRange: setIssuedAssetsRange } =
-    usePagination();
-  const { range: ownedAssetsRange, setRange: setOwnedAssetsRange } =
-    usePagination();
+  useEffect(() => {
+    if (!profile) dispatch(fetchProfileByAddress({ address, network }));
+  }, [dispatch, address, network, profile]);
 
-  const issuedCards = useSelector((state: RootState) =>
-    selectAllCardItems(state.cards[params.network]),
-  ).filter((item) =>
-    profile?.issuedAssets
-      .slice(issuedAssetsRange[0], issuedAssetsRange[1] + 1)
-      .some((i) => i === item.address),
-  );
+  useEffect(() => {
+    if (
+      !profile ||
+      profile.issuedAssets.length > 0 ||
+      userDataStatus.fetchIssuedAssetAddresses !== STATUS.IDLE
+    )
+      return;
+    dispatch(
+      fetchIssuedAssetsAddresses({
+        profileAddress: profile.address,
+        network: network,
+      }),
+    );
+  }, [dispatch, userDataStatus.fetchIssuedAssetAddresses, network, profile]);
 
-  const issuedCardStatus = useSelector(
-    (state: RootState) => state.cards[params.network].status.fetchIssuedCards,
-  );
+  useEffect(() => {
+    if (
+      !profile ||
+      profile.ownedAssets.length > 0 ||
+      userDataStatus.fetchOwnedAssetsAddresses !== STATUS.IDLE
+    )
+      return;
+    dispatch(
+      fetchOwnedAssetsAddresses({
+        profileAddress: profile.address,
+        network: network,
+      }),
+    );
+  }, [dispatch, userDataStatus.fetchOwnedAssetsAddresses, network, profile]);
 
   useEffect(() => {
     if (!profile || profile?.issuedAssets.length === 0) return;
@@ -179,22 +213,10 @@ const ProfileDetails: React.FC = () => {
           issuedAssetsRange[0],
           issuedAssetsRange[1] + 1,
         ),
-        network: params.network,
+        network: network,
       }),
     );
-  }, [dispatch, profile, params.network, issuedAssetsRange]);
-
-  const ownedCardStatus = useSelector(
-    (state: RootState) => state.cards[params.network].status.fetchOwnedCards,
-  );
-
-  const ownedCards = useSelector((state: RootState) =>
-    selectAllCardItems(state.cards[params.network]),
-  ).filter((item) =>
-    profile?.ownedAssets
-      .slice(ownedAssetsRange[0], ownedAssetsRange[1] + 1)
-      .some((i) => i.assetAddress === item.address),
-  );
+  }, [dispatch, profile, network, issuedAssetsRange]);
 
   useEffect(() => {
     if (!profile || profile?.ownedAssets.length === 0) return;
@@ -203,10 +225,15 @@ const ProfileDetails: React.FC = () => {
         addresses: profile.ownedAssets
           .map((asset) => asset.assetAddress)
           .slice(ownedAssetsRange[0], ownedAssetsRange[1] + 1),
-        network: params.network,
+        network: network,
       }),
     );
-  }, [dispatch, profile, params.network, ownedAssetsRange]);
+  }, [dispatch, profile, network, ownedAssetsRange]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   const renderLinks = useMemo(
     () =>
@@ -239,31 +266,6 @@ const ProfileDetails: React.FC = () => {
     [profile?.links],
   );
 
-  // const shareButtonHandler = useCallback(async () => {
-  //   try {
-  //     if (navigator.userAgent.includes('Safari')) {
-  //       throw new Error('Safari share list disabled');
-  //     }
-
-  //     await navigator.share({
-  //       title: `Fanzone.io Universal Profile – ${profile && profile.address}`,
-  //       text: `This is Fanzone.io's Universal Profile page for ${
-  //         profile && profile.address
-  //       }`,
-  //       url: `${window.location.origin}/#${pathname}`,
-  //     });
-  //     console.log('shared successfully');
-  //   } catch (err) {
-  //     onPresentShareModal();
-  //     console.error('Error: ' + err);
-  //   }
-  // }, [pathname, profile]);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.add, profile]);
-
   const {
     handlePresent: onPresentSettingModal,
     onDismiss: onDismissSettingModal,
@@ -287,7 +289,7 @@ const ProfileDetails: React.FC = () => {
         profile={profile}
         ownedCards={ownedCards}
         onDismiss={() => onDismissTransferCardsModal()}
-        network={params.network}
+        network={network}
       />
     ),
     'Cards Transfer Modal',
@@ -313,7 +315,7 @@ const ProfileDetails: React.FC = () => {
     profile && (
       <WithdrawFundsModal
         profile={profile}
-        network={params.network}
+        network={network}
         onDismiss={() => onDismissWithdrawFundsModal()}
       />
     ),
@@ -324,7 +326,7 @@ const ProfileDetails: React.FC = () => {
   const { handlePresent: onPresentShareModal, onDismiss: onDismissShareModal } =
     useModal(
       <ShareReferModal
-        network={params.network}
+        network={network}
         pathName={pathname}
         onDismiss={() => onDismissShareModal()}
       />,
@@ -334,15 +336,17 @@ const ProfileDetails: React.FC = () => {
 
   return (
     <StyledProfileDetails>
-      {profileStatus === 'loading' ? (
+      {userDataStatus.fetchProfile === STATUS.LOADING ? (
         <StyledLoadingHolder>
           <StyledLoader color="#ed7a2d" />
         </StyledLoadingHolder>
       ) : (
         <StyledProfileDetailsContent>
-          {profileError ? (
+          {userDataStatus.fetchProfile === STATUS.FAILED && (
             <StyledProfileNotFound>Profile not found</StyledProfileNotFound>
-          ) : (
+          )}
+          {(userDataStatus.fetchProfile === STATUS.SUCCESSFUL ||
+            (userDataStatus.fetchProfile === STATUS.IDLE && profile)) && (
             <>
               <StyledProfileCoverImg src={profile?.backgroundImage} alt="" />
               <StyledProfileInfoWrapper>
@@ -358,7 +362,7 @@ const ProfileDetails: React.FC = () => {
                         <ProfileImage
                           profileImgSrc={profile?.profileImage}
                           blockieImgSrc={makeBlockie(
-                            profile ? profile.address : params.add,
+                            profile ? profile.address : address,
                           )}
                           profileAddress={profile?.address}
                         />
@@ -395,7 +399,7 @@ const ProfileDetails: React.FC = () => {
                 <StyledProfileInfo2>
                   <StyledProfileInfo2Content>
                     {!isTablet && (
-                      <StyledProfileAddress>{params.add}</StyledProfileAddress>
+                      <StyledProfileAddress>{address}</StyledProfileAddress>
                     )}
                   </StyledProfileInfo2Content>
                 </StyledProfileInfo2>
@@ -430,53 +434,82 @@ const ProfileDetails: React.FC = () => {
                 </StyledWitdrawFundsButton>
               )}
               <StyledAssetsWrapper>
-                {profile && profile.issuedAssets.length > 0 && (
-                  <>
-                    <StyledProfilesHeader>
-                      <StyledProfileHeading>Issued Assets</StyledProfileHeading>
-                    </StyledProfilesHeader>
-                    <Pagination
-                      status={issuedCardStatus}
-                      components={issuedCards.map((digitalCard: ICard) => {
-                        return (
-                          <MetaCard
-                            key={digitalCard.address}
-                            digitalCard={digitalCard}
-                            type="demo"
-                            canTransfer={canTransfer}
-                            profile={profile}
-                          />
-                        );
-                      })}
-                      nbrOfAllComponents={profile.issuedAssets.length}
-                      setComponentsRange={setIssuedAssetsRange}
-                    />
-                  </>
+                {userDataStatus.fetchIssuedAssetAddresses ===
+                  STATUS.LOADING && (
+                  <StyledProfilesHeader>
+                    <StyledAssetsCheckText>
+                      checking for issued assets . . .
+                    </StyledAssetsCheckText>
+                  </StyledProfilesHeader>
                 )}
-                {/* @TODO: Change names of components StyledProfilesHeader and StyledProfileHeading */}
-                {profile && profile.ownedAssets.length > 0 && (
-                  <>
-                    <StyledProfilesHeader>
-                      <StyledProfileHeading>Owned Assets</StyledProfileHeading>
-                    </StyledProfilesHeader>
-                    <Pagination
-                      status={ownedCardStatus}
-                      components={ownedCards.map((digitalCard: ICard) => {
-                        return (
-                          <MetaCard
-                            key={digitalCard.address}
-                            digitalCard={digitalCard}
-                            type="demo"
-                            canTransfer={canTransfer}
-                            profile={profile}
-                          />
-                        );
-                      })}
-                      nbrOfAllComponents={profile.ownedAssets.length}
-                      setComponentsRange={setOwnedAssetsRange}
-                    />
-                  </>
+                {profile &&
+                  profile.issuedAssets.length > 0 &&
+                  (userDataStatus.fetchIssuedAssetAddresses ===
+                    STATUS.SUCCESSFUL ||
+                    userDataStatus.fetchIssuedAssetAddresses ===
+                      STATUS.IDLE) && (
+                    <>
+                      <StyledProfilesHeader>
+                        <StyledProfileHeaderText>
+                          Issued Assets
+                        </StyledProfileHeaderText>
+                      </StyledProfilesHeader>
+                      <Pagination
+                        status={cardsStatus.fetchIssuedCards}
+                        components={issuedCards.map((digitalCard: ICard) => {
+                          return (
+                            <MetaCard
+                              key={digitalCard.address}
+                              digitalCard={digitalCard}
+                              type="demo"
+                              canTransfer={canTransfer}
+                              profile={profile}
+                            />
+                          );
+                        })}
+                        nbrOfAllComponents={profile.issuedAssets.length}
+                        setComponentsRange={setIssuedAssetsRange}
+                      />
+                    </>
+                  )}
+                {userDataStatus.fetchOwnedAssetsAddresses ===
+                  STATUS.LOADING && (
+                  <StyledProfilesHeader>
+                    <StyledAssetsCheckText>
+                      checking for owned assets . . .
+                    </StyledAssetsCheckText>
+                  </StyledProfilesHeader>
                 )}
+                {profile &&
+                  profile.ownedAssets.length > 0 &&
+                  (userDataStatus.fetchOwnedAssetsAddresses ===
+                    STATUS.SUCCESSFUL ||
+                    userDataStatus.fetchOwnedAssetsAddresses ===
+                      STATUS.IDLE) && (
+                    <>
+                      <StyledProfilesHeader>
+                        <StyledProfileHeaderText>
+                          Owned Assets
+                        </StyledProfileHeaderText>
+                      </StyledProfilesHeader>
+                      <Pagination
+                        status={cardsStatus.fetchOwnedCards}
+                        components={ownedCards.map((digitalCard: ICard) => {
+                          return (
+                            <MetaCard
+                              key={digitalCard.address}
+                              digitalCard={digitalCard}
+                              type="owned"
+                              canTransfer={canTransfer}
+                              profile={profile}
+                            />
+                          );
+                        })}
+                        nbrOfAllComponents={profile.ownedAssets.length}
+                        setComponentsRange={setOwnedAssetsRange}
+                      />
+                    </>
+                  )}
               </StyledAssetsWrapper>
             </>
           )}

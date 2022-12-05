@@ -165,7 +165,7 @@ const approveTokenViaKeyManager = async (
   universalProfileAddress: string,
   spenderAddress: string,
   tokenAddress: string,
-  amount: BigNumber,
+  amount: number,
   signer: Signer,
 ) => {
   const universalProfileContract = UniversalProfileProxy__factory.connect(
@@ -203,7 +203,7 @@ const buyFromCardMarketViaKeyManager = async (
   keyManagerAddress: string,
   universalProfileAddress: string,
   tokenId: number,
-  minimumAmount: BigNumber,
+  minimumAmount: number,
   signer: Signer,
   referrerAddress: Address,
 ) => {

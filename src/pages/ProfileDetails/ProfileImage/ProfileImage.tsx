@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { UniversalProfileIcon } from '../../../assets';
 import { NetworkName } from '../../../boot/types';
+import { useUrlParams } from '../../../hooks/useUrlParams';
 import { getChainExplorer } from '../../../utility';
 import {
   StyledBlockieImg,
@@ -17,17 +18,13 @@ interface IProps {
   profileAddress?: string;
 }
 
-interface IParams {
-  network: NetworkName;
-}
-
 export const ProfileImage: React.FC<IProps> = ({
   profileImgSrc,
   blockieImgSrc,
   profileAddress,
 }: IProps) => {
-  const params = useParams<IParams>();
-  const explorer = getChainExplorer(params.network);
+  const { network } = useUrlParams();
+  const explorer = getChainExplorer(network);
   return (
     <StyledProfileImageWrapper>
       <StyledBlockieImg src={blockieImgSrc} />
@@ -38,7 +35,7 @@ export const ProfileImage: React.FC<IProps> = ({
       >
         <StyledBlockScoutLogo src={explorer && explorer.icon} />
       </a>
-      {params.network in ['l14', 'l16'] && (
+      {network in ['l14', 'l16'] && (
         <a
           href={'https://universalprofile.cloud/' + profileAddress}
           target="_blank"

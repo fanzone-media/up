@@ -40,12 +40,15 @@ export const useCurrentUserPermissions = (profileAddress: Address | null) => {
       setCurrentUsersPermissionsSet(defaultPermissions);
       return;
     }
+
     const _currentUsersPermissionsSet = getAddressPermissionsOnUniversalProfile(
       activeProfile.permissionSet,
       account.address,
     );
-    if (_currentUsersPermissionsSet !== undefined)
-      setCurrentUsersPermissionsSet(_currentUsersPermissionsSet.permissions);
+
+    _currentUsersPermissionsSet !== undefined
+      ? setCurrentUsersPermissionsSet(_currentUsersPermissionsSet.permissions)
+      : setCurrentUsersPermissionsSet(defaultPermissions);
   }, [account, activeProfile, defaultPermissions]);
 
   return currentUsersPermissionsSet;

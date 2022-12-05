@@ -30,6 +30,8 @@ const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
     fetchHolders: null,
     fetchCreators: null,
     fetchOwnerOfTokenId: null,
+    fetchIssuedAssetAddresses: null,
+    fetchOwnedAssetsAddresses: null,
   },
   status: {
     fetchProfile: STATUS.IDLE,
@@ -38,6 +40,8 @@ const usersAdapterInitialState = usersAdapter.getInitialState<IUsersState>({
     fetchHolders: STATUS.IDLE,
     fetchCreators: STATUS.IDLE,
     fetchOwnerOfTokenId: STATUS.IDLE,
+    fetchIssuedAssetAddresses: STATUS.IDLE,
+    fetchOwnedAssetsAddresses: STATUS.IDLE,
   },
 });
 
@@ -164,6 +168,44 @@ export const fetchAllProfiles = createAsyncThunk<
     fetchProfileByAddresses(addresses, network, api, getState()),
 );
 
+export const fetchIssuedAssetsAddresses = createAsyncThunk<
+  IProfile,
+  { profileAddress: string; network: NetworkName },
+  { extra: ThunkExtra; state: RootState }
+>(
+  'profile/fetchIssuedAssetsAddresses',
+  async ({ profileAddress, network }, { extra: { api }, getState }) => {
+    const res = await api.profiles.fetchProfileIssuedAssetsAddresses(
+      network,
+      profileAddress,
+    );
+    const state: RootState = getState();
+    return {
+      ...state.userData[network].entities[profileAddress],
+      issuedAssets: res,
+    } as IProfile;
+  },
+);
+
+export const fetchOwnedAssetsAddresses = createAsyncThunk<
+  IProfile,
+  { profileAddress: string; network: NetworkName },
+  { extra: ThunkExtra; state: RootState }
+>(
+  'profile/fetchOwnedAssetsAddresses',
+  async ({ profileAddress, network }, { extra: { api }, getState }) => {
+    const res = await api.profiles.fetchOwnedAssetsAddressesWithBalance(
+      profileAddress,
+      network,
+    );
+    const state: RootState = getState();
+    return {
+      ...state.userData[network].entities[profileAddress],
+      ownedAssets: res,
+    } as IProfile;
+  },
+);
+
 /**
  * **********************
  *    REDUCERS (SLICE)
@@ -193,6 +235,8 @@ const userDataSlice = createSlice({
             fetchOwnerOfProfile: null,
             fetchHolders: null,
             fetchCreators: null,
+            fetchIssuedAssetAddresses: null,
+            fetchOwnedAssetsAddresses: null,
           },
           status: {
             fetchProfile: STATUS.IDLE,
@@ -200,6 +244,8 @@ const userDataSlice = createSlice({
             fetchOwnerOfProfile: STATUS.IDLE,
             fetchHolders: STATUS.IDLE,
             fetchCreators: STATUS.IDLE,
+            fetchIssuedAssetAddresses: STATUS.IDLE,
+            fetchOwnedAssetsAddresses: STATUS.IDLE,
           },
         },
       };
@@ -300,6 +346,44 @@ const userDataSlice = createSlice({
         state.me = null;
         state[action.meta.arg.network].error.fetchOwnerOfTokenId = action.error;
         state[action.meta.arg.network].status.fetchOwnerOfTokenId =
+          STATUS.FAILED;
+      });
+    builder
+      .addCase(fetchIssuedAssetsAddresses.pending, (state, action) => {
+        state[action.meta.arg.network].status.fetchIssuedAssetAddresses =
+          STATUS.LOADING;
+      })
+      .addCase(fetchIssuedAssetsAddresses.fulfilled, (state, action) => {
+        usersAdapter.upsertOne(
+          state[action.meta.arg.network],
+          action.payload as IProfile,
+        );
+        state[action.meta.arg.network].status.fetchIssuedAssetAddresses =
+          STATUS.SUCCESSFUL;
+      })
+      .addCase(fetchIssuedAssetsAddresses.rejected, (state, action) => {
+        state[action.meta.arg.network].error.fetchIssuedAssetAddresses =
+          action.error;
+        state[action.meta.arg.network].status.fetchIssuedAssetAddresses =
+          STATUS.FAILED;
+      });
+    builder
+      .addCase(fetchOwnedAssetsAddresses.pending, (state, action) => {
+        state[action.meta.arg.network].status.fetchOwnedAssetsAddresses =
+          STATUS.LOADING;
+      })
+      .addCase(fetchOwnedAssetsAddresses.fulfilled, (state, action) => {
+        usersAdapter.upsertOne(
+          state[action.meta.arg.network],
+          action.payload as IProfile,
+        );
+        state[action.meta.arg.network].status.fetchOwnedAssetsAddresses =
+          STATUS.SUCCESSFUL;
+      })
+      .addCase(fetchOwnedAssetsAddresses.rejected, (state, action) => {
+        state[action.meta.arg.network].error.fetchOwnedAssetsAddresses =
+          action.error;
+        state[action.meta.arg.network].status.fetchOwnedAssetsAddresses =
           STATUS.FAILED;
       });
   },

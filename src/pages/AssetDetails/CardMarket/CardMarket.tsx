@@ -51,8 +51,8 @@ export const CardMarket = ({
             Price
           </StyledCardMarketListHeaderContent>
         </StyledCardMarketListHeader>
-        {cardMarkets.map((market) => (
-          <StyledCardMarket>
+        {cardMarkets.map((market, i) => (
+          <StyledCardMarket key={i}>
             <StyledCardMarketMint>
               {Number(market.tokenId)}
             </StyledCardMarketMint>

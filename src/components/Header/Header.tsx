@@ -80,7 +80,6 @@ export const Header: React.FC = () => {
       connectToast();
       const provider = await detectEthereumProvider();
       if (provider) {
-        console.log('connect');
         connect(data.connectors[0])
           .then(() => {
             toast('Connected', {

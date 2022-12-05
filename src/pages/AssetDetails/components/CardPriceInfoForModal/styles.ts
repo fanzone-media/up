@@ -8,6 +8,7 @@ export const StyledCardPriceInfoContainer = styled.div`
 
 export const StyledCardImg = styled.img`
   max-width: 5em;
+  height: 7em;
 `;
 
 export const StyledInfo = styled.div`

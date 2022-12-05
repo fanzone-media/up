@@ -36,7 +36,7 @@ interface IProps {
   onDismiss: () => void;
   address: string;
   mint: number;
-  price: BigNumber;
+  price: number;
   cardImg: string;
   tokenAddress: string;
   whiteListedTokens: IWhiteListedTokens[];

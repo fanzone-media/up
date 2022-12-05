@@ -4,7 +4,7 @@ export const StyledProcessingWindow = styled.div<{ height?: 'full' }>`
   display: flex;
   position: absolute;
   width: 100%;
-  height: ${({ height }) => (height ? '100%' : 'calc(100% - 11em)')};
+  height: ${({ height }) => (height ? '100%' : 'calc(100% - 12em)')};
   bottom: 0;
   left: -0.03em;
   border-radius: 0.625em;
@@ -20,6 +20,7 @@ export const StyledStateContent = styled.div`
 
 export const StyledStateIcon = styled.img`
   height: 8.5em;
+  margin-top: -2em;
 `;
 
 export const StyledStateHeading = styled.h2`

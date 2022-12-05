@@ -98,8 +98,9 @@ export const WithdrawFundsModal = ({ profile, network, onDismiss }: IProps) => {
 
   return (
     <StyledWithdrawModalContent>
-      {whiteListedTokensInfo.map((item) => (
+      {whiteListedTokensInfo.map((item, i) => (
         <StyledRadioLabel
+          key={i}
           htmlFor="token"
           $checked={
             selectedTokenInput.toLowerCase() === item.tokenAddress.toLowerCase()

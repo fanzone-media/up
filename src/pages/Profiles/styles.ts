@@ -118,12 +118,18 @@ export const StyledDivider = styled.span`
     rgba(33, 33, 33, 0.6);
 `;
 
+export const StyledAssetsCheckText = styled.h1`
+  font-size: 24px;
+  font-weight: ${({ theme }) => theme.font.weight.bolder};
+  margin: auto;
+`;
+
 export const StyledProfilesHeader = styled.div`
   padding-top: 30px;
   display: flex;
 `;
 
-export const StyledProfileHeading = styled.h1`
+export const StyledProfileHeaderText = styled.h1`
   font-size: 24px;
   font-weight: ${({ theme }) => theme.font.weight.bolder};
   margin-right: auto;

@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom';
 import { ICard, IProfile } from '../../../services/models';
 import universalprofile from '../../../assets/universalprofile.png';
 import transferIcon from '../../../assets/transfer-icon.png';
-import polygon from '../../../assets/polygon.svg';
 import {
   StyledBlockScoutIcon,
   StyledCardDetail,
@@ -17,15 +16,11 @@ import {
   StyledUniversalProfileIcon,
 } from './styles';
 import { getChainExplorer } from '../../../utility';
-import { NetworkName } from '../../../boot/types';
-import {
-  StyledBalance,
-  StyledBalanceWrapper,
-  StyledPolygon,
-} from '../../profiles/ProfileCard/styles';
 import { useModal } from '../../../hooks/useModal';
 import { TransferCardModal } from '../../../pages/ProfileDetails/TransferCardModal';
 import Utils from '../../../services/utilities/util';
+import { useOwnedMints } from '../../../hooks/useOwnedMints';
+import { useUrlParams } from '../../../hooks/useUrlParams';
 
 interface IProps {
   digitalCard: ICard;
@@ -35,19 +30,19 @@ interface IProps {
   canTransfer?: boolean;
 }
 
-interface IParams {
-  network: NetworkName;
-}
-
 export const MetaCard: React.FC<IProps> = ({
   digitalCard,
   type,
-  balance,
   profile,
   canTransfer,
 }: IProps) => {
-  const params = useParams<IParams>();
-  const explorer = getChainExplorer(params.network);
+  const { network } = useUrlParams();
+  const explorer = getChainExplorer(network);
+  const { currentTokenId } = useOwnedMints(
+    profile ? profile.address : '',
+    digitalCard.address,
+    0,
+  );
 
   const {
     handlePresent: onPresentTransferCardModal,
@@ -64,7 +59,7 @@ export const MetaCard: React.FC<IProps> = ({
       }}
       asset={digitalCard}
       onDismiss={() => onDismissTransferCardModal()}
-      network={params.network}
+      network={network}
     />,
     'Card Transfer Modal',
     'Transfer Card',
@@ -86,7 +81,7 @@ export const MetaCard: React.FC<IProps> = ({
 
   return (
     <StyledCardWrapper>
-      {params.network === 'l14' && (
+      {network === 'l14' && (
         <a
           href={'https://universalprofile.cloud/asset/' + digitalCard.address}
           target="_blank"
@@ -94,14 +89,6 @@ export const MetaCard: React.FC<IProps> = ({
         >
           <StyledUniversalProfileIcon src={universalprofile} alt="" />
         </a>
-      )}
-      {type === 'owned' && (
-        <>
-          <StyledBalanceWrapper demo={true}>
-            <StyledBalance demo={true}>{balance}</StyledBalance>
-          </StyledBalanceWrapper>
-          <StyledPolygon src={polygon} alt="" demo={true} />
-        </>
       )}
       {canTransfer === true && (
         <StyledTransferButton onClick={onPresentTransferCardModal}>
@@ -115,7 +102,13 @@ export const MetaCard: React.FC<IProps> = ({
       >
         <StyledBlockScoutIcon src={explorer?.icon} alt="" />
       </a>
-      <Link to={`/up/${params.network}/asset/` + digitalCard.address}>
+      <Link
+        to={
+          type === 'owned'
+            ? `/up/${network}/asset/${digitalCard.address}/${currentTokenId}`
+            : `/up/${network}/asset/` + digitalCard.address
+        }
+      >
         <StyledMediaWrapper>
           <StyledMetaCardImg src={getCardImg()} alt="" />
         </StyledMediaWrapper>

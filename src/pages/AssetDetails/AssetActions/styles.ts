@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const StyledActionsButtonWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  row-gap: 10px;
+  row-gap: 0.7em;
 
   @media ${({ theme }) => theme.screen.md} {
     flex-direction: row;

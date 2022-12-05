@@ -8,8 +8,9 @@ export const StyledEmbedSetPriceContent = styled.div`
 `;
 
 export const StyledEmbedSetPriceWrapper = styled.div`
+  margin-top: 0.7em;
   height: 250px;
   display: flex;
   flex-direction: column;
-  row-gap: 1em;
+  row-gap: 0.7em;
 `;

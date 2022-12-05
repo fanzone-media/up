@@ -106,6 +106,25 @@ const fetchAuctionFor = async (
   }
 };
 
+const fetchAllAuctionFor = async (
+  network: NetworkName,
+  tokenAddress: Address,
+) => {
+  try {
+    const provider = useRpcProvider(network);
+    const contract = CardAuction__factory.connect(
+      auctionContracts[network],
+      provider,
+    );
+
+    const auctions = await contract.getAuctionsForLSP8Contract(tokenAddress);
+
+    return auctions;
+  } catch (error) {
+    return null;
+  }
+};
+
 export const AuctionApi = {
   encodeOpenAuctionFor,
   encodeCancelAuctionFor,

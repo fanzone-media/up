@@ -117,9 +117,6 @@ export const AssetActions = ({
       )}
       {!marketForTokenId && currentUsersPermissions.call === '1' && (
         <>
-          <StyledCardPriceValueWrapper>
-            <StyledCardPriceValue>-</StyledCardPriceValue>
-          </StyledCardPriceValueWrapper>
           <StyledActionsButtonWrapper>
             <StyledSetPriceButton onClick={onPresentSellCardModal}>
               Set price

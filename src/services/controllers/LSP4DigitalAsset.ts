@@ -40,11 +40,6 @@ const fetchCard = async (
 
   let supportedInterface: SupportedInterface | null = null;
 
-  // tokenId &&
-  //   (await contract.ownerOf(tokenId).catch(() => {
-  //     throw new Error('Not a valid token id');
-  //   }));
-
   const [
     name,
     symbol,
@@ -93,18 +88,18 @@ const fetchCard = async (
   const result = await getLSP4Metadata(metaDataUrl, supportedInterface);
 
   let creators: string[] = [];
-  supportedInterface !== 'erc721' &&
-    (await LSP3ProfileApi.fetchCreatorsAddresses(
-      address,
-      network,
-      supportedInterface,
-    )
-      .then((result) => {
-        creators = result;
-      })
-      .catch((error) => {
-        console.log(error);
-      }));
+  try {
+    if (supportedInterface !== 'erc721') {
+      creators = await LSP3ProfileApi.fetchCreatorsAddresses(
+        address,
+        network,
+        supportedInterface,
+      );
+    }
+  } catch (error) {
+    creators = [];
+  }
+
   return {
     address,
     name: name.status === 'fulfilled' ? name.value : 'unknown',
@@ -138,18 +133,15 @@ const fetchAllCards = async (
 ): Promise<ICard[]> => {
   let assets: ICard[] = [];
   const cardFetcher = fetchCard;
-  await Promise.allSettled(
-    new Array(addresses.length).fill(0).map(async (_, index) => {
-      const asset = await cardFetcher(addresses[index], network);
-      return asset;
-    }),
-  ).then((results) =>
-    results.forEach((result) => {
-      if (result.status === 'fulfilled') {
-        assets.push(result.value);
-      }
-    }),
+  const results = await Promise.allSettled(
+    addresses.map(async (address) => await cardFetcher(address, network)),
   );
+  results.forEach((result) => {
+    if (result.status === 'fulfilled') {
+      assets.push(result.value);
+    }
+  });
+
   return assets;
 };
 
@@ -189,117 +181,12 @@ const fetchAllMarkets = async (
 ): Promise<IMarket[]> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
-  try {
-    const markets = await contract.getAllMarkets();
-    return markets;
-  } catch (error) {
-    throw new Error('No Markets available');
-  }
-};
-
-const fetchProfileIssuedAssetsAddresses = async (
-  network: NetworkName,
-  profileAddress: string,
-): Promise<string[]> => {
-  const provider = useRpcProvider(network);
-  const contract = UniversalProfileProxy__factory.connect(
-    profileAddress,
-    provider,
-  );
-  const universalProfileOld = new ethers.Contract(
-    profileAddress,
-    ABIs.LSP3AccountABI,
-    provider,
-  );
-
-  let assets: string[] = [];
-  // Use the LSP3IssuedAssets_KEY to request the number of elements
-  // response ex: 0x0000000000000000000000000000000000000000000000000000000000000002 (2 elements)
-  let numAssetsHex = '0x';
-
-  await contract
-    .getData([KeyChain.LSP3IssuedAssets])
-    .then((res) => {
-      numAssetsHex = res[0];
-    })
-    .catch(async () => {
-      await universalProfileOld
-        .getData(KeyChain.LSP3IssuedAssets)
-        .then((res: string) => {
-          numAssetsHex = res as string;
-        })
-        .catch(() => {});
-    });
-
-  // Convert the hex to decimal
-  //
-  // Example:
-  //      0x3a47ab5bd3a594c3a8995f8fa58d087600000000000000000000000000000007 => 7
-  //      0x000000000000000000000000000000000000000000000000000000000000000a => 10
-  //      0x3a47ab5bd3a594c3a8995f8fa58d087600000000000000000000000000000013 => 19
-  // const numAssets = EthereumSerive.web3.utils.hexToNumber(numAssetsHex);
-  const numAssets = parseInt(numAssetsHex, 16);
-
-  if (isNaN(numAssets) || numAssets === 0) {
-    //return assets;
-    return assets;
-    //throw new Error('No Assets');
-  }
-
-  // The first 16 bytes are the first 16 bytes of the key hash     => [elementPrefix]
-  // The second 16 bytes is a uint128 of the number of the element => [elementSufix]
-  //
-  // Get the first 16 bytes + '0x' => 34
-  const elementPrefix = KeyChain.LSP3IssuedAssets.slice(0, 34);
-
-  await Promise.allSettled(
-    new Array(numAssets).fill(0).map(async (_, index) => {
-      // Conver the number to hex and remove the perfix ('0x')
-      //
-      // Example:
-      //      19   => 0x13
-      //      0x13 => 13
-      const elementSufix = index.toString(16);
-
-      // Create the element key by appending the prefix with the sufix and filling the
-      // prefix with enough '0's to reach the 32 byte key
-      //
-      // Example:
-      //      elementPrefix = 0x3a47ab5bd3a594c3a8995f8fa58d0876
-      //      elementSufix  = 5
-      //      elementKey    = 0x3a47ab5bd3a594c3a8995f8fa58d087600000000000000000000000000000005
-      const elementKey =
-        elementPrefix.padEnd(66 - elementSufix.length, '0') + elementSufix;
-
-      let assetAddr: string = '';
-
-      await contract
-        .getData([elementKey])
-        .then((res) => {
-          assetAddr = res[0];
-        })
-        .catch(async () => {
-          await universalProfileOld
-            .getData(elementKey)
-            .then((res: string) => {
-              assetAddr = res as string;
-            })
-            .catch(() => {});
-        });
-
-      // const assetAddr = await contract.getData([elementKey]);
-
-      return assetAddr;
-    }),
-  ).then((results) =>
-    results.forEach((result) => {
-      if (result.status === 'fulfilled' && result.value !== '0x') {
-        assets.push(result.value);
-      }
-    }),
-  );
-
-  return assets;
+  const markets = await contract.getAllMarkets();
+  return markets.map((market) => ({
+    tokenId: market.tokenId,
+    acceptedToken: market.acceptedToken,
+    minimumAmount: Number(market.minimumAmount.toString()),
+  }));
 };
 
 const fetchAcceptedTokens = async (
@@ -308,31 +195,23 @@ const fetchAcceptedTokens = async (
 ): Promise<IWhiteListedTokens[]> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
-  let whiteListedTokens = [] as IWhiteListedTokens[];
-  let contractRegistryAddress: string = ethers.constants.AddressZero;
-  await contract
-    .contractRegistry()
-    .then((res) => {
-      contractRegistryAddress = res;
-    })
-    .catch(() => {
-      return whiteListedTokens;
-    });
+
+  const contractRegistryAddress: string = await contract.contractRegistry();
+
   const contractRegistry = ContractRegistry__factory.connect(
     contractRegistryAddress,
     provider,
   );
 
-  await contractRegistry
-    .allWhitelistedTokens()
-    .then(async (res) => {
-      whiteListedTokens = await Promise.all(
-        res.map(async (item) => await fetchErc20TokenInfo(item, provider)),
-      );
-    })
-    .catch(() => {
-      return whiteListedTokens;
-    });
+  const whitelistedTokenAddresses =
+    await contractRegistry.allWhitelistedTokens();
+
+  const whiteListedTokens = await Promise.all(
+    whitelistedTokenAddresses.map(
+      async (item) => await fetchErc20TokenInfo(item, provider),
+    ),
+  );
+
   return whiteListedTokens;
 };
 
@@ -358,7 +237,7 @@ const buyFromCardMarketViaUniversalProfile = async (
   assetAddress: string,
   universalProfileAddress: string,
   tokenId: number,
-  minimumAmount: BigNumber,
+  minimumAmount: number,
   signer: Signer,
   referrerAddress: Address,
 ) => {
@@ -391,7 +270,7 @@ const buyFromCardMarketViaUniversalProfile = async (
 const buyFromMarketViaEOA = async (
   assetAddress: string,
   tokenId: number,
-  minimumAmount: BigNumber,
+  minimumAmount: number,
   signer: Signer,
   referrerAddress: Address,
 ) => {
@@ -550,7 +429,6 @@ const encodeAuthorizeOperator = (
 
 export const LSP4DigitalAssetApi = {
   fetchCard,
-  fetchProfileIssuedAssetsAddresses,
   fetchAllCards,
   getTokenSale,
   setMarketViaUniversalProfile,

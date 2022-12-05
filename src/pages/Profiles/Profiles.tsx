@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ProfileCard } from '../../features/profiles/ProfileCard';
-import { NetworkName, RootState } from '../../boot/types';
+import { RootState } from '../../boot/types';
 import {
   fetchAllProfiles,
   resetUserDataSliceInitialState,
@@ -18,12 +18,11 @@ import {
   StyledHeading,
   StyledDivider,
   StyledProfilesHeader,
-  StyledProfileHeading,
+  StyledProfileHeaderText,
   StyledImg,
   StyledInfoSection,
   StyledInfoHeading,
   StyledInfoContent,
-  StyledContainer,
   StyledLuksoBadge,
   StyledLuksoIcon,
   StyledLuksoLogo,
@@ -36,7 +35,6 @@ import {
 import { Search } from '../../components';
 import { theme } from '../../boot/styles';
 import { useAppDispatch } from '../../boot/store';
-import { useParams } from 'react-router-dom';
 import {
   fetchAllCards,
   resetCardsSliceInitialState,
@@ -47,12 +45,8 @@ import { useDefaultAddresses } from '../../hooks/useDefaultAddresses';
 import { usePagination } from '../../hooks/usePagination';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import {
-  BgFanzoneHero,
-  LuksoHeader,
-  HeaderBackground,
   LuksoBadge,
   Lukso,
-  HeaderAd,
   NftShowcaseIcon,
   NftBuyAndSellIcon,
   NftGrantPermissionIcon,
@@ -60,13 +54,10 @@ import {
   NftPersonaliseIcon,
   NftExchangeIcon,
 } from '../../assets';
-
-interface IParams {
-  network: NetworkName;
-}
+import { useUrlParams } from '../../hooks/useUrlParams';
 
 const Profiles: React.FC = () => {
-  const params = useParams<IParams>();
+  const { network } = useUrlParams();
   const dispatch = useAppDispatch();
 
   const { addresses: profileAddresses, error: errorLoadingProfileAddresses } =
@@ -79,9 +70,9 @@ const Profiles: React.FC = () => {
   const { range: assetsRange, setRange: setAssetsRange } = usePagination();
 
   useEffect(() => {
-    dispatch(resetUserDataSliceInitialState(params.network));
-    dispatch(resetCardsSliceInitialState(params.network));
-  }, [dispatch, params]);
+    dispatch(resetUserDataSliceInitialState(network));
+    dispatch(resetCardsSliceInitialState(network));
+  }, [dispatch, network]);
 
   useEffect(() => {
     if (profileAddresses.length === 0) return;
@@ -91,14 +82,14 @@ const Profiles: React.FC = () => {
           profilesRange[0],
           profilesRange[1] + 1,
         ),
-        network: params.network,
+        network,
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, profileAddresses, params.network, profilesRange]);
+  }, [dispatch, profileAddresses, network, profilesRange]);
 
   const userProfiles = useSelector((state: RootState) =>
-    selectAllUsersItems(state.userData[params.network]).filter((item) =>
+    selectAllUsersItems(state.userData[network]).filter((item) =>
       profileAddresses
         .slice(profilesRange[0], profilesRange[1] + 1)
         .some((i) => i === item.address && item.owner !== ''),
@@ -106,12 +97,11 @@ const Profiles: React.FC = () => {
   );
 
   const userProfilesState = useSelector(
-    (state: RootState) =>
-      state.userData[params.network].status.fetchAllProfiles,
+    (state: RootState) => state.userData[network].status.fetchAllProfiles,
   );
 
   const cards = useSelector((state: RootState) =>
-    selectAllCardItems(state.cards[params.network]),
+    selectAllCardItems(state.cards[network]),
   ).filter((item) =>
     assetsAddresses
       .slice(assetsRange[0], assetsRange[1] + 1)
@@ -123,17 +113,14 @@ const Profiles: React.FC = () => {
     dispatch(
       fetchAllCards({
         addresses: assetsAddresses.slice(assetsRange[0], assetsRange[1] + 1),
-        network: params.network,
+        network,
       }),
     );
-  }, [dispatch, assetsAddresses, params.network, assetsRange]);
+  }, [dispatch, assetsAddresses, network, assetsRange]);
 
   const assetsState = useSelector(
-    (state: RootState) => state.cards[params.network].status.fetchAllCards,
+    (state: RootState) => state.cards[network].status.fetchAllCards,
   );
-
-  const luksoNetwork = params.network === 'l14' || params.network === 'l16';
-  const imgUrl = LuksoHeader;
 
   const nftIconParams = [
     {
@@ -218,8 +205,8 @@ const Profiles: React.FC = () => {
         </StyledInfoSection>
         {isTablet && <StyledDivider />}
         <StyledNftInfoSection>
-          {nftIconParams.map(({ url, text }) => (
-            <StyledNftInfo>
+          {nftIconParams.map(({ url, text }, i) => (
+            <StyledNftInfo key={i}>
               <StyledNftInfoIcon>
                 <StyledImg src={url} />
               </StyledNftInfoIcon>
@@ -231,14 +218,14 @@ const Profiles: React.FC = () => {
         <>
           {errorLoadingProfileAddresses ? (
             <StyledProfilesHeader>
-              <StyledProfileHeading>
+              <StyledProfileHeaderText>
                 Error loading profiles
-              </StyledProfileHeading>
+              </StyledProfileHeaderText>
             </StyledProfilesHeader>
           ) : (
             <>
               <StyledProfilesHeader>
-                <StyledProfileHeading>Profiles</StyledProfileHeading>
+                <StyledProfileHeaderText>Profiles</StyledProfileHeaderText>
                 <Search />
               </StyledProfilesHeader>
               <Pagination
@@ -257,12 +244,14 @@ const Profiles: React.FC = () => {
           )}
           {errorLoadingAssetsAddresses ? (
             <StyledProfilesHeader>
-              <StyledProfileHeading>Error loading assets</StyledProfileHeading>
+              <StyledProfileHeaderText>
+                Error loading assets
+              </StyledProfileHeaderText>
             </StyledProfilesHeader>
           ) : (
             <>
               <StyledProfilesHeader>
-                <StyledProfileHeading>Assets</StyledProfileHeading>
+                <StyledProfileHeaderText>Assets</StyledProfileHeaderText>
                 <Search />
               </StyledProfilesHeader>
               <Pagination

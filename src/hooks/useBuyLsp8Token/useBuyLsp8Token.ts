@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { isAddress } from 'ethers/lib/utils';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -33,7 +32,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
 
   const buyFromMarket = async (
     assetAddress: string,
-    amount: BigNumber,
+    amount: number,
     tokenId: number,
     universalProfileAddress?: string,
   ) => {

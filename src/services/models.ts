@@ -109,7 +109,7 @@ export interface IWhiteListedTokens {
 
 export interface IMarket {
   tokenId: string;
-  minimumAmount: BigNumber;
+  minimumAmount: number;
   acceptedToken: string;
 }
 

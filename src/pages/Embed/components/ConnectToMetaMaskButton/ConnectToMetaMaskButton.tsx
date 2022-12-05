@@ -6,7 +6,7 @@ import { StyledConnectToMetaMaskButton } from './styles';
 
 export const ConnectToMetaMaskButton = () => {
   const [{ data }, connect] = useConnect();
-  const [{}, disconnect] = useAccount();
+  const [, disconnect] = useAccount();
   const connectToastRef = useRef<ReactText>();
 
   const handleConnect = async () => {
@@ -22,7 +22,6 @@ export const ConnectToMetaMaskButton = () => {
       connectToast();
       const provider = await detectEthereumProvider();
       if (provider) {
-        console.log('connect');
         connect(data.connectors[0])
           .then(() => {
             toast('Connected', {

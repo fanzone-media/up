@@ -9,7 +9,7 @@ import {
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
 import { InputField } from '../../../components/InputField';
 import { displayPrice } from '../../../utility';
-import { BigNumber, BigNumberish } from 'ethers';
+import { BigNumberish } from 'ethers';
 import { useSellLsp8Token } from '../../../hooks/useSellLsp8Token';
 import { getWhiteListedTokenAddresses } from '../../../utility/content/addresses';
 import {
@@ -23,7 +23,7 @@ interface IProps {
   address: string;
   mint: number;
   marketTokenAddress?: string;
-  price?: BigNumber;
+  price?: number;
   cardImg: string;
   ownerProfile: IProfile;
   whiteListedTokens?: IWhiteListedTokens[];

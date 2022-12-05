@@ -127,9 +127,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
             [currentTarget.name]: currentTarget.files![0],
           });
         })
-        .catch((error) => {
-          console.log(error);
-        });
+        .catch((error) => {});
     }
   };
 
@@ -254,8 +252,6 @@ export const ProfileEditModal: React.FC<IProps> = ({
 
       window.location.reload();
     } catch (error) {
-      console.log(error);
-
       if (setTabName) {
         setTabName('Oops...');
       }
