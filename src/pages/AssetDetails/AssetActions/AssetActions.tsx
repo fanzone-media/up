@@ -1,7 +1,6 @@
 import { useAccount } from 'wagmi';
 import { MintMarketType } from '../../../hooks/useMintMarket';
 import { useModal } from '../../../hooks/useModal';
-import { useRemoveMarketForLsp8Token } from '../../../hooks/useRemoveMarketForLsp8Token';
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
 import { useUrlParams } from '../../../hooks/useUrlParams';
 import { ICard, IPermissionSet, IProfile } from '../../../services/models';
@@ -9,6 +8,7 @@ import { displayPrice, STATUS } from '../../../utility';
 import { AuctionModalContent } from '../AuctionModalContent';
 import { BuyCardButton } from '../components/BuyCardButton';
 import { SellCardModal } from '../SellCardModal';
+import { WithdrawCardSaleModalContent } from '../WithdrawCardSaleModalContent';
 import {
   StyledActionsButtonWrapper,
   StyledCardPriceValue,
@@ -43,12 +43,6 @@ export const AssetActions = ({
     network,
   );
 
-  const { removeMarket, removingMarket } = useRemoveMarketForLsp8Token(
-    address,
-    parseInt(tokenId),
-    activeProfile ? activeProfile : ({} as IProfile),
-  );
-
   const {
     handlePresent: onPresentSellCardModal,
     onDismiss: onDismissSellCardModal,
@@ -70,6 +64,26 @@ export const AssetActions = ({
     ),
     'Sell Card Modal',
     'Sell Card',
+  );
+
+  const {
+    handlePresent: onPresentWithdrawCardSaleModal,
+    onDismiss: onDismissWithdrawCardSaleModal,
+  } = useModal(
+    asset && activeProfile && (
+      <WithdrawCardSaleModalContent
+        profile={activeProfile}
+        assetAddress={address}
+        tokenId={tokenId}
+        cardImg={asset.lsp8MetaData[tokenId ? tokenId : 0]?.image}
+        price={marketForTokenId?.minimumAmount}
+        marketTokenAddress={marketForTokenId?.acceptedToken}
+        whiteListedTokens={asset.whiteListedTokens}
+        onDismiss={() => onDismissWithdrawCardSaleModal()}
+      />
+    ),
+    'Withdraw Card Sale Modal',
+    'Withdraw from Sale',
   );
 
   const {
@@ -150,8 +164,8 @@ export const AssetActions = ({
             <StyledChangePriceButton onClick={onPresentSellCardModal}>
               Change price
             </StyledChangePriceButton>
-            <StyledWithdrawButton onClick={removeMarket}>
-              {removingMarket ? 'Withdrawing from sale…' : 'Withdraw from sale'}
+            <StyledWithdrawButton onClick={onPresentWithdrawCardSaleModal}>
+              Withdraw from sale
             </StyledWithdrawButton>
           </StyledActionsButtonWrapper>
           <StyledActionsButtonWrapper>

@@ -4,6 +4,7 @@ import { useSigner } from 'wagmi';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { IOwnedAssets } from '../../services/models';
+import { STATUS } from '../../utility';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { Address } from '../../utils/types';
 
@@ -21,12 +22,14 @@ export const useRemoveMarketForLsp8Token = (
   profile: IProfile,
   callback?: () => any,
 ) => {
-  const [removingMarket, setRemovingMarket] = useState(false);
+  const [removeMarketState, setRemovingMarketState] = useState<STATUS>(
+    STATUS.IDLE,
+  );
   const [error, setError] = useState();
   const [{ data: signer }] = useSigner();
 
   const removeMarket = async () => {
-    setRemovingMarket(true);
+    setRemovingMarketState(STATUS.LOADING);
     if (profile.isOwnerKeyManager) {
       await KeyManagerApi.removeMarketViaKeymanager(
         cardAddress,
@@ -36,13 +39,12 @@ export const useRemoveMarketForLsp8Token = (
         signer as Signer,
       )
         .then(() => {
+          setRemovingMarketState(STATUS.SUCCESSFUL);
           callback && callback();
         })
         .catch((error: any) => {
           setError(error);
-        })
-        .finally(() => {
-          setRemovingMarket(false);
+          setRemovingMarketState(STATUS.FAILED);
         });
     } else {
       await LSP3ProfileApi.removeMarket(
@@ -52,16 +54,15 @@ export const useRemoveMarketForLsp8Token = (
         signer as Signer,
       )
         .then(() => {
+          setRemovingMarketState(STATUS.SUCCESSFUL);
           callback && callback();
         })
         .catch((error: any) => {
           setError(error);
-        })
-        .finally(() => {
-          setRemovingMarket(false);
+          setRemovingMarketState(STATUS.FAILED);
         });
     }
   };
 
-  return { removeMarket, removingMarket, error };
+  return { removeMarket, removeMarketState, error };
 };
