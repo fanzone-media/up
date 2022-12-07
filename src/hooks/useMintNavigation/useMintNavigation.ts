@@ -1,4 +1,4 @@
-import { Dispatch, RefObject, useEffect } from 'react';
+import { Dispatch, RefObject, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { useAppDispatch } from '../../boot/store';
@@ -9,12 +9,12 @@ import { STATUS } from '../../utility';
 import { useUrlParams } from '../useUrlParams';
 
 export const useMintNavigation = (
-  currentIndex: number,
-  setCurrentIndex: Dispatch<React.SetStateAction<number>>,
   ownedTokenIds: number[] | null,
   mintIdInputRef: RefObject<HTMLInputElement>,
   asset: ICard | null,
 ) => {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+
   const history = useHistory();
   const dispatch = useAppDispatch();
   const { network, address, tokenId } = useUrlParams();
@@ -84,5 +84,7 @@ export const useMintNavigation = (
     nextMint,
     previousMint,
     mintChangeHelper,
+    currentIndex,
+    setCurrentIndex,
   };
 };

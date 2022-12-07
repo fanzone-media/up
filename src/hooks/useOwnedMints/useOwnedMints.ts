@@ -10,7 +10,6 @@ import { useUrlParams } from '../useUrlParams';
 export const useOwnedMints = (
   profileAddress: Address,
   assetAddress: Address,
-  currentIndex: number,
 ) => {
   const { tokenId, network } = useUrlParams();
   const profile = useSelector((state: RootState) =>
@@ -40,16 +39,12 @@ export const useOwnedMints = (
     ) {
       index = tokenId ? tokenId : '0';
     } else if (asset?.supportedInterface === 'lsp8') {
-      index = ownedTokenIds ? ownedTokenIds[currentIndex].toString() : '0';
+      index = ownedTokenIds
+        ? ownedTokenIds[ownedTokenIds.indexOf(Number(tokenId))].toString()
+        : '0';
     }
     return index;
-  }, [
-    asset?.supportedInterface,
-    currentIndex,
-    metaDataStatus,
-    ownedTokenIds,
-    tokenId,
-  ]);
+  }, [asset?.supportedInterface, metaDataStatus, ownedTokenIds, tokenId]);
 
   return {
     ownedTokenIds:

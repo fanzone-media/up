@@ -23,7 +23,6 @@ import {
   fetchLSP5Data,
 } from '../../utils/LSPSchema';
 import { BigNumberish, BytesLike, ethers, Signer } from 'ethers';
-import { LSP4DigitalAssetApi } from './LSP4DigitalAsset';
 import { encodeArrayKey } from '@erc725/erc725.js/build/main/lib/utils';
 import { ERC725 } from '@erc725/erc725.js';
 import Web3 from 'web3';

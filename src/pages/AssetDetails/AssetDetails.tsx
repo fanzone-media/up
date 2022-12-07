@@ -104,8 +104,6 @@ import { useCurrentUserPermissions } from '../../hooks/useCurrentUserPermissions
 import { useUrlParams } from '../../hooks/useUrlParams';
 
 const AssetDetails: React.FC = () => {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-
   const mintIdInputRef = useRef<HTMLInputElement>(null);
 
   const { network, address, tokenId } = useUrlParams();
@@ -154,18 +152,17 @@ const AssetDetails: React.FC = () => {
   const { ownedTokenIds, currentTokenId } = useOwnedMints(
     wasActiveProfile ? wasActiveProfile : '',
     address,
-    currentIndex,
   );
 
   const currentMintMarket = useMintMarket(address, tokenId);
 
-  const { nextMint, previousMint, mintChangeHelper } = useMintNavigation(
+  const {
+    nextMint,
+    previousMint,
+    mintChangeHelper,
     currentIndex,
     setCurrentIndex,
-    ownedTokenIds,
-    mintIdInputRef,
-    asset ? asset : null,
-  );
+  } = useMintNavigation(ownedTokenIds, mintIdInputRef, asset ? asset : null);
 
   const ownerStatus = useSelector(
     (state: RootState) => state.userData[network].status.fetchAllProfiles,

@@ -41,7 +41,6 @@ export const MetaCard: React.FC<IProps> = ({
   const { currentTokenId } = useOwnedMints(
     profile ? profile.address : '',
     digitalCard.address,
-    0,
   );
 
   const {
