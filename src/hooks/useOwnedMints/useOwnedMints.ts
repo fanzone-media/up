@@ -32,18 +32,20 @@ export const useOwnedMints = (
   );
 
   const currentTokenId = useMemo(() => {
-    let index: string = '0';
+    let id: string = '0';
     if (
       asset?.supportedInterface === 'erc721' &&
       metaDataStatus !== STATUS.FAILED
     ) {
-      index = tokenId ? tokenId : '0';
+      id = tokenId ? tokenId : '0';
     } else if (asset?.supportedInterface === 'lsp8') {
-      index = ownedTokenIds
-        ? ownedTokenIds[ownedTokenIds.indexOf(Number(tokenId))].toString()
-        : '0';
+      const index =
+        ownedTokenIds && ownedTokenIds.indexOf(Number(tokenId)) >= 0
+          ? ownedTokenIds.indexOf(Number(tokenId))
+          : 0;
+      id = ownedTokenIds ? ownedTokenIds[index].toString() : '0';
     }
-    return index;
+    return id;
   }, [asset?.supportedInterface, metaDataStatus, ownedTokenIds, tokenId]);
 
   return {

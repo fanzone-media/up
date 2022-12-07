@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ICard, IProfile } from '../../../services/models';
 import universalprofile from '../../../assets/universalprofile.png';
 import transferIcon from '../../../assets/transfer-icon.png';
@@ -38,7 +38,7 @@ export const MetaCard: React.FC<IProps> = ({
 }: IProps) => {
   const { network } = useUrlParams();
   const explorer = getChainExplorer(network);
-  const { currentTokenId } = useOwnedMints(
+  const { ownedTokenIds } = useOwnedMints(
     profile ? profile.address : '',
     digitalCard.address,
   );
@@ -100,7 +100,9 @@ export const MetaCard: React.FC<IProps> = ({
       <Link
         to={
           type === 'owned'
-            ? `/up/${network}/asset/${digitalCard.address}/${currentTokenId}`
+            ? `/up/${network}/asset/${digitalCard.address}/${
+                ownedTokenIds ? ownedTokenIds[0] : ''
+              }`
             : `/up/${network}/asset/` + digitalCard.address
         }
       >

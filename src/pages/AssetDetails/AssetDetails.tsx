@@ -253,6 +253,7 @@ const AssetDetails: React.FC = () => {
     )
       return;
     setCurrentIndex(ownedTokenIds.indexOf(Number(tokenId)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ownedTokenIds, tokenId, userDataStatus.fetchOwnerOfTokenId]);
 
   useMemo(() => {
