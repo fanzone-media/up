@@ -1,10 +1,10 @@
 export default class Utils {
-  static convertImageURL(url: string) {
+  static convertURL(url: string) {
     let hash = url.split('//')[1];
-    return Utils.getImageURL(hash);
+    return url.startsWith('ipfs://') ? Utils.getURL(hash) : url;
   }
 
-  static getImageURL(hash: string) {
+  static getURL(hash: string) {
     return `https://ipfs.fanzone.io/ipfs/${hash}`;
   }
 

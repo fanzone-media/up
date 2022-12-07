@@ -458,23 +458,17 @@ const AssetDetails: React.FC = () => {
       const img =
         asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images &&
         asset?.lsp8MetaData[currentTokenId]?.image;
-      return img && img.startsWith('ipfs://')
-        ? Utils.convertImageURL(img)
-        : img;
+      return img && Utils.convertURL(img);
     } else if (asset?.supportedInterface === 'lsp8') {
       const img =
         asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images &&
         asset?.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images[0][0]?.url;
-      return img && img.startsWith('ipfs://')
-        ? Utils.convertImageURL(img)
-        : img;
+      return img && Utils.convertURL(img);
     } else {
       const img =
         asset?.lsp8MetaData[0]?.LSP4Metadata?.images &&
         asset?.lsp8MetaData[0]?.LSP4Metadata?.images[0][0]?.url;
-      return img && img.startsWith('ipfs://')
-        ? Utils.convertImageURL(img)
-        : img;
+      return img && Utils.convertURL(img);
     }
   }, [asset?.lsp8MetaData, asset?.supportedInterface, currentTokenId]);
 
@@ -487,9 +481,7 @@ const AssetDetails: React.FC = () => {
     ) {
       return asset.lsp8MetaData[0]?.LSP4Metadata?.images.map((item, i) => {
         if (i !== 0) {
-          return item[0]?.url.startsWith('ipfs://')
-            ? Utils.convertImageURL(item[0].url)
-            : item[0].url;
+          return Utils.convertURL(item[0].url);
         }
       });
     } else if (
@@ -501,9 +493,7 @@ const AssetDetails: React.FC = () => {
       return asset.lsp8MetaData[currentTokenId]?.LSP4Metadata?.images.map(
         (item, i) => {
           if (i !== 0) {
-            return item[0]?.url.startsWith('ipfs://')
-              ? Utils.convertImageURL(item[0].url)
-              : item[0].url;
+            return Utils.convertURL(item[0].url);
           }
         },
       );
@@ -590,7 +580,7 @@ const AssetDetails: React.FC = () => {
                         if (item.fileType === 'mp4') {
                           return (
                             <StyledVideo
-                              src={Utils.convertImageURL(item.url)}
+                              src={Utils.convertURL(item.url)}
                               controls
                             />
                           );
@@ -600,7 +590,7 @@ const AssetDetails: React.FC = () => {
                   {['lsp8', 'erc721'].includes(asset.supportedInterface) &&
                     (asset.lsp8MetaData[currentTokenId]?.animation_url ? (
                       <StyledVideo
-                        src={Utils.convertImageURL(
+                        src={Utils.convertURL(
                           asset.lsp8MetaData[currentTokenId].animation_url,
                         )}
                         controls

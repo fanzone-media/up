@@ -68,14 +68,10 @@ export const MetaCard: React.FC<IProps> = ({
   const getCardImg = () => {
     if (digitalCard.supportedInterface === 'erc721') {
       const img = digitalCard.lsp8MetaData[0]?.image;
-      return img && img.startsWith('ipfs://')
-        ? Utils.convertImageURL(img)
-        : img;
+      return img && Utils.convertURL(img);
     } else {
       const img = digitalCard?.lsp8MetaData[0]?.LSP4Metadata.images[0][0].url;
-      return img && img.startsWith('ipfs://')
-        ? Utils.convertImageURL(img)
-        : img;
+      return img && Utils.convertURL(img);
     }
   };
 

@@ -2,16 +2,7 @@ import axios from 'axios';
 import { ILSP8MetaData, ISetProfileData, SupportedInterface } from './models';
 import { ethers } from 'ethers';
 import FormData from 'form-data';
-
-const url: string = 'https://ipfs.fanzone.io/ipfs/';
-// const IPFS_HOST = 'ipfs.infura.io';
-// const IPFS_PORT = 5001;
-// const IPFS_PROTOCOL = 'https';
-// const ipfsApi = create({
-//   host: IPFS_HOST,
-//   port: IPFS_PORT,
-//   protocol: IPFS_PROTOCOL,
-// });
+import Utils from './utilities/util';
 
 const getIpfsPath = (hashedUrl: string) => {
   const hash = `0x${hashedUrl.slice(74)}`;
@@ -21,7 +12,7 @@ const getIpfsPath = (hashedUrl: string) => {
 
 export const getLSP3ProfileData = async (hashedUrl: string) => {
   const ipfsPath = getIpfsPath(hashedUrl);
-  const result = await axios.get(url + ipfsPath);
+  const result = await axios.get(Utils.getURL(ipfsPath));
   return result.data;
 };
 
@@ -30,11 +21,11 @@ export const getLSP4Metadata = async (
   standard: SupportedInterface,
 ): Promise<ILSP8MetaData> => {
   if (standard === 'erc721') {
-    const result = await axios.get(url + hashedUrl.replace('ipfs://', ''));
+    const result = await axios.get(Utils.convertURL(hashedUrl));
     return result.data as ILSP8MetaData;
   } else {
     const ipfsPath = getIpfsPath(hashedUrl);
-    const result = await axios.get(url + ipfsPath);
+    const result = await axios.get(Utils.getURL(ipfsPath));
     return result.data as ILSP8MetaData;
   }
 };
@@ -89,21 +80,3 @@ export const addData = async (profileData: ISetProfileData) => {
     console.error(error);
   }
 };
-
-// export const addFile = async (file: File) => {
-//   try {
-//     const res = await ipfsApi.add(file);
-//     return `ipfs://${res.path}`;
-//   } catch (err) {
-//     console.error(err);
-//   }
-// };
-
-// export const addData = async (profileData: string) => {
-//   try {
-//     const res = await ipfsApi.add(profileData);
-//     return `ipfs://${res.path}`;
-//   } catch (err) {
-//     console.error(err);
-//   }
-// };
