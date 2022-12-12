@@ -95,10 +95,11 @@ export const SellCardModal = ({
     },
   };
 
-  useMemo(() => {
+  useEffect(() => {
     sellState === STATUS.SUCCESSFUL &&
       onDismissCallback(() => window.location.reload());
-  }, [onDismissCallback, sellState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sellState]);
 
   return (
     <StyledSellCardModalContent>

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ProfilePreview } from '../ProfilePreview';
 import { NetworkName } from '../../../boot/types';
 import { InputField } from '../../../components/InputField';
@@ -66,10 +66,11 @@ export const TransferCardTokenIdModal = ({
     setToAddress(event.target.value);
   };
 
-  useMemo(() => {
+  useEffect(() => {
     transferState === STATUS.SUCCESSFUL &&
       onDismissCallback(() => window.location.reload());
-  }, [onDismissCallback, transferState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transferState]);
 
   return (
     <>

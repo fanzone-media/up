@@ -1,4 +1,4 @@
-import { useMemo, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { NetworkName } from '../../../boot/types';
 import { InputField } from '../../../components/InputField';
 import { useErc20 } from '../../../hooks/useErc20';
@@ -109,10 +109,11 @@ export const BuyCardModal = ({
     },
   };
 
-  useMemo(() => {
+  useEffect(() => {
     buyState === STATUS.SUCCESSFUL &&
       onDismissCallback(() => window.location.reload());
-  }, [buyState, onDismissCallback]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buyState]);
 
   return (
     <StyledBuyCardModalContent>

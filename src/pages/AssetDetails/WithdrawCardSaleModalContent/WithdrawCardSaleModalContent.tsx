@@ -1,4 +1,4 @@
-import { useMemo, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import {
   StyledModalButton,
   StyledModalButtonsWrapper,
@@ -60,10 +60,11 @@ export const WithdrawCardSaleModalContent = ({
     },
   };
 
-  useMemo(() => {
+  useEffect(() => {
     removeMarketState === STATUS.SUCCESSFUL &&
       onDismissCallback(() => window.location.reload());
-  }, [onDismissCallback, removeMarketState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [removeMarketState]);
 
   return (
     <StyledWithdrawCardSaleModalContent>

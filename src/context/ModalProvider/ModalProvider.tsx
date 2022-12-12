@@ -71,7 +71,7 @@ export const ModalProvider: React.FC = ({ children }) => {
       dismissCallback && dismissCallback();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setContent, setIsOpen, modalKey],
+    [setContent, setIsOpen, modalKey, dismissCallback],
   );
 
   const handleDismissCallback: IOnDismissCallback = useCallback(
