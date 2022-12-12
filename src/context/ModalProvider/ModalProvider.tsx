@@ -19,18 +19,22 @@ export type IOnPresent = (
   persist?: boolean,
 ) => void;
 
+export type IOnDismissCallback = (callback: () => any) => void;
+
 interface ModalsContext {
   content?: React.ReactNode;
   isOpen?: boolean;
   modalKey?: string;
   onPresent: IOnPresent;
   onDismiss: () => void;
+  onDismissCallback: IOnDismissCallback;
 }
 
 export const ModalContext = createContext<ModalsContext>({
   isOpen: false,
   onPresent: () => {},
   onDismiss: () => {},
+  onDismissCallback: () => {},
 });
 
 export const ModalProvider: React.FC = ({ children }) => {
@@ -39,6 +43,7 @@ export const ModalProvider: React.FC = ({ children }) => {
   const [content, setContent] = useState<React.ReactNode>();
   const [modalKey, setModalKey] = useState<string>();
   const [persist, setPersist] = useState(false);
+  const [dismissCallback, setDismissCallback] = useState<() => () => any>();
 
   const handlePresentCb: IOnPresent = (content, key, title, persist) => {
     setModalKey(key);
@@ -57,13 +62,24 @@ export const ModalProvider: React.FC = ({ children }) => {
     setModalKey,
   ]);
 
-  const handleDismiss = useCallback(() => {
-    setContent(undefined);
-    setIsOpen(false);
-    setModalKey(undefined);
-    document.body.style.overflow = 'auto';
+  const handleDismiss = useCallback(
+    () => {
+      setContent(undefined);
+      setIsOpen(false);
+      setModalKey(undefined);
+      document.body.style.overflow = 'auto';
+      dismissCallback && dismissCallback();
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setContent, setIsOpen, modalKey]);
+    [setContent, setIsOpen, modalKey],
+  );
+
+  const handleDismissCallback: IOnDismissCallback = useCallback(
+    (dismissCallback) => {
+      setDismissCallback(() => dismissCallback);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -90,16 +106,17 @@ export const ModalProvider: React.FC = ({ children }) => {
         modalKey,
         onPresent: handlePresent,
         onDismiss: handleDismiss,
+        onDismissCallback: handleDismissCallback,
       }}
     >
       {children}
       {isOpen && (
         <StyledModalWrapper>
           <StyledModalBackdrop
-            onClick={!persist ? handleDismiss : () => null}
+            onClick={!persist ? () => handleDismiss() : () => null}
           />
           <StyledModalBoxWrapper>
-            <StyledCloseModalButton onClick={handleDismiss}>
+            <StyledCloseModalButton onClick={() => handleDismiss()}>
               <StyledCloseButtonIcon src={CloseIcon} alt="" />
             </StyledCloseModalButton>
             <StyledModalBoxInner>
@@ -108,13 +125,6 @@ export const ModalProvider: React.FC = ({ children }) => {
                 React.cloneElement(content, {
                   onDismiss: handleDismiss,
                 })}
-              {/* <StyledModalButtonsWrapper topMargin={false}>
-                {!persist && (
-                  <StyledModalButton variant="gray" onClick={handleDismiss}>
-                    Cancel
-                  </StyledModalButton>
-                )}
-              </StyledModalButtonsWrapper> */}
             </StyledModalBoxInner>
           </StyledModalBoxWrapper>
         </StyledModalWrapper>

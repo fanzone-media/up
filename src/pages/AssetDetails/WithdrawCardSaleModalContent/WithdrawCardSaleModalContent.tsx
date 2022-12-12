@@ -1,11 +1,13 @@
+import { useMemo, useContext } from 'react';
 import {
   StyledModalButton,
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
 import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
+import { ModalContext } from '../../../context/ModalProvider';
 import { useRemoveMarketForLsp8Token } from '../../../hooks/useRemoveMarketForLsp8Token';
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
-import { displayPrice } from '../../../utility';
+import { displayPrice, STATUS } from '../../../utility';
 import { Address } from '../../../utils/types';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
@@ -34,16 +36,17 @@ export const WithdrawCardSaleModalContent = ({
   whiteListedTokens,
   onDismiss,
 }: IProps) => {
-  const marketTokenDecimals =
-    whiteListedTokens &&
-    whiteListedTokens.find((i) => i.tokenAddress === marketTokenAddress)
-      ?.decimals;
-
+  const { onDismissCallback } = useContext(ModalContext);
   const { removeMarketState, removeMarket } = useRemoveMarketForLsp8Token(
     assetAddress,
     parseInt(tokenId),
     profile ? profile : ({} as IProfile),
   );
+
+  const marketTokenDecimals =
+    whiteListedTokens &&
+    whiteListedTokens.find((i) => i.tokenAddress === marketTokenAddress)
+      ?.decimals;
 
   const transactionStatesMessages = {
     loading: {
@@ -56,6 +59,11 @@ export const WithdrawCardSaleModalContent = ({
       mainHeading: 'SOMETHING WENT WRONG',
     },
   };
+
+  useMemo(() => {
+    removeMarketState === STATUS.SUCCESSFUL &&
+      onDismissCallback(() => window.location.reload());
+  }, [onDismissCallback, removeMarketState]);
 
   return (
     <StyledWithdrawCardSaleModalContent>

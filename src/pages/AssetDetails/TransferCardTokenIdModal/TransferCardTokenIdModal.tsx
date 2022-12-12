@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { ProfilePreview } from '../ProfilePreview';
 import { NetworkName } from '../../../boot/types';
 import { InputField } from '../../../components/InputField';
@@ -11,6 +11,8 @@ import { TransactionStateWindow } from '../../../components/TransactionStateWind
 import { useTransferLsp8Token } from '../../../hooks/useTransferLsp8Token';
 import { IProfile } from '../../../services/models';
 import { useProfile } from '../../../hooks/useProfile';
+import { ModalContext } from '../../../context/ModalProvider';
+import { STATUS } from '../../../utility';
 
 interface TransferCardTokenIdModalProps {
   cardAddress: string;
@@ -27,6 +29,7 @@ export const TransferCardTokenIdModal = ({
   onDismiss,
   network,
 }: TransferCardTokenIdModalProps) => {
+  const { onDismissCallback } = useContext(ModalContext);
   const [toAddress, setToAddress] = useState<string>('');
 
   const [
@@ -62,6 +65,11 @@ export const TransferCardTokenIdModal = ({
     getProfile(event.target.value, network);
     setToAddress(event.target.value);
   };
+
+  useMemo(() => {
+    transferState === STATUS.SUCCESSFUL &&
+      onDismissCallback(() => window.location.reload());
+  }, [onDismissCallback, transferState]);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useContext, useEffect } from 'react';
 import { NetworkName } from '../../../boot/types';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
@@ -8,7 +8,7 @@ import {
 } from './styles';
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
 import { InputField } from '../../../components/InputField';
-import { displayPrice } from '../../../utility';
+import { displayPrice, STATUS } from '../../../utility';
 import { BigNumberish } from 'ethers';
 import { useSellLsp8Token } from '../../../hooks/useSellLsp8Token';
 import { getWhiteListedTokenAddresses } from '../../../utility/content/addresses';
@@ -17,6 +17,7 @@ import {
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
 import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
+import { ModalContext } from '../../../context/ModalProvider';
 
 interface IProps {
   onDismiss: () => void;
@@ -52,6 +53,7 @@ export const SellCardModal = ({
         : '',
   });
   const { setForSale, sellState } = useSellLsp8Token();
+  const { onDismissCallback } = useContext(ModalContext);
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -92,6 +94,11 @@ export const SellCardModal = ({
       mainHeading: 'SOMETHING WENT WRONG',
     },
   };
+
+  useMemo(() => {
+    sellState === STATUS.SUCCESSFUL &&
+      onDismissCallback(() => window.location.reload());
+  }, [onDismissCallback, sellState]);
 
   return (
     <StyledSellCardModalContent>

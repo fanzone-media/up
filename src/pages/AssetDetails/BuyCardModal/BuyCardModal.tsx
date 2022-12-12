@@ -1,5 +1,4 @@
-import { BigNumber } from 'ethers';
-import { useState } from 'react';
+import { useMemo, useState, useContext } from 'react';
 import { NetworkName } from '../../../boot/types';
 import { InputField } from '../../../components/InputField';
 import { useErc20 } from '../../../hooks/useErc20';
@@ -9,7 +8,7 @@ import {
 } from '../../../hooks/useLocalStorage';
 import { useBuyLsp8Token } from '../../../hooks/useBuyLsp8Token';
 import { IWhiteListedTokens } from '../../../services/models';
-import { displayPrice } from '../../../utility';
+import { displayPrice, STATUS } from '../../../utility';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
   StyledBuyCardModalContent,
@@ -31,6 +30,7 @@ import {
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
 import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
+import { ModalContext } from '../../../context/ModalProvider';
 
 interface IProps {
   onDismiss: () => void;
@@ -53,6 +53,7 @@ export const BuyCardModal = ({
   whiteListedTokens,
   network,
 }: IProps) => {
+  const { onDismissCallback } = useContext(ModalContext);
   const { approve, isApproved, resetApproveState, approveError } = useErc20({
     tokenAddress,
     network,
@@ -107,6 +108,11 @@ export const BuyCardModal = ({
       description: 'Please try again.',
     },
   };
+
+  useMemo(() => {
+    buyState === STATUS.SUCCESSFUL &&
+      onDismissCallback(() => window.location.reload());
+  }, [buyState, onDismissCallback]);
 
   return (
     <StyledBuyCardModalContent>
