@@ -20,6 +20,7 @@ import {
   StyledAuctionModalInputContainer,
 } from './styles';
 import { isAddress } from 'ethers/lib/utils';
+import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
 
 interface IProps {
   network: NetworkName;
@@ -39,7 +40,7 @@ export const AuctionModalContent = ({
   onDismiss,
 }: IProps) => {
   const auctionOptions = useAuctionOptions(network);
-  const { setForAuction } = useSetAuction();
+  const { setForAuction, auctioningState } = useSetAuction();
   const [auctionForm, setAuctionForm] = useState<{
     acceptedToken: Address;
     minBidAmount: number;
@@ -49,6 +50,26 @@ export const AuctionModalContent = ({
     minBidAmount: 0,
     duration: 0,
   });
+
+  const acceptedTokenDetails = useMemo(
+    () =>
+      whiteListedTokens.find(
+        (item) => item.tokenAddress.toLowerCase() === auctionForm.acceptedToken,
+      ),
+    [auctionForm.acceptedToken, whiteListedTokens],
+  );
+
+  const transactionStatesMessages = {
+    loading: {
+      mainHeading: 'SETTING FOR SALE...',
+    },
+    successful: {
+      mainHeading: 'SUCCESSFULLY SET FOR SALE',
+    },
+    failed: {
+      mainHeading: 'SOMETHING WENT WRONG',
+    },
+  };
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -98,6 +119,7 @@ export const AuctionModalContent = ({
       auctionOptions &&
       whiteListedTokens &&
       whiteListedTokens.length > 0 &&
+      acceptedTokenDetails &&
       isAddress(auctionForm.acceptedToken) &&
       auctionForm.duration <= auctionOptions?.maxAuctionDuration &&
       auctionForm.duration >= auctionOptions?.minAuctionDuration &&
@@ -108,6 +130,7 @@ export const AuctionModalContent = ({
       return false;
     }
   }, [
+    acceptedTokenDetails,
     auctionForm.acceptedToken,
     auctionForm.duration,
     auctionForm.minBidAmount,
@@ -124,6 +147,7 @@ export const AuctionModalContent = ({
         auctionForm.duration,
         auctionForm.minBidAmount,
         auctionForm.acceptedToken,
+        acceptedTokenDetails ? acceptedTokenDetails.decimals : 0,
         network,
       );
     }
@@ -180,6 +204,11 @@ export const AuctionModalContent = ({
           Set for auction
         </StyledModalButton>
       </StyledModalButtonsWrapper>
+      <TransactionStateWindow
+        height="full"
+        state={auctioningState}
+        transactionMessages={transactionStatesMessages}
+      />
     </StyledAuctionModal>
   );
 };

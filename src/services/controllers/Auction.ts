@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Signer } from 'ethers';
+import { BigNumberish, Signer } from 'ethers';
 import { NetworkName } from '../../boot/types';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { CardAuction__factory } from '../../submodules/fanzone-smart-contracts/typechain';
@@ -19,7 +19,7 @@ const encodeOpenAuctionFor = (
   assetAddress: Address,
   tokenId: number,
   acceptedToken: Address,
-  minimumBid: number,
+  minimumBid: BigNumberish,
   duration: number,
   signer: Signer,
   network: NetworkName,
@@ -35,7 +35,7 @@ const encodeOpenAuctionFor = (
       assetAddress,
       tokenIdAsBytes32(tokenId),
       acceptedToken,
-      minimumBid,
+      minimumBid.toString(),
       duration,
     ],
   );

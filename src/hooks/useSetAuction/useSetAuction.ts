@@ -8,7 +8,7 @@ import {
 import { Address } from '../../utils/types';
 import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
-import { STATUS } from '../../utility';
+import { convertPrice, STATUS } from '../../utility';
 import { IProfile } from '../../services/models';
 
 export const useSetAuction = () => {
@@ -22,6 +22,7 @@ export const useSetAuction = () => {
     duration: number,
     minimumBid: number,
     acceptedToken: Address,
+    acceptedTokenDecimals: number,
     network: NetworkName,
   ) => {
     setAuctioningState(STATUS.LOADING);
@@ -31,7 +32,7 @@ export const useSetAuction = () => {
         assetAddress,
         tokenId,
         acceptedToken,
-        minimumBid,
+        convertPrice(minimumBid, acceptedTokenDecimals),
         duration,
         signer,
         network,
