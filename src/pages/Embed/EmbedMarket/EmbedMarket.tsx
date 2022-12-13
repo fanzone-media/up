@@ -16,6 +16,7 @@ import {
   StyledEmbedMarketContent,
   StyledEmbedMarketWrapper,
   StyledMessageLabel,
+  StyledReloadMarketButton,
 } from './styles';
 
 interface IPrams {
@@ -59,6 +60,9 @@ export const EmbedMarket = () => {
   return (
     <StyledEmbedMarketContent>
       <ConnectToMetaMaskButton />
+      <StyledReloadMarketButton onClick={() => window.location.reload()}>
+        Reload Market
+      </StyledReloadMarketButton>
       <StyledEmbedMarketWrapper>
         {(cardStatus === STATUS.LOADING ||
           marketsStatus === STATUS.LOADING) && (

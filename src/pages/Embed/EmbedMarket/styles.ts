@@ -23,3 +23,11 @@ export const StyledMessageLabel = styled.h3`
 export const StyledColorSpan = styled.span`
   color: #ff8101;
 `;
+
+export const StyledReloadMarketButton = styled.button`
+  background-color: rgba(255, 129, 1, 1);
+  border-radius: 0.3em;
+  padding: 0.5em 0;
+  width: 100%;
+  margin-top: 0.5em;
+`;
