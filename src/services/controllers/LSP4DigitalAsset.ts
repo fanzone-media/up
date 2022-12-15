@@ -288,37 +288,6 @@ const buyFromMarketViaEOA = async (
   });
 };
 
-const setMarketViaUniversalProfile = async (
-  assetAddress: string,
-  universalProfileAddress: string,
-  tokenId: number,
-  acceptedToken: string,
-  minimumAmount: BigNumberish,
-  signer: Signer,
-) => {
-  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
-  const universalProfileContract = UniversalProfileProxy__factory.connect(
-    universalProfileAddress,
-    signer,
-  );
-  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
-  const encodedSetMarketFor = assetContract.interface.encodeFunctionData(
-    'setMarketFor',
-    [tokenIdAsBytes, acceptedToken, minimumAmount.toString()],
-  );
-  const transaction = await universalProfileContract.execute(
-    '0x0',
-    assetAddress,
-    0,
-    encodedSetMarketFor,
-  );
-  await transaction.wait(1).then((result) => {
-    if (result.status === 0) {
-      throw new Error('Transaction reverted');
-    }
-  });
-};
-
 const getTokenSale = async (
   assetAddress: string,
   tokenId: number,
@@ -431,7 +400,6 @@ export const LSP4DigitalAssetApi = {
   fetchCard,
   fetchAllCards,
   getTokenSale,
-  setMarketViaUniversalProfile,
   fetchMetaDataForTokenID,
   fetchAllMarkets,
   fetchOwnerOfTokenId,
@@ -439,4 +407,5 @@ export const LSP4DigitalAssetApi = {
   fetchErc20TokenInfo,
   buyFromMarketViaEOA,
   buyFromCardMarketViaUniversalProfile,
+  encodeSetMarketFor,
 };

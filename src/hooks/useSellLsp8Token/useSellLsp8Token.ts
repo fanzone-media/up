@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useNetwork, useSigner } from 'wagmi';
 import { NetworkName } from '../../boot/types';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
+import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { LSP4DigitalAssetApi } from '../../services/controllers/LSP4DigitalAsset';
 import { IProfile } from '../../services/models';
 import { convertPrice, STATUS } from '../../utility';
@@ -11,7 +12,6 @@ import { convertPrice, STATUS } from '../../utility';
 export const useSellLsp8Token = () => {
   const [{ data: signer }] = useSigner();
   const [{ data: networkData }] = useNetwork();
-  const [error, setError] = useState();
   const [sellState, setSellState] = useState<STATUS>(STATUS.IDLE);
 
   const setForSale = async (
@@ -23,52 +23,59 @@ export const useSellLsp8Token = () => {
     decimals: number,
     network: NetworkName,
   ) => {
+    if (!signer) {
+      toast('wallet not connected', { type: 'error', position: 'top-right' });
+      return;
+    }
     if (networkData.chain?.name !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }
+
     setSellState(STATUS.LOADING);
-    if (ownerProfile.isOwnerKeyManager && signer) {
-      await KeyManagerApi.setCardMarketViaKeyManager(
+    try {
+      const encodedSetMarketForData = LSP4DigitalAssetApi.encodeSetMarketFor(
         assetAddress,
-        ownerProfile.address,
-        ownerProfile.owner,
         mint,
         tokenAddress,
         convertPrice(amount, decimals),
         signer,
-      )
-        .then(() => {
-          setSellState(STATUS.SUCCESSFUL);
-        })
-        .catch((error) => {
-          setError(error);
-          setSellState(STATUS.FAILED);
-        });
-    }
-    if (!ownerProfile.isOwnerKeyManager && signer) {
-      await LSP4DigitalAssetApi.setMarketViaUniversalProfile(
-        assetAddress,
+      );
+
+      if (ownerProfile.isOwnerKeyManager) {
+        const encodedExecuteData = LSP3ProfileApi.encodeExecute(
+          ownerProfile.address,
+          assetAddress,
+          encodedSetMarketForData,
+          signer,
+        );
+
+        await KeyManagerApi.executeTransactionViaKeyManager(
+          ownerProfile.owner,
+          encodedExecuteData,
+          signer,
+        );
+
+        setSellState(STATUS.SUCCESSFUL);
+
+        return;
+      }
+      await LSP3ProfileApi.executeTransactionViaUniversalProfile(
         ownerProfile.address,
-        mint,
-        tokenAddress,
-        convertPrice(amount, decimals),
+        assetAddress,
+        encodedSetMarketForData,
         signer,
-      )
-        .then(() => {
-          setSellState(STATUS.SUCCESSFUL);
-        })
-        .catch((error) => {
-          setError(error);
-          setSellState(STATUS.FAILED);
-        });
+      );
+
+      setSellState(STATUS.SUCCESSFUL);
+    } catch (error) {
+      setSellState(STATUS.FAILED);
     }
   };
 
   return {
     sellState,
     setForSale,
-    error,
     resetState: () => setSellState(STATUS.IDLE),
   };
 };

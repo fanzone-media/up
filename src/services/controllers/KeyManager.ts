@@ -3,7 +3,7 @@ import {
   encodeArrayKey,
   encodeKeyValue,
 } from '@erc725/erc725.js/build/main/lib/utils';
-import { BigNumber, BigNumberish, BytesLike, ethers, Signer } from 'ethers';
+import { BigNumberish, BytesLike, ethers, Signer } from 'ethers';
 import {
   CardMarket__factory,
   CardTokenProxy__factory,
@@ -111,45 +111,6 @@ const transferCardViaKeyManager = async (
       assetAddress,
       0,
       encodedTransferFunction,
-    ]);
-
-  const transaction = await keyManagerContract.execute(encodedExecuteFunction);
-  await transaction.wait(1).then((result) => {
-    if (result.status === 0) {
-      throw new Error('Transaction reverted');
-    }
-  });
-};
-
-const setCardMarketViaKeyManager = async (
-  assetAddress: string,
-  universalProfileAddress: string,
-  keyManagerAddress: string,
-  tokenId: number,
-  acceptedToken: string,
-  minimumAmount: BigNumberish,
-  signer: Signer,
-) => {
-  const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
-  const universalProfileContract = UniversalProfileProxy__factory.connect(
-    universalProfileAddress,
-    signer,
-  );
-  const keyManagerContract = LSP6KeyManagerProxy__factory.connect(
-    keyManagerAddress,
-    signer,
-  );
-  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
-  const encodedSetMarketFor = assetContract.interface.encodeFunctionData(
-    'setMarketFor',
-    [tokenIdAsBytes, acceptedToken, minimumAmount.toString()],
-  );
-  const encodedExecuteFunction =
-    universalProfileContract.interface.encodeFunctionData('execute', [
-      '0x0',
-      assetAddress,
-      0,
-      encodedSetMarketFor,
     ]);
 
   const transaction = await keyManagerContract.execute(encodedExecuteFunction);
@@ -321,9 +282,7 @@ const executeTransactionViaKeyManager = async (
     keyManagerAddress,
     signer,
   );
-  const transaction = await contract.execute(encodedData, {
-    gasLimit: 7000000,
-  });
+  const transaction = await contract.execute(encodedData);
   await transaction.wait(1).then((result) => {
     if (result.status === 0) {
       throw new Error('Transaction reverted');
@@ -333,7 +292,6 @@ const executeTransactionViaKeyManager = async (
 
 export const KeyManagerApi = {
   addPermissions,
-  setCardMarketViaKeyManager,
   transferCardViaKeyManager,
   approveTokenViaKeyManager,
   buyFromCardMarketViaKeyManager,
