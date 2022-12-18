@@ -23,7 +23,6 @@ import { erc20ABI } from 'wagmi';
 import { Provider } from '@ethersproject/providers';
 import ABIs from '../utilities/ABIs';
 import { Address } from '../../utils/types';
-import { auctionContracts } from './Auction';
 
 const fetchCard = async (
   address: string,
@@ -116,7 +115,8 @@ const fetchCard = async (
         : [],
     creators,
     network: network,
-    markets: [],
+    market: [],
+    auctionMarket: null,
     supportedInterface,
     whiteListedTokens:
       whiteListedTokens.status === 'fulfilled' ? whiteListedTokens.value : [],
@@ -367,7 +367,6 @@ const encodeSetMarketFor = (
 
 const encodeRemoveMarketFor = (
   assetAddress: string,
-  universalProfileAddress: string,
   tokenId: BytesLike,
   signer: Signer,
 ) => {
@@ -381,8 +380,37 @@ const encodeRemoveMarketFor = (
   return encodedRemoveMarketFor;
 };
 
+const fetchIsApprovedErc721 = async (
+  assetAddress: Address,
+  operatorAddress: Address,
+  tokenId: number,
+  network: NetworkName,
+) => {
+  const provider = useRpcProvider(network);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  const address = await contract.getApproved(tokenId);
+  return address.toLowerCase() === operatorAddress.toLowerCase() ? true : false;
+};
+
+const fetchIsOperatorFor = async (
+  assetAddress: Address,
+  operatorAddress: Address,
+  tokenId: number,
+  network: NetworkName,
+) => {
+  const provider = useRpcProvider(network);
+  const contract = CardTokenProxy__factory.connect(assetAddress, provider);
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
+  const isOperator = await contract.isOperatorFor(
+    operatorAddress,
+    tokenIdAsBytes,
+  );
+  return isOperator;
+};
+
 const encodeAuthorizeOperator = (
   assetAddress: Address,
+  operatorAddress: Address,
   signer: Signer,
   tokenId: number,
   network: NetworkName,
@@ -391,9 +419,24 @@ const encodeAuthorizeOperator = (
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
   const encodedAuthorizeOperator = contract.interface.encodeFunctionData(
     'authorizeOperator',
-    [auctionContracts[network], tokenIdAsBytes],
+    [operatorAddress, tokenIdAsBytes],
   );
   return encodedAuthorizeOperator;
+};
+
+const encodeApproveErc721 = (
+  assetAddress: Address,
+  operatorAddress: Address,
+  signer: Signer,
+  tokenId: number,
+  network: NetworkName,
+): string => {
+  const contract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const encodedApprove = contract.interface.encodeFunctionData('approve', [
+    operatorAddress,
+    tokenId,
+  ]);
+  return encodedApprove;
 };
 
 export const LSP4DigitalAssetApi = {
@@ -408,4 +451,8 @@ export const LSP4DigitalAssetApi = {
   buyFromMarketViaEOA,
   buyFromCardMarketViaUniversalProfile,
   encodeSetMarketFor,
+  encodeAuthorizeOperator,
+  encodeApproveErc721,
+  fetchIsApprovedErc721,
+  fetchIsOperatorFor,
 };

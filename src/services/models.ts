@@ -97,7 +97,8 @@ export interface ICard {
   lsp8MetaData: {
     [key: string]: ILSP8MetaData;
   };
-  markets: IMarket[];
+  market: IMarket[];
+  auctionMarket: IAuctionMarket[] | null;
   whiteListedTokens: IWhiteListedTokens[];
 }
 
@@ -117,6 +118,11 @@ export interface IAuctionOptions {
   minAuctionDuration: number;
   maxAuctionDuration: number;
   bidExtensionDuration: number;
+}
+
+export interface IAuctionMarket {
+  tokenId: string;
+  auction: IAuctionState;
 }
 
 export interface IAuctionState {

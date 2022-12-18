@@ -14,7 +14,7 @@ export const BuyCardButton = ({ asset, mint }: IProps) => {
   const { network, tokenId } = useUrlParams();
 
   const selectedMintMarket = useMemo(() => {
-    const market = asset.markets.find((item) => Number(item.tokenId) === mint);
+    const market = asset.market.find((item) => Number(item.tokenId) === mint);
     const token =
       market &&
       asset &&

@@ -10,6 +10,7 @@ interface IBaseState {
     fetchOwnedCards: STATUS;
     fetchMetaData: STATUS;
     fetchMarket: STATUS;
+    fetchAuctionMarket: STATUS;
   };
   error: {
     fetchCard: Error | SerializedError | null;
@@ -18,6 +19,7 @@ interface IBaseState {
     fetchOwnedCards: Error | SerializedError | null;
     fetchMetaData: Error | SerializedError | null;
     fetchMarket: Error | SerializedError | null;
+    fetchAuctionMarket: Error | SerializedError | null;
   };
 }
 export type ICardItemsState = IBaseState;

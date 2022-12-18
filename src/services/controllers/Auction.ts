@@ -5,7 +5,7 @@ import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { CardAuction__factory } from '../../submodules/fanzone-smart-contracts/typechain';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
 import { Address } from '../../utils/types';
-import { IAuctionOptions, IAuctionState } from '../models';
+import { IAuctionMarket, IAuctionOptions, IAuctionState } from '../models';
 
 export const auctionContracts = {
   l14: '',
@@ -107,9 +107,9 @@ const fetchAuctionFor = async (
 };
 
 const fetchAllAuctionFor = async (
+  assetAddress: Address,
   network: NetworkName,
-  tokenAddress: Address,
-) => {
+): Promise<IAuctionMarket[] | null> => {
   try {
     const provider = useRpcProvider(network);
     const contract = CardAuction__factory.connect(
@@ -117,9 +117,9 @@ const fetchAllAuctionFor = async (
       provider,
     );
 
-    const auctions = await contract.getAuctionsForLSP8Contract(tokenAddress);
+    const auctions = await contract.getAuctionsForLSP8Contract(assetAddress);
 
-    return auctions;
+    return auctions.auctions.length > 0 ? auctions.auctions : null;
   } catch (error) {
     return null;
   }
@@ -130,4 +130,5 @@ export const AuctionApi = {
   encodeCancelAuctionFor,
   fetchAuctionSettings,
   fetchAuctionFor,
+  fetchAllAuctionFor,
 };

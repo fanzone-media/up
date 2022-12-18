@@ -1,5 +1,6 @@
 import { LSP3ProfileApi } from './controllers/LSP3Profile';
 import { LSP4DigitalAssetApi } from './controllers/LSP4DigitalAsset';
+import { AuctionApi } from './controllers/Auction';
 
 // type ApiCalls = {
 //   [key: string]: (...args: any[]) => Promise<any>;
@@ -20,11 +21,13 @@ import { LSP4DigitalAssetApi } from './controllers/LSP4DigitalAsset';
 export type API = {
   profiles: typeof LSP3ProfileApi;
   cards: typeof LSP4DigitalAssetApi;
+  auctions: typeof AuctionApi;
 };
 
 export const buildApi = (): API => {
   return {
     profiles: LSP3ProfileApi,
     cards: LSP4DigitalAssetApi,
+    auctions: AuctionApi,
   };
 };

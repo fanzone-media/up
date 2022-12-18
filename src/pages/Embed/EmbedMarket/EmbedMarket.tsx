@@ -76,7 +76,7 @@ export const EmbedMarket = () => {
           marketsStatus !== STATUS.LOADING && (
             <CardMarket
               asset={asset}
-              cardMarkets={asset?.markets}
+              cardMarkets={asset?.market}
               whiteListedTokens={asset?.whiteListedTokens}
             />
           )}

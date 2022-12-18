@@ -194,7 +194,7 @@ const AssetDetails: React.FC = () => {
     ownedTokenIds && asset && (
       <SelectMintModalContent
         ownedTokenIds={ownedTokenIds}
-        markets={asset.markets}
+        markets={asset.market}
         whiteListedTokens={asset.whiteListedTokens}
         onSelect={mintChangeHelper}
         onSelectCallback={() => onDismissSelectMintModal()}
@@ -653,7 +653,7 @@ const AssetDetails: React.FC = () => {
                       {asset && (
                         <CardMarket
                           asset={asset}
-                          cardMarkets={asset?.markets}
+                          cardMarkets={asset?.market}
                           whiteListedTokens={asset?.whiteListedTokens}
                         />
                       )}

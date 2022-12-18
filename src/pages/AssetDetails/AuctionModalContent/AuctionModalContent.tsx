@@ -18,9 +18,12 @@ import {
   StyledAuctionDurationInfo,
   StyledAuctionModal,
   StyledAuctionModalInputContainer,
+  StyledStepsText,
 } from './styles';
 import { isAddress } from 'ethers/lib/utils';
 import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
+import { useAuthorizeOperator } from '../../../hooks/useAuthorizeOperator';
+import { auctionContracts } from '../../../services/controllers/Auction';
 
 interface IProps {
   network: NetworkName;
@@ -40,6 +43,13 @@ export const AuctionModalContent = ({
   onDismiss,
 }: IProps) => {
   const auctionOptions = useAuctionOptions(network);
+  const { isAuthorized, authorizeOperator } = useAuthorizeOperator(
+    assetAddress,
+    auctionContracts[network],
+    profile.address,
+    tokenId,
+    network,
+  );
   const { setForAuction, auctioningState } = useSetAuction();
   const [auctionForm, setAuctionForm] = useState<{
     acceptedToken: Address;
@@ -117,6 +127,7 @@ export const AuctionModalContent = ({
   const validateInput = useCallback(() => {
     if (
       auctionOptions &&
+      isAuthorized &&
       whiteListedTokens &&
       whiteListedTokens.length > 0 &&
       acceptedTokenDetails &&
@@ -135,6 +146,7 @@ export const AuctionModalContent = ({
     auctionForm.duration,
     auctionForm.minBidAmount,
     auctionOptions,
+    isAuthorized,
     whiteListedTokens,
   ]);
 
@@ -155,6 +167,13 @@ export const AuctionModalContent = ({
 
   return (
     <StyledAuctionModal>
+      <StyledStepsText>
+        1. Approve the auction contract as an operator
+      </StyledStepsText>
+      <StyledModalButton disabled={isAuthorized} onClick={authorizeOperator}>
+        Approve
+      </StyledModalButton>
+      <StyledStepsText>2. Provide Auction details</StyledStepsText>
       <StyledAuctionModalInputContainer>
         <StyledInputGroup>
           <InputField

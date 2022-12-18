@@ -30,6 +30,7 @@ const cardAdapterInitialState = cardsAdapter.getInitialState<ICardItemsState>({
     fetchOwnedCards: STATUS.IDLE,
     fetchMetaData: STATUS.IDLE,
     fetchMarket: STATUS.IDLE,
+    fetchAuctionMarket: STATUS.IDLE,
   },
   error: {
     fetchCard: null,
@@ -38,6 +39,7 @@ const cardAdapterInitialState = cardsAdapter.getInitialState<ICardItemsState>({
     fetchOwnedCards: null,
     fetchMetaData: null,
     fetchMarket: null,
+    fetchAuctionMarket: null,
   },
 });
 
@@ -99,16 +101,6 @@ export const fetchAllCards = createAsyncThunk<
     fetchCardsByAddresses(addresses, network, api, getState()),
 );
 
-export const fetchIssuedCards = createAsyncThunk<
-  ICard[],
-  { network: NetworkName; addresses: Address[] },
-  { state: RootState; extra: ThunkExtra }
->(
-  'cards/fetchIssuedCards',
-  async ({ network, addresses }, { getState, extra: { api } }) =>
-    fetchCardsByAddresses(addresses, network, api, getState()),
-);
-
 export const fetchCard = createAsyncThunk<
   ICard,
   { network: NetworkName; address: string; tokenId?: BigNumberish },
@@ -119,6 +111,16 @@ export const fetchCard = createAsyncThunk<
     const res = await api.cards.fetchCard(address, network, tokenId);
     return res as ICard;
   },
+);
+
+export const fetchIssuedCards = createAsyncThunk<
+  ICard[],
+  { network: NetworkName; addresses: Address[] },
+  { state: RootState; extra: ThunkExtra }
+>(
+  'cards/fetchIssuedCards',
+  async ({ network, addresses }, { getState, extra: { api } }) =>
+    fetchCardsByAddresses(addresses, network, api, getState()),
 );
 
 export const fetchOwnedCards = createAsyncThunk<
@@ -174,7 +176,23 @@ export const fetchAllMarkets = createAsyncThunk<
     const state: RootState = getState();
     return {
       ...state.cards[network].entities[assetAddress],
-      markets: res,
+      market: res,
+    } as ICard;
+  },
+);
+
+export const fetchAuctionMarket = createAsyncThunk<
+  ICard,
+  { assetAddress: string; network: NetworkName },
+  { state: RootState; extra: ThunkExtra }
+>(
+  'cards/fetchAuctionMarket',
+  async ({ assetAddress, network }, { extra: { api }, getState }) => {
+    const res = await api.auctions.fetchAllAuctionFor(assetAddress, network);
+    const state: RootState = getState();
+    return {
+      ...state.cards[network].entities[assetAddress],
+      auctionMarket: res,
     } as ICard;
   },
 );
@@ -327,6 +345,25 @@ const cardsSlice = createSlice({
       .addCase(fetchAllMarkets.rejected, (state, action) => {
         state[action.meta.arg.network].error.fetchMarket = action.error;
         state[action.meta.arg.network].status.fetchMarket = STATUS.FAILED;
+      });
+    builder
+      .addCase(fetchAuctionMarket.pending, (state, _action) => {
+        state[_action.meta.arg.network].status.fetchAuctionMarket =
+          STATUS.LOADING;
+      })
+      .addCase(fetchAuctionMarket.fulfilled, (state, action) => {
+        if (action.payload)
+          cardsAdapter.upsertOne(
+            state[action.meta.arg.network],
+            action.payload as ICard,
+          );
+        state[action.meta.arg.network].status.fetchAuctionMarket =
+          STATUS.SUCCESSFUL;
+      })
+      .addCase(fetchAuctionMarket.rejected, (state, action) => {
+        state[action.meta.arg.network].error.fetchAuctionMarket = action.error;
+        state[action.meta.arg.network].status.fetchAuctionMarket =
+          STATUS.FAILED;
       });
   },
 });
