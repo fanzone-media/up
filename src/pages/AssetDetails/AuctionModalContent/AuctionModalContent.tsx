@@ -74,7 +74,7 @@ export const AuctionModalContent = ({
       mainHeading: 'SETTING FOR SALE...',
     },
     successful: {
-      mainHeading: 'SUCCESSFULLY SET FOR SALE',
+      mainHeading: 'SUCCESSFULLY SET FOR AUCTION',
     },
     failed: {
       mainHeading: 'SOMETHING WENT WRONG',

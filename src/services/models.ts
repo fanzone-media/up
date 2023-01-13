@@ -128,10 +128,10 @@ export interface IAuctionMarket {
 export interface IAuctionState {
   seller: string;
   acceptedToken: string;
-  minimumBid: BigNumber;
-  endTime: BigNumber;
+  minimumBid: number;
+  endTime: number;
   activeBidder: string;
-  activeBidAmount: BigNumber;
+  activeBidAmount: number;
 }
 
 export interface IProfile {

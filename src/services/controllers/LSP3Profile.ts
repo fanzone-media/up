@@ -896,10 +896,10 @@ const removeMarket = async (
 };
 
 const encodeSetData = (
-  profileAddress: string,
+  profileAddress: Address,
   jsonUrl: string,
   signer: Signer,
-) => {
+): string => {
   const universalProfileContract = UniversalProfileProxy__factory.connect(
     profileAddress,
     signer,
@@ -918,7 +918,7 @@ const encodeExecute = (
   callToAddress: Address,
   encodedData: string,
   signer: Signer,
-) => {
+): string => {
   const contract = UniversalProfileProxy__factory.connect(
     universalProfileAddress,
     signer,
@@ -937,7 +937,7 @@ const executeTransactionViaUniversalProfile = async (
   callToAddress: Address,
   encodedData: string,
   signer: Signer,
-) => {
+): Promise<void> => {
   const contract = UniversalProfileProxy__factory.connect(
     universalProfileAddress,
     signer,

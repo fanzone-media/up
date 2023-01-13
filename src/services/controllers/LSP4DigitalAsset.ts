@@ -315,12 +315,12 @@ const getTokenSale = async (
 };
 
 const encodeTransferFrom = (
-  assetAddress: string,
-  universalProfileAddress: string,
+  assetAddress: Address,
+  universalProfileAddress: Address,
+  toAddress: Address,
   tokenId: number,
-  toAddress: string,
   signer: Signer,
-) => {
+): string => {
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
 
   const encodedTransfer = assetContract.interface.encodeFunctionData(
@@ -332,32 +332,31 @@ const encodeTransferFrom = (
 };
 
 const encodeBuyFromCardMarket = (
-  assetAddress: string,
-  tokenId: number,
-  minimumAmount: BigNumber,
-  signer: Signer,
+  assetAddress: Address,
   referrerAddress: Address,
-) => {
+  tokenId: number,
+  minimumAmount: BigNumberish,
+  signer: Signer,
+): string => {
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
   const tokenIdBytes = tokenIdAsBytes32(tokenId);
-  const frag = 'buyFromMarket';
   const encodedBuyFromMarket = assetContract.interface.encodeFunctionData(
-    frag,
-    [tokenIdBytes, minimumAmount, referrerAddress],
+    'buyFromMarket',
+    [tokenIdBytes, minimumAmount.toString(), referrerAddress],
   );
 
   return encodedBuyFromMarket;
 };
 
 const encodeSetMarketFor = (
-  assetAddress: string,
+  assetAddress: Address,
   tokenId: number,
   acceptedToken: string,
   minimumAmount: BigNumberish,
   signer: Signer,
 ): string => {
-  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
   const assetContract = CardTokenProxy__factory.connect(assetAddress, signer);
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
   const encodedSetMarketFor = assetContract.interface.encodeFunctionData(
     'setMarketFor',
     [tokenIdAsBytes, acceptedToken, minimumAmount.toString()],
@@ -366,15 +365,15 @@ const encodeSetMarketFor = (
 };
 
 const encodeRemoveMarketFor = (
-  assetAddress: string,
-  tokenId: BytesLike,
+  assetAddress: Address,
+  tokenId: number,
   signer: Signer,
-) => {
+): string => {
   const assetContract = CardMarket__factory.connect(assetAddress, signer);
-
+  const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
   const encodedRemoveMarketFor = assetContract.interface.encodeFunctionData(
     'removeMarketFor',
-    [tokenId],
+    [tokenIdAsBytes],
   );
 
   return encodedRemoveMarketFor;
@@ -385,7 +384,7 @@ const fetchIsApprovedErc721 = async (
   operatorAddress: Address,
   tokenId: number,
   network: NetworkName,
-) => {
+): Promise<boolean> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
   const address = await contract.getApproved(tokenId);
@@ -397,7 +396,7 @@ const fetchIsOperatorFor = async (
   operatorAddress: Address,
   tokenId: number,
   network: NetworkName,
-) => {
+): Promise<boolean> => {
   const provider = useRpcProvider(network);
   const contract = CardTokenProxy__factory.connect(assetAddress, provider);
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
@@ -413,7 +412,6 @@ const encodeAuthorizeOperator = (
   operatorAddress: Address,
   signer: Signer,
   tokenId: number,
-  network: NetworkName,
 ): string => {
   const contract = CardTokenProxy__factory.connect(assetAddress, signer);
   const tokenIdAsBytes = tokenIdAsBytes32(tokenId);
@@ -429,7 +427,6 @@ const encodeApproveErc721 = (
   operatorAddress: Address,
   signer: Signer,
   tokenId: number,
-  network: NetworkName,
 ): string => {
   const contract = CardTokenProxy__factory.connect(assetAddress, signer);
   const encodedApprove = contract.interface.encodeFunctionData('approve', [

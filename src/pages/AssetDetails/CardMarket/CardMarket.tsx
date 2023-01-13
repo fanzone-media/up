@@ -41,7 +41,6 @@ export const CardMarket = ({
 
   return cardMarkets && cardMarkets.length > 0 && whiteListedTokens ? (
     <StyledCardMarketContainer>
-      {/* {asset && <MetaCard digitalCard={asset} type="" />} */}
       <StyledCardMarketTable>
         <StyledCardMarketListHeader>
           <StyledCardMarketListHeaderContent>

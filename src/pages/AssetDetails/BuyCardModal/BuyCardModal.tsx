@@ -159,7 +159,7 @@ export const BuyCardModal = ({
                 <StyledUpAddressSelectLabel>
                   UP Address
                 </StyledUpAddressSelectLabel>
-                <StyledUpAddressSelectInput>
+                <StyledUpAddressSelectInput onChange={changeHandler}>
                   {savedProfilesAddresses.map((item) => (
                     <option key={item} value={item}>
                       {item}

@@ -221,6 +221,7 @@ const cardsSlice = createSlice({
             fetchOwnedCards: STATUS.IDLE,
             fetchMetaData: STATUS.IDLE,
             fetchMarket: STATUS.IDLE,
+            fetchAuctionMarket: STATUS.IDLE,
           },
           error: {
             fetchCard: null,
@@ -229,6 +230,7 @@ const cardsSlice = createSlice({
             fetchOwnedCards: null,
             fetchMetaData: null,
             fetchMarket: null,
+            fetchAuctionMarket: null,
           },
         },
       };

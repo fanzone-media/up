@@ -102,6 +102,8 @@ import { useMintMarket } from '../../hooks/useMintMarket';
 import { AssetActions } from './AssetActions';
 import { useCurrentUserPermissions } from '../../hooks/useCurrentUserPermissions';
 import { useUrlParams } from '../../hooks/useUrlParams';
+import { AuctionMarket } from './AuctionMarket';
+import { useFetchAuctionMarket } from '../../hooks/useFetchAuctionMarket';
 
 const AssetDetails: React.FC = () => {
   const mintIdInputRef = useRef<HTMLInputElement>(null);
@@ -148,6 +150,7 @@ const AssetDetails: React.FC = () => {
   const currentUsersPermissions = useCurrentUserPermissions(wasActiveProfile);
 
   useFetchMarkets(asset);
+  useFetchAuctionMarket(address);
 
   const { ownedTokenIds, currentTokenId } = useOwnedMints(
     wasActiveProfile ? wasActiveProfile : '',
@@ -650,13 +653,23 @@ const AssetDetails: React.FC = () => {
                       }
                       enableToggle
                     >
-                      {asset && (
-                        <CardMarket
-                          asset={asset}
-                          cardMarkets={asset?.market}
-                          whiteListedTokens={asset?.whiteListedTokens}
-                        />
-                      )}
+                      <CardMarket
+                        asset={asset}
+                        cardMarkets={asset.market}
+                        whiteListedTokens={asset.whiteListedTokens}
+                      />
+                    </StyledMarketAccordion>
+                  )}
+                  {asset.supportedInterface === 'lsp8' && (
+                    <StyledMarketAccordion
+                      header={
+                        <StyledAccordionTitle>
+                          Auction Market
+                        </StyledAccordionTitle>
+                      }
+                      enableToggle
+                    >
+                      <AuctionMarket asset={asset} />
                     </StyledMarketAccordion>
                   )}
                   {['lsp4', 'lsp8'].includes(asset.supportedInterface) && (

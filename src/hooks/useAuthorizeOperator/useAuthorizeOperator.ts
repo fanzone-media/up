@@ -70,14 +70,12 @@ export const useAuthorizeOperator = (
               operatorAddress,
               signer,
               tokenId,
-              network,
             )
           : LSP4DigitalAssetApi.encodeAuthorizeOperator(
               assetAddress,
               operatorAddress,
               signer,
               tokenId,
-              network,
             );
 
       if (profile.isOwnerKeyManager) {

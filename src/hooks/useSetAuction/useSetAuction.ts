@@ -25,8 +25,8 @@ export const useSetAuction = () => {
     acceptedTokenDecimals: number,
     network: NetworkName,
   ) => {
-    setAuctioningState(STATUS.LOADING);
     if (!signer) return;
+    setAuctioningState(STATUS.LOADING);
     try {
       const encodedAuctionData = AuctionApi.encodeOpenAuctionFor(
         assetAddress,

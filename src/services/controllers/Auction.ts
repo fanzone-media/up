@@ -23,7 +23,7 @@ const encodeOpenAuctionFor = (
   duration: number,
   signer: Signer,
   network: NetworkName,
-) => {
+): string => {
   const contract = CardAuction__factory.connect(
     auctionContracts[network],
     signer,
@@ -47,7 +47,7 @@ const encodeCancelAuctionFor = (
   tokenId: number,
   signer: Signer,
   network: NetworkName,
-) => {
+): string => {
   const contract = CardAuction__factory.connect(
     auctionContracts[network],
     signer,
@@ -58,6 +58,27 @@ const encodeCancelAuctionFor = (
     [assetAddress, tokenIdAsBytes32(tokenId)],
   );
   return encodedCancelAuctionFor;
+};
+
+const encodeSubmitBid = (
+  assetAddress: Address,
+  tokenId: number,
+  bidAmount: BigNumberish,
+  signer: Signer,
+  network: NetworkName,
+): string => {
+  const contract = CardAuction__factory.connect(
+    auctionContracts[network],
+    signer,
+  );
+
+  const encodedSubmitBid = contract.interface.encodeFunctionData('submitBid', [
+    assetAddress,
+    tokenIdAsBytes32(tokenId),
+    bidAmount.toString(),
+  ]);
+
+  return encodedSubmitBid;
 };
 
 const fetchAuctionSettings = async (
@@ -95,12 +116,23 @@ const fetchAuctionFor = async (
       provider,
     );
 
-    const auctions = await contract.auctionFor(
-      tokenAddress,
-      tokenIdAsBytes32(tokenId),
-    );
+    const {
+      acceptedToken,
+      seller,
+      minimumBid,
+      activeBidder,
+      activeBidAmount,
+      endTime,
+    } = await contract.auctionFor(tokenAddress, tokenIdAsBytes32(tokenId));
 
-    return auctions;
+    return {
+      acceptedToken,
+      seller,
+      minimumBid: Number(minimumBid.toString()),
+      activeBidder,
+      activeBidAmount: Number(activeBidAmount.toString()),
+      endTime: Number(endTime.toString()),
+    };
   } catch (error) {
     return null;
   }
@@ -117,9 +149,26 @@ const fetchAllAuctionFor = async (
       provider,
     );
 
-    const auctions = await contract.getAuctionsForLSP8Contract(assetAddress);
+    const { auctions } = await contract.getAuctionsForLSP8Contract(
+      assetAddress,
+    );
 
-    return auctions.auctions.length > 0 ? auctions.auctions : null;
+    const auctionsMap = auctions.map((item) => {
+      const { tokenId, auction } = item;
+      return {
+        tokenId,
+        auction: {
+          acceptedToken: auction.acceptedToken,
+          seller: auction.seller,
+          minimumBid: Number(auction.minimumBid.toString()),
+          activeBidder: auction.activeBidder,
+          activeBidAmount: Number(auction.activeBidAmount.toString()),
+          endTime: Number(auction.endTime.toString()),
+        },
+      };
+    });
+
+    return auctionsMap.length > 0 ? auctionsMap : null;
   } catch (error) {
     return null;
   }
@@ -128,6 +177,7 @@ const fetchAllAuctionFor = async (
 export const AuctionApi = {
   encodeOpenAuctionFor,
   encodeCancelAuctionFor,
+  encodeSubmitBid,
   fetchAuctionSettings,
   fetchAuctionFor,
   fetchAllAuctionFor,

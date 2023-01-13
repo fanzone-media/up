@@ -1,12 +1,13 @@
-import { BigNumber, BigNumberish, Signer } from 'ethers';
+import { BigNumberish, Signer } from 'ethers';
 import { ERC20__factory } from '../../submodules/fanzone-smart-contracts/typechain';
+import { Address } from '../../utils/types';
 
 const encodeTransfer = (
-  tokenAddress: string,
+  tokenAddress: Address,
   amountToTransfer: BigNumberish,
-  toAddress: string,
+  toAddress: Address,
   signer: Signer,
-) => {
+): string => {
   const tokenContract = ERC20__factory.connect(tokenAddress, signer);
   const encodedTransfer = tokenContract.interface.encodeFunctionData(
     'transfer',
@@ -17,11 +18,11 @@ const encodeTransfer = (
 };
 
 const encodeApprove = (
-  spenderAddress: string,
-  tokenAddress: string,
-  amount: BigNumber,
+  spenderAddress: Address,
+  tokenAddress: Address,
+  amount: BigNumberish,
   signer: Signer,
-) => {
+): string => {
   const erc20Contract = ERC20__factory.connect(tokenAddress, signer);
   const encodedApprove = erc20Contract.interface.encodeFunctionData('approve', [
     spenderAddress,
