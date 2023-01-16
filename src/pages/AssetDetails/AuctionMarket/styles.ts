@@ -5,6 +5,10 @@ export const StyledAuctionMarket = styled.div`
   display: flex;
 `;
 
+export const StyledNoAuctionMarketLabel = styled.h3`
+  margin: auto;
+`;
+
 export const StyledAuctionMarketTable = styled.div`
   width: 100%;
 `;

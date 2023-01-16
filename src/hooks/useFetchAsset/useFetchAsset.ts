@@ -2,28 +2,30 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../boot/store';
 import { RootState } from '../../boot/types';
-import { fetchAllMarkets, selectCardById } from '../../features/cards';
+import { fetchCard, selectCardById } from '../../features/cards';
 import { STATUS } from '../../utility';
 import { Address } from '../../utils/types';
 import { useUrlParams } from '../useUrlParams';
 
-export const useFetchMarkets = (assetAddress: Address) => {
-  const { network } = useUrlParams();
+export const useFetchAsset = (assetAddress: Address) => {
   const dispatch = useAppDispatch();
+  const { network } = useUrlParams();
   const asset = useSelector((state: RootState) =>
     selectCardById(state.cards[network], assetAddress),
   );
   const status = useSelector(
-    (state: RootState) => state.cards[network].status.fetchMarket,
+    (state: RootState) => state.cards[network].status.fetchCard,
   );
 
   useEffect(() => {
-    if (!asset || status !== STATUS.IDLE) return;
-
+    if (asset || status !== STATUS.IDLE) return;
     dispatch(
-      fetchAllMarkets({ assetAddress: asset.address, network: network }),
+      fetchCard({
+        address: assetAddress,
+        network,
+      }),
     );
-  }, [asset, dispatch, status, network]);
+  }, [asset, assetAddress, dispatch, network, status]);
 
-  return { market: asset ? asset.market : null, status };
+  return { asset: asset ? asset : null, status };
 };

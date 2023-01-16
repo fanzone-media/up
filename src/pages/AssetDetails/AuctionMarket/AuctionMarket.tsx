@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon';
-import { useUrlParams } from '../../../hooks/useUrlParams';
 import { ICard } from '../../../services/models';
 import { displayPrice } from '../../../utility';
 import { Bidbutton } from '../components/BidButton';
@@ -14,6 +13,7 @@ import {
   StyledAuctionMarketMint,
   StyledAuctionMarketSeller,
   StyledAuctionMarketTable,
+  StyledNoAuctionMarketLabel,
 } from './styles';
 
 interface IProps {
@@ -39,7 +39,7 @@ export const AuctionMarket = ({ asset }: IProps) => {
     return symbol ? symbol : '';
   };
 
-  return (
+  return auctionMarket && auctionMarket.length > 0 ? (
     <StyledAuctionMarket>
       <StyledAuctionMarketTable>
         <StyledAuctionMarketListHeader>
@@ -91,5 +91,7 @@ export const AuctionMarket = ({ asset }: IProps) => {
         ))}
       </StyledAuctionMarketTable>
     </StyledAuctionMarket>
+  ) : (
+    <StyledNoAuctionMarketLabel>No market available</StyledNoAuctionMarketLabel>
   );
 };

@@ -3,10 +3,10 @@ import { useSelector } from 'react-redux';
 import { useAccount } from 'wagmi';
 import { useAppDispatch } from '../../../boot/store';
 import { RootState } from '../../../boot/types';
-import { fetchCard, selectCardById } from '../../../features/cards';
 import { fetchOwnerAddressOfTokenId } from '../../../features/profiles';
 import { useActiveProfile } from '../../../hooks/useActiveProfile';
 import { useCurrentUserPermissions } from '../../../hooks/useCurrentUserPermissions';
+import { useFetchAsset } from '../../../hooks/useFetchAsset';
 import { useFetchMarkets } from '../../../hooks/useFetchMarkets';
 import { useMintMarket } from '../../../hooks/useMintMarket';
 import { useUrlParams } from '../../../hooks/useUrlParams';
@@ -29,19 +29,10 @@ export const EmbedSetPrice = () => {
     (state: RootState) => tokenId && state.userData.me,
   );
 
-  const asset = useSelector((state: RootState) =>
-    selectCardById(state.cards[network], address),
-  );
-
-  const cardStatus = useSelector(
-    (state: RootState) => state.cards[network].status.fetchCard,
-  );
   const profileStatus = useSelector(
     (state: RootState) => state.userData[network].status.fetchOwnerOfProfile,
   );
-  const marketsStatus = useSelector(
-    (state: RootState) => state.cards[network].status.fetchMarket,
-  );
+
   const tokenIdOwnerStatus = useSelector(
     (state: RootState) => state.userData[network].status.fetchOwnerOfTokenId,
   );
@@ -50,7 +41,9 @@ export const EmbedSetPrice = () => {
 
   const { activeProfile } = useActiveProfile();
 
-  useFetchMarkets(asset);
+  const { asset, status: assetStatus } = useFetchAsset(address);
+
+  const { status: marketStatus } = useFetchMarkets(address);
 
   const currentMintMarket = useMintMarket(address, tokenId);
 
@@ -66,17 +59,6 @@ export const EmbedSetPrice = () => {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, address, tokenId, network]);
-
-  useEffect(() => {
-    if (asset || cardStatus !== STATUS.IDLE || !account) return;
-    dispatch(
-      fetchCard({
-        address,
-        network,
-        tokenId,
-      }),
-    );
-  }, [account, address, asset, cardStatus, dispatch, network, tokenId]);
 
   const renderCardPrice = useMemo(
     () => (
@@ -94,8 +76,8 @@ export const EmbedSetPrice = () => {
     <StyledEmbedSetPriceContent>
       <ConnectToMetaMaskButton />
       <StyledEmbedSetPriceWrapper>
-        {(cardStatus === STATUS.LOADING ||
-          marketsStatus === STATUS.LOADING ||
+        {(assetStatus === STATUS.LOADING ||
+          marketStatus === STATUS.LOADING ||
           profileStatus === STATUS.LOADING) && (
           <StyledMessageLabel>loading . . .</StyledMessageLabel>
         )}

@@ -9,7 +9,7 @@ import {
   SupportedInterface,
 } from '../models';
 import { getLSP4Metadata } from '../ipfsClient';
-import { BigNumber, BigNumberish, BytesLike, ethers, Signer } from 'ethers';
+import { BigNumber, BigNumberish, ethers, Signer } from 'ethers';
 import {
   CardMarket__factory,
   CardTokenProxy__factory,

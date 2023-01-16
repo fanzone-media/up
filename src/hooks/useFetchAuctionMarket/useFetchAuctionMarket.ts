@@ -21,4 +21,6 @@ export const useFetchAuctionMarket = (assetAddress: Address) => {
     if (!asset || status !== STATUS.IDLE) return;
     dispatch(fetchAuctionMarket({ assetAddress, network }));
   }, [asset, assetAddress, dispatch, network, status]);
+
+  return { auctionMarket: asset ? asset.auctionMarket : null, status };
 };

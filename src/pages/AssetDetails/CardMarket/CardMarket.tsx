@@ -62,11 +62,6 @@ export const CardMarket = ({
               )}{' '}
               {findSymbol(market.acceptedToken)}
             </StyledCardMarketPrice>
-            {/* <StyledCardMarketBuy
-              onClick={() => onBuyClick(Number(market.tokenId))}
-            >
-              Buy
-            </StyledCardMarketBuy> */}
             <BuyCardButton asset={asset} mint={Number(market.tokenId)} />
           </StyledCardMarket>
         ))}

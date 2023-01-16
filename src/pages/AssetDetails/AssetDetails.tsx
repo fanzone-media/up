@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   BackwardsIcon,
@@ -149,7 +149,7 @@ const AssetDetails: React.FC = () => {
 
   const currentUsersPermissions = useCurrentUserPermissions(wasActiveProfile);
 
-  useFetchMarkets(asset);
+  useFetchMarkets(address);
   useFetchAuctionMarket(address);
 
   const { ownedTokenIds, currentTokenId } = useOwnedMints(
