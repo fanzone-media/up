@@ -77,5 +77,9 @@ export const useSubmitBid = (
     }
   };
 
-  return { bidingState, submitBid };
+  return {
+    bidingState,
+    submitBid,
+    resetState: () => setbidingState(STATUS.IDLE),
+  };
 };

@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { ReactText, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useSigner } from 'wagmi';
@@ -37,7 +38,7 @@ export const Bidbutton = ({ asset, auctionMarket }: IProps) => {
   const { handlePresent: onPresentBidModal, onDismiss: onDismissBidModal } =
     useModal(
       <BidModalContent
-        onDismiss={() => {}}
+        onDismiss={() => onDismissBidModal}
         asset={asset}
         auctionMarket={auctionMarket}
         network={network}
@@ -46,5 +47,12 @@ export const Bidbutton = ({ asset, auctionMarket }: IProps) => {
       'Bid',
     );
 
-  return <StyledBidButton onClick={handleOnClick}>Bid</StyledBidButton>;
+  return (
+    <StyledBidButton
+      disabled={auctionMarket.auction.endTime <= DateTime.now().toSeconds()}
+      onClick={handleOnClick}
+    >
+      Bid
+    </StyledBidButton>
+  );
 };

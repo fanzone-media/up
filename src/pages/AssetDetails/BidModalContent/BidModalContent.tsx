@@ -8,6 +8,7 @@ import {
   StyledModalButton,
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
+import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
 import { ModalContext } from '../../../context/ModalProvider';
 import { useErc20 } from '../../../hooks/useErc20';
 import {
@@ -62,7 +63,7 @@ export const BidModalContent = ({
     tokenAddress: auctionMarket.auction.acceptedToken,
     network,
   });
-  const { bidingState, submitBid } = useSubmitBid(
+  const { bidingState, submitBid, resetState } = useSubmitBid(
     assetAddress,
     Number(auctionMarket.tokenId),
     network,
@@ -132,9 +133,23 @@ export const BidModalContent = ({
   ]);
 
   const onSubmit = async () => {
-    if (!validateInput()) {
+    if (validateInput()) {
       await submitBid(Number(bidForm.bidAmount), bidForm.upAddress);
     }
+  };
+
+  const transactionStatesMessages = {
+    loading: {
+      mainHeading: 'Bid is being placed',
+      description: 'In a few moments you will know if the bid was successful.',
+    },
+    successful: {
+      mainHeading: 'Bid successful!',
+    },
+    failed: {
+      mainHeading: 'Bid failed',
+      description: 'Please try again.',
+    },
   };
 
   useMemo(() => {
@@ -215,6 +230,10 @@ export const BidModalContent = ({
             changeHandler={changeHandler}
           />
           <StyledModalButton
+            disabled={
+              bidForm.bidAmount <= auctionMarket.auction.minimumBid ||
+              bidForm.bidAmount <= auctionMarket.auction.activeBidAmount
+            }
             onClick={async () =>
               await approve(
                 auctionContracts[network],
@@ -247,6 +266,12 @@ export const BidModalContent = ({
           Submit Bid
         </StyledModalButton>
       </StyledModalButtonsWrapper>
+      <TransactionStateWindow
+        height="full"
+        state={bidingState}
+        transactionMessages={transactionStatesMessages}
+        callback={resetState}
+      />
     </StyledBidModalContent>
   );
 };

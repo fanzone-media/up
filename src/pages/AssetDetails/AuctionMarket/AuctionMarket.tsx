@@ -59,8 +59,8 @@ export const AuctionMarket = ({ asset }: IProps) => {
             Ends in
           </StyledAuctionMarketListHeaderContent>
         </StyledAuctionMarketListHeader>
-        {auctionMarket?.map((market) => (
-          <StyledAuctionMarketItem>
+        {auctionMarket?.map((market, i) => (
+          <StyledAuctionMarketItem key={i}>
             <StyledAuctionMarketMint>
               {Number(market.tokenId)}
             </StyledAuctionMarketMint>
