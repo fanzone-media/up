@@ -35,6 +35,7 @@ import {
   StyledWitdrawFundsButton,
   StyledProfileSettingButton,
   StyledSettingIcon,
+  StyledClaimAuctionTokenButton,
 } from './styles';
 import { ProfileImage } from './ProfileImage';
 import {
@@ -46,7 +47,6 @@ import {
   ShareIcon,
   Twitter,
 } from '../../assets';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 import {
   currentProfile,
   fetchIssuedAssetsAddresses,
@@ -73,16 +73,20 @@ import {
   StyledProfilesHeader,
 } from '../Profiles/styles';
 import { TransferCardsModal } from './TransferCardModal/TransferCardsModal';
-import { useModal } from '../../hooks/useModal';
-import { usePagination } from '../../hooks/usePagination';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
+import {
+  useModal,
+  useUrlParams,
+  usePagination,
+  useLocalStorage,
+  useQueryParams,
+  useMediaQuery,
+} from '../../hooks';
 import { WithdrawFundsModal } from './WithdrawFundsModal';
 import { ProfileSettingModal } from './ProfileSettingModal';
-import { useQueryParams } from '../../hooks/useQueryParams';
 import { isAddress } from 'ethers/lib/utils';
 import { ShareReferModal } from '../../components/ShareReferModal';
 import { STATUS } from '../../utility';
-import { useUrlParams } from '../../hooks/useUrlParams';
+import { ClaimAuctionTokens } from './ClaimAuctionTokens';
 
 const ProfileDetails: React.FC = () => {
   const { address, network } = useUrlParams();
@@ -323,6 +327,21 @@ const ProfileDetails: React.FC = () => {
     'Withdraw Funds',
   );
 
+  const {
+    handlePresent: onPresentClaimAuctionTokensModal,
+    onDismiss: onDismissClaimAuctionTokensModal,
+  } = useModal(
+    profile && (
+      <ClaimAuctionTokens
+        profile={profile}
+        network={network}
+        onDismiss={() => onDismissClaimAuctionTokensModal()}
+      />
+    ),
+    'Claim Auction Tokens Modal',
+    'Claim Tokens',
+  );
+
   const { handlePresent: onPresentShareModal, onDismiss: onDismissShareModal } =
     useModal(
       <ShareReferModal
@@ -433,6 +452,17 @@ const ProfileDetails: React.FC = () => {
                   Withdraw Funds
                 </StyledWitdrawFundsButton>
               )}
+              {profile &&
+                account &&
+                (canTransfer ||
+                  profile.owner.toLowerCase() ===
+                    account.address.toLowerCase()) && (
+                  <StyledClaimAuctionTokenButton
+                    onClick={onPresentClaimAuctionTokensModal}
+                  >
+                    Claim Auction Token
+                  </StyledClaimAuctionTokenButton>
+                )}
               <StyledAssetsWrapper>
                 {userDataStatus.fetchIssuedAssetAddresses ===
                   STATUS.LOADING && (

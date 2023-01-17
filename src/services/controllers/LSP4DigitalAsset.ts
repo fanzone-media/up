@@ -19,10 +19,9 @@ import {
 import { LSP3ProfileApi } from './LSP3Profile';
 import { useRpcProvider } from '../../hooks/useRpcProvider';
 import { tokenIdAsBytes32 } from '../../utils/cardToken';
-import { erc20ABI } from 'wagmi';
-import { Provider } from '@ethersproject/providers';
 import ABIs from '../utilities/ABIs';
 import { Address } from '../../utils/types';
+import { ERC20Api } from './ERC20';
 
 const fetchCard = async (
   address: string,
@@ -207,30 +206,12 @@ const fetchAcceptedTokens = async (
     await contractRegistry.allWhitelistedTokens();
 
   const whiteListedTokens = await Promise.all(
-    whitelistedTokenAddresses.map(
-      async (item) => await fetchErc20TokenInfo(item, provider),
+    whitelistedTokenAddresses.map((item) =>
+      ERC20Api.fetchErc20TokenInfo(item, network),
     ),
   );
 
   return whiteListedTokens;
-};
-
-const fetchErc20TokenInfo = async (
-  address: string,
-  providerOrSigner: Signer | Provider,
-) => {
-  const erc20Contract = new ethers.Contract(
-    address,
-    erc20ABI,
-    providerOrSigner,
-  );
-  const symbol: string = await erc20Contract.symbol();
-  const decimals: number = await erc20Contract.decimals();
-  return {
-    tokenAddress: address,
-    symbol,
-    decimals,
-  };
 };
 
 const buyFromCardMarketViaUniversalProfile = async (
@@ -444,7 +425,6 @@ export const LSP4DigitalAssetApi = {
   fetchAllMarkets,
   fetchOwnerOfTokenId,
   fetchAcceptedTokens,
-  fetchErc20TokenInfo,
   buyFromMarketViaEOA,
   buyFromCardMarketViaUniversalProfile,
   encodeSetMarketFor,

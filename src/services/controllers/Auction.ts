@@ -81,6 +81,25 @@ const encodeSubmitBid = (
   return encodedSubmitBid;
 };
 
+const encodeClaimToken = (
+  accountAddress: Address,
+  tokenAddress: Address,
+  network: NetworkName,
+  signer: Signer,
+): string => {
+  const contract = CardAuction__factory.connect(
+    auctionContracts[network],
+    signer,
+  );
+
+  const encodedClaimToken = contract.interface.encodeFunctionData(
+    'claimToken',
+    [accountAddress, tokenAddress],
+  );
+
+  return encodedClaimToken;
+};
+
 const fetchAuctionSettings = async (
   network: NetworkName,
 ): Promise<IAuctionOptions | null> => {
@@ -174,11 +193,36 @@ const fetchAllAuctionFor = async (
   }
 };
 
+const fetchClaimableAmountsFor = async (
+  accountAddress: Address,
+  tokenAddress: Address,
+  network: NetworkName,
+): Promise<{ tokenAddress: Address; amount: number }> => {
+  try {
+    const provider = useRpcProvider(network);
+    const contract = CardAuction__factory.connect(
+      auctionContracts[network],
+      provider,
+    );
+
+    const amount = await contract.claimableAmountsFor(
+      accountAddress,
+      tokenAddress,
+    );
+
+    return { tokenAddress, amount: Number(amount.toString()) };
+  } catch (error) {
+    return { tokenAddress, amount: 0 };
+  }
+};
+
 export const AuctionApi = {
   encodeOpenAuctionFor,
   encodeCancelAuctionFor,
   encodeSubmitBid,
+  encodeClaimToken,
   fetchAuctionSettings,
   fetchAuctionFor,
   fetchAllAuctionFor,
+  fetchClaimableAmountsFor,
 };

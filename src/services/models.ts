@@ -134,6 +134,13 @@ export interface IAuctionState {
   activeBidAmount: number;
 }
 
+export interface IClaimableAuctionToken {
+  tokenAddress: string;
+  symbol: string;
+  decimals: number;
+  amount: number;
+}
+
 export interface IProfile {
   address: string;
   owner: string;

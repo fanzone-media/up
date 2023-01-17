@@ -269,19 +269,15 @@ export const StyledOpenTransferModalButton = styled.button`
   }
 `;
 
-export const StyledOpenEditProfileModal = styled.button`
-  background-color: rgba(33, 33, 33, 1);
-  max-width: max-content;
-  margin: 1.25em auto;
-  padding: 5px 0.625em;
-  border-radius: 8px;
+export const StyledOpenEditProfileModal = styled(
+  StyledOpenTransferModalButton,
+)``;
 
-  @media ${({ theme }) => theme.screen.md} {
-    margin: 2em auto 0 auto;
-  }
-`;
+export const StyledWitdrawFundsButton = styled(StyledOpenTransferModalButton)``;
 
-export const StyledWitdrawFundsButton = styled(StyledOpenEditProfileModal)``;
+export const StyledClaimAuctionTokenButton = styled(
+  StyledOpenEditProfileModal,
+)``;
 
 export const StyledShareProfileButton = styled.button`
   align-items: center;

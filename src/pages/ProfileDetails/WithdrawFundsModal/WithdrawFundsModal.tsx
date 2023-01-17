@@ -10,7 +10,7 @@ import {
 import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
 import { useRpcProvider } from '../../../hooks/useRpcProvider';
 import { useWitdrawFunds } from '../../../hooks/useWithdrawFunds';
-import { LSP4DigitalAssetApi } from '../../../services/controllers/LSP4DigitalAsset';
+import { ERC20Api } from '../../../services/controllers/ERC20';
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
 import { displayPrice } from '../../../utility';
 import { getWhiteListedTokenAddresses } from '../../../utility/content/addresses';
@@ -55,8 +55,7 @@ export const WithdrawFundsModal = ({ profile, network, onDismiss }: IProps) => {
   const fetchWhiteListedTokenInfo = useCallback(async () => {
     const res = await Promise.all(
       whiteListedtokensAddresses.map(
-        async (address) =>
-          await LSP4DigitalAssetApi.fetchErc20TokenInfo(address, provider),
+        async (address) => await ERC20Api.fetchErc20TokenInfo(address, network),
       ),
     );
     setWhiteListedTokensInfo(res);
