@@ -14,3 +14,10 @@ export const StyledEmbedSetPriceWrapper = styled.div`
   flex-direction: column;
   row-gap: 0.7em;
 `;
+
+export const StyledClaimAuctionTokensButton = styled.button`
+  width: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  padding: 7px 0;
+`;
