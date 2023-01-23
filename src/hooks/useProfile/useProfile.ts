@@ -55,7 +55,7 @@ export const useProfile = (): Result => {
           setIsLoading(false);
         });
     },
-    [profileCache, profile, profileAddressError, isLoading],
+    [profileCache],
   );
 
   return [profile, profileAddressError, getProfile, isLoading];

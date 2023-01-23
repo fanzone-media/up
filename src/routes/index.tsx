@@ -15,8 +15,8 @@ import { Footer, Header } from '../components';
 import { EmbedMarket } from '../pages/Embed/EmbedMarket';
 import { EmbedSetPrice } from '../pages/Embed/EmbedSetPrice';
 import { Transfer } from '../pages/Transfer';
-import { AddPermissions } from '../pages/AddPermissions';
 import { EmbedAuctionMarket } from '../pages/Embed/EmbedAuctionMarket';
+import { Permissions } from '../pages/Permissions';
 
 const LazyProfiles = React.lazy(() => import('../pages/Profiles/Profiles'));
 const LazyProfileDetails = React.lazy(
@@ -52,8 +52,8 @@ const Routes: React.FC = () => {
               <Route exact path="/up/test/fanzoneSportsClub">
                 <FanzoneClub />
               </Route>
-              <Route exact path="/up/addpermissions">
-                <AddPermissions />
+              <Route exact path="/up/:network/addpermissions">
+                <Permissions />
               </Route>
               <Route exact path="/up/:network">
                 <LazyProfiles />

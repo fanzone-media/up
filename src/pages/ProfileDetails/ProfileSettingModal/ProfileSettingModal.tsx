@@ -1,18 +1,23 @@
 import { useMemo, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { StringBoolean } from '../../../boot/types';
+import { NetworkName, StringBoolean } from '../../../boot/types';
 import { Tabs } from '../../../components/Tabs';
 import { IProfile } from '../../../services/models';
 import { getAddressPermissionsOnUniversalProfile } from '../../../utility/permissions';
-import { AddPermissions } from '../../AddPermissions';
+import { AddPermissionsModalContent } from '../AddPermissionsModalContent';
 import { ProfileEditModal } from '../ProfileEditModal';
 
 interface IProps {
   profile: IProfile;
+  network: NetworkName;
   onDismiss: () => void;
 }
 
-export const ProfileSettingModal = ({ profile, onDismiss }: IProps) => {
+export const ProfileSettingModal = ({
+  profile,
+  network,
+  onDismiss,
+}: IProps) => {
   const [{ data: account }] = useAccount();
 
   const [tabName, setTabName] = useState('');
@@ -46,8 +51,10 @@ export const ProfileSettingModal = ({ profile, onDismiss }: IProps) => {
     },
     {
       name: 'Permissions',
-      content: <AddPermissions upAddress={profile.address} />,
-      visible: canTransfer && canAddPermissions,
+      content: (
+        <AddPermissionsModalContent profile={profile} network={network} />
+      ),
+      visible: canAddPermissions,
     },
   ];
 

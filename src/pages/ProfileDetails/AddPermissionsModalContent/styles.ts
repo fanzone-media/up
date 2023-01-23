@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { StyledInputRow } from '../ProfileDetails/ProfileEditModal/styles';
+import { StyledInputRow } from '../ProfileEditModal/styles';
 
 export const StyledAddPermissions = styled.div`
   display: flex;
@@ -27,6 +27,7 @@ export const StyledInput = styled.input`
   margin: auto 0;
   max-width: 350px;
   width: 100%;
+  color: black;
 `;
 
 export const StyledCheckboxInput = styled.input`

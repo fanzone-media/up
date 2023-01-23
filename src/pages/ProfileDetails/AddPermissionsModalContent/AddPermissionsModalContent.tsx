@@ -1,7 +1,11 @@
 import { ethers } from 'ethers';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
-import { KeyManagerApi } from '../../services/controllers/KeyManager';
+import { NetworkName, StringBoolean } from '../../../boot/types';
+import { useProfile } from '../../../hooks';
+import { KeyManagerApi } from '../../../services/controllers/KeyManager';
+import { IPermissionSet, IProfile } from '../../../services/models';
+import { getAddressPermissionsOnUniversalProfile } from '../../../utility/permissions';
 import {
   StyledAddPermissions,
   StyledInputWrapper,
@@ -10,11 +14,11 @@ import {
   StyledPermissionInputWrapper,
   StyledCheckboxInput,
   StyledSetPermisssionButton,
-  StyledNetworkLabel,
 } from './styles';
 
 interface IProps {
-  upAddress?: string;
+  profile?: IProfile;
+  network: NetworkName;
 }
 
 type formInput = {
@@ -34,10 +38,10 @@ type formInput = {
   };
 };
 
-export const AddPermissions = ({ upAddress }: IProps) => {
+export const AddPermissionsModalContent = ({ profile, network }: IProps) => {
   const [{ data }] = useSigner();
   const [permissionsForm, setpermissionsForm] = useState<formInput>({
-    upAddress: upAddress ? upAddress : '',
+    upAddress: profile ? profile.address : '',
     addressTo: '',
     permissions: {
       CHANGEOWNER: false,
@@ -52,6 +56,48 @@ export const AddPermissions = ({ upAddress }: IProps) => {
       SIGN: false,
     },
   });
+
+  const [
+    destinationProfile,
+    profileAddressError,
+    getProfile,
+    isProfileLoading,
+  ] = useProfile();
+
+  const currentPermissions = useMemo(() => {
+    const res = getAddressPermissionsOnUniversalProfile(
+      profile
+        ? profile.permissionSet
+        : destinationProfile
+        ? destinationProfile.permissionSet
+        : [],
+      permissionsForm.addressTo,
+    );
+
+    const keys =
+      res &&
+      (Object.keys(res.permissions) as Array<
+        keyof IPermissionSet['permissions']
+      >);
+
+    const permissions =
+      res &&
+      keys &&
+      (Object.fromEntries(
+        keys.map((key) => [
+          key.toUpperCase(),
+          res.permissions[key] === StringBoolean.TRUE,
+        ]),
+      ) as formInput['permissions']);
+
+    permissions &&
+      setpermissionsForm({
+        ...permissionsForm,
+        permissions,
+      });
+
+    return permissions;
+  }, [destinationProfile, permissionsForm.addressTo, profile]);
 
   const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.currentTarget.type === 'checkbox') {
@@ -93,24 +139,39 @@ export const AddPermissions = ({ upAddress }: IProps) => {
     }
   };
 
+  useMemo(() => {
+    if (!profile && permissionsForm.upAddress) {
+      getProfile(permissionsForm.upAddress, network);
+    }
+  }, [getProfile, network, permissionsForm.upAddress, profile]);
+
   return (
     <StyledAddPermissions>
-      <StyledInputWrapper>
-        <StyledLabel>Up Address: </StyledLabel>
-        <StyledInput name="upAddress" onChange={changeHandler}></StyledInput>
-      </StyledInputWrapper>
+      {!profile && (
+        <StyledInputWrapper>
+          <StyledLabel>Up Address: </StyledLabel>
+          <StyledInput name="upAddress" onChange={changeHandler}></StyledInput>
+        </StyledInputWrapper>
+      )}
       <StyledInputWrapper>
         <StyledLabel>Grant permission to Address: </StyledLabel>
         <StyledInput name="addressTo" onChange={changeHandler}></StyledInput>
       </StyledInputWrapper>
       <StyledPermissionInputWrapper>
-        {Object.keys(permissionsForm.permissions).map((key) => (
-          <StyledInputWrapper key={key}>
+        {(
+          Object.keys(permissionsForm.permissions) as Array<
+            keyof formInput['permissions']
+          >
+        ).map((key, i) => (
+          <StyledInputWrapper key={permissionsForm.addressTo + '_' + i}>
             <StyledCheckboxInput
               type="checkbox"
               name={key}
               id={key}
               value={key}
+              defaultChecked={
+                currentPermissions ? currentPermissions[key] : false
+              }
               onChange={changeHandler}
             ></StyledCheckboxInput>
             <StyledLabel htmlFor={key}>{key}</StyledLabel>

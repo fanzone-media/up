@@ -277,6 +277,7 @@ const ProfileDetails: React.FC = () => {
     profile && (
       <ProfileSettingModal
         profile={profile}
+        network={network}
         onDismiss={() => onDismissSettingModal()}
       />
     ),
