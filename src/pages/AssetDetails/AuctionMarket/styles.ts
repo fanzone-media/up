@@ -26,7 +26,7 @@ export const StyledAuctionMarketListHeaderContent = styled.h4``;
 
 export const StyledAuctionMarketItem = styled.div`
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   padding: 1em;
 
   &:nth-child(even) {
@@ -40,7 +40,8 @@ export const StyledAuctionMarketItem = styled.div`
 `;
 
 export const StyledAuctionMarketMint = styled.p`
-  margin: auto 0;
+  margin: auto 0em;
+  overflow-wrap: break-word;
 `;
 
 export const StyledAuctionMarketMinBid = styled(StyledAuctionMarketMint)``;

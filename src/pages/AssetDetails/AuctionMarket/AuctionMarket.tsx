@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import { ICard } from '../../../services/models';
 import { displayPrice } from '../../../utility';
+import { trimedAddress } from '../../../utility/content/addresses';
 import { Bidbutton } from '../components/BidButton';
 import {
   StyledAuctionMarket,
@@ -56,7 +57,7 @@ export const AuctionMarket = ({ asset }: IProps) => {
             Seller
           </StyledAuctionMarketListHeaderContent>
           <StyledAuctionMarketListHeaderContent>
-            Ends in
+            Ends on
           </StyledAuctionMarketListHeaderContent>
         </StyledAuctionMarketListHeader>
         {auctionMarket?.map((market, i) => (
@@ -78,8 +79,8 @@ export const AuctionMarket = ({ asset }: IProps) => {
               )}{' '}
               {findSymbol(market.auction.acceptedToken)}
             </StyledAuctionMarketCurrentBid>
-            <StyledAuctionMarketSeller>
-              {/* {market.auction.seller} */}
+            <StyledAuctionMarketSeller title={market.auction.seller}>
+              {trimedAddress(market.auction.seller)}
             </StyledAuctionMarketSeller>
             <StyledAuctionMarketEndsIn>
               {DateTime.fromSeconds(market.auction.endTime).toLocaleString(

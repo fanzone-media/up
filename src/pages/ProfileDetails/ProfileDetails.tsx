@@ -144,6 +144,7 @@ const ProfileDetails: React.FC = () => {
         profile.permissionSet,
         account.address,
       );
+
       return [
         permissionsSet?.permissions.call === StringBoolean.TRUE,
         permissionsSet?.permissions.setdata === StringBoolean.TRUE,
@@ -151,6 +152,10 @@ const ProfileDetails: React.FC = () => {
         permissionsSet?.permissions.addpermissions === StringBoolean.TRUE,
       ];
     }, [account, profile]);
+
+  useMemo(() => {
+    console.log(profile?.permissionSet);
+  }, [profile?.permissionSet]);
 
   useMemo(() => {
     if (!account || !profile || !canTransfer || !canSetData) return;
@@ -406,7 +411,7 @@ const ProfileDetails: React.FC = () => {
                           </StyledShareProfileButton>
                         </StyledShareProfileWrapper>
                       </StyledShareProfileHolder>
-                      {(canAddPermissions || canSetData) && canTransfer && (
+                      {(canAddPermissions || canSetData) && (
                         <StyledProfileSettingButton
                           onClick={onPresentSettingModal}
                         >

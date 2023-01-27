@@ -9,6 +9,7 @@ import {
   StyledEmbedAuctionMarketContent,
   StyledEmbedAuctionMarketWrapper,
   StyledReloadAuctionMarketButton,
+  StyledButtonContainer,
 } from './styles';
 
 export const EmbedAuctionMarket = () => {
@@ -19,10 +20,15 @@ export const EmbedAuctionMarket = () => {
 
   return (
     <StyledEmbedAuctionMarketContent>
-      <ConnectToMetaMaskButton />
-      <StyledReloadAuctionMarketButton onClick={() => window.location.reload()}>
-        Reload Auction Market
-      </StyledReloadAuctionMarketButton>
+      <StyledButtonContainer>
+        <ConnectToMetaMaskButton />
+        <StyledReloadAuctionMarketButton
+          onClick={() => window.location.reload()}
+        >
+          Reload Auction Market
+        </StyledReloadAuctionMarketButton>
+      </StyledButtonContainer>
+
       <StyledEmbedAuctionMarketWrapper>
         {(assetStatus === STATUS.LOADING ||
           auctionMarketStatus === STATUS.LOADING) && (
