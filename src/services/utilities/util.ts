@@ -21,7 +21,7 @@ export default class Utils {
       try {
         operation(resolve, reject);
       } catch (error) {
-        reject(new Error(error));
+        reject(new Error(error as string));
       }
     });
   }

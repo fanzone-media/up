@@ -18,7 +18,7 @@ export const ProfileSettingModal = ({
   network,
   onDismiss,
 }: IProps) => {
-  const [{ data: account }] = useAccount();
+  const { address: account } = useAccount();
 
   const [tabName, setTabName] = useState('');
 
@@ -27,7 +27,7 @@ export const ProfileSettingModal = ({
 
     const permissionsSet = getAddressPermissionsOnUniversalProfile(
       profile.permissionSet,
-      account.address,
+      account,
     );
 
     return [

@@ -25,7 +25,7 @@ import {
 export const EmbedSetPrice = () => {
   const { address, network, tokenId } = useUrlParams();
   const dispatch = useAppDispatch();
-  const [{ data: account }] = useAccount();
+  const { address: account } = useAccount();
 
   const wasActiveProfile = useSelector(
     (state: RootState) => tokenId && state.userData.me,

@@ -1,3 +1,4 @@
+import { Signer } from 'ethers';
 import { useState } from 'react';
 import { useSigner } from 'wagmi';
 import { NetworkName } from '../../boot/types';
@@ -16,7 +17,7 @@ export const useSubmitBid = (
   network: NetworkName,
 ) => {
   const [bidingState, setbidingState] = useState<STATUS>(STATUS.IDLE);
-  const [{ data: signer }] = useSigner();
+  const { data: signer } = useSigner();
 
   const submitBid = async (bidAmount: number, upAddress: Address) => {
     if (!signer) return;
@@ -41,7 +42,7 @@ export const useSubmitBid = (
         assetAddress,
         tokenId,
         bidAmount,
-        signer,
+        signer as Signer,
         network,
       );
 
@@ -50,13 +51,13 @@ export const useSubmitBid = (
           upAddress,
           auctionContracts[network],
           encodedAuctionData,
-          signer,
+          signer as Signer,
         );
 
         await KeyManagerApi.executeTransactionViaKeyManager(
           upOwnerAddress,
           encodedExecuteData,
-          signer,
+          signer as Signer,
         );
 
         setbidingState(STATUS.SUCCESSFUL);
@@ -68,7 +69,7 @@ export const useSubmitBid = (
         upAddress,
         auctionContracts[network],
         encodedAuctionData,
-        signer,
+        signer as Signer,
       );
 
       setbidingState(STATUS.SUCCESSFUL);

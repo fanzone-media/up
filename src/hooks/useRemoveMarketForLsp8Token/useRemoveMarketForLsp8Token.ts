@@ -26,7 +26,7 @@ export const useRemoveMarketForLsp8Token = (
     STATUS.IDLE,
   );
   const [error, setError] = useState();
-  const [{ data: signer }] = useSigner();
+  const { data: signer } = useSigner();
 
   const removeMarket = async () => {
     setRemovingMarketState(STATUS.LOADING);

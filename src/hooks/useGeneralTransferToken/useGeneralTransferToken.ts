@@ -21,8 +21,8 @@ export const useGeneralTransferToken = (
 ) => {
   const [transferState, setTransferState] = useState<STATUS>(STATUS.IDLE);
   const [error, setError] = useState();
-  const [{ data: signer }] = useSigner();
-  const [{ data: networkData }] = useNetwork();
+  const { data: signer } = useSigner();
+  const { chain } = useNetwork();
   const profile = useSelector((state: RootState) =>
     selectUserById(state.userData[network], fromAddress),
   );
@@ -34,7 +34,7 @@ export const useGeneralTransferToken = (
   }, [dispatch, fromAddress, network, profile]);
 
   const transferCard = useCallback(async () => {
-    if (networkData.chain?.name !== network) {
+    if (chain?.name !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }
@@ -72,15 +72,7 @@ export const useGeneralTransferToken = (
             setTransferState(STATUS.FAILED);
           }));
     }
-  }, [
-    cardAddress,
-    network,
-    networkData.chain?.name,
-    profile,
-    signer,
-    toAddress,
-    tokenId,
-  ]);
+  }, [cardAddress, network, chain?.name, profile, signer, toAddress, tokenId]);
 
   return {
     transferCard,

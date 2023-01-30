@@ -1,28 +1,11 @@
-import detectEthereumProvider from '@metamask/detect-provider';
-import React, { ReactText, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useAccount, useConnect } from 'wagmi';
-import {
-  CloseMenuIcon,
-  hamburgerIcon,
-  Logo,
-  UserIcon,
-  WalletIcon,
-} from '../../assets';
+import { CloseMenuIcon, hamburgerIcon, Logo } from '../../assets';
 import { theme } from '../../boot/styles';
-import {
-  LOCAL_STORAGE_KEYS,
-  ProfilePermissionsLocal,
-  useLocalStorage,
-} from '../../hooks/useLocalStorage';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
+import { HeaderContent } from './HeaderContent';
 import {
-  StyledButtonConainer,
-  StyledButtonIcon,
-  StyledButtonText,
-  StyledConnectMetaMask,
   StyledHamburgerMenu,
   StyledHamburgerMenuButton,
   StyledHamburgerMenuContent,
@@ -31,75 +14,19 @@ import {
   StyledHmamburgerMenuIcon,
   StyledLink,
   StyledLogo,
-  StyledMyUpLink,
-  StyledSignUpLink,
 } from './styles';
-
-type HeaderContentType = {
-  isConnected: boolean;
-  isConnecting: boolean;
-  connectMetamask: () => void;
-  myUpLink?: string;
-};
 
 export const Header: React.FC = () => {
   const isTablet = useMediaQuery(theme.screen.md);
-  const [{ data, loading }, connect] = useConnect();
-  const [, disconnect] = useAccount();
   const [showAccountDetail, setShowAccountDetail] = useState<boolean>(false);
   const [showHamburgerMenu, setShowHamburgerMenu] = useState<boolean>(false);
-  const { getItems } = useLocalStorage();
-
-  const upAddressLink = () => {
-    const permissions = getItems(
-      LOCAL_STORAGE_KEYS.UP,
-    ) as ProfilePermissionsLocal;
-    return permissions && permissions['polygon']
-      ? `/up/polygon/profile/${Object.keys(permissions['polygon'])[0]}`
-      : undefined;
-  };
 
   const accountDetailsRef = useRef(null);
-  const connectToastRef = useRef<ReactText>();
 
   useOutsideClick(
     accountDetailsRef,
     () => showAccountDetail && setShowAccountDetail(false),
   );
-
-  const handleConnect = async () => {
-    const connectToast = () =>
-      (connectToastRef.current = toast('Connecting', {
-        type: 'default',
-        position: 'top-center',
-      }));
-
-    if (data.connected) {
-      disconnect();
-    } else {
-      connectToast();
-      const provider = await detectEthereumProvider();
-      if (provider) {
-        connect(data.connectors[0])
-          .then(() => {
-            toast('Connected', {
-              type: 'success',
-              position: 'top-center',
-              autoClose: 2000,
-            });
-          })
-          .finally(() => {
-            toast.dismiss(connectToastRef.current);
-          });
-      } else {
-        toast.dismiss(connectToastRef.current);
-        toast('Please install metamask', {
-          type: 'error',
-          position: 'top-center',
-        });
-      }
-    }
-  };
 
   return (
     <>
@@ -108,12 +35,7 @@ export const Header: React.FC = () => {
           {!isTablet && showHamburgerMenu && (
             <StyledHamburgerMenu>
               <StyledHamburgerMenuContent>
-                <HeaderContent
-                  isConnected={data.connected}
-                  connectMetamask={handleConnect}
-                  isConnecting={loading ? loading : false}
-                  myUpLink={upAddressLink()}
-                />
+                <HeaderContent />
               </StyledHamburgerMenuContent>
             </StyledHamburgerMenu>
           )}
@@ -121,14 +43,7 @@ export const Header: React.FC = () => {
             <StyledLink to="/">
               <StyledLogo src={Logo} alt="" />
             </StyledLink>
-            {isTablet && (
-              <HeaderContent
-                isConnected={data.connected}
-                connectMetamask={handleConnect}
-                isConnecting={loading ? loading : false}
-                myUpLink={upAddressLink()}
-              />
-            )}
+            {isTablet && <HeaderContent />}
             {!isTablet && (
               <StyledHamburgerMenuButton
                 onClick={() => setShowHamburgerMenu(!showHamburgerMenu)}
@@ -147,40 +62,3 @@ export const Header: React.FC = () => {
     </>
   );
 };
-
-const HeaderContent = ({
-  isConnected,
-  connectMetamask,
-  myUpLink,
-  isConnecting,
-}: HeaderContentType) => (
-  <>
-    <StyledButtonConainer>
-      {myUpLink && (
-        <StyledMyUpLink to={myUpLink}>
-          <StyledButtonIcon src={UserIcon} alt="" />
-          <StyledButtonText>My UP</StyledButtonText>
-        </StyledMyUpLink>
-      )}
-
-      <StyledConnectMetaMask
-        disabled={isConnecting}
-        onClick={() => {
-          connectMetamask();
-        }}
-      >
-        <StyledButtonIcon src={WalletIcon} alt="" />
-        <StyledButtonText>
-          {isConnected ? 'Disconnect wallet' : 'Connect wallet'}
-        </StyledButtonText>
-      </StyledConnectMetaMask>
-      <StyledSignUpLink
-        href="https://app.fanzone.io/login"
-        target="_blank"
-        rel="noreferrer"
-      >
-        {myUpLink ? 'Go to Fanzone App' : 'Sign up'}
-      </StyledSignUpLink>
-    </StyledButtonConainer>
-  </>
-);

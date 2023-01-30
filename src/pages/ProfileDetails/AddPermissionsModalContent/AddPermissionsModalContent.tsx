@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, Signer } from 'ethers';
 import React, { useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
 import { NetworkName, StringBoolean } from '../../../boot/types';
@@ -39,7 +39,7 @@ type formInput = {
 };
 
 export const AddPermissionsModalContent = ({ profile, network }: IProps) => {
-  const [{ data }] = useSigner();
+  const { data: signer } = useSigner();
   const [permissionsForm, setpermissionsForm] = useState<formInput>({
     upAddress: profile ? profile.address : '',
     addressTo: '',
@@ -129,12 +129,12 @@ export const AddPermissionsModalContent = ({ profile, network }: IProps) => {
       ethers.utils.isAddress(permissionsForm.upAddress) &&
       ethers.utils.isAddress(permissionsForm.addressTo)
     ) {
-      data &&
+      signer &&
         (await KeyManagerApi.addPermissions(
           permissionsForm.upAddress,
           permissionsForm.addressTo,
           permissionsForm.permissions,
-          data,
+          signer as Signer,
         ));
     }
   };

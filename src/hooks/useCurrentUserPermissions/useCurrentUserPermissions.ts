@@ -26,7 +26,7 @@ export const useCurrentUserPermissions = (profileAddress: Address | null) => {
   );
 
   const { network } = useUrlParams();
-  const [{ data: account }] = useAccount();
+  const { address: account } = useAccount();
   const activeProfile = useSelector(
     (state: RootState) =>
       profileAddress && selectUserById(state.userData[network], profileAddress),
@@ -43,7 +43,7 @@ export const useCurrentUserPermissions = (profileAddress: Address | null) => {
 
     const _currentUsersPermissionsSet = getAddressPermissionsOnUniversalProfile(
       activeProfile.permissionSet,
-      account.address,
+      account,
     );
 
     _currentUsersPermissionsSet !== undefined

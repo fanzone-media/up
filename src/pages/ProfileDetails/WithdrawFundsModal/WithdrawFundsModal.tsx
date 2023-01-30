@@ -38,7 +38,7 @@ export const WithdrawFundsModal = ({ profile, network, onDismiss }: IProps) => {
   const [balances, setBalances] = useState<
     Array<{ balance: BigNumber; address: string }>
   >([]);
-  const [{ data: account }] = useAccount();
+  const { address: account } = useAccount();
   const [selectedTokenInput, setSelectedTokenInput] = useState<Address>('');
   const whiteListedtokensAddresses = getWhiteListedTokenAddresses(network);
 
@@ -135,7 +135,7 @@ export const WithdrawFundsModal = ({ profile, network, onDismiss }: IProps) => {
             (await withdrawFunds(
               profile,
               selectedTokenInput,
-              account.address,
+              account,
               selectedTokenBalance ? selectedTokenBalance : 0,
             ))
           }

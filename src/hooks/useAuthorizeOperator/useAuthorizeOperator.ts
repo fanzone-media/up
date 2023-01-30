@@ -1,3 +1,4 @@
+import { Signer } from 'ethers';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useSigner } from 'wagmi';
@@ -27,7 +28,7 @@ export const useAuthorizeOperator = (
     selectUserById(state.userData[network], upAddress),
   );
 
-  const [{ data: signer }] = useSigner();
+  const { data: signer } = useSigner();
 
   useEffect(() => {
     getIsOperator();
@@ -68,13 +69,13 @@ export const useAuthorizeOperator = (
           ? LSP4DigitalAssetApi.encodeApproveErc721(
               assetAddress,
               operatorAddress,
-              signer,
+              signer as Signer,
               tokenId,
             )
           : LSP4DigitalAssetApi.encodeAuthorizeOperator(
               assetAddress,
               operatorAddress,
-              signer,
+              signer as Signer,
               tokenId,
             );
 
@@ -83,13 +84,13 @@ export const useAuthorizeOperator = (
           profile.address,
           assetAddress,
           encodedAuthorizeOperator,
-          signer,
+          signer as Signer,
         );
 
         await KeyManagerApi.executeTransactionViaKeyManager(
           profile.owner,
           encodedExecuteData,
-          signer,
+          signer as Signer,
         );
 
         setIsAuthorized(true);
@@ -101,7 +102,7 @@ export const useAuthorizeOperator = (
         profile.address,
         assetAddress,
         encodedAuthorizeOperator,
-        signer,
+        signer as Signer,
       );
 
       setIsAuthorized(true);

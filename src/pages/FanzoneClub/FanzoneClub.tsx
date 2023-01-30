@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useCallback, useMemo } from 'react';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, ethers, Signer } from 'ethers';
 import {
   useAccount,
   useConnect,
@@ -49,14 +49,14 @@ const FanzoneClub: FC = () => {
     return [[1], 'Ethereum', '0x4b406ACb6C43Caf306e4662AAf3a4C8e085e6439', 2];
   }, [location]);
 
-  const [{ data: connectData }] = useConnect();
-  const [{ data: network }] = useNetwork();
-  const [{ data: signer }] = useSigner();
-  const [{ data: account }] = useAccount();
+  const { isConnected } = useAccount();
+  const { chain } = useNetwork();
+  const { data: signer } = useSigner();
+  const { address: account } = useAccount();
   const fanzoneClubContract = useContract({
-    addressOrName: fanzoneClubContractAddress,
-    contractInterface: FanzoneClubABI,
-    signerOrProvider: signer,
+    address: fanzoneClubContractAddress,
+    abi: FanzoneClubABI as {}[],
+    signerOrProvider: signer as Signer,
   });
   const [status, setStatus] = useState<STATUS>(STATUS.IDLE);
   const [transactionResponse, setTransactionResponse] = useState<{
@@ -84,63 +84,55 @@ const FanzoneClub: FC = () => {
   const mintFanzoneClubCard = useCallback(async () => {
     setError('');
     setStatus(STATUS.LOADING);
-    await fanzoneClubContract
-      .mint(formInput.amount, true, {
-        value: formInput.maticAmount,
-      })
-      .then(async (transaction: TransactionResponse) => {
-        await transaction.wait(1).then((receipt) => {
-          setTransactionResponse({
-            tokenIdMinted: parseInt(receipt.logs[1].topics[3]),
-            transactionHash: receipt.transactionHash,
+    fanzoneClubContract &&
+      (await fanzoneClubContract
+        .mint(formInput.amount, true, {
+          value: formInput.maticAmount,
+        })
+        .then(async (transaction: TransactionResponse) => {
+          await transaction.wait(1).then((receipt) => {
+            setTransactionResponse({
+              tokenIdMinted: parseInt(receipt.logs[1].topics[3]),
+              transactionHash: receipt.transactionHash,
+            });
+            setStatus(STATUS.SUCCESSFUL);
           });
-          setStatus(STATUS.SUCCESSFUL);
-        });
-      })
-      .catch((err: any) => {
-        setError(err.data ? err.data.message : err.message);
-        setStatus(STATUS.IDLE);
-      });
+        })
+        .catch((err: any) => {
+          setError(err.data ? err.data.message : err.message);
+          setStatus(STATUS.IDLE);
+        }));
   }, [fanzoneClubContract, formInput.amount, formInput.maticAmount]);
 
   const whitelistMint = useCallback(async () => {
     setError('');
     setStatus(STATUS.LOADING);
     if (!account) return;
-    await fanzoneClubContract
-      .whitelistMint(
-        formInput.amount,
-        true,
-        await getHexProof(account.address),
-        {
+    fanzoneClubContract &&
+      (await fanzoneClubContract
+        .whitelistMint(formInput.amount, true, await getHexProof(account), {
           value: formInput.maticAmount,
-        },
-      )
-      .then(async (transaction: TransactionResponse) => {
-        await transaction.wait(1).then((receipt) => {
-          setTransactionResponse({
-            tokenIdMinted: parseInt(receipt.logs[1].topics[3]),
-            transactionHash: receipt.transactionHash,
+        })
+        .then(async (transaction: TransactionResponse) => {
+          await transaction.wait(1).then((receipt) => {
+            setTransactionResponse({
+              tokenIdMinted: parseInt(receipt.logs[1].topics[3]),
+              transactionHash: receipt.transactionHash,
+            });
+            setStatus(STATUS.SUCCESSFUL);
           });
-          setStatus(STATUS.SUCCESSFUL);
-        });
-      })
-      .catch((err: any) => {
-        setError(
-          err.reason ? err.reason : err.data ? err.data.message : err.message,
-        );
-        setStatus(STATUS.IDLE);
-      });
+        })
+        .catch((err: any) => {
+          setError(
+            err.reason ? err.reason : err.data ? err.data.message : err.message,
+          );
+          setStatus(STATUS.IDLE);
+        }));
   }, [fanzoneClubContract, formInput.amount, formInput.maticAmount, account]);
 
   const validConnection = useMemo(
-    () =>
-      isValidConnection(
-        connectData.connected,
-        network.chain?.id || 0,
-        validChainIds,
-      ),
-    [connectData.connected, network.chain, validChainIds],
+    () => isValidConnection(isConnected, chain?.id || 0, validChainIds),
+    [isConnected, chain, validChainIds],
   );
 
   useEffect(() => {
@@ -151,7 +143,7 @@ const FanzoneClub: FC = () => {
         maticAmount: await fanzoneClubContract.price(),
         publicSale: await fanzoneClubContract.publicSale(),
         whiteListSale: await fanzoneClubContract.whiteListSale(),
-        ownedPasses: await fanzoneClubContract.balanceOf(account.address),
+        ownedPasses: await fanzoneClubContract.balanceOf(account),
       });
     })();
     // Adding formInput to the dependencies array will end up in an infinit loop
@@ -162,7 +154,7 @@ const FanzoneClub: FC = () => {
     <StyledFanzoneClubPage>
       <StyledFanzoneClubFormContainer>
         <StyledFanzoneClubCardsImg src={FanzoneClubCardsImg} alt="" />
-        {!connectData.connected ? (
+        {!isConnected ? (
           <StyledErrorMessage>
             Wallet not connected! Please connect via Metamask first
           </StyledErrorMessage>

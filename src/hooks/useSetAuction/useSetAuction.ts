@@ -10,10 +10,11 @@ import { LSP3ProfileApi } from '../../services/controllers/LSP3Profile';
 import { KeyManagerApi } from '../../services/controllers/KeyManager';
 import { convertPrice, STATUS } from '../../utility';
 import { IProfile } from '../../services/models';
+import { Signer } from 'ethers';
 
 export const useSetAuction = () => {
   const [auctioningState, setAuctioningState] = useState<STATUS>(STATUS.IDLE);
-  const [{ data: signer }] = useSigner();
+  const { data: signer } = useSigner();
 
   const setForAuction = async (
     profile: IProfile,
@@ -34,7 +35,7 @@ export const useSetAuction = () => {
         acceptedToken,
         convertPrice(minimumBid, acceptedTokenDecimals),
         duration,
-        signer,
+        signer as Signer,
         network,
       );
 
@@ -43,13 +44,13 @@ export const useSetAuction = () => {
           profile.address,
           auctionContracts[network],
           encodedAuctionData,
-          signer,
+          signer as Signer,
         );
 
         await KeyManagerApi.executeTransactionViaKeyManager(
           profile.owner,
           encodedExecuteData,
-          signer,
+          signer as Signer,
         );
 
         setAuctioningState(STATUS.SUCCESSFUL);
@@ -60,7 +61,7 @@ export const useSetAuction = () => {
         profile.address,
         auctionContracts[network],
         encodedAuctionData,
-        signer,
+        signer as Signer,
       );
 
       setAuctioningState(STATUS.SUCCESSFUL);

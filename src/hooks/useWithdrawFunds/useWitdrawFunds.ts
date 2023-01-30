@@ -1,4 +1,4 @@
-import { BigNumberish } from 'ethers';
+import { BigNumberish, Signer } from 'ethers';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useSigner, useNetwork } from 'wagmi';
@@ -12,8 +12,8 @@ import { Address } from '../../utils/types';
 import { useRpcProvider } from '../useRpcProvider';
 
 export const useWitdrawFunds = (network: NetworkName) => {
-  const [{ data: signer }] = useSigner();
-  const [{ data: networkData }] = useNetwork();
+  const { data: signer } = useSigner();
+  const { chain } = useNetwork();
   const [error, setError] = useState();
   const [withdrawState, setWithdrawState] = useState<STATUS>(STATUS.IDLE);
   const provider = useRpcProvider(network);
@@ -41,7 +41,7 @@ export const useWitdrawFunds = (network: NetworkName) => {
     toAddress: Address,
     amount: BigNumberish,
   ) => {
-    if (networkData.chain?.name !== network) {
+    if (chain?.name !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }
@@ -54,7 +54,7 @@ export const useWitdrawFunds = (network: NetworkName) => {
           profile.address,
           amount,
           toAddress,
-          signer,
+          signer as Signer,
         )
           .then(() => {
             setWithdrawState(STATUS.SUCCESSFUL);
@@ -70,7 +70,7 @@ export const useWitdrawFunds = (network: NetworkName) => {
           profile.address,
           amount,
           toAddress,
-          signer,
+          signer as Signer,
         )
           .then(() => {
             setWithdrawState(STATUS.SUCCESSFUL);

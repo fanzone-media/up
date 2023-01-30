@@ -1,3 +1,4 @@
+import { Signer } from 'ethers';
 import { isAddress } from 'ethers/lib/utils';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -15,8 +16,8 @@ import {
 } from '../useLocalStorage';
 
 export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
-  const [{ data: signer }] = useSigner();
-  const [{ data: networkData }] = useNetwork();
+  const { data: signer } = useSigner();
+  const { chain } = useNetwork();
   const { getItems } = useLocalStorage();
   const localReferrerAddress = getItems(
     LOCAL_STORAGE_KEYS.REFERRER,
@@ -36,7 +37,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
     tokenId: number,
     universalProfileAddress?: string,
   ) => {
-    if (networkData.chain?.name !== network) {
+    if (chain?.name !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }
@@ -64,7 +65,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           universalProfileAddress,
           tokenId,
           amount,
-          signer,
+          signer as Signer,
           referrerAddress,
         )
           .then(() => {
@@ -82,7 +83,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           universalProfileAddress,
           tokenId,
           amount,
-          signer,
+          signer as Signer,
           referrerAddress,
         )
           .then(() => {
@@ -98,7 +99,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
           assetAddress,
           tokenId,
           amount,
-          signer,
+          signer as Signer,
           referrerAddress,
         )
           .then(() => {

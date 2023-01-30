@@ -57,6 +57,8 @@ import NftExchangeIcon from './nft-exchange-icon.svg';
 import BodyBackground from './body-background.png';
 import SettingIcon from './setting-icon.svg';
 import ExclamationIcon from './exclamation-icon.svg';
+import WalletConnectIcon from './walletconnect-icon.png';
+import MetaMaskIcon from './metamask-icon.png';
 
 export {
   BgMetaCard,
@@ -118,4 +120,6 @@ export {
   BodyBackground,
   SettingIcon,
   ExclamationIcon,
+  WalletConnectIcon,
+  MetaMaskIcon,
 };

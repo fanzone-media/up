@@ -1,4 +1,4 @@
-import { BigNumberish } from 'ethers';
+import { BigNumberish, Signer } from 'ethers';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNetwork, useSigner } from 'wagmi';
@@ -10,8 +10,8 @@ import { IProfile } from '../../services/models';
 import { convertPrice, STATUS } from '../../utility';
 
 export const useSellLsp8Token = () => {
-  const [{ data: signer }] = useSigner();
-  const [{ data: networkData }] = useNetwork();
+  const { data: signer } = useSigner();
+  const { chain } = useNetwork();
   const [sellState, setSellState] = useState<STATUS>(STATUS.IDLE);
 
   const setForSale = async (
@@ -27,7 +27,7 @@ export const useSellLsp8Token = () => {
       toast('wallet not connected', { type: 'error', position: 'top-right' });
       return;
     }
-    if (networkData.chain?.name !== network) {
+    if (chain?.name !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }
@@ -39,7 +39,7 @@ export const useSellLsp8Token = () => {
         mint,
         tokenAddress,
         convertPrice(amount, decimals),
-        signer,
+        signer as Signer,
       );
 
       if (ownerProfile.isOwnerKeyManager) {
@@ -47,13 +47,13 @@ export const useSellLsp8Token = () => {
           ownerProfile.address,
           assetAddress,
           encodedSetMarketForData,
-          signer,
+          signer as Signer,
         );
 
         await KeyManagerApi.executeTransactionViaKeyManager(
           ownerProfile.owner,
           encodedExecuteData,
-          signer,
+          signer as Signer,
         );
 
         setSellState(STATUS.SUCCESSFUL);
@@ -64,7 +64,7 @@ export const useSellLsp8Token = () => {
         ownerProfile.address,
         assetAddress,
         encodedSetMarketForData,
-        signer,
+        signer as Signer,
       );
 
       setSellState(STATUS.SUCCESSFUL);

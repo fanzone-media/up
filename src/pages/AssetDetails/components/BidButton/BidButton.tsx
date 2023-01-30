@@ -15,7 +15,7 @@ interface IProps {
 
 export const Bidbutton = ({ asset, auctionMarket }: IProps) => {
   const { network } = useUrlParams();
-  const [{ data: signer }] = useSigner();
+  const { data: signer } = useSigner();
   const toastRef = useRef<ReactText>();
 
   const handleOnClick = () => {

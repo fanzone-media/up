@@ -26,11 +26,11 @@ export const useTransferLsp8Token = (
 ) => {
   const [transferState, setTransferState] = useState<STATUS>(STATUS.IDLE);
   const [error, setError] = useState();
-  const [{ data: signer }] = useSigner();
-  const [{ data: networkData }] = useNetwork();
+  const { data: signer } = useSigner();
+  const { chain } = useNetwork();
 
   const transferCard = async () => {
-    if (networkData.chain?.name !== network) {
+    if (chain?.name !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }

@@ -28,6 +28,7 @@ import {
   StyledErrorIcon,
 } from './styles';
 import { ExclamationIcon } from '../../../assets';
+import { Signer } from 'ethers';
 
 interface IProps {
   onDismiss: () => void;
@@ -68,7 +69,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
     [profile.links],
   );
 
-  const [{ data: signer }] = useSigner();
+  const { data: signer } = useSigner();
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [txVerification, setTxVerification] = useState<boolean>(false);
@@ -238,12 +239,12 @@ export const ProfileEditModal: React.FC<IProps> = ({
             profile.owner,
             profile.address,
             data,
-            signer,
+            signer as Signer,
           )
         : LSP3ProfileApi.setUniversalProfileData(
             profile.address,
             data,
-            signer,
+            signer as Signer,
           ));
 
       setTxVerification(true);

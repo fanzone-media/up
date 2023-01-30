@@ -1,3 +1,4 @@
+import { Signer } from 'ethers';
 import { useState } from 'react';
 import { useSigner } from 'wagmi';
 import { NetworkName } from '../../boot/types';
@@ -20,7 +21,7 @@ export const useRemoveAuction = (
   const [removeAuctionState, setRemoveAuctionState] = useState<STATUS>(
     STATUS.IDLE,
   );
-  const [{ data: signer }] = useSigner();
+  const { data: signer } = useSigner();
 
   const removeAuction = async () => {
     setRemoveAuctionState(STATUS.LOADING);
@@ -30,7 +31,7 @@ export const useRemoveAuction = (
       const encodedRemoveAuctionData = AuctionApi.encodeCancelAuctionFor(
         assetAddress,
         tokenId,
-        signer,
+        signer as Signer,
         network,
       );
 
@@ -39,13 +40,13 @@ export const useRemoveAuction = (
           profile.address,
           auctionContracts[network],
           encodedRemoveAuctionData,
-          signer,
+          signer as Signer,
         );
 
         await KeyManagerApi.executeTransactionViaKeyManager(
           profile.owner,
           encodedExecuteData,
-          signer,
+          signer as Signer,
         );
 
         setRemoveAuctionState(STATUS.SUCCESSFUL);
@@ -57,7 +58,7 @@ export const useRemoveAuction = (
         profile.address,
         auctionContracts[network],
         encodedRemoveAuctionData,
-        signer,
+        signer as Signer,
       );
 
       setRemoveAuctionState(STATUS.SUCCESSFUL);

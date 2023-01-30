@@ -1,3 +1,4 @@
+import { Signer } from 'ethers';
 import { useEffect, useState } from 'react';
 import { useSigner } from 'wagmi';
 import { NetworkName } from '../../boot/types';
@@ -18,7 +19,7 @@ export const useClaimAuctionTokens = (
   profile: IProfile,
   network: NetworkName,
 ) => {
-  const [{ data: signer }] = useSigner();
+  const { data: signer } = useSigner();
   const [claimableTokens, setClaimableTokens] = useState<
     IClaimableAuctionToken[] | null
   >(null);
@@ -61,7 +62,7 @@ export const useClaimAuctionTokens = (
         profile.address,
         tokenAddress,
         network,
-        signer,
+        signer as Signer,
       );
 
       if (profile.isOwnerKeyManager) {
@@ -69,13 +70,13 @@ export const useClaimAuctionTokens = (
           profile.address,
           auctionContracts[network],
           encodedAuctionData,
-          signer,
+          signer as Signer,
         );
 
         await KeyManagerApi.executeTransactionViaKeyManager(
           profile.owner,
           encodedExecuteData,
-          signer,
+          signer as Signer,
         );
 
         setState(STATUS.SUCCESSFUL);
@@ -86,7 +87,7 @@ export const useClaimAuctionTokens = (
         profile.address,
         auctionContracts[network],
         encodedAuctionData,
-        signer,
+        signer as Signer,
       );
 
       setState(STATUS.SUCCESSFUL);

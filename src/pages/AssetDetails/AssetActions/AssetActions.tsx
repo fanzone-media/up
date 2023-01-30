@@ -33,11 +33,11 @@ export const AssetActions = ({
   marketForTokenId,
 }: IProps) => {
   const { network, address, tokenId } = useUrlParams();
-  const [{ data: account }] = useAccount();
+  const { address: account } = useAccount();
 
   const { transferCard, transferState } = useTransferLsp8Token(
     address,
-    account ? account.address : '',
+    account ? account : '',
     Number(tokenId),
     activeProfile ? activeProfile : ({} as IProfile),
     network,

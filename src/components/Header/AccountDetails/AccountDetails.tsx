@@ -7,7 +7,7 @@ import {
 } from './styles';
 
 export const AccountDetails = React.forwardRef((_props: any, ref: any) => {
-  const [{ data }, disconnect] = useAccount();
+  // const [{ data }, disconnect] = useAccount();
   //const [{data: dataSigner}] = useSigner();
 
   // const getBalance = async () => {
@@ -23,10 +23,10 @@ export const AccountDetails = React.forwardRef((_props: any, ref: any) => {
   return (
     <StyledAccountDetailsModal ref={ref}>
       <StyledAddressLabel>Address:</StyledAddressLabel>
-      {data?.address}
+      {/* {data?.address}
       <StyledDisconnectButton onClick={() => disconnect()}>
         Disconnect
-      </StyledDisconnectButton>
+      </StyledDisconnectButton> */}
     </StyledAccountDetailsModal>
   );
 });

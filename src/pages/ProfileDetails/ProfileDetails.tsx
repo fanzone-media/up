@@ -94,8 +94,8 @@ const ProfileDetails: React.FC = () => {
   const { pathname } = useLocation();
   let query = useQueryParams();
   const { setItem, setReferrer } = useLocalStorage();
-  const [{ data: account }] = useAccount();
-  const [{ data: signer }] = useSigner();
+  const { address: account } = useAccount();
+  const { data: signer } = useSigner();
 
   const { range: issuedAssetsRange, setRange: setIssuedAssetsRange } =
     usePagination();
@@ -138,11 +138,11 @@ const ProfileDetails: React.FC = () => {
 
   const [canTransfer, canSetData, canTransferValue, canAddPermissions] =
     useMemo(() => {
-      if (!profile || !account) return [false, false, false];
+      if (!profile || !account) return [false, false, false, false];
 
       const permissionsSet = getAddressPermissionsOnUniversalProfile(
         profile.permissionSet,
-        account.address,
+        account,
       );
 
       return [
@@ -433,8 +433,7 @@ const ProfileDetails: React.FC = () => {
                 account &&
                 profile.ownedAssets.length > 0 &&
                 (canTransfer ||
-                  profile.owner.toLowerCase() ===
-                    account.address.toLowerCase()) && (
+                  profile.owner.toLowerCase() === account.toLowerCase()) && (
                   <StyledOpenTransferModalButton
                     onClick={onPresentTransferCardsModal}
                   >
@@ -445,8 +444,7 @@ const ProfileDetails: React.FC = () => {
                 profile &&
                 account &&
                 (canSetData ||
-                  profile.owner.toLowerCase() ===
-                    account.address.toLowerCase()) && (
+                  profile.owner.toLowerCase() === account.toLowerCase()) && (
                   <StyledOpenEditProfileModal
                     onClick={onPresentProfileEditModal}
                   >
@@ -461,8 +459,7 @@ const ProfileDetails: React.FC = () => {
               {profile &&
                 account &&
                 (canTransfer ||
-                  profile.owner.toLowerCase() ===
-                    account.address.toLowerCase()) && (
+                  profile.owner.toLowerCase() === account.toLowerCase()) && (
                   <StyledClaimAuctionTokenButton
                     onClick={onPresentClaimAuctionTokensModal}
                   >

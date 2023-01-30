@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, Signer } from 'ethers';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAccount, useNetwork, useSigner } from 'wagmi';
@@ -14,15 +14,19 @@ interface IProps {
 }
 
 export const useErc20 = ({ tokenAddress, network }: IProps) => {
-  const [{ data: signer }] = useSigner();
-  const [{ data: account }] = useAccount();
-  const [{ data: networkData }] = useNetwork();
+  const { data: signer } = useSigner();
+  const { address: account } = useAccount();
+  const { chain } = useNetwork();
   const [error, setError] = useState();
   const [approveError, setApproveError] = useState<string>();
   const [isApproved, setIsApproved] = useState<boolean>(false);
   const provider = useRpcProvider(network);
   const erc20Contract = useMemo(
-    () => ERC20__factory.connect(tokenAddress, signer ? signer : provider),
+    () =>
+      ERC20__factory.connect(
+        tokenAddress,
+        signer ? (signer as Signer) : provider,
+      ),
     [provider, signer, tokenAddress],
   );
 
@@ -32,7 +36,7 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
     network: NetworkName,
     universalProfileAddress?: string,
   ) => {
-    if (networkData.chain?.name !== network) {
+    if (chain?.name !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }
@@ -40,7 +44,7 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
     const buyer = universalProfileAddress
       ? universalProfileAddress
       : account
-      ? account.address
+      ? account
       : '';
 
     const balance = await checkBalanceOf(buyer);
@@ -81,7 +85,7 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
           spenderAddress,
           tokenAddress,
           amount,
-          signer,
+          signer as Signer,
         )
           .then(() => {
             setIsApproved(true);
@@ -97,7 +101,7 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
           spenderAddress,
           tokenAddress,
           amount,
-          signer,
+          signer as Signer,
         )
           .then(() => {
             setIsApproved(true);

@@ -49,9 +49,6 @@ const Routes: React.FC = () => {
               <Route exact path="/up/fanzoneSportsClub">
                 <FanzoneClub />
               </Route>
-              <Route exact path="/up/test/fanzoneSportsClub">
-                <FanzoneClub />
-              </Route>
               <Route exact path="/up/:network/addpermissions">
                 <Permissions />
               </Route>
