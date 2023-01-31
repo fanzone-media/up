@@ -35,8 +35,10 @@ export const HeaderContent = () => {
         toast.update(toastRef.current, {
           render: 'Disconnected',
           type: 'warning',
-          isLoading: false,
+          closeOnClick: true,
+          closeButton: true,
           autoClose: 2000,
+          isLoading: false,
         });
       }
     },
@@ -45,8 +47,10 @@ export const HeaderContent = () => {
         toast.update(toastRef.current, {
           render: 'Something went wrong',
           type: 'error',
-          isLoading: false,
+          closeOnClick: true,
+          closeButton: true,
           autoClose: 2000,
+          isLoading: false,
         });
       }
     },

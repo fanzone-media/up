@@ -4,9 +4,9 @@ import './App.css';
 import { theme } from './boot/styles';
 import Routes from './routes';
 import { ModalProvider } from './context/ModalProvider';
+import { Web3Provider } from './boot/Web3Provider';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Web3Provider } from './boot/Web3Provider';
 
 const App: React.FC = () => {
   return (
