@@ -1,5 +1,6 @@
 import detectEthereumProvider from '@metamask/detect-provider';
-import { useEffect, useState } from 'react';
+import { ReactText, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useConnect } from 'wagmi';
 import { MetaMaskIcon, WalletConnectIcon } from '../../assets';
 import {
@@ -21,11 +22,38 @@ interface IProps {
 }
 
 export const Web3WalletConnectModalContent = ({ onDismiss }: IProps) => {
+  const toastRef = useRef<ReactText>();
+
   const { connect } = useConnect({
+    onMutate() {
+      toast.dismiss(toastRef.current);
+      toastRef.current = toast.loading('connecting', {
+        position: 'top-center',
+      });
+    },
     onSuccess() {
+      if (toastRef && toastRef.current) {
+        toast.update(toastRef.current, {
+          render: 'Connected',
+          type: 'success',
+          isLoading: false,
+          autoClose: 2000,
+        });
+      }
       onDismiss();
     },
+    onError() {
+      if (toastRef && toastRef.current) {
+        toast.update(toastRef.current, {
+          render: 'Connection failed',
+          type: 'error',
+          isLoading: false,
+          autoClose: 2000,
+        });
+      }
+    },
   });
+
   const [isMetaMaskInstalled, setIsMetaMaskInstalled] =
     useState<boolean>(false);
 
