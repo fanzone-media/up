@@ -37,7 +37,7 @@ export const useBuyLsp8Token = (assetAddress: string, network: NetworkName) => {
     tokenId: number,
     universalProfileAddress?: string,
   ) => {
-    if (chain?.name !== network) {
+    if (chain?.name.toLowerCase() !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }

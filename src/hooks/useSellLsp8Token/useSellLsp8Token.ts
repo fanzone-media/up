@@ -27,7 +27,8 @@ export const useSellLsp8Token = () => {
       toast('wallet not connected', { type: 'error', position: 'top-right' });
       return;
     }
-    if (chain?.name !== network) {
+    if (chain?.name.toLowerCase() !== network) {
+      console.log(chain?.name);
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }

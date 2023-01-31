@@ -30,7 +30,7 @@ export const useTransferLsp8Token = (
   const { chain } = useNetwork();
 
   const transferCard = async () => {
-    if (chain?.name !== network) {
+    if (chain?.name.toLowerCase() !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }

@@ -41,7 +41,7 @@ export const useWitdrawFunds = (network: NetworkName) => {
     toAddress: Address,
     amount: BigNumberish,
   ) => {
-    if (chain?.name !== network) {
+    if (chain?.name.toLowerCase() !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }

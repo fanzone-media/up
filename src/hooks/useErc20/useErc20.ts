@@ -36,7 +36,7 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
     network: NetworkName,
     universalProfileAddress?: string,
   ) => {
-    if (chain?.name !== network) {
+    if (chain?.name.toLowerCase() !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }

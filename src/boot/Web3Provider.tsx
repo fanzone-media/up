@@ -51,7 +51,7 @@ const l16: Chain = {
 };
 
 const { chains, provider } = configureChains(
-  [mainnet, polygon, polygonMumbai, l14, l16],
+  [mainnet, polygon, { ...polygonMumbai, name: 'Mumbai' }, l14, l16],
   [
     publicProvider(),
     alchemyProvider({

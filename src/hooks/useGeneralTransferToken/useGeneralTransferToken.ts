@@ -34,7 +34,7 @@ export const useGeneralTransferToken = (
   }, [dispatch, fromAddress, network, profile]);
 
   const transferCard = useCallback(async () => {
-    if (chain?.name !== network) {
+    if (chain?.name.toLowerCase() !== network) {
       toast('Wrong Network', { type: 'error', position: 'top-right' });
       return;
     }
