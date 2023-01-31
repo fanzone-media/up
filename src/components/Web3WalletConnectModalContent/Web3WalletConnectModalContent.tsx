@@ -18,12 +18,14 @@ import {
 } from './styles';
 
 interface IProps {
+  toastRef: React.MutableRefObject<ReactText | undefined>;
   onDismiss: () => any;
 }
 
-export const Web3WalletConnectModalContent = ({ onDismiss }: IProps) => {
-  const toastRef = useRef<ReactText>();
-
+export const Web3WalletConnectModalContent = ({
+  toastRef,
+  onDismiss,
+}: IProps) => {
   const { connect } = useConnect({
     onMutate() {
       toast.dismiss(toastRef.current);
