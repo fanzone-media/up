@@ -11,7 +11,7 @@ export const auctionContracts = {
   l14: '',
   l16: '0xEA1062CC65A0601C2adAA5e27B40e886726F3FE2',
   ethereum: '',
-  polygon: '0x1B29547c6bD8F9312331B5f059F6572526D0Da59',
+  polygon: '0x4cad844314a281960ce639d7783587e4bc0da591',
   mumbai: '',
 };
 
