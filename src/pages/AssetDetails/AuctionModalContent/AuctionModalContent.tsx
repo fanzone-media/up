@@ -64,7 +64,9 @@ export const AuctionModalContent = ({
   const acceptedTokenDetails = useMemo(
     () =>
       whiteListedTokens.find(
-        (item) => item.tokenAddress.toLowerCase() === auctionForm.acceptedToken,
+        (item) =>
+          item.tokenAddress.toLowerCase() ===
+          auctionForm.acceptedToken.toLowerCase(),
       ),
     [auctionForm.acceptedToken, whiteListedTokens],
   );
@@ -224,7 +226,6 @@ export const AuctionModalContent = ({
         </StyledModalButton>
       </StyledModalButtonsWrapper>
       <TransactionStateWindow
-        height="full"
         state={auctioningState}
         transactionMessages={transactionStatesMessages}
       />

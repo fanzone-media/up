@@ -82,7 +82,7 @@ const Routes: React.FC = () => {
               <Route exact path="/embed/:network/assetmarket/:add">
                 <EmbedMarket />
               </Route>
-              <Route exact path="/embed/:network/assetItem/:add/:id">
+              <Route exact path="/embed/:network/assetItem/:upaddress/:add/:id">
                 <EmbedSetPrice />
               </Route>
               <Route exact path="/embed/:network/auctionmarket/:add">

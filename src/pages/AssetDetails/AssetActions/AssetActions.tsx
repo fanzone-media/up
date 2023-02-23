@@ -8,6 +8,7 @@ import { displayPrice, STATUS } from '../../../utility';
 import { AuctionModalContent } from '../AuctionModalContent';
 import { BuyCardButton } from '../components/BuyCardButton';
 import { SellCardModal } from '../SellCardModal';
+import { WithdrawCardAuctionModal } from '../WithdrawCardAuctionModal';
 import { WithdrawCardSaleModalContent } from '../WithdrawCardSaleModalContent';
 import {
   StyledActionsButtonWrapper,
@@ -34,6 +35,9 @@ export const AssetActions = ({
 }: IProps) => {
   const { network, address, tokenId } = useUrlParams();
   const { address: account } = useAccount();
+  const auctionMarketForTokenId = asset?.auctionMarket?.find(
+    (market) => Number(market.tokenId) === Number(tokenId),
+  );
 
   const { transferCard, transferState } = useTransferLsp8Token(
     address,
@@ -104,6 +108,23 @@ export const AssetActions = ({
     'Auction',
   );
 
+  const {
+    handlePresent: onPresentWithdrawCardAuctionModal,
+    onDismiss: onDismissWithdrawCardAuctionModal,
+  } = useModal(
+    asset && activeProfile && (
+      <WithdrawCardAuctionModal
+        profile={activeProfile}
+        assetAddress={address}
+        tokenId={Number(tokenId)}
+        network={network}
+        onDismiss={() => onDismissWithdrawCardAuctionModal()}
+      />
+    ),
+    'Withdraw Card Auction Modal',
+    'Withdraw from Auction',
+  );
+
   return (
     <>
       {currentUsersPermissions.call === '0' && marketForTokenId && (
@@ -129,25 +150,27 @@ export const AssetActions = ({
           </StyledActionsButtonWrapper>
         </>
       )}
-      {!marketForTokenId && currentUsersPermissions.call === '1' && (
-        <>
-          <StyledActionsButtonWrapper>
-            <StyledSetPriceButton onClick={onPresentSellCardModal}>
-              Set price
-            </StyledSetPriceButton>
-            <StyledSetForAuctionButton onClick={onPresentAuctionModal}>
-              Set for Auction
-            </StyledSetForAuctionButton>
-          </StyledActionsButtonWrapper>
-          <StyledActionsButtonWrapper>
-            <StyledSetPriceButton onClick={transferCard}>
-              {transferState === STATUS.LOADING
-                ? 'Transfering to metamask account…'
-                : 'Transfer to metamask account'}
-            </StyledSetPriceButton>
-          </StyledActionsButtonWrapper>
-        </>
-      )}
+      {!marketForTokenId &&
+        !auctionMarketForTokenId &&
+        currentUsersPermissions.call === '1' && (
+          <>
+            <StyledActionsButtonWrapper>
+              <StyledSetPriceButton onClick={onPresentSellCardModal}>
+                Set price
+              </StyledSetPriceButton>
+              <StyledSetForAuctionButton onClick={onPresentAuctionModal}>
+                Set for Auction
+              </StyledSetForAuctionButton>
+            </StyledActionsButtonWrapper>
+            <StyledActionsButtonWrapper>
+              <StyledSetPriceButton onClick={transferCard}>
+                {transferState === STATUS.LOADING
+                  ? 'Transfering to metamask account…'
+                  : 'Transfer to metamask account'}
+              </StyledSetPriceButton>
+            </StyledActionsButtonWrapper>
+          </>
+        )}
       {marketForTokenId && currentUsersPermissions.call === '1' && (
         <>
           <StyledCardPriceValueWrapper>
@@ -166,6 +189,22 @@ export const AssetActions = ({
             </StyledChangePriceButton>
             <StyledWithdrawButton onClick={onPresentWithdrawCardSaleModal}>
               Withdraw from sale
+            </StyledWithdrawButton>
+          </StyledActionsButtonWrapper>
+          <StyledActionsButtonWrapper>
+            <StyledSetPriceButton onClick={transferCard}>
+              {transferState === STATUS.LOADING
+                ? 'Transfering to metamask account…'
+                : 'Transfer to metamask account'}
+            </StyledSetPriceButton>
+          </StyledActionsButtonWrapper>
+        </>
+      )}
+      {auctionMarketForTokenId && currentUsersPermissions.call === '1' && (
+        <>
+          <StyledActionsButtonWrapper>
+            <StyledWithdrawButton onClick={onPresentWithdrawCardAuctionModal}>
+              Withdraw from Auction
             </StyledWithdrawButton>
           </StyledActionsButtonWrapper>
           <StyledActionsButtonWrapper>

@@ -1,16 +1,16 @@
 import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { useAppDispatch } from '../../../boot/store';
-import { RootState } from '../../../boot/types';
-import { fetchOwnerAddressOfTokenId } from '../../../features/profiles';
-import { useModal } from '../../../hooks';
+import { NetworkName, RootState } from '../../../boot/types';
+import { currentProfile } from '../../../features/profiles';
+import { useFetchAuctionMarket, useModal } from '../../../hooks';
 import { useActiveProfile } from '../../../hooks/useActiveProfile';
 import { useCurrentUserPermissions } from '../../../hooks/useCurrentUserPermissions';
 import { useFetchAsset } from '../../../hooks/useFetchAsset';
 import { useFetchMarkets } from '../../../hooks/useFetchMarkets';
 import { useMintMarket } from '../../../hooks/useMintMarket';
-import { useUrlParams } from '../../../hooks/useUrlParams';
 import { STATUS } from '../../../utility';
 import { AssetActions } from '../../AssetDetails/AssetActions';
 import { ClaimAuctionTokens } from '../../ProfileDetails/ClaimAuctionTokens';
@@ -23,7 +23,19 @@ import {
 } from './styles';
 
 export const EmbedSetPrice = () => {
-  const { address, network, tokenId } = useUrlParams();
+  // const { address, network, tokenId } = useUrlParams();
+
+  const {
+    add: address,
+    network,
+    id: tokenId,
+    upaddress,
+  } = useParams<{
+    network: NetworkName;
+    add: string;
+    id: string;
+    upaddress: string;
+  }>();
   const dispatch = useAppDispatch();
   const { address: account } = useAccount();
 
@@ -49,18 +61,12 @@ export const EmbedSetPrice = () => {
 
   const currentMintMarket = useMintMarket(address, tokenId);
 
+  useFetchAuctionMarket(address);
+
   useEffect(() => {
-    if (!tokenId || !address || !account || tokenIdOwnerStatus !== STATUS.IDLE)
-      return;
-    dispatch(
-      fetchOwnerAddressOfTokenId({
-        assetAddress: address,
-        tokenId,
-        network,
-      }),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, address, tokenId, network]);
+    if (upaddress === wasActiveProfile) return;
+    dispatch(currentProfile(upaddress));
+  }, [address, dispatch, upaddress, wasActiveProfile]);
 
   const {
     handlePresent: onPresentClaimAuctionTokensModal,
