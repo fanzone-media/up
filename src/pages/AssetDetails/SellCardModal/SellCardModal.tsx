@@ -2,6 +2,7 @@ import React, { useMemo, useState, useContext, useEffect } from 'react';
 import { NetworkName } from '../../../boot/types';
 import { CardPriceInfoForModal } from '../components/CardPriceInfoForModal';
 import {
+  StyledErrorMessage,
   StyledInputGroup,
   StyledSellCardModalContent,
   StyledTokenSelectorDropDown,
@@ -9,15 +10,15 @@ import {
 import { IProfile, IWhiteListedTokens } from '../../../services/models';
 import { InputField } from '../../../components/InputField';
 import { displayPrice, STATUS } from '../../../utility';
-import { BigNumberish } from 'ethers';
-import { useSellLsp8Token } from '../../../hooks/useSellLsp8Token';
-import { getWhiteListedTokenAddresses } from '../../../utility/content/addresses';
+import { WHITE_LISTED_TOKENS } from '../../../utility/content/addresses';
 import {
   StyledModalButton,
   StyledModalButtonsWrapper,
 } from '../../../components/Modal/styles';
 import { TransactionStateWindow } from '../../../components/TransactionStateWindow';
 import { ModalContext } from '../../../context/ModalProvider';
+import { useSetForSale } from '../../../hooks';
+import { useAccount, useNetwork } from 'wagmi';
 
 interface IProps {
   onDismiss: () => void;
@@ -42,17 +43,41 @@ export const SellCardModal = ({
   marketTokenAddress,
   network,
 }: IProps) => {
+  const { isConnected } = useAccount();
+  const { chain } = useNetwork();
+
+  const whiteListedTokensAddress = Object.keys(WHITE_LISTED_TOKENS[network]);
+
   const [sellForm, setSellForm] = useState<{
-    amount: BigNumberish;
+    amount: number;
     tokenAddress: string;
   }>({
     amount: 0,
-    tokenAddress:
-      whiteListedTokens && whiteListedTokens.length > 0
-        ? whiteListedTokens[0].tokenAddress
-        : '',
+    tokenAddress: whiteListedTokensAddress[0],
   });
-  const { setForSale, sellState } = useSellLsp8Token();
+  const [sellStatus, setSellStatus] = useState<STATUS>(STATUS.IDLE);
+  const isMarketAlreadySet = !!price && !!marketTokenAddress;
+  const isCorrectNetwork = isConnected && chain?.name.toLowerCase() === network;
+
+  const { setForSale, error: sellError } = useSetForSale(
+    {
+      lsp8Address: address,
+      mintNumber: mint,
+      network,
+    },
+    {
+      onMutate() {
+        setSellStatus(STATUS.LOADING);
+      },
+      onSuccess() {
+        setSellStatus(STATUS.SUCCESSFUL);
+      },
+      onError() {
+        setSellStatus(STATUS.FAILED);
+      },
+    },
+  );
+
   const { onDismissCallback } = useContext(ModalContext);
 
   const changeHandler = (
@@ -64,42 +89,28 @@ export const SellCardModal = ({
     });
   };
 
-  const selectedTokenDecimals = useMemo(() => {
-    const selectedToken =
-      whiteListedTokens &&
-      whiteListedTokens.find(
-        (item) => item.tokenAddress === sellForm.tokenAddress,
-      );
-    if (selectedToken) {
-      return selectedToken.decimals;
-    }
-    return 1;
-  }, [sellForm.tokenAddress, whiteListedTokens]);
-
-  const marketTokenDecimals =
-    whiteListedTokens &&
-    whiteListedTokens.find((i) => i.tokenAddress === marketTokenAddress)
-      ?.decimals;
-
-  const whiteListedtokensAddresses = getWhiteListedTokenAddresses(network);
-
-  const transactionStatesMessages = {
-    loading: {
-      mainHeading: 'SETTING FOR SALE...',
-    },
-    successful: {
-      mainHeading: 'SUCCESSFULLY SET FOR SALE',
-    },
-    failed: {
-      mainHeading: 'SOMETHING WENT WRONG',
-    },
-  };
+  const transactionStatesMessages = useMemo(
+    () => ({
+      loading: {
+        mainHeading: 'SETTING FOR SALE...',
+      },
+      successful: {
+        mainHeading: 'SUCCESSFULLY SET FOR SALE',
+      },
+      failed: {
+        mainHeading: 'SOMETHING WENT WRONG',
+        description: sellError ? sellError : undefined,
+        callback: () => setSellStatus(STATUS.IDLE),
+      },
+    }),
+    [sellError],
+  );
 
   useEffect(() => {
-    sellState === STATUS.SUCCESSFUL &&
+    sellStatus === STATUS.SUCCESSFUL &&
       onDismissCallback(() => window.location.reload());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sellState]);
+  }, [sellStatus]);
 
   return (
     <StyledSellCardModalContent>
@@ -107,37 +118,52 @@ export const SellCardModal = ({
         address={address}
         mint={mint}
         price={
-          price &&
-          displayPrice(price, marketTokenDecimals ? marketTokenDecimals : 0)
+          isMarketAlreadySet
+            ? displayPrice(
+                price,
+                WHITE_LISTED_TOKENS[network][marketTokenAddress.toLowerCase()]
+                  .decimals,
+              )
+            : undefined
         }
         cardImg={cardImg}
       />
       {whiteListedTokens && (
-        <StyledInputGroup>
-          <InputField
-            name="amount"
-            label="Your Price"
-            type="number"
-            changeHandler={changeHandler}
-          />
-          <StyledTokenSelectorDropDown
-            name="tokenAddress"
-            onChange={changeHandler}
-          >
-            {whiteListedTokens?.map((item, i) => (
-              <option
-                key={i}
-                value={item.tokenAddress}
-                selected={
-                  item.tokenAddress.toLowerCase() ===
-                  whiteListedtokensAddresses[0].toLowerCase()
-                }
-              >
-                {item.symbol}
-              </option>
-            ))}
-          </StyledTokenSelectorDropDown>
-        </StyledInputGroup>
+        <>
+          {!isConnected && (
+            <StyledErrorMessage>wallet not connected</StyledErrorMessage>
+          )}
+
+          {!isCorrectNetwork && (
+            <StyledErrorMessage>
+              connected to wrong network ({chain?.name})
+            </StyledErrorMessage>
+          )}
+          <StyledInputGroup>
+            <InputField
+              name="amount"
+              label="Your Price"
+              type="number"
+              changeHandler={changeHandler}
+            />
+            <StyledTokenSelectorDropDown
+              name="tokenAddress"
+              onChange={changeHandler}
+            >
+              {whiteListedTokensAddress?.map((item, i) => (
+                <option
+                  key={i}
+                  value={item}
+                  selected={
+                    item.toLowerCase() === sellForm.tokenAddress.toLowerCase()
+                  }
+                >
+                  {WHITE_LISTED_TOKENS[network][item].symbol}
+                </option>
+              ))}
+            </StyledTokenSelectorDropDown>
+          </StyledInputGroup>
+        </>
       )}
       <StyledModalButtonsWrapper>
         <StyledModalButton variant="gray" onClick={onDismiss}>
@@ -145,17 +171,25 @@ export const SellCardModal = ({
         </StyledModalButton>
         <StyledModalButton
           onClick={() =>
-            setForSale(
-              address,
-              ownerProfile,
-              mint,
-              sellForm.tokenAddress,
-              sellForm.amount,
-              selectedTokenDecimals,
-              network,
-            )
+            setForSale({
+              price: sellForm.amount,
+              acceptedToken: sellForm.tokenAddress,
+              executeVia:
+                ownerProfile && ownerProfile.isOwnerKeyManager
+                  ? {
+                      type: 'Key_Manager',
+                      upOwnerAddress: ownerProfile.owner,
+                      upAddress: ownerProfile.address,
+                    }
+                  : {
+                      type: 'Universal_Profile',
+                      upAddress: ownerProfile.address,
+                    },
+            })
           }
           disabled={
+            !isConnected ||
+            !isCorrectNetwork ||
             !whiteListedTokens ||
             whiteListedTokens?.length === 0 ||
             sellForm.amount <= 0
@@ -165,7 +199,7 @@ export const SellCardModal = ({
         </StyledModalButton>
       </StyledModalButtonsWrapper>
       <TransactionStateWindow
-        state={sellState}
+        state={sellStatus}
         transactionMessages={transactionStatesMessages}
       />
     </StyledSellCardModalContent>

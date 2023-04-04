@@ -31,6 +31,63 @@ export const getWhiteListedTokenAddresses = (network: NetworkName) => {
   return whiteListedTokens[network];
 };
 
+export const WHITE_LISTED_TOKENS: {
+  [key in NetworkName]: {
+    [key in Address]: { symbol: string; decimals: number };
+  };
+} = {
+  polygon: {
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': {
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619': {
+      symbol: 'WETH',
+      decimals: 18,
+    },
+  },
+  mumbai: {
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': {
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619': {
+      symbol: 'WETH',
+      decimals: 18,
+    },
+  },
+  ethereum: {
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': {
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619': {
+      symbol: 'WETH',
+      decimals: 18,
+    },
+  },
+  l16: {
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': {
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619': {
+      symbol: 'WETH',
+      decimals: 18,
+    },
+  },
+  l14: {
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': {
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619': {
+      symbol: 'WETH',
+      decimals: 18,
+    },
+  },
+};
+
 export const defaultReferrerAddress = {
   polygon: ethers.constants.AddressZero,
   mumbai: ethers.constants.AddressZero,

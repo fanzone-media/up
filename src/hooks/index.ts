@@ -1,7 +1,7 @@
 export * from './useActiveProfile';
 export * from './useAuctionOptions';
 export * from './useAuthorizeOperator';
-export * from './useBuyLsp8Token';
+export * from './useBuyFromMarket';
 export * from './useClaimAuctionTokens';
 export * from './useCopyText';
 export * from './useCurrentUserPermissions';
@@ -25,7 +25,7 @@ export * from './useQueryParams';
 export * from './useRemoveAuction';
 export * from './useRemoveMarketForLsp8Token';
 export * from './useRpcProvider';
-export * from './useSellLsp8Token';
+export * from './useSetForSale';
 export * from './useSetAuction';
 export * from './useSubmitBid';
 export * from './useTransferLsp8Token';

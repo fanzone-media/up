@@ -56,7 +56,7 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
 
     const allowance = await checkAllowance(buyer, spenderAddress);
 
-    if (allowance && allowance.toNumber() >= amount) {
+    if (allowance && Number(allowance.toString()) >= amount) {
       setIsApproved(true);
       return;
     }
@@ -93,6 +93,8 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
           .catch((err) => {
             setError(err);
           }));
+
+      return;
     }
     if (owner && universalProfileAddress) {
       signer &&
@@ -134,7 +136,7 @@ export const useErc20 = ({ tokenAddress, network }: IProps) => {
 
   const checkBalanceOf = async (address: string): Promise<number> => {
     const balance = await erc20Contract.balanceOf(address);
-    return balance.toNumber();
+    return Number(balance.toString());
   };
 
   const resetApproveState = () => {

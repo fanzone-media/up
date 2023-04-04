@@ -21,10 +21,12 @@ interface IProps {
     successful: {
       mainHeading: string;
       description?: string;
+      callback?: () => any;
     };
     failed: {
       mainHeading: string;
       description?: string;
+      callback?: () => any;
     };
   };
 }
@@ -58,9 +60,19 @@ export const TransactionStateWindow = ({
             <StyledStateDescription>
               {transactionMessages[state]?.description}
             </StyledStateDescription>
-            {callback && state === STATUS.FAILED && (
-              <StyledTryButton onClick={callback}>Try again</StyledTryButton>
-            )}
+            {state === STATUS.SUCCESSFUL &&
+              transactionMessages[state]?.callback && (
+                <StyledTryButton onClick={transactionMessages[state].callback}>
+                  Proceed
+                </StyledTryButton>
+              )}
+            {state === STATUS.FAILED &&
+              transactionMessages[state] &&
+              transactionMessages[state]?.callback && (
+                <StyledTryButton onClick={transactionMessages[state].callback}>
+                  Try again
+                </StyledTryButton>
+              )}
           </StyledStateContent>
         </StyledProcessingWindow>
       )}

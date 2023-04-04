@@ -24,3 +24,7 @@ export const StyledInputGroup = styled.div`
 export const StyledTokenSelectorDropDown = styled.select`
   background: none;
 `;
+
+export const StyledErrorMessage = styled.p`
+  color: red;
+`;

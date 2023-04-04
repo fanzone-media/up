@@ -32,5 +32,7 @@ export const StyledStateDescription = styled.p``;
 export const StyledTryButton = styled.button`
   background-color: rgba(255, 129, 1, 1);
   border-radius: 0.2em;
-  padding: 0.3em 0;
+  padding: 0.3em 2em;
+  margin: 0 auto;
+  width: max-content;
 `;

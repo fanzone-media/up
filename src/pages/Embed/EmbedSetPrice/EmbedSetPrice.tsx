@@ -55,13 +55,16 @@ export const EmbedSetPrice = () => {
 
   const { activeProfile } = useActiveProfile();
 
-  const { asset, status: assetStatus } = useFetchAsset(address);
+  const { asset, status: assetStatus } = useFetchAsset(address.toLowerCase());
 
-  const { status: marketStatus } = useFetchMarkets(address);
+  const { status: marketStatus } = useFetchMarkets(address.toLowerCase());
 
-  const currentMintMarket = useMintMarket(address, tokenId);
+  const currentMintMarket = useMintMarket(
+    address.toLowerCase(),
+    tokenId ? tokenId : '',
+  );
 
-  useFetchAuctionMarket(address);
+  useFetchAuctionMarket(address.toLowerCase());
 
   useEffect(() => {
     if (upaddress === wasActiveProfile) return;

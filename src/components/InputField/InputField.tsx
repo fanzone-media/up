@@ -1,10 +1,11 @@
+import { InputHTMLAttributes } from 'react';
 import {
   StyledInputContainer,
   StyledPriceInput,
   StyledPriceLabel,
 } from './styles';
 
-interface IProps {
+interface IProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
   type: string;
