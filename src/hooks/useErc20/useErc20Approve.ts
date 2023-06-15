@@ -103,7 +103,7 @@ export const useErc20Approve = (
 
       const encodedApprove = erc20Contract.interface.encodeFunctionData(
         'approve',
-        [spenderAddress, amount],
+        [spenderAddress, amount.toString()],
       );
 
       if (executeVia.type === 'Key_Manager') {
@@ -189,7 +189,10 @@ export const useErc20Approve = (
 
       onMutate && onMutate({ ...hookParams, ...funcParams });
 
-      const transaction = await erc20Contract.approve(spenderAddress, amount);
+      const transaction = await erc20Contract.approve(
+        spenderAddress,
+        amount.toString(),
+      );
 
       onTransaction &&
         onTransaction({ ...hookParams, ...funcParams }, transaction);

@@ -57,7 +57,7 @@ export const SellCardModal = ({
   });
   const [sellStatus, setSellStatus] = useState<STATUS>(STATUS.IDLE);
   const isMarketAlreadySet = !!price && !!marketTokenAddress;
-  const isCorrectNetwork = isConnected && chain?.name.toLowerCase() === network;
+  const isCorrectNetwork = chain?.name.toLowerCase() === network;
 
   const { setForSale, error: sellError } = useSetForSale(
     {
@@ -134,7 +134,7 @@ export const SellCardModal = ({
             <StyledErrorMessage>wallet not connected</StyledErrorMessage>
           )}
 
-          {!isCorrectNetwork && (
+          {isConnected && !isCorrectNetwork && (
             <StyledErrorMessage>
               connected to wrong network ({chain?.name})
             </StyledErrorMessage>

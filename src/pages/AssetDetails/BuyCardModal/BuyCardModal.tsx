@@ -160,7 +160,7 @@ export const BuyCardModal = ({
     [isLoadingBalances, isLoadingAllowance],
   );
 
-  const isCorrectNetwork = isConnected && chain?.name.toLowerCase() === network;
+  const isCorrectNetwork = chain?.name.toLowerCase() === network;
 
   const changeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -237,7 +237,7 @@ export const BuyCardModal = ({
         {!isConnected && (
           <StyledErrorMessage>wallet not connected</StyledErrorMessage>
         )}
-        {!isCorrectNetwork && (
+        {isConnected && !isCorrectNetwork && (
           <StyledErrorMessage>
             connected to wrong network ({chain?.name})
           </StyledErrorMessage>

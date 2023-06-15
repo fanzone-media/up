@@ -112,7 +112,7 @@ export const useBuyFromMarket = (
       const encodedBuyFromMarket =
         cardTokenContract.interface.encodeFunctionData('buyFromMarket', [
           tokenIdBytes,
-          price,
+          price.toString(),
           referrer,
         ]);
 
