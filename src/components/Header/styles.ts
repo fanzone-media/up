@@ -4,7 +4,8 @@ import styled from 'styled-components';
 export const StyledHeader = styled.header<{ $showHamburger: boolean }>`
   background-color: black;
   display: flex;
-  height: 54px;
+  flex-direction: column;
+  // height: 54px;
   color: white;
   border-bottom: 1px solid #858585;
   position: ${({ $showHamburger }) => ($showHamburger ? 'fixed' : 'relative')};
@@ -12,7 +13,7 @@ export const StyledHeader = styled.header<{ $showHamburger: boolean }>`
   z-index: 10;
 
   @media ${({ theme }) => theme.screen.sm} {
-    height: 65px;
+    // height: 65px;
   }
 `;
 
@@ -20,15 +21,34 @@ export const StyledHeaderContent = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-  padding: 0 8px;
+  padding: 8px 8px;
+  border-bottom: 1px solid white;
 
   @media ${({ theme }) => theme.screen.md} {
     display: grid;
     max-width: 1440px;
     margin: 0 auto;
-    padding: 0 40px;
+    padding: 10px 40px;
     grid-template-columns: 1fr 1fr;
   }
+`;
+
+export const StyledNotice = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  text-align: justify;
+  padding: 8px 8px;
+
+  @media ${({ theme }) => theme.screen.md} {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 8px 40px;
+  }
+`;
+
+export const StyledDownloadLink = styled.a`
+  color: blue;
 `;
 
 export const StyledHamburgerMenu = styled.div`
