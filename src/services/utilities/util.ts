@@ -5,7 +5,7 @@ export default class Utils {
   }
 
   static getURL(hash: string) {
-    return `https://ipfs.fanzone.io/ipfs/${hash}`;
+    return `https://fanzone.mypinata.cloud/ipfs/${hash}`;
   }
 
   static logstream(log: string) {
