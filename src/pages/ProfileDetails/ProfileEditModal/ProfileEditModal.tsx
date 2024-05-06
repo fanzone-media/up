@@ -269,7 +269,7 @@ export const ProfileEditModal: React.FC<IProps> = ({
   const getImageUrl = useCallback((url: string) => {
     return url.includes('ipfs.infura-ipfs.io')
       ? url
-      : `https://ipfs.fanzone.io/${sanitizeLink(url)}`;
+      : `https://fanzone.mypinata.cloud/${sanitizeLink(url)}`;
   }, []);
 
   return !loading && !error ? (
